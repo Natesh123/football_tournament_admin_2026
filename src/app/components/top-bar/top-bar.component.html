@@ -1,0 +1,73 @@
+<nav class="bg-black-main/80 backdrop-blur-md border-b border-black-border">
+    <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-28">
+            <!-- Logo -->
+            <div class="flex items-center gap-4">
+                <img src="images/logo-gold.png" alt="Gold Manager Logo"
+                    class="h-24 w-auto object-contain mix-blend-screen">
+                <span class="text-2xl font-bold tracking-tight text-gold ml-2">ATB SPORT</span>
+            </div>
+
+            <!-- Navigation Links -->
+            <div class="hidden md:flex items-center gap-8">
+                <a routerLink="/dashboard"
+                    routerLinkActive="!text-gold !opacity-100 drop-shadow-[0_0_8px_rgba(255,215,0,0.5)]"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                    class="text-lg font-bold uppercase tracking-wider text-text-muted hover:text-gold hover:drop-shadow-[0_0_8px_rgba(255,215,0,0.5)] transition-all duration-300 cursor-pointer">{{
+                    'TOPBAR.DASHBOARD' | translate }}</a>
+                <a routerLink="/tournaments"
+                    routerLinkActive="!text-gold !opacity-100 drop-shadow-[0_0_8px_rgba(255,215,0,0.5)]"
+                    class="text-lg font-bold uppercase tracking-wider text-text-muted hover:text-gold hover:drop-shadow-[0_0_8px_rgba(255,215,0,0.5)] transition-all duration-300 cursor-pointer">{{
+                    'TOPBAR.TOURNAMENTS' | translate }}</a>
+                <a href="#"
+                    class="text-lg font-bold uppercase tracking-wider text-text-muted hover:text-gold hover:drop-shadow-[0_0_8px_rgba(255,215,0,0.5)] transition-all duration-300">{{
+                    'TOPBAR.TEAMS' | translate }}</a>
+                <a href="#"
+                    class="text-lg font-bold uppercase tracking-wider text-text-muted hover:text-gold hover:drop-shadow-[0_0_8px_rgba(255,215,0,0.5)] transition-all duration-300">{{
+                    'TOPBAR.SETTINGS' | translate }}</a>
+            </div>
+
+            <!-- Right Actions -->
+            <div class="flex items-center gap-6">
+                <!-- Search -->
+                <!-- DaisyUI Search Input -->
+                <label
+                    class="input input-bordered input-sm flex items-center gap-2 bg-white/5 backdrop-blur-md border-[#D4AF37]/50 text-gold rounded-full hover:border-[#D4AF37] focus-within:border-[#D4AF37] focus-within:outline-none w-48 transition-all duration-300 focus-within:w-64 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+                    <input type="text" class="grow bg-transparent text-gold placeholder-white/30"
+                        [placeholder]="'TOPBAR.SEARCH' | translate" />
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"
+                        class="w-4 h-4 opacity-70">
+                        <path fill-rule="evenodd"
+                            d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </label>
+
+                <!-- DaisyUI Language Select -->
+                <div class="relative group">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gold z-10 pointer-events-none group-hover:drop-shadow-[0_0_5px_rgba(255,215,0,0.5)] transition-all duration-300"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <select (change)="setLang($event)" [value]="currentLang()"
+                        class="select select-bordered select-sm pl-10 bg-white/5 backdrop-blur-md border-[#D4AF37]/50 text-gold rounded-full hover:border-[#D4AF37] focus:border-[#D4AF37] focus:outline-none w-full max-w-xs shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+                        @for (lang of languages; track lang.code) {
+                        <option [value]="lang.code" class="bg-black-card text-gold font-bold">{{ lang.label }}
+                            ({{lang.code | uppercase}})</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- User Profile (DaisyUI Avatar with Logo) -->
+                <div class="avatar cursor-pointer group">
+                    <div
+                        class="w-10 rounded-full ring ring-[#D4AF37] ring-offset-black-main ring-offset-2 group-hover:ring-[#F1D37E] transition-all duration-300 bg-black-card">
+                        <img src="images/logo-gold.png" alt="Profile" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,187 @@
+@if (isLoading()) {
+<div class="h-[calc(100vh-64px)] flex items-center justify-center">
+    <app-loader></app-loader>
+</div>
+} @else {
+<div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="space-y-6">
+
+
+
+
+
+        <!-- Tabs -->
+        <div class="border-b border-white/10 flex gap-8">
+            <button class="pb-3 text-sm font-bold tracking-wider relative transition-colors"
+                [class.text-gold]="currentTab() === 'live'" [class.text-text-muted]="currentTab() !== 'live'"
+                (click)="switchTab('live')">
+                ● LIVE
+                @if (currentTab() === 'live') {
+                <span class="absolute bottom-0 left-0 w-full h-0.5 bg-gold"></span>
+                }
+            </button>
+            <button
+                class="pb-3 text-sm font-bold tracking-wider relative transition-colors text-text-muted hover:text-white"
+                [class.text-white]="currentTab() === 'upcoming'" [class.text-gold]="currentTab() === 'upcoming'"
+                (click)="switchTab('upcoming')">
+                UPCOMING
+                @if (currentTab() === 'upcoming') {
+                <span class="absolute bottom-0 left-0 w-full h-0.5 bg-gold"></span>
+                }
+            </button>
+            <button
+                class="pb-3 text-sm font-bold tracking-wider relative transition-colors text-text-muted hover:text-white"
+                [class.text-white]="currentTab() === 'past'" [class.text-gold]="currentTab() === 'past'"
+                (click)="switchTab('past')">
+                PAST TOURNAMENTS
+                @if (currentTab() === 'past') {
+                <span class="absolute bottom-0 left-0 w-full h-0.5 bg-gold"></span>
+                }
+            </button>
+            <button
+                class="pb-3 text-sm font-bold tracking-wider relative transition-colors text-text-muted hover:text-white"
+                [class.text-white]="currentTab() === 'archived'" [class.text-gold]="currentTab() === 'archived'"
+                (click)="switchTab('archived')">
+                ARCHIVED
+                @if (currentTab() === 'archived') {
+                <span class="absolute bottom-0 left-0 w-full h-0.5 bg-gold"></span>
+                }
+            </button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="grid gap-6">
+            @for (tournament of activeTournaments; track tournament.id) {
+            <div
+                class="bg-black-card border border-white/10 rounded-xl p-6 flex flex-col lg:flex-row gap-6 hover:border-gold/50 hover:bg-white/5 hover:scale-[1.01] hover:shadow-[0_0_30px_rgba(212,175,55,0.15)] transition-all duration-300 group cursor-pointer relative overflow-hidden">
+
+                <!-- Decorative Glow Background -->
+                <div
+                    class="absolute inset-0 bg-gradient-to-r from-transparent via-gold/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                </div>
+                <!-- Image -->
+                <div class="lg:w-1/4 relative rounded-lg overflow-hidden bg-zinc-800 aspect-video lg:aspect-auto">
+                    <!-- Image Placeholder -->
+                    <div class="absolute inset-0 bg-zinc-700/50 flex items-center justify-center">
+                        <span class="text-zinc-500">Image</span>
+                    </div>
+                    <div class="absolute bottom-3 left-3 bg-gold text-black text-xs font-bold px-2 py-0.5 rounded">
+                        {{ tournament.tag }}
+                    </div>
+                </div>
+
+                <!-- Details -->
+                <div class="flex-1 flex flex-col justify-between">
+                    <div class="flex items-start justify-between">
+                        <h3 class="text-xl font-bold text-white group-hover:text-gold transition-colors">{{
+                            tournament.title }}</h3>
+                        <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded border"
+                            [class]="tournament.statusClass">
+                            {{ tournament.status }}
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                        <div>
+                            <div class="text-[10px] text-text-muted font-bold uppercase tracking-wider mb-1">
+                                SCHEDULE
+                            </div>
+                            <div class="text-sm font-semibold text-white flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gold" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                {{ tournament.schedule }}
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-text-muted font-bold uppercase tracking-wider mb-1">
+                                PARTICIPANTS</div>
+                            <div class="text-sm font-semibold text-white flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gold" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                                {{ tournament.participants }}
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-text-muted font-bold uppercase tracking-wider mb-1">PRIZE
+                                POOL
+                            </div>
+                            <div class="text-sm font-semibold text-gold flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                {{ tournament.prizePool }}
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-text-muted font-bold uppercase tracking-wider mb-1">
+                                @if(currentTab() === 'past' || currentTab() === 'archived') { WINNER } @else {
+                                CURRENT ROUND }
+                            </div>
+                            <div class="text-sm font-semibold text-white flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gold" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                </svg>
+                                {{ tournament.currentRound }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex lg:flex-col gap-3 justify-center lg:w-48 relative z-10">
+                    <button
+                        class="flex-1 bg-transparent hover:bg-white/5 border border-white/20 text-white hover:border-gold/50 hover:text-gold font-bold py-2.5 px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 group/btn">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4 transition-transform group-hover/btn:scale-110" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        View Details
+                    </button>
+                    <button
+                        class="flex-1 bg-gold hover:bg-gold/90 text-black font-bold py-2.5 px-4 rounded-lg transition-all duration-300 hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] flex items-center justify-center gap-2 transform hover:-translate-y-0.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.532 1.532 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        Manage
+                    </button>
+                </div>
+            </div>
+            }
+        </div>
+
+        <!-- Stats Footer -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 mb-12">
+            @for (stat of stats; track stat.label) {
+            <div class="bg-black-card border border-white/10 rounded-xl p-6 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full bg-gold/20 flex items-center justify-center text-gold">
+                    <!-- Icon Placeholder -->
+                    <span class="text-xl">🏆</span>
+                </div>
+                <div>
+                    <div class="text-[10px] font-bold text-text-muted uppercase tracking-wider">{{ stat.label }}
+                    </div>
+                    <div class="text-2xl font-bold text-white">{{ stat.value }}</div>
+                </div>
+            </div>
+            }
+        </div>
+
+    </div>
+</div>
+}

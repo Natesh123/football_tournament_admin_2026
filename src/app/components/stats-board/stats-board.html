@@ -1,0 +1,60 @@
+<!-- System Overview & Live Activity -->
+<div class="grid grid-cols-1 gap-6 mb-8 mt-8">
+    <!-- SECTION 1: SYSTEM OVERVIEW -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        @for (stat of platformStats; track stat.label) {
+        <div
+            class="bg-black-card border border-white/10 rounded-xl p-4 flex items-center gap-4 hover:border-gold/30 hover:shadow-[0_0_15px_rgba(212,175,55,0.1)] transition-all relative overflow-hidden group">
+            <!-- Gradient Border Effect -->
+            <div
+                class="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-transparent via-gold/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+            </div>
+
+            <div class="w-12 h-12 rounded-full bg-gold/10 flex items-center justify-center text-gold shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="stat.icon" />
+                </svg>
+            </div>
+            <div>
+                <div class="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-0.5">{{ stat.label
+                    }}</div>
+                <div class="text-2xl font-bold text-white">{{ stat.value }}</div>
+            </div>
+        </div>
+        }
+    </div>
+
+    <!-- SECTION 2: LIVE & TODAY ACTIVITY -->
+    @if (showAllSections) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        @for (activity of activityStats; track activity.label) {
+        <div class="bg-black-card border rounded-xl p-4 flex items-center gap-4 hover:bg-white/5 transition-all relative overflow-hidden group"
+            [class]="activity.borderClass + ' ' + activity.bgClass">
+
+            <div class="w-10 h-10 rounded-full flex items-center justify-center opacity-80 shrink-0"
+                [class]="activity.colorClass + ' bg-white/5'">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="activity.icon" />
+                </svg>
+            </div>
+
+            <div>
+                <div class="text-[10px] font-bold uppercase tracking-wider text-white/70 mb-1">{{ activity.label }}
+                </div>
+                <div class="text-3xl font-bold" [class]="activity.colorClass">{{ activity.value }}</div>
+            </div>
+
+            <!-- Pulsing dot for Live -->
+            @if (activity.type === 'live') {
+            <div class="absolute top-3 right-3 flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+            </div>
+            }
+        </div>
+        }
+    </div>
+    }
+</div>

@@ -1,0 +1,29 @@
+{
+    "TOPBAR": {
+        "DASHBOARD": "Dashboard",
+        "TOURNAMENTS": "Tournaments",
+        "TEAMS": "Teams",
+        "SETTINGS": "Settings",
+        "SEARCH": "Search",
+        "PROFILE": "Profile"
+    },
+    "MATCH_FEED": {
+        "TABS": {
+            "LIVE": "Live",
+            "UPCOMING": "Upcoming",
+            "PAST": "Past Results"
+        },
+        "VIEW_ALL": "VIEW ALL MATCHES",
+        "LIVE_MATCH": {
+            "STATUS": "LIVE",
+            "AGGREGATE": "Aggregate"
+        },
+        "UPCOMING_MATCH": {
+            "REMIND": "Remind"
+        },
+        "PAST_MATCH": {
+            "DETAILS": "Details",
+            "STATUS_FT": "FT"
+        }
+    }
+}
