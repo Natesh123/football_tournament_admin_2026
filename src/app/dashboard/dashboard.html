@@ -1,0 +1,17 @@
+<div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <app-hero></app-hero>
+
+    <!-- System Overview & Live Activity -->
+    <app-stats-board [platformStats]="platformStats" [activityStats]="activityStats"
+        [showAllSections]="true"></app-stats-board>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        <div class="lg:col-span-2 xl:col-span-3">
+            <app-match-feed></app-match-feed>
+        </div>
+        <div class="lg:col-span-1 xl:col-span-1">
+            <app-widgets></app-widgets>
+        </div>
+    </div>
+</div>

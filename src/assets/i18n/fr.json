@@ -1,0 +1,29 @@
+{
+    "TOPBAR": {
+        "DASHBOARD": "Tableau de bord",
+        "TOURNAMENTS": "Tournois",
+        "TEAMS": "Équipes",
+        "SETTINGS": "Paramètres",
+        "SEARCH": "Rechercher",
+        "PROFILE": "Profil"
+    },
+    "MATCH_FEED": {
+        "TABS": {
+            "LIVE": "En Direct",
+            "UPCOMING": "À Venir",
+            "PAST": "Résultats Passés"
+        },
+        "VIEW_ALL": "VOIR TOUS LES MATCHS",
+        "LIVE_MATCH": {
+            "STATUS": "EN DIRECT",
+            "AGGREGATE": "Agrégat"
+        },
+        "UPCOMING_MATCH": {
+            "REMIND": "Rappeler"
+        },
+        "PAST_MATCH": {
+            "DETAILS": "Détails",
+            "STATUS_FT": "FM"
+        }
+    }
+}

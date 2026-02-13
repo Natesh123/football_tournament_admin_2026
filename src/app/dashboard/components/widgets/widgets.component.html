@@ -1,0 +1,114 @@
+<div class="space-y-8">
+    <!-- Standings Widget -->
+    <div class="bg-black-card border border-black-border rounded-xl p-6">
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gold" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                <h3 class="font-bold">Premier Standings</h3>
+            </div>
+            <a href="#" class="text-xs text-gold hover:underline">Full Table</a>
+        </div>
+
+        <div class="space-y-3 font-mono text-sm">
+            <!-- Row 1 -->
+            <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
+                <div class="flex items-center gap-3">
+                    <span class="text-xs font-bold text-gray-500 w-4">1</span>
+                    <div
+                        class="w-6 h-6 bg-zinc-800 rounded-full flex items-center justify-center text-[10px] text-zinc-500">
+                        L</div>
+                    <span class="font-bold">Liverpool</span>
+                </div>
+                <div class="flex gap-4 text-xs">
+                    <span class="text-text-muted">24</span>
+                    <span class="font-bold text-gold">58</span>
+                </div>
+            </div>
+            <!-- Row 2 -->
+            <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
+                <div class="flex items-center gap-3">
+                    <span class="text-xs font-bold text-gray-500 w-4">2</span>
+                    <div
+                        class="w-6 h-6 bg-zinc-800 rounded-full flex items-center justify-center text-[10px] text-zinc-500">
+                        M</div>
+                    <span class="font-bold">Man City</span>
+                </div>
+                <div class="flex gap-4 text-xs">
+                    <span class="text-text-muted">24</span>
+                    <span class="font-bold text-gold">56</span>
+                </div>
+            </div>
+            <!-- Row 3 -->
+            <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
+                <div class="flex items-center gap-3">
+                    <span class="text-xs font-bold text-gray-500 w-4">3</span>
+                    <div
+                        class="w-6 h-6 bg-zinc-800 rounded-full flex items-center justify-center text-[10px] text-zinc-500">
+                        A</div>
+                    <span class="font-bold">Arsenal</span>
+                </div>
+                <div class="flex gap-4 text-xs">
+                    <span class="text-text-muted">24</span>
+                    <span class="font-bold text-gold">52</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Golden Boot Widget -->
+    <div class="bg-black-card border border-black-border rounded-xl p-6">
+        <div class="flex items-center gap-2 mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gold" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            <h3 class="font-bold">Golden Boot Race</h3>
+        </div>
+
+        <div class="space-y-4">
+            <div class="flex items-center gap-4">
+                <div class="h-10 w-10 bg-zinc-800 rounded-full flex-shrink-0 border border-gold/30"></div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-sm truncate">Erling Haaland</span>
+                        <span class="text-xs font-bold text-gold">21 G</span>
+                    </div>
+                    <div class="w-full bg-zinc-800 rounded-full h-1.5">
+                        <div class="bg-gold h-1.5 rounded-full" style="width: 85%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="h-10 w-10 bg-zinc-800 rounded-full flex-shrink-0"></div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-sm truncate">Mohamed Salah</span>
+                        <span class="text-xs font-bold text-text-muted">18 G</span>
+                    </div>
+                    <div class="w-full bg-zinc-800 rounded-full h-1.5">
+                        <div class="bg-zinc-600 h-1.5 rounded-full" style="width: 70%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Promo Widget -->
+    <div class="bg-gradient-to-br from-gold-mid to-gold-shadow rounded-xl p-6 text-black relative overflow-hidden">
+        <div class="relative z-10">
+            <div class="font-bold text-xs uppercase tracking-wider opacity-70 mb-2">Pro Feature</div>
+            <h3 class="text-2xl font-extrabold mb-2 leading-tight">UNLOCK<br>ANALYTICS</h3>
+            <p class="text-sm font-medium opacity-80 mb-4">Get detailed player stats and heatmaps.</p>
+            <button
+                class="bg-black text-gold text-xs font-bold uppercase py-2 px-4 rounded hover:bg-zinc-800 transition-colors">Upgrade
+                Now</button>
+        </div>
+        <!-- Decorative circle -->
+        <div class="absolute -bottom-6 -right-6 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+    </div>
+</div>
