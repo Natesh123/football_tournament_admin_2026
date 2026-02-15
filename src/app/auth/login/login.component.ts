@@ -3,15 +3,17 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../auth.service';
+import { PhysicsBallDirective } from '../physics-ball.directive';
 
 @Component({
     selector: 'app-login',
     templateUrl: './login.html',
     styleUrl: './login.css',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, RouterLink]
+    imports: [CommonModule, ReactiveFormsModule, RouterLink, PhysicsBallDirective]
 })
 export class LoginComponent {
+
 
     loginForm: FormGroup;
     errorMessage: string = '';
@@ -31,7 +33,6 @@ export class LoginComponent {
 
     login() {
         if (this.loginForm.invalid) {
-            // Mark all fields as touched to show validation errors
             Object.keys(this.loginForm.controls).forEach(key => {
                 this.loginForm.get(key)?.markAsTouched();
             });
@@ -46,13 +47,13 @@ export class LoginComponent {
             .subscribe({
                 next: (res: any) => {
                     this.isLoading = false;
-                    // Store email for OTP verification
-                    localStorage.setItem('email', this.loginForm.value.email);
-                    this.successMessage = res.message || 'OTP sent to your email';
-                    // Navigate to OTP page after a brief delay
-                    setTimeout(() => {
-                        this.router.navigate(['/auth/otp']);
-                    }, 1500);
+                    // Store token directly — no OTP step for login
+                    if (res.token) {
+                        localStorage.setItem('token', res.token);
+                    }
+                    this.successMessage = res.message || 'Login successful';
+                    // Navigate directly to dashboard
+                    this.router.navigate(['/dashboard']);
                 },
                 error: (err) => {
                     this.isLoading = false;

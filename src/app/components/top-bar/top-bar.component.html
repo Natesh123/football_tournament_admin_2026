@@ -1,29 +1,27 @@
-<nav class="bg-black-main/80 backdrop-blur-md border-b border-black-border">
+<nav class="bg-black-main/80 backdrop-blur-md border-b border-black-border sticky top-0 z-50">
     <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-28">
             <!-- Logo -->
             <div class="flex items-center gap-4">
                 <img src="images/logo-gold.png" alt="Gold Manager Logo"
                     class="h-24 w-auto object-contain mix-blend-screen">
-                <span class="text-2xl font-bold tracking-tight text-gold ml-2">ATB SPORT</span>
+                <span class="text-2xl font-bold tracking-tight text-gold-400 ml-2">ATB SPORTS</span>
             </div>
 
             <!-- Navigation Links -->
-            <div class="hidden md:flex items-center gap-8">
-                <a routerLink="/dashboard"
-                    routerLinkActive="!text-gold !opacity-100 drop-shadow-[0_0_8px_rgba(255,215,0,0.5)]"
+            <div class="flex items-center gap-8">
+                <a routerLink="/dashboard" routerLinkActive="!text-gold-400 border-b-2 border-gold-400"
                     [routerLinkActiveOptions]="{ exact: true }"
-                    class="text-lg font-bold uppercase tracking-wider text-text-muted hover:text-gold hover:drop-shadow-[0_0_8px_rgba(255,215,0,0.5)] transition-all duration-300 cursor-pointer">{{
+                    class="text-lg font-bold uppercase tracking-wider text-white hover:text-gold-400 transition-all duration-300 cursor-pointer pb-1">{{
                     'TOPBAR.DASHBOARD' | translate }}</a>
-                <a routerLink="/tournaments"
-                    routerLinkActive="!text-gold !opacity-100 drop-shadow-[0_0_8px_rgba(255,215,0,0.5)]"
-                    class="text-lg font-bold uppercase tracking-wider text-text-muted hover:text-gold hover:drop-shadow-[0_0_8px_rgba(255,215,0,0.5)] transition-all duration-300 cursor-pointer">{{
+                <a routerLink="/tournaments" routerLinkActive="!text-gold-400 border-b-2 border-gold-400"
+                    class="text-lg font-bold uppercase tracking-wider text-white hover:text-gold-400 transition-all duration-300 cursor-pointer pb-1">{{
                     'TOPBAR.TOURNAMENTS' | translate }}</a>
                 <a href="#"
-                    class="text-lg font-bold uppercase tracking-wider text-text-muted hover:text-gold hover:drop-shadow-[0_0_8px_rgba(255,215,0,0.5)] transition-all duration-300">{{
+                    class="text-lg font-bold uppercase tracking-wider text-white hover:text-gold-400 transition-all duration-300 pb-1">{{
                     'TOPBAR.TEAMS' | translate }}</a>
                 <a href="#"
-                    class="text-lg font-bold uppercase tracking-wider text-text-muted hover:text-gold hover:drop-shadow-[0_0_8px_rgba(255,215,0,0.5)] transition-all duration-300">{{
+                    class="text-lg font-bold uppercase tracking-wider text-white hover:text-gold-400 transition-all duration-300 pb-1">{{
                     'TOPBAR.SETTINGS' | translate }}</a>
             </div>
 
@@ -32,8 +30,8 @@
                 <!-- Search -->
                 <!-- DaisyUI Search Input -->
                 <label
-                    class="input input-bordered input-sm flex items-center gap-2 bg-white/5 backdrop-blur-md border-[#D4AF37]/50 text-gold rounded-full hover:border-[#D4AF37] focus-within:border-[#D4AF37] focus-within:outline-none w-48 transition-all duration-300 focus-within:w-64 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
-                    <input type="text" class="grow bg-transparent text-gold placeholder-white/30"
+                    class="input input-bordered input-sm flex items-center gap-2 bg-white/5 backdrop-blur-md border-gold-400/50 text-gold-400 rounded-full hover:border-gold-400 focus-within:border-gold-400 focus-within:outline-none w-48 transition-all duration-300 focus-within:w-64 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+                    <input type="text" class="grow bg-transparent text-gold-400 placeholder-white/30"
                         [placeholder]="'TOPBAR.SEARCH' | translate" />
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"
                         class="w-4 h-4 opacity-70">
@@ -43,29 +41,174 @@
                     </svg>
                 </label>
 
+                <!-- Notification Bell -->
+                <div class="relative notification-bell">
+                    <button (click)="toggleNotifications()"
+                        class="relative w-10 h-10 rounded-full bg-white/5 border border-gold-400/30 flex items-center justify-center text-gold-400 hover:bg-gold-400/10 hover:border-gold-400 transition-all duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                        <!-- Badge -->
+                        @if (unreadCount > 0) {
+                        <span
+                            class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-[10px] font-bold text-white flex items-center justify-center animate-pulse">
+                            {{ unreadCount }}
+                        </span>
+                        }
+                    </button>
+
+                    <!-- Notification Dropdown -->
+                    @if (showNotifications()) {
+                    <div
+                        class="notification-panel absolute right-0 top-14 w-96 bg-black-card border border-black-border rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.6)] overflow-hidden z-50">
+
+                        <!-- Panel Header -->
+                        <div
+                            class="px-5 py-4 border-b border-black-border bg-gradient-to-r from-black-card to-white/[0.02]">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <h3 class="font-bold text-white text-sm">Notifications</h3>
+                                    @if (unreadCount > 0) {
+                                    <span
+                                        class="bg-gold-400/20 text-gold-400 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                                        {{ unreadCount }} new
+                                    </span>
+                                    }
+                                </div>
+                                @if (unreadCount > 0) {
+                                <button (click)="markAllAsRead()"
+                                    class="text-[10px] font-bold text-gold-400 uppercase tracking-wider hover:underline">
+                                    Mark all read
+                                </button>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Notification List -->
+                        <div class="max-h-80 overflow-y-auto">
+                            @for (notif of notifications; track notif.id) {
+                            <div (click)="markAsRead(notif.id)"
+                                class="px-5 py-3 flex items-start gap-3 hover:bg-white/[0.03] transition-colors cursor-pointer border-b border-zinc-800/50 last:border-b-0"
+                                [ngClass]="{'bg-gold-400/[0.03]': !notif.read}">
+
+                                <!-- Icon -->
+                                <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 text-sm mt-0.5"
+                                    [ngClass]="getTypeClass(notif.type)">
+                                    {{ notif.icon }}
+                                </div>
+
+                                <!-- Content -->
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-start justify-between gap-2">
+                                        <p class="text-sm font-bold truncate"
+                                            [ngClass]="{'text-white': !notif.read, 'text-zinc-400': notif.read}">
+                                            {{ notif.title }}
+                                        </p>
+                                        @if (!notif.read) {
+                                        <span class="w-2 h-2 rounded-full bg-gold-400 shrink-0 mt-1.5"></span>
+                                        }
+                                    </div>
+                                    <p class="text-xs text-zinc-500 truncate">{{ notif.message }}</p>
+                                    <p class="text-[10px] text-zinc-600 mt-1">{{ notif.time }}</p>
+                                </div>
+                            </div>
+                            }
+                        </div>
+
+                        <!-- Panel Footer -->
+                        <div class="px-5 py-3 border-t border-black-border text-center">
+                            <a href="#"
+                                class="text-xs font-bold text-gold-400 uppercase tracking-wider hover:underline">
+                                View All Notifications
+                            </a>
+                        </div>
+                    </div>
+                    }
+                </div>
+
                 <!-- DaisyUI Language Select -->
                 <div class="relative group">
                     <svg xmlns="http://www.w3.org/2000/svg"
-                        class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gold z-10 pointer-events-none group-hover:drop-shadow-[0_0_5px_rgba(255,215,0,0.5)] transition-all duration-300"
+                        class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gold-400 z-10 pointer-events-none group-hover:drop-shadow-[0_0_5px_rgba(255,215,0,0.5)] transition-all duration-300"
                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <select (change)="setLang($event)" [value]="currentLang()"
-                        class="select select-bordered select-sm pl-10 bg-white/5 backdrop-blur-md border-[#D4AF37]/50 text-gold rounded-full hover:border-[#D4AF37] focus:border-[#D4AF37] focus:outline-none w-full max-w-xs shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+                        class="select select-bordered select-sm pl-10 bg-white/5 backdrop-blur-md border-gold-400/50 text-gold-400 rounded-full hover:border-gold-400 focus:border-gold-400 focus:outline-none w-full max-w-xs shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
                         @for (lang of languages; track lang.code) {
-                        <option [value]="lang.code" class="bg-black-card text-gold font-bold">{{ lang.label }}
+                        <option [value]="lang.code" class="bg-black-card text-gold-400 font-bold">{{ lang.label }}
                             ({{lang.code | uppercase}})</option>
                         }
                     </select>
                 </div>
 
-                <!-- User Profile (DaisyUI Avatar with Logo) -->
-                <div class="avatar cursor-pointer group">
-                    <div
-                        class="w-10 rounded-full ring ring-[#D4AF37] ring-offset-black-main ring-offset-2 group-hover:ring-[#F1D37E] transition-all duration-300 bg-black-card">
-                        <img src="images/logo-gold.png" alt="Profile" />
+                <!-- User Profile (DaisyUI Avatar with Dropdown) -->
+                <div class="relative profile-dropdown">
+                    <div class="avatar cursor-pointer group" (click)="toggleProfile()">
+                        <div
+                            class="w-10 rounded-full ring ring-gold-400 ring-offset-black-main ring-offset-2 group-hover:ring-gold-300 transition-all duration-300 bg-black-card">
+                            <img src="images/logo-gold.png" alt="Profile" />
+                        </div>
                     </div>
+
+                    <!-- Profile Dropdown -->
+                    @if (showProfile()) {
+                    <div
+                        class="absolute right-0 top-14 w-64 bg-black-card border border-black-border rounded-xl shadow-[0_16px_48px_rgba(0,0,0,0.7)] overflow-hidden z-50">
+                        <!-- User Info -->
+                        <div class="px-5 py-4 border-b border-black-border">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gold-400/20 flex items-center justify-center">
+                                    <span class="text-gold-400 font-black text-sm">A</span>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-sm font-bold text-white truncate">Admin</p>
+                                    <p class="text-[11px] text-zinc-500 truncate">admin&#64;atbsport.com</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Menu Items -->
+                        <div class="py-2 px-2">
+                            <button
+                                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-zinc-400 hover:text-white hover:bg-white/5 transition-all font-bold">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                My Profile
+                            </button>
+                            <button
+                                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-zinc-400 hover:text-white hover:bg-white/5 transition-all font-bold">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                Settings
+                            </button>
+                        </div>
+
+                        <!-- Logout -->
+                        <div class="px-2 py-2 border-t border-black-border">
+                            <button (click)="logout()"
+                                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all font-bold">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
+                                Log Out
+                            </button>
+                        </div>
+                    </div>
+                    }
                 </div>
             </div>
         </div>

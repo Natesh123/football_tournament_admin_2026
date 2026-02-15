@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
@@ -15,8 +15,8 @@ export class TopBarComponent {
 
     currentLang = signal('en');
     isDropdownOpen = signal(false);
-
-
+    showNotifications = signal(false);
+    showProfile = signal(false);
 
     languages = [
         { code: 'en', label: 'English', flag: '🇬🇧' },
@@ -25,8 +25,44 @@ export class TopBarComponent {
         { code: 'es', label: 'Spanish', flag: '🇪🇸' }
     ];
 
+    notifications = [
+        {
+            id: 1, type: 'match', read: false, time: '2m ago',
+            title: 'Goal! Madrid CF 2 - 1 London Blue',
+            message: 'Vinicius Jr scores in the 58th minute',
+            icon: '⚽'
+        },
+        {
+            id: 2, type: 'tournament', read: false, time: '15m ago',
+            title: 'Tournament Update',
+            message: 'Champions League Quarter-Finals draw completed',
+            icon: '🏆'
+        },
+        {
+            id: 3, type: 'system', read: false, time: '1h ago',
+            title: 'New Team Registered',
+            message: 'Bayern Munich joined the Winter League 2026',
+            icon: '👥'
+        },
+        {
+            id: 4, type: 'match', read: true, time: '2h ago',
+            title: 'Match Started',
+            message: 'Munich FC vs Paris SG - Gold Cup Semi-Final',
+            icon: '📣'
+        },
+        {
+            id: 5, type: 'system', read: true, time: '5h ago',
+            title: 'System Maintenance',
+            message: 'Scheduled maintenance completed successfully',
+            icon: '🔧'
+        }
+    ];
+
+    get unreadCount(): number {
+        return this.notifications.filter(n => !n.read).length;
+    }
+
     constructor() {
-        this.translate.setDefaultLang('en');
         this.translate.use('en');
     }
 
@@ -38,5 +74,50 @@ export class TopBarComponent {
 
     toggleDropdown() {
         this.isDropdownOpen.update(v => !v);
+    }
+
+    toggleNotifications() {
+        this.showNotifications.update(v => !v);
+    }
+
+    markAsRead(id: number) {
+        const notif = this.notifications.find(n => n.id === id);
+        if (notif) notif.read = true;
+    }
+
+    markAllAsRead() {
+        this.notifications.forEach(n => n.read = true);
+    }
+
+    getTypeClass(type: string): string {
+        switch (type) {
+            case 'match': return 'bg-green-500/20 text-green-400';
+            case 'tournament': return 'bg-gold-400/20 text-gold-400';
+            case 'system': return 'bg-blue-500/20 text-blue-400';
+            default: return 'bg-zinc-800 text-zinc-400';
+        }
+    }
+
+    toggleProfile() {
+        this.showProfile.update(v => !v);
+        this.showNotifications.set(false);
+    }
+
+    logout() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        this.showProfile.set(false);
+        this.router.navigate(['/auth/login']);
+    }
+
+    @HostListener('document:click', ['$event'])
+    onDocumentClick(event: Event) {
+        const target = event.target as HTMLElement;
+        if (!target.closest('.notification-panel') && !target.closest('.notification-bell')) {
+            this.showNotifications.set(false);
+        }
+        if (!target.closest('.profile-dropdown')) {
+            this.showProfile.set(false);
+        }
     }
 }
