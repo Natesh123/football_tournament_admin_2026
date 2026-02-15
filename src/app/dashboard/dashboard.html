@@ -1,6 +1,9 @@
 <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <app-hero></app-hero>
 
+    <!-- <h1>Welcome, <span style="color: #667eea;">{{ auth.userEmail }}</span></h1>
+    <button (click)="logout()" class="logout-btn">Logout</button> -->
+
     <!-- System Overview & Live Activity -->
     <app-stats-board [platformStats]="platformStats" [activityStats]="activityStats"
         [showAllSections]="true"></app-stats-board>
