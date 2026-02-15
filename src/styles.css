@@ -1,7 +1,27 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+@theme {
+    --color-gold-50: #fbf7ef;
+    --color-gold-100: #f5ebd6;
+    --color-gold-200: #ead4aa;
+    --color-gold-300: #deccab;
+    --color-gold-400: #d4af37;
+    /* Metallic Gold */
+    --color-gold-500: #bfa15f;
+    --color-gold-600: #997b42;
+    --color-gold-700: #7a6034;
+    --color-gold-800: #634d2e;
+    --color-gold-900: #544129;
+    --color-gold-950: #2e2316;
+
+    --color-black-main: #000000;
+    --color-black-card: #09090b;
+    --color-black-border: #27272a;
+}
+
 html,
 body {
     height: 100%;
+    @apply bg-neutral-950 text-gold-100;
 }

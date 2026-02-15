@@ -1,111 +1,159 @@
 <div class="space-y-8">
-    <!-- Standings Widget -->
-    <div class="bg-black-card border border-black-border rounded-xl p-6">
-        <div class="flex items-center justify-between mb-6">
-            <div class="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gold" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-                <h3 class="font-bold">Premier Standings</h3>
+    <!-- Premier Standings Widget - Full Table -->
+    <div class="bg-black-card border border-black-border rounded-xl overflow-hidden">
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-black-border bg-gradient-to-r from-black-card to-white/[0.02]">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-gold-400/15 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gold-400" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-white text-sm">Premier League Standings</h3>
+                        <p class="text-[10px] text-zinc-500 uppercase tracking-wider">Season 2025/26 • Matchday 24</p>
+                    </div>
+                </div>
+                <a href="#"
+                    class="text-[10px] font-bold text-gold-400 uppercase tracking-wider hover:underline border border-gold-400/30 px-2.5 py-1 rounded-full hover:bg-gold-400/10 transition-all">Full
+                    Table</a>
             </div>
-            <a href="#" class="text-xs text-gold hover:underline">Full Table</a>
         </div>
 
-        <div class="space-y-3 font-mono text-sm">
-            <!-- Row 1 -->
-            <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
-                <div class="flex items-center gap-3">
-                    <span class="text-xs font-bold text-gray-500 w-4">1</span>
-                    <div
-                        class="w-6 h-6 bg-zinc-800 rounded-full flex items-center justify-center text-[10px] text-zinc-500">
-                        L</div>
-                    <span class="font-bold">Liverpool</span>
+        <!-- Table Header -->
+        <div
+            class="grid grid-cols-[24px_1fr_28px_32px_36px_80px] gap-1 px-4 py-2.5 text-[9px] font-bold text-zinc-500 uppercase tracking-widest border-b border-zinc-800/50">
+            <span class="text-center">#</span>
+            <span>Club</span>
+            <span class="text-center">P</span>
+            <span class="text-center">GD</span>
+            <span class="text-center">Pts</span>
+            <span class="text-center">Form</span>
+        </div>
+
+        <!-- Table Rows -->
+        @for (team of standings; track team.pos) {
+        <div class="grid grid-cols-[24px_1fr_28px_32px_36px_80px] gap-1 px-4 py-2.5 items-center hover:bg-white/[0.03] transition-colors group"
+            [ngClass]="getZoneClass(team.zone)">
+
+            <!-- Position -->
+            <span class="text-center text-xs font-bold"
+                [ngClass]="{'text-gold-400': team.pos <= 4, 'text-orange-400': team.pos === 5, 'text-zinc-500': team.pos > 5}">
+                {{ team.pos }}
+            </span>
+
+            <!-- Team -->
+            <div class="flex items-center gap-2 min-w-0">
+                <div
+                    class="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-[9px] font-bold text-zinc-400 shrink-0 border border-zinc-700 group-hover:border-gold-400/30 transition-colors">
+                    {{ team.short.charAt(0) }}
                 </div>
-                <div class="flex gap-4 text-xs">
-                    <span class="text-text-muted">24</span>
-                    <span class="font-bold text-gold">58</span>
-                </div>
+                <span class="font-bold text-sm text-white truncate group-hover:text-gold-400 transition-colors">{{
+                    team.team }}</span>
             </div>
-            <!-- Row 2 -->
-            <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
-                <div class="flex items-center gap-3">
-                    <span class="text-xs font-bold text-gray-500 w-4">2</span>
-                    <div
-                        class="w-6 h-6 bg-zinc-800 rounded-full flex items-center justify-center text-[10px] text-zinc-500">
-                        M</div>
-                    <span class="font-bold">Man City</span>
-                </div>
-                <div class="flex gap-4 text-xs">
-                    <span class="text-text-muted">24</span>
-                    <span class="font-bold text-gold">56</span>
-                </div>
+
+            <!-- Key Stats -->
+            <span class="text-center text-xs text-zinc-400 font-mono">{{ team.played }}</span>
+            <span class="text-center text-xs font-mono font-bold"
+                [ngClass]="{'text-green-400': team.gd > 0, 'text-red-400': team.gd < 0, 'text-zinc-500': team.gd === 0}">
+                {{ team.gd > 0 ? '+' : '' }}{{ team.gd }}
+            </span>
+            <span class="text-center text-sm font-bold text-gold-400 font-mono">{{ team.pts }}</span>
+
+            <!-- Form Guide -->
+            <div class="flex gap-0.5 justify-center">
+                @for (result of team.form; track $index) {
+                <span class="w-4 h-4 rounded-sm flex items-center justify-center text-[8px] font-bold"
+                    [ngClass]="getFormClass(result)">
+                    {{ result }}
+                </span>
+                }
             </div>
-            <!-- Row 3 -->
-            <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
-                <div class="flex items-center gap-3">
-                    <span class="text-xs font-bold text-gray-500 w-4">3</span>
-                    <div
-                        class="w-6 h-6 bg-zinc-800 rounded-full flex items-center justify-center text-[10px] text-zinc-500">
-                        A</div>
-                    <span class="font-bold">Arsenal</span>
-                </div>
-                <div class="flex gap-4 text-xs">
-                    <span class="text-text-muted">24</span>
-                    <span class="font-bold text-gold">52</span>
-                </div>
+        </div>
+        }
+
+        <!-- Zone Legend -->
+        <div class="px-4 py-3 border-t border-zinc-800/50 flex items-center gap-4 text-[9px] text-zinc-600">
+            <div class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-sm bg-blue-500"></span>
+                Champions League
+            </div>
+            <div class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-sm bg-orange-500"></span>
+                Europa League
             </div>
         </div>
     </div>
 
-    <!-- Golden Boot Widget -->
-    <div class="bg-black-card border border-black-border rounded-xl p-6">
-        <div class="flex items-center gap-2 mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gold" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-            <h3 class="font-bold">Golden Boot Race</h3>
+    <!-- Top Scorers Widget - Redesigned -->
+    <div class="bg-black-card border border-black-border rounded-xl overflow-hidden">
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-black-border">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-gold-400/15 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gold-400" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white text-sm">Golden Boot Race</h3>
+                    <p class="text-[10px] text-zinc-500 uppercase tracking-wider">Top Goal Scorers</p>
+                </div>
+            </div>
         </div>
 
-        <div class="space-y-4">
-            <div class="flex items-center gap-4">
-                <div class="h-10 w-10 bg-zinc-800 rounded-full flex-shrink-0 border border-gold/30"></div>
-                <div class="flex-1 min-w-0">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="font-bold text-sm truncate">Erling Haaland</span>
-                        <span class="text-xs font-bold text-gold">21 G</span>
-                    </div>
-                    <div class="w-full bg-zinc-800 rounded-full h-1.5">
-                        <div class="bg-gold h-1.5 rounded-full" style="width: 85%"></div>
-                    </div>
+        <!-- Scorers List -->
+        <div class="divide-y divide-zinc-800/50">
+            @for (scorer of topScorers; track scorer.name; let i = $index) {
+            <div class="px-5 py-3 flex items-center gap-3 hover:bg-white/[0.03] transition-colors group">
+                <!-- Rank Badge -->
+                <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
+                    [ngClass]="{'bg-gold-400/20 text-gold-400': i === 0, 'bg-zinc-800 text-zinc-400': i > 0}">
+                    {{ i + 1 }}
                 </div>
-            </div>
 
-            <div class="flex items-center gap-4">
-                <div class="h-10 w-10 bg-zinc-800 rounded-full flex-shrink-0"></div>
+                <!-- Player Avatar -->
+                <div class="w-9 h-9 rounded-full bg-zinc-800 shrink-0 flex items-center justify-center border group-hover:border-gold-400/30 transition-colors"
+                    [ngClass]="{'border-gold-400/30': i === 0, 'border-zinc-700': i > 0}">
+                    <span class="text-[10px] font-bold text-zinc-500">{{ scorer.name.charAt(0) }}</span>
+                </div>
+
+                <!-- Info -->
                 <div class="flex-1 min-w-0">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="font-bold text-sm truncate">Mohamed Salah</span>
-                        <span class="text-xs font-bold text-text-muted">18 G</span>
+                    <div class="font-bold text-sm text-white truncate group-hover:text-gold-400 transition-colors">{{
+                        scorer.name }}</div>
+                    <div class="text-[10px] text-zinc-500">{{ scorer.team }}</div>
+                </div>
+
+                <!-- Stats -->
+                <div class="flex items-center gap-3 text-xs font-mono shrink-0">
+                    <div class="text-center">
+                        <div class="font-bold" [ngClass]="{'text-gold-400': i === 0, 'text-white': i > 0}">{{
+                            scorer.goals }}</div>
+                        <div class="text-[8px] text-zinc-600 uppercase">G</div>
                     </div>
-                    <div class="w-full bg-zinc-800 rounded-full h-1.5">
-                        <div class="bg-zinc-600 h-1.5 rounded-full" style="width: 70%"></div>
+                    <div class="text-center">
+                        <div class="font-bold text-zinc-400">{{ scorer.assists }}</div>
+                        <div class="text-[8px] text-zinc-600 uppercase">A</div>
                     </div>
                 </div>
             </div>
+            }
         </div>
     </div>
 
     <!-- Promo Widget -->
-    <div class="bg-gradient-to-br from-gold-mid to-gold-shadow rounded-xl p-6 text-black relative overflow-hidden">
+    <div class="bg-gradient-to-br from-gold-400 to-gold-600 rounded-xl p-6 text-black relative overflow-hidden">
         <div class="relative z-10">
             <div class="font-bold text-xs uppercase tracking-wider opacity-70 mb-2">Pro Feature</div>
             <h3 class="text-2xl font-extrabold mb-2 leading-tight">UNLOCK<br>ANALYTICS</h3>
             <p class="text-sm font-medium opacity-80 mb-4">Get detailed player stats and heatmaps.</p>
             <button
-                class="bg-black text-gold text-xs font-bold uppercase py-2 px-4 rounded hover:bg-zinc-800 transition-colors">Upgrade
+                class="bg-black text-gold-400 text-xs font-bold uppercase py-2 px-4 rounded hover:bg-zinc-800 transition-colors">Upgrade
                 Now</button>
         </div>
         <!-- Decorative circle -->

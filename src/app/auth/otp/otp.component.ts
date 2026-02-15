@@ -3,15 +3,17 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
+import { PhysicsBallDirective } from '../physics-ball.directive';
 
 @Component({
     selector: 'app-otp',
     templateUrl: './otp.html',
     styleUrl: './otp.css',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule]
+    imports: [CommonModule, ReactiveFormsModule, PhysicsBallDirective]
 })
 export class OtpComponent {
+
 
     otpForm: FormGroup;
     errorMessage: string = '';

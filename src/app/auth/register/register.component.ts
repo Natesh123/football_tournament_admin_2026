@@ -3,15 +3,17 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../auth.service';
+import { PhysicsBallDirective } from '../physics-ball.directive';
 
 @Component({
     selector: 'app-register',
     templateUrl: './register.html',
     styleUrl: './register.css',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, RouterLink]
+    imports: [CommonModule, ReactiveFormsModule, RouterLink, PhysicsBallDirective]
 })
 export class RegisterComponent {
+
 
     registerForm: FormGroup;
     errorMessage: string = '';
@@ -24,14 +26,36 @@ export class RegisterComponent {
         private router: Router
     ) {
         this.registerForm = this.fb.group({
+            name: ['', [Validators.required]],
             email: ['', [Validators.required, Validators.email]],
-            password: ['', [Validators.required, Validators.minLength(6)]]
-        });
+            password: ['', [Validators.required, Validators.minLength(6)]],
+            confirmPassword: ['', [Validators.required]],
+            agreeTerms: [false, [Validators.requiredTrue]]
+        }, { validators: this.passwordMatchValidator });
+    }
+
+    passwordMatchValidator(form: FormGroup) {
+        const password = form.get('password');
+        const confirmPassword = form.get('confirmPassword');
+
+        if (!password || !confirmPassword) {
+            return null;
+        }
+
+        if (password.value !== confirmPassword.value) {
+            confirmPassword.setErrors({ ...confirmPassword.errors, mismatch: true });
+        } else {
+            if (confirmPassword.hasError('mismatch')) {
+                const errors = { ...confirmPassword.errors };
+                delete errors['mismatch'];
+                confirmPassword.setErrors(Object.keys(errors).length ? errors : null);
+            }
+        }
+        return null;
     }
 
     submit() {
         if (this.registerForm.invalid) {
-            // Mark all fields as touched to show validation errors
             Object.keys(this.registerForm.controls).forEach(key => {
                 this.registerForm.get(key)?.markAsTouched();
             });
@@ -42,12 +66,14 @@ export class RegisterComponent {
         this.successMessage = '';
         this.isLoading = true;
 
-        this.auth.register(this.registerForm.value)
+        const { name, email, password } = this.registerForm.value;
+
+        this.auth.register({ name, email, password })
             .subscribe({
                 next: (res: any) => {
                     this.isLoading = false;
                     // Store email for OTP verification
-                    localStorage.setItem('email', this.registerForm.value.email);
+                    localStorage.setItem('email', email);
                     this.successMessage = res.message || 'OTP sent to your email';
                     // Navigate to OTP page after a brief delay
                     setTimeout(() => {
