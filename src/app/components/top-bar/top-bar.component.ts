@@ -1,7 +1,8 @@
-import { Component, signal, inject, HostListener } from '@angular/core';
+import { Component, signal, inject, HostListener, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
     selector: 'app-top-bar',
@@ -12,11 +13,14 @@ import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 export class TopBarComponent {
     private translate = inject(TranslateService);
     private router = inject(Router);
+    auth = inject(AuthService);
 
     currentLang = signal('en');
     isDropdownOpen = signal(false);
     showNotifications = signal(false);
     showProfile = signal(false);
+
+    user = computed(() => this.auth.user);
 
     languages = [
         { code: 'en', label: 'English', flag: '🇬🇧' },
@@ -104,10 +108,8 @@ export class TopBarComponent {
     }
 
     logout() {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
         this.showProfile.set(false);
-        this.router.navigate(['/auth/login']);
+        this.auth.logout();
     }
 
     @HostListener('document:click', ['$event'])

@@ -162,11 +162,13 @@
                         <div class="px-5 py-4 border-b border-black-border">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-full bg-gold-400/20 flex items-center justify-center">
-                                    <span class="text-gold-400 font-black text-sm">A</span>
+                                    <span class="text-gold-400 font-black text-sm">{{
+                                        user()?.user_name?.charAt(0)?.toUpperCase() || 'U' }}</span>
                                 </div>
                                 <div class="min-w-0">
-                                    <p class="text-sm font-bold text-white truncate">Admin</p>
-                                    <p class="text-[11px] text-zinc-500 truncate">admin&#64;atbsport.com</p>
+                                    <p class="text-sm font-bold text-white truncate">{{ user()?.user_name || 'User' }}
+                                    </p>
+                                    <p class="text-[11px] text-zinc-500 truncate">{{ user()?.email || 'No Email' }}</p>
                                 </div>
                             </div>
                         </div>

@@ -49,13 +49,13 @@ export class OtpComponent {
         }).subscribe({
             next: (res: any) => {
                 this.isLoading = false;
-                // Store the token
-                if (res.token) {
-                    localStorage.setItem('token', res.token);
+                // Set authenticated user state
+                if (res.token && res.user) {
+                    this.auth.setAuthenticatedUser(res.user, res.token);
                 }
-                // Clear email from storage
+                // Clear temporary email from storage
                 localStorage.removeItem('email');
-                // Navigate to dashboard or home
+                // Navigate to dashboard
                 this.router.navigate(['/dashboard']);
             },
             error: (err) => {

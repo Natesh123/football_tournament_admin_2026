@@ -15,7 +15,7 @@ export const routes: Routes = [
             { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
             {
                 path: 'dashboard',
-                loadComponent: () => import('./dashboard/dashboard').then(m => m.Dashboard)
+                loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent)
             },
             {
                 path: 'tournaments',
@@ -26,5 +26,9 @@ export const routes: Routes = [
                 loadComponent: () => import('./tournament-dashboard/tournament-dashboard.component').then(m => m.TournamentDashboardComponent)
             }
         ]
-    }
+    },
+
+    // { path: 'auth', loadChildren: () => import('./auth/auth-module').then(m => m.AuthModule) },
+    // { path: 'dashboard', loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent) },
+    { path: '', redirectTo: 'auth/login', pathMatch: 'full' }
 ];
