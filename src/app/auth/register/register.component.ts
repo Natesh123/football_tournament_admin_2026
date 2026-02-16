@@ -27,6 +27,8 @@ export class RegisterComponent {
     ) {
         this.registerForm = this.fb.group({
             name: ['', [Validators.required]],
+            user_name: ['', [Validators.required]],
+            phone_number: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
             email: ['', [Validators.required, Validators.email]],
             password: ['', [Validators.required, Validators.minLength(6)]],
             confirmPassword: ['', [Validators.required]],
@@ -66,9 +68,9 @@ export class RegisterComponent {
         this.successMessage = '';
         this.isLoading = true;
 
-        const { name, email, password } = this.registerForm.value;
+        const { name, email, password, user_name, phone_number } = this.registerForm.value;
 
-        this.auth.register({ name, email, password })
+        this.auth.register({ name, email, password, user_name, phone_number })
             .subscribe({
                 next: (res: any) => {
                     this.isLoading = false;

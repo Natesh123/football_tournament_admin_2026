@@ -50,8 +50,8 @@ export class OtpComponent {
             next: (res: any) => {
                 this.isLoading = false;
                 // Set authenticated user state
-                if (res.token && this.email) {
-                    this.auth.setAuthenticatedUser(this.email, res.token);
+                if (res.token && res.user) {
+                    this.auth.setAuthenticatedUser(res.user, res.token);
                 }
                 // Clear temporary email from storage
                 localStorage.removeItem('email');

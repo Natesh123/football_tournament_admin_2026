@@ -64,13 +64,18 @@ export class LoginComponent implements OnInit {
         this.successMessage = '';
         this.isLoading = true;
 
-        this.auth.login(this.loginForm.value)
+        const loginData = {
+            ...this.loginForm.value,
+            email: this.loginForm.value.email.trim()
+        };
+
+        this.auth.login(loginData)
             .subscribe({
                 next: (res: any) => {
                     this.isLoading = false;
                     // Directly handle success without OTP
                     if (res.token) {
-                        this.auth.setAuthenticatedUser(this.loginForm.value.email, res.token);
+                        this.auth.setAuthenticatedUser(res.user, res.token);
                         this.successMessage = 'Login successful! Redirecting...';
                         setTimeout(() => this.router.navigate(['/dashboard']), 1000);
                     }

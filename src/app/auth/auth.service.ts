@@ -5,13 +5,17 @@ import { Router } from '@angular/router';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
-    baseUrl = 'http://127.0.0.1:3000/auth';
-    private userEmailSignal = signal<string | null>(localStorage.getItem('user_email'));
+    baseUrl = 'http://localhost:3000/auth';
+    private userSignal = signal<any | null>(JSON.parse(localStorage.getItem('user') || 'null'));
 
     constructor(private http: HttpClient, private router: Router) { }
 
+    get user() {
+        return this.userSignal();
+    }
+
     get userEmail() {
-        return this.userEmailSignal();
+        return this.userSignal()?.email;
     }
 
     register(data: any) {
@@ -34,16 +38,16 @@ export class AuthService {
         return this.http.post(`${this.baseUrl}/resend-otp`, data);
     }
 
-    setAuthenticatedUser(email: string, token: string) {
+    setAuthenticatedUser(user: any, token: string) {
         localStorage.setItem('token', token);
-        localStorage.setItem('user_email', email);
-        this.userEmailSignal.set(email);
+        localStorage.setItem('user', JSON.stringify(user));
+        this.userSignal.set(user);
     }
 
     logout() {
         localStorage.removeItem('token');
-        localStorage.removeItem('user_email');
-        this.userEmailSignal.set(null);
+        localStorage.removeItem('user');
+        this.userSignal.set(null);
         this.router.navigate(['/auth/login']);
     }
 
