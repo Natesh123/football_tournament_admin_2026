@@ -5,4 +5,101 @@
     width: 100%;
     min-height: 100vh;
     font-family: 'Outfit', sans-serif;
+    /* Background handled in HTML for this design */
+}
+
+/* Float Animation */
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-15px);
+    }
+}
+
+.animate-float {
+    animation: float 8s ease-in-out infinite;
+}
+
+/* Shimmer Animation */
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translateX(-4px);
+    }
+
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translateX(4px);
+    }
+}
+
+/* Utility classes overrides */
+.animate-in {
+    animation-duration: 0.6s;
+    animation-fill-mode: both;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fade-in {
+    animation-name: fadeIn;
+}
+
+.zoom-in {
+    animation-name: zoomIn;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes zoomIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.delay-100 {
+    animation-delay: 100ms;
+}
+
+.delay-300 {
+    animation-delay: 300ms;
 }

@@ -1,20 +1,88 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { AuthService } from '../auth/auth.service';
 import { HeroComponent } from './components/hero/hero.component';
 import { MatchFeedComponent } from './components/match-feed/match-feed.component';
 import { WidgetsComponent } from './components/widgets/widgets.component';
 import { StatsBoard } from '../components/stats-board/stats-board';
+import { TournamentService } from '../tournament/tournament.service';
 
 @Component({
     selector: 'app-dashboard',
     templateUrl: './dashboard.html',
     styleUrl: './dashboard.css',
     standalone: true,
-    imports: [CommonModule, HeroComponent, MatchFeedComponent, WidgetsComponent, StatsBoard]
+    imports: [CommonModule, HeroComponent, MatchFeedComponent, WidgetsComponent, StatsBoard, FormsModule]
 })
 export class DashboardComponent {
+    private tournamentService = inject(TournamentService);
+
+    showCreateModal = signal(false);
+    isCreating = signal(false);
+    toastMessage = signal('');
+
+    newTournament = {
+        name: '',
+        description: '',
+        startDate: '',
+        endDate: '',
+        status: 'draft',
+        maxTeams: 16,
+        prizePool: ''
+    };
+
+    openCreateModal() {
+        this.showCreateModal.set(true);
+    }
+
+    closeCreateModal() {
+        this.showCreateModal.set(false);
+        this.resetForm();
+    }
+
+    createTournament() {
+        if (!this.newTournament.name || !this.newTournament.startDate) return;
+        this.isCreating.set(true);
+
+        this.tournamentService.create({
+            name: this.newTournament.name,
+            description: this.newTournament.description,
+            startDate: this.newTournament.startDate,
+            endDate: this.newTournament.endDate || this.newTournament.startDate,
+            maxTeams: this.newTournament.maxTeams,
+            status: this.newTournament.status,
+        }).subscribe({
+            next: (created) => {
+                this.isCreating.set(false);
+                this.closeCreateModal();
+                this.router.navigate(['/tournaments', created.id]);
+            },
+            error: (err) => {
+                console.error('Failed to create tournament:', err);
+                this.isCreating.set(false);
+                this.showToast('Failed to create tournament. Please try again.');
+            }
+        });
+    }
+
+    showToast(message: string) {
+        this.toastMessage.set(message);
+        setTimeout(() => this.toastMessage.set(''), 3000);
+    }
+
+    resetForm() {
+        this.newTournament = {
+            name: '',
+            description: '',
+            startDate: '',
+            endDate: '',
+            status: 'draft',
+            maxTeams: 16,
+            prizePool: ''
+        };
+    }
 
     platformStats = [
         {

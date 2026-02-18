@@ -24,6 +24,10 @@ export const routes: Routes = [
             {
                 path: 'tournaments/:id',
                 loadComponent: () => import('./tournament-dashboard/tournament-dashboard.component').then(m => m.TournamentDashboardComponent)
+            },
+            {
+                path: 'settings',
+                loadChildren: () => import('./settings/settings.routes').then(m => m.SETTINGS_ROUTES)
             }
         ]
     },
