@@ -1,12 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
-    selector: 'app-settings-layout',
-    standalone: true,
-    imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet],
-    template: `
+  selector: 'app-settings-layout',
+  standalone: true,
+  imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet],
+  template: `
     <div class="flex flex-col md:flex-row gap-6 min-h-[calc(100vh-theme(spacing.28)-theme(spacing.16))]">
       <!-- Sidebar -->
       <aside class="w-full md:w-64 shrink-0">
@@ -50,4 +51,6 @@ import { CommonModule } from '@angular/common';
     </div>
   `
 })
-export class SettingsLayoutComponent { }
+export class SettingsLayoutComponent {
+  auth = inject(AuthService);
+}

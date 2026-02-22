@@ -54,4 +54,11 @@ export class AuthService {
     isAuthenticated(): boolean {
         return !!localStorage.getItem('token');
     }
+
+    hasPermission(permission: string): boolean {
+        const user = this.user;
+        if (!user || !user.permissions) return false;
+        const access = user.permissions.module_access || {};
+        return !!access[permission];
+    }
 }
