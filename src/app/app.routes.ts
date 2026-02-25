@@ -26,6 +26,22 @@ export const routes: Routes = [
                 loadComponent: () => import('./tournament-dashboard/tournament-dashboard.component').then(m => m.TournamentDashboardComponent)
             },
             {
+                path: 'teams',
+                loadComponent: () => import('./teams/teams.component').then(m => m.TeamsComponent)
+            },
+            {
+                path: 'teams/:id',
+                loadComponent: () => import('./teams/team-layout.component').then(m => m.TeamLayoutComponent),
+                children: [
+                    { path: '', redirectTo: 'overview', pathMatch: 'full' },
+                    { path: 'overview', loadComponent: () => import('./teams/components/team-overview/team-overview.component').then(m => m.TeamOverviewComponent) },
+                    { path: 'members', loadComponent: () => import('./teams/components/team-members/team-members.component').then(m => m.TeamMembersComponent) },
+                    { path: 'matches', loadComponent: () => import('./teams/components/team-matches/team-matches.component').then(m => m.TeamMatchesComponent) },
+                    { path: 'statistics', loadComponent: () => import('./teams/components/team-statistics/team-statistics.component').then(m => m.TeamStatisticsComponent) },
+                    { path: 'gallery', loadComponent: () => import('./teams/components/team-gallery/team-gallery.component').then(m => m.TeamGalleryComponent) }
+                ]
+            },
+            {
                 path: 'settings',
                 loadChildren: () => import('./settings/settings.routes').then(m => m.SETTINGS_ROUTES)
             }

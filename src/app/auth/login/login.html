@@ -61,22 +61,21 @@
                             <span class="text-2xl font-black tracking-tighter uppercase block leading-none">ATB<span
                                     class="text-gold-500">Sports</span></span>
                             <span
-                                class="text-[10px] text-neutral-500 font-bold tracking-[0.3em] uppercase block mt-1">Tournament
-                                Edition</span>
+                                class="text-[10px] text-neutral-500 font-bold tracking-[0.3em] uppercase block mt-1">{{
+                                'AUTH.LOGIN.TOURNAMENT_EDITION' | translate }}</span>
                         </div>
                     </div>
 
                     <div class="space-y-6 max-w-lg">
                         <h1 class="text-6xl lg:text-7xl font-black leading-[0.9] tracking-tight">
-                            Command <br />
+                            {{ 'AUTH.LOGIN.HEADLINE' | translate }} <br />
                             <span
-                                class="text-transparent bg-clip-text bg-gradient-to-r from-gold-300 via-amber-500 to-yellow-600">The
-                                League.</span>
+                                class="text-transparent bg-clip-text bg-gradient-to-r from-gold-300 via-amber-500 to-yellow-600">{{
+                                'AUTH.LOGIN.TAGLINE' | translate }}</span>
                         </h1>
                         <div class="h-1 w-24 bg-gold-600 rounded-full"></div>
                         <p class="text-neutral-400 text-base leading-relaxed font-medium text-shadow-sm">
-                            The ultimate dashboard for modern football management. Orchestrate every match, track every
-                            stat, and dominate the season.
+                            {{ 'AUTH.LOGIN.DESCRIPTION' | translate }}
                         </p>
                     </div>
                 </div>
@@ -85,11 +84,13 @@
                 <div class="relative z-10 flex items-end gap-12 mt-12">
                     <div>
                         <p class="text-4xl font-black text-white">2.4k+</p>
-                        <p class="text-xs text-neutral-500 font-bold uppercase tracking-wider mt-1">Active Players</p>
+                        <p class="text-xs text-neutral-500 font-bold uppercase tracking-wider mt-1">{{
+                            'AUTH.LOGIN.ACTIVE_PLAYERS' | translate }}</p>
                     </div>
                     <div>
                         <p class="text-4xl font-black text-white">150+</p>
-                        <p class="text-xs text-neutral-500 font-bold uppercase tracking-wider mt-1">Live Matches</p>
+                        <p class="text-xs text-neutral-500 font-bold uppercase tracking-wider mt-1">{{
+                            'AUTH.LOGIN.LIVE_MATCHES' | translate }}</p>
                     </div>
                     <div
                         class="ml-auto flex items-center gap-2 mb-2 bg-neutral-900/50 px-4 py-2 rounded-full border border-white/5 backdrop-blur-md">
@@ -98,8 +99,8 @@
                                 class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                         </span>
-                        <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">System
-                            Online</span>
+                        <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">{{
+                            'AUTH.LOGIN.SYSTEM_ONLINE' | translate }}</span>
                     </div>
                 </div>
             </div>
@@ -109,15 +110,15 @@
                 class="md:w-[45%] bg-gradient-to-br from-neutral-800 via-neutral-900 to-black p-16 lg:p-24 flex flex-col justify-center relative border-l border-white/5 shadow-2xl">
                 <div class="max-w-md mx-auto w-full">
                     <div class="mb-12">
-                        <h2 class="text-3xl font-bold text-white mb-3">Welcome Back</h2>
-                        <p class="text-neutral-500 text-sm font-medium">Enter your credentials to access the dugout.</p>
+                        <h2 class="text-3xl font-bold text-white mb-3">{{ 'AUTH.LOGIN.TITLE' | translate }}</h2>
+                        <p class="text-neutral-500 text-sm font-medium">{{ 'AUTH.LOGIN.SUBTITLE' | translate }}</p>
                     </div>
 
                     <form [formGroup]="loginForm" (ngSubmit)="login()" class="space-y-8">
                         <!-- Email -->
                         <div class="space-y-2 group">
-                            <label class="text-xs font-bold text-neutral-400 uppercase tracking-widest">Email
-                                Address</label>
+                            <label class="text-xs font-bold text-neutral-400 uppercase tracking-widest">{{
+                                'AUTH.LOGIN.EMAIL_LABEL' | translate }}</label>
                             <div class="relative">
                                 <input type="email" formControlName="email"
                                     class="w-full bg-[#1e1e20] border-b-2 border-[#333] px-5 py-4 text-white placeholder-neutral-600 focus:outline-none focus:border-gold-500 focus:bg-[#252528] transition-all duration-300 rounded-t-lg text-sm font-medium"
@@ -136,10 +137,11 @@
                         <!-- Password -->
                         <div class="space-y-2 group">
                             <div class="flex justify-between items-center">
-                                <label
-                                    class="text-xs font-bold text-neutral-400 uppercase tracking-widest">Password</label>
+                                <label class="text-xs font-bold text-neutral-400 uppercase tracking-widest">{{
+                                    'AUTH.LOGIN.PASSWORD_LABEL' | translate }}</label>
                                 <a href="#"
-                                    class="text-[11px] text-gold-500 hover:text-gold-400 transition-colors font-bold uppercase tracking-wider">Forgot?</a>
+                                    class="text-[11px] text-gold-500 hover:text-gold-400 transition-colors font-bold uppercase tracking-wider">{{
+                                    'AUTH.LOGIN.FORGOT' | translate }}</a>
                             </div>
                             <div class="relative">
                                 <input type="password" formControlName="password"
@@ -193,17 +195,17 @@
                                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                                     </path>
                                 </svg>
-                                PROCESSING
+                                {{ 'AUTH.LOGIN.PROCESSING' | translate }}
                             </span>
                             } @else {
-                            SECURE LOGIN
+                            {{ 'AUTH.LOGIN.SUBMIT' | translate }}
                             }
                         </button>
 
                         <p class="text-center text-xs text-neutral-500 mt-8 font-medium">
-                            New Organization? <a routerLink="/auth/register"
-                                class="text-white hover:text-gold-500 transition-colors font-bold ml-1 cursor-pointer">Register
-                                Here</a>
+                            {{ 'AUTH.LOGIN.NO_ACCOUNT' | translate }} <a routerLink="/auth/register"
+                                class="text-white hover:text-gold-500 transition-colors font-bold ml-1 cursor-pointer">{{
+                                'AUTH.LOGIN.REGISTER_LINK' | translate }}</a>
                         </p>
                     </form>
                 </div>

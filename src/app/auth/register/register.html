@@ -61,21 +61,21 @@
                             <span class="text-2xl font-black tracking-tighter uppercase block leading-none">ATB<span
                                     class="text-gold-500">Sports</span></span>
                             <span
-                                class="text-[10px] text-neutral-500 font-bold tracking-[0.3em] uppercase block mt-1">Tournament
-                                Edition</span>
+                                class="text-[10px] text-neutral-500 font-bold tracking-[0.3em] uppercase block mt-1">{{
+                                'AUTH.REGISTER.TOURNAMENT_EDITION' | translate }}</span>
                         </div>
                     </div>
 
                     <div class="space-y-6 max-w-lg">
                         <h1 class="text-5xl lg:text-7xl font-black leading-[0.9] tracking-tight">
-                            Join <br />
+                            {{ 'AUTH.REGISTER.HEADLINE' | translate }} <br />
                             <span
-                                class="text-transparent bg-clip-text bg-gradient-to-r from-gold-300 via-amber-500 to-yellow-600">The
-                                League.</span>
+                                class="text-transparent bg-clip-text bg-gradient-to-r from-gold-300 via-amber-500 to-yellow-600">{{
+                                'AUTH.REGISTER.TAGLINE' | translate }}</span>
                         </h1>
                         <div class="h-1 w-24 bg-gold-600 rounded-full"></div>
                         <p class="text-neutral-400 text-base leading-relaxed font-medium text-shadow-sm">
-                            Create your organization account and start managing tournaments like a pro.
+                            {{ 'AUTH.REGISTER.DESCRIPTION' | translate }}
                         </p>
                     </div>
                 </div>
@@ -84,7 +84,8 @@
                 <div class="relative z-10 flex items-end gap-12 mt-12 hidden lg:flex">
                     <div>
                         <p class="text-4xl font-black text-white">500+</p>
-                        <p class="text-xs text-neutral-500 font-bold uppercase tracking-wider mt-1">Clubs Joined</p>
+                        <p class="text-xs text-neutral-500 font-bold uppercase tracking-wider mt-1">{{
+                            'AUTH.REGISTER.CLUBS_JOINED' | translate }}</p>
                     </div>
                     <div
                         class="ml-auto flex items-center gap-2 mb-2 bg-neutral-900/50 px-4 py-2 rounded-full border border-white/5 backdrop-blur-md">
@@ -93,8 +94,8 @@
                                 class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                         </span>
-                        <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Registration
-                            Open</span>
+                        <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">{{
+                            'AUTH.REGISTER.REGISTRATION_OPEN' | translate }}</span>
                     </div>
                 </div>
             </div>
@@ -104,9 +105,8 @@
                 class="md:w-[55%] bg-gradient-to-br from-neutral-800 via-neutral-900 to-black p-12 lg:p-16 flex flex-col justify-center relative border-l border-white/5 shadow-2xl overflow-y-auto max-h-[900px]">
                 <div class="max-w-xl mx-auto w-full">
                     <div class="mb-8">
-                        <h2 class="text-3xl font-bold text-white mb-2">Create Account</h2>
-                        <p class="text-neutral-500 text-sm font-medium">Enter your details to give your organization a
-                            home.</p>
+                        <h2 class="text-3xl font-bold text-white mb-2">{{ 'AUTH.REGISTER.TITLE' | translate }}</h2>
+                        <p class="text-neutral-500 text-sm font-medium">{{ 'AUTH.REGISTER.SUBTITLE' | translate }}</p>
                     </div>
 
                     <form [formGroup]="registerForm" (ngSubmit)="submit()" class="space-y-6">
@@ -114,15 +114,15 @@
                         <!-- Row 1: Name & Username -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2 group">
-                                <label class="text-xs font-bold text-neutral-400 uppercase tracking-widest">Org
-                                    Name</label>
+                                <label class="text-xs font-bold text-neutral-400 uppercase tracking-widest">{{
+                                    'AUTH.REGISTER.ORG_NAME' | translate }}</label>
                                 <input type="text" formControlName="name"
                                     class="w-full bg-[#1e1e20] border-b-2 border-[#333] px-4 py-3 text-white placeholder-neutral-600 focus:outline-none focus:border-gold-500 focus:bg-[#252528] transition-all duration-300 rounded-t-lg text-sm font-medium"
                                     placeholder="Victorian FA">
                             </div>
                             <div class="space-y-2 group">
-                                <label
-                                    class="text-xs font-bold text-neutral-400 uppercase tracking-widest">Username</label>
+                                <label class="text-xs font-bold text-neutral-400 uppercase tracking-widest">{{
+                                    'AUTH.REGISTER.USERNAME' | translate }}</label>
                                 <input type="text" formControlName="user_name"
                                     class="w-full bg-[#1e1e20] border-b-2 border-[#333] px-4 py-3 text-white placeholder-neutral-600 focus:outline-none focus:border-gold-500 focus:bg-[#252528] transition-all duration-300 rounded-t-lg text-sm font-medium"
                                     placeholder="john_doe">
@@ -132,15 +132,15 @@
                         <!-- Row 2: Phone & Email -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2 group">
-                                <label
-                                    class="text-xs font-bold text-neutral-400 uppercase tracking-widest">Phone</label>
+                                <label class="text-xs font-bold text-neutral-400 uppercase tracking-widest">{{
+                                    'AUTH.REGISTER.PHONE' | translate }}</label>
                                 <input type="text" formControlName="phone_number"
                                     class="w-full bg-[#1e1e20] border-b-2 border-[#333] px-4 py-3 text-white placeholder-neutral-600 focus:outline-none focus:border-gold-500 focus:bg-[#252528] transition-all duration-300 rounded-t-lg text-sm font-medium"
                                     placeholder="1234567890">
                             </div>
                             <div class="space-y-2 group">
-                                <label
-                                    class="text-xs font-bold text-neutral-400 uppercase tracking-widest">Email</label>
+                                <label class="text-xs font-bold text-neutral-400 uppercase tracking-widest">{{
+                                    'AUTH.REGISTER.EMAIL' | translate }}</label>
                                 <input type="email" formControlName="email"
                                     class="w-full bg-[#1e1e20] border-b-2 border-[#333] px-4 py-3 text-white placeholder-neutral-600 focus:outline-none focus:border-gold-500 focus:bg-[#252528] transition-all duration-300 rounded-t-lg text-sm font-medium"
                                     placeholder="admin@org.com">
@@ -150,15 +150,15 @@
                         <!-- Row 3: Passwords -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2 group">
-                                <label
-                                    class="text-xs font-bold text-neutral-400 uppercase tracking-widest">Password</label>
+                                <label class="text-xs font-bold text-neutral-400 uppercase tracking-widest">{{
+                                    'AUTH.REGISTER.PASSWORD' | translate }}</label>
                                 <input type="password" formControlName="password"
                                     class="w-full bg-[#1e1e20] border-b-2 border-[#333] px-4 py-3 text-white placeholder-neutral-600 focus:outline-none focus:border-gold-500 focus:bg-[#252528] transition-all duration-300 rounded-t-lg text-sm font-medium"
                                     placeholder="••••••••">
                             </div>
                             <div class="space-y-2 group">
-                                <label
-                                    class="text-xs font-bold text-neutral-400 uppercase tracking-widest">Confirm</label>
+                                <label class="text-xs font-bold text-neutral-400 uppercase tracking-widest">{{
+                                    'AUTH.REGISTER.CONFIRM_PASSWORD' | translate }}</label>
                                 <input type="password" formControlName="confirmPassword"
                                     class="w-full bg-[#1e1e20] border-b-2 border-[#333] px-4 py-3 text-white placeholder-neutral-600 focus:outline-none focus:border-gold-500 focus:bg-[#252528] transition-all duration-300 rounded-t-lg text-sm font-medium"
                                     [class.border-red-500]="registerForm.get('confirmPassword')?.touched && registerForm.hasError('mismatch', 'confirmPassword')"
@@ -168,7 +168,8 @@
 
                         @if (registerForm.get('confirmPassword')?.touched && registerForm.hasError('mismatch',
                         'confirmPassword')) {
-                        <p class="text-[10px] font-bold text-red-400 -mt-2">Passwords do not match</p>
+                        <p class="text-[10px] font-bold text-red-400 -mt-2">{{ 'AUTH.REGISTER.PASSWORDS_MISMATCH' |
+                            translate }}</p>
                         }
 
                         <!-- Terms -->
@@ -179,10 +180,12 @@
                             </div>
                             <label for="terms"
                                 class="text-xs text-neutral-500 font-medium leading-tight select-none cursor-pointer group-hover:text-neutral-300 transition-colors">
-                                I agree to the <a href="#"
-                                    class="text-gold-500 hover:text-gold-400 hover:underline">Terms of Service</a> and
-                                <a href="#" class="text-gold-500 hover:text-gold-400 hover:underline">Privacy
-                                    Policy</a>.
+                                {{ 'AUTH.REGISTER.AGREE_TERMS' | translate }} <a href="#"
+                                    class="text-gold-500 hover:text-gold-400 hover:underline">{{
+                                    'AUTH.REGISTER.TERMS_OF_SERVICE' | translate }}</a> {{ 'AUTH.REGISTER.AND' |
+                                translate }}
+                                <a href="#" class="text-gold-500 hover:text-gold-400 hover:underline">{{
+                                    'AUTH.REGISTER.PRIVACY_POLICY' | translate }}</a>.
                             </label>
                         </div>
 
@@ -213,17 +216,17 @@
                                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                                     </path>
                                 </svg>
-                                PROCESSING
+                                {{ 'AUTH.REGISTER.PROCESSING' | translate }}
                             </span>
                             } @else {
-                            CREATE ACCOUNT
+                            {{ 'AUTH.REGISTER.SUBMIT' | translate }}
                             }
                         </button>
 
                         <p class="text-center text-xs text-neutral-500 mt-6 font-medium">
-                            Already have an account? <a routerLink="/auth/login"
-                                class="text-white hover:text-gold-500 transition-colors font-bold ml-1 cursor-pointer">Sign
-                                In</a>
+                            {{ 'AUTH.REGISTER.HAVE_ACCOUNT' | translate }} <a routerLink="/auth/login"
+                                class="text-white hover:text-gold-500 transition-colors font-bold ml-1 cursor-pointer">{{
+                                'AUTH.REGISTER.SIGN_IN' | translate }}</a>
                         </p>
                     </form>
                 </div>

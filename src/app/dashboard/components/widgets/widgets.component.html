@@ -13,13 +13,14 @@
                         </svg>
                     </div>
                     <div>
-                        <h3 class="font-bold text-white text-sm">Premier League Standings</h3>
-                        <p class="text-[10px] text-zinc-500 uppercase tracking-wider">Season 2025/26 • Matchday 24</p>
+                        <h3 class="font-bold text-white text-sm">{{ 'WIDGETS.STANDINGS.TITLE' | translate }}</h3>
+                        <p class="text-[10px] text-zinc-500 uppercase tracking-wider">{{ 'WIDGETS.STANDINGS.SEASON' |
+                            translate }}</p>
                     </div>
                 </div>
                 <a href="#"
-                    class="text-[10px] font-bold text-gold-400 uppercase tracking-wider hover:underline border border-gold-400/30 px-2.5 py-1 rounded-full hover:bg-gold-400/10 transition-all">Full
-                    Table</a>
+                    class="text-[10px] font-bold text-gold-400 uppercase tracking-wider hover:underline border border-gold-400/30 px-2.5 py-1 rounded-full hover:bg-gold-400/10 transition-all">{{
+                    'WIDGETS.STANDINGS.FULL_TABLE' | translate }}</a>
             </div>
         </div>
 
@@ -79,11 +80,11 @@
         <div class="px-4 py-3 border-t border-zinc-800/50 flex items-center gap-4 text-[9px] text-zinc-600">
             <div class="flex items-center gap-1.5">
                 <span class="w-2 h-2 rounded-sm bg-blue-500"></span>
-                Champions League
+                {{ 'WIDGETS.STANDINGS.CHAMPIONS_LEAGUE' | translate }}
             </div>
             <div class="flex items-center gap-1.5">
                 <span class="w-2 h-2 rounded-sm bg-orange-500"></span>
-                Europa League
+                {{ 'WIDGETS.STANDINGS.EUROPA_LEAGUE' | translate }}
             </div>
         </div>
     </div>
@@ -100,8 +101,9 @@
                     </svg>
                 </div>
                 <div>
-                    <h3 class="font-bold text-white text-sm">Golden Boot Race</h3>
-                    <p class="text-[10px] text-zinc-500 uppercase tracking-wider">Top Goal Scorers</p>
+                    <h3 class="font-bold text-white text-sm">{{ 'WIDGETS.SCORERS.TITLE' | translate }}</h3>
+                    <p class="text-[10px] text-zinc-500 uppercase tracking-wider">{{ 'WIDGETS.SCORERS.SUBTITLE' |
+                        translate }}</p>
                 </div>
             </div>
         </div>
@@ -149,12 +151,14 @@
     <!-- Promo Widget -->
     <div class="bg-gradient-to-br from-gold-400 to-gold-600 rounded-xl p-6 text-black relative overflow-hidden">
         <div class="relative z-10">
-            <div class="font-bold text-xs uppercase tracking-wider opacity-70 mb-2">Pro Feature</div>
-            <h3 class="text-2xl font-extrabold mb-2 leading-tight">UNLOCK<br>ANALYTICS</h3>
-            <p class="text-sm font-medium opacity-80 mb-4">Get detailed player stats and heatmaps.</p>
+            <div class="font-bold text-xs uppercase tracking-wider opacity-70 mb-2">{{ 'WIDGETS.PROMO.BADGE' | translate
+                }}</div>
+            <h3 class="text-2xl font-extrabold mb-2 leading-tight">{{ 'WIDGETS.PROMO.TITLE' | translate | uppercase }}
+            </h3>
+            <p class="text-sm font-medium opacity-80 mb-4">{{ 'WIDGETS.PROMO.SUBTITLE' | translate }}</p>
             <button
-                class="bg-black text-gold-400 text-xs font-bold uppercase py-2 px-4 rounded hover:bg-zinc-800 transition-colors">Upgrade
-                Now</button>
+                class="bg-black text-gold-400 text-xs font-bold uppercase py-2 px-4 rounded hover:bg-zinc-800 transition-colors">{{
+                'WIDGETS.PROMO.BTN' | translate }}</button>
         </div>
         <!-- Decorative circle -->
         <div class="absolute -bottom-6 -right-6 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>

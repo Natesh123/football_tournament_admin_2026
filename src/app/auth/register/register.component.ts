@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../auth.service';
@@ -10,7 +11,7 @@ import { PhysicsBallDirective } from '../physics-ball.directive';
     templateUrl: './register.html',
     styleUrl: './register.css',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, RouterLink, PhysicsBallDirective]
+    imports: [CommonModule, ReactiveFormsModule, RouterLink, PhysicsBallDirective, TranslateModule]
 })
 export class RegisterComponent {
 

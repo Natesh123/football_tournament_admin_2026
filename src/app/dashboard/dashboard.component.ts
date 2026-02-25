@@ -8,13 +8,14 @@ import { MatchFeedComponent } from './components/match-feed/match-feed.component
 import { WidgetsComponent } from './components/widgets/widgets.component';
 import { StatsBoard } from '../components/stats-board/stats-board';
 import { TournamentService } from '../tournament/tournament.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-dashboard',
     templateUrl: './dashboard.html',
     styleUrl: './dashboard.css',
     standalone: true,
-    imports: [CommonModule, HeroComponent, MatchFeedComponent, WidgetsComponent, StatsBoard, FormsModule]
+    imports: [CommonModule, HeroComponent, MatchFeedComponent, WidgetsComponent, StatsBoard, FormsModule, TranslateModule]
 })
 export class DashboardComponent {
     private tournamentService = inject(TournamentService);

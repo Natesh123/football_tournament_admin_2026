@@ -1,11 +1,102 @@
 {
+    "AUTH": {
+        "LOGIN": {
+            "HEADLINE": "Comanda",
+            "TAGLINE": "La Liga.",
+            "DESCRIPTION": "El panel definitivo para la gestión moderna del fútbol. Orquesta cada partido, sigue cada estadística.",
+            "ACTIVE_PLAYERS": "Jugadores Activos",
+            "LIVE_MATCHES": "Partidos en Vivo",
+            "SYSTEM_ONLINE": "Sistema En Línea",
+            "TITLE": "Bienvenido",
+            "SUBTITLE": "Introduce tus credenciales para acceder al panel.",
+            "EMAIL_LABEL": "Correo Electrónico",
+            "PASSWORD_LABEL": "Contraseña",
+            "FORGOT": "¿Olvidaste?",
+            "PROCESSING": "Procesando",
+            "SUBMIT": "Inicio de Sesión Seguro",
+            "NO_ACCOUNT": "¿Nueva Organización?",
+            "REGISTER_LINK": "Regístrate Aquí",
+            "TOURNAMENT_EDITION": "Edición Torneo"
+        },
+        "REGISTER": {
+            "HEADLINE": "Únete a",
+            "TAGLINE": "La Liga.",
+            "DESCRIPTION": "Crea tu cuenta de organización y empieza a gestionar torneos como un profesional.",
+            "CLUBS_JOINED": "Clubes Unidos",
+            "REGISTRATION_OPEN": "Registro Abierto",
+            "TITLE": "Crear Cuenta",
+            "SUBTITLE": "Introduce tus datos para dar un hogar a tu organización.",
+            "ORG_NAME": "Nombre de Org.",
+            "USERNAME": "Nombre de Usuario",
+            "PHONE": "Teléfono",
+            "EMAIL": "Correo",
+            "PASSWORD": "Contraseña",
+            "CONFIRM_PASSWORD": "Confirmar",
+            "PASSWORDS_MISMATCH": "Las contraseñas no coinciden",
+            "AGREE_TERMS": "Acepto los",
+            "TERMS_OF_SERVICE": "Términos de Servicio",
+            "AND": "y la",
+            "PRIVACY_POLICY": "Política de Privacidad",
+            "PROCESSING": "Procesando",
+            "SUBMIT": "Crear Cuenta",
+            "HAVE_ACCOUNT": "¿Ya tienes una cuenta?",
+            "SIGN_IN": "Iniciar Sesión",
+            "TOURNAMENT_EDITION": "Edición Torneo"
+        },
+        "OTP": {
+            "TITLE": "Verificación de Seguridad",
+            "SUBTITLE": "Por favor verifica tu identidad para continuar.",
+            "CODE_SENT_TO": "Código enviado a",
+            "CODE_REQUIRED": "El código es requerido",
+            "MUST_BE_6_DIGITS": "Debe ser 6 dígitos",
+            "VERIFYING": "Verificando...",
+            "SUBMIT": "Autenticar",
+            "NO_CODE": "¿No recibiste el código?",
+            "RESEND": "Reenviar Código",
+            "SECURED_BY": "Protegido por ATB Sports Shield"
+        }
+    },
     "TOPBAR": {
         "DASHBOARD": "Tablero",
         "TOURNAMENTS": "Torneos",
         "TEAMS": "Equipos",
         "SETTINGS": "Ajustes",
         "SEARCH": "Buscar",
-        "PROFILE": "Perfil"
+        "PROFILE": "Perfil",
+        "NOTIFICATIONS": "Notificaciones",
+        "NEW": "nuevo",
+        "MARK_ALL_READ": "Marcar todo leído",
+        "VIEW_ALL_NOTIFICATIONS": "Ver Todas las Notificaciones",
+        "MY_PROFILE": "Mi Perfil",
+        "SETTINGS_MENU": "Ajustes",
+        "LOG_OUT": "Cerrar Sesión",
+        "NO_EMAIL": "Sin correo"
+    },
+    "COMMON": {
+        "SAVE": "Guardar",
+        "CANCEL": "Cancelar",
+        "DELETE": "Eliminar",
+        "EDIT": "Editar",
+        "CREATE": "Crear",
+        "SEARCH": "Buscar",
+        "LOADING": "Cargando...",
+        "NO_DATA": "No se encontraron datos",
+        "STATUS": {
+            "APPROVED": "Aprobado",
+            "PENDING": "Pendiente",
+            "REJECTED": "Rechazado",
+            "ACTIVE": "Activo",
+            "INACTIVE": "Inactivo"
+        },
+        "NA": "N/D",
+        "UPLOAD": "Subir",
+        "REMOVE": "Eliminar"
+    },
+    "HERO": {
+        "TITLE": "Torneo",
+        "TITLE_HIGHLIGHT": "Centro de Control",
+        "SUBTITLE": "Gestiona brackets, programa partidos y maneja puntuaciones en vivo desde un panel unificado.",
+        "CREATE_BTN": "Crear Nuevo Torneo"
     },
     "MATCH_FEED": {
         "TABS": {
@@ -25,5 +116,326 @@
             "DETAILS": "Detalles",
             "STATUS_FT": "FIN"
         }
+    },
+    "DASHBOARD": {
+        "TITLE": "Tablero",
+        "SUBTITLE": "¡Bienvenido! Esto es lo que pasa hoy.",
+        "STATS": {
+            "TOTAL_TOURNAMENTS": "Total de Torneos",
+            "FINISHED_TOURNAMENTS": "Torneos Terminados",
+            "TOTAL_TEAMS": "Total Equipos / Clubes",
+            "TOTAL_PLAYERS": "Total de Jugadores",
+            "LIVE_TOURNAMENTS": "Torneos en Vivo",
+            "LIVE_MATCHES": "Partidos en Vivo",
+            "UPCOMING_MATCHES": "Partidos de Hoy",
+            "FINISHED_MATCHES": "Partidos Terminados Hoy"
+        },
+        "CREATE_TOURNAMENT": "Crear Torneo",
+        "MODAL": {
+            "TITLE": "Crear Torneo",
+            "NAME": "Nombre del Torneo",
+            "NAME_PLACEHOLDER": "ej. Liga de Campeones 2026",
+            "DESCRIPTION": "Descripción",
+            "DESCRIPTION_PLACEHOLDER": "Breve descripción...",
+            "START_DATE": "Fecha de Inicio",
+            "END_DATE": "Fecha de Fin",
+            "STATUS": "Estado",
+            "STATUS_DRAFT": "Borrador",
+            "STATUS_ACTIVE": "Activo",
+            "STATUS_REGISTRATION_OPEN": "Registro Abierto",
+            "MAX_TEAMS": "Máx. Equipos",
+            "PRIZE_POOL": "Premio",
+            "PRIZE_POOL_PLACEHOLDER": "ej. $500k USD",
+            "SUBMIT": "Crear Torneo",
+            "CREATING": "Creando..."
+        }
+    },
+    "TOURNAMENTS": {
+        "TITLE": "Torneos",
+        "SUBTITLE": "Gestionar todas las competiciones",
+        "CREATE": "Crear Torneo",
+        "SEARCH_PLACEHOLDER": "Buscar torneos...",
+        "FILTER": {
+            "STATUS": "Estado",
+            "ALL": "Todos",
+            "DATE_FROM": "Desde",
+            "DATE_TO": "Hasta",
+            "SORT_BY": "Ordenar por",
+            "SORT_NAME": "Nombre",
+            "SORT_DATE": "Fecha",
+            "SORT_PARTICIPANTS": "Participantes",
+            "CLEAR": "Limpiar Filtros"
+        },
+        "TABS": {
+            "LIVE": "En Vivo",
+            "UPCOMING": "Próximos",
+            "PAST": "Pasados",
+            "ARCHIVED": "Archivados"
+        },
+        "CARD": {
+            "PARTICIPANTS": "Participantes",
+            "PRIZE_POOL": "Premio",
+            "ROUND": "Ronda",
+            "SCHEDULE": "Calendario",
+            "VIEW": "Ver"
+        },
+        "EMPTY": "No se encontraron torneos.",
+        "FILTER_STATUSES": {
+            "ALL": "Todos los Estados",
+            "LIVE": "En Vivo",
+            "IN_PROGRESS": "En Progreso",
+            "REGISTRATION": "Registro Abierto",
+            "STARTING_SOON": "Próximamente",
+            "COMPLETED": "Completado",
+            "DRAFT": "Borrador",
+            "ARCHIVED": "Archivado"
+        },
+        "SORT": {
+            "NAME": "Ordenar: Nombre",
+            "DATE": "Ordenar: Fecha",
+            "PARTICIPANTS": "Ordenar: Participantes"
+        },
+        "CLEAR": "Limpiar",
+        "TRY_FILTERS": "Intenta ajustar tu búsqueda o filtros",
+        "CLEAR_ALL_FILTERS": "Limpiar todos los filtros",
+        "MANAGE": "Gestionar",
+        "CURRENT_ROUND": "Ronda Actual",
+        "WINNER": "Ganador",
+        "PRIZE_POOL": "Premio",
+        "IMAGE": "Imagen"
+    },
+    "TEAMS": {
+        "TITLE": "Equipos",
+        "SUBTITLE": "Gestionar todos los equipos participantes",
+        "CREATE": "Crear Equipo",
+        "SEARCH_PLACEHOLDER": "Buscar equipos...",
+        "EMPTY": "No se encontraron equipos.",
+        "CARD": {
+            "NO_EMAIL": "Sin correo electrónico",
+            "CAPTAIN": "Capitán"
+        }
+    },
+    "TEAM_LAYOUT": {
+        "TEAM_MANAGER": "Gerente de Equipo",
+        "NAV": {
+            "OVERVIEW": "Resumen",
+            "MEMBERS": "Miembros",
+            "MATCHES": "Partidos",
+            "STATISTICS": "Estadísticas",
+            "GALLERY": "Galería"
+        }
+    },
+    "TEAM_OVERVIEW": {
+        "TITLE": "Resumen del Equipo",
+        "SUBTITLE": "Resumen de estadísticas y rendimiento del equipo.",
+        "PERFORMANCE": {
+            "TITLE": "Resumen de Rendimiento",
+            "TOTAL_MATCHES": "Partidos Totales",
+            "WINS": "Victorias",
+            "DRAWS": "Empates",
+            "LOSSES": "Derrotas",
+            "GOALS_SCORED": "Goles a Favor",
+            "GOALS_CONCEDED": "Goles en Contra",
+            "CLEAN_SHEETS": "Porterías a Cero",
+            "WIN_PERCENTAGE": "% Victorias"
+        },
+        "RECENT_MATCHES": {
+            "TITLE": "Partidos Recientes",
+            "OPPONENT": "Oponente",
+            "SCORE": "Marcador",
+            "RESULT": "Resultado",
+            "DATE": "Fecha",
+            "TOURNAMENT": "Nombre del Torneo",
+            "EMPTY": "Sin partidos recientes."
+        }
+    },
+    "TEAM_MATCHES": {
+        "TITLE": "Partidos",
+        "SUBTITLE": "Ver todos los partidos jugados por este equipo.",
+        "EMPTY": "Sin partidos aún",
+        "EMPTY_SUBTITLE": "Los partidos aparecerán aquí una vez programados."
+    },
+    "TEAM_STATISTICS": {
+        "TITLE": "Estadísticas",
+        "SUBTITLE": "Estadísticas de rendimiento de este equipo.",
+        "STATS": {
+            "PLAYED": "Partidos Jugados",
+            "WINS": "Victorias",
+            "DRAWS": "Empates",
+            "LOSSES": "Derrotas"
+        },
+        "EMPTY": "Sin datos disponibles",
+        "EMPTY_SUBTITLE": "Las estadísticas se llenarán tras los partidos."
+    },
+    "TEAM_MEMBERS": {
+        "PAGE_TITLE": "Miembros del Equipo",
+        "TOTAL_PLAYERS": "Total Jugadores",
+        "ADD_PLAYER": "Añadir Jugador",
+        "ADD_STAFF": "Añadir Cuerpo Técnico",
+        "SEARCH_PLACEHOLDER": "Buscar por nombre o número...",
+        "FILTER": {
+            "ALL": "Todos",
+            "PLAYERS": "Jugadores",
+            "STAFF": "Cuerpo Técnico",
+            "ACTIVE": "Activo",
+            "INJURED": "Lesionado"
+        },
+        "ROLES": {
+            "CAPTAIN": "Capitán",
+            "VICE_CAPTAIN": "Vice Capitán",
+            "PLAYER": "Jugador",
+            "COACH": "Entrenador",
+            "MANAGER": "Manager"
+        },
+        "STATUS": {
+            "ACTIVE": "Activo",
+            "INJURED": "Lesionado",
+            "SUSPENDED": "Suspendido"
+        },
+        "EMPTY_STATE": {
+            "TITLE": "Aún no se han añadido miembros",
+            "SUBTITLE": "Empieza a construir tu equipo añadiendo jugadores.",
+            "ADD_FIRST": "Añadir Primer Miembro"
+        },
+        "MODAL": {
+            "ADD_TITLE": "Añadir Nuevo Miembro",
+            "EDIT_TITLE": "Editar Miembro",
+            "FULL_NAME": "Nombre Completo",
+            "FULL_NAME_PLACEHOLDER": "ej. Andrés Iniesta",
+            "PHOTO": "Foto de Perfil",
+            "PHOTO_HINT": "Añadir foto (PNG, JPG)",
+            "JERSEY": "Número de Camiseta",
+            "JERSEY_PLACEHOLDER": "ej. 8",
+            "POSITION": "Posición",
+            "POSITION_PLACEHOLDER": "Seleccionar Posición",
+            "DOB": "Fecha de Nacimiento",
+            "FOOT": "Pie Preferido",
+            "PHONE": "Teléfono (Opcional)",
+            "EMAIL": "Correo Electrónico (Opcional)",
+            "ROLE": "Rol",
+            "STATUS": "Estado",
+            "SUBMIT": "Añadir Miembro",
+            "UPDATING": "Actualizando...",
+            "ADDING": "Añadiendo..."
+        },
+        "POSITIONS": {
+            "GK": "Portero (GK)",
+            "DF": "Defensa (DF)",
+            "MF": "Centrocampista (MF)",
+            "FW": "Delantero (FW)"
+        },
+        "FOOT": {
+            "RIGHT": "Derecho",
+            "LEFT": "Izquierdo",
+            "BOTH": "Ambos"
+        },
+        "QUICK_STATS": {
+            "MATCHES": "Partidos",
+            "GOALS": "Goles",
+            "ASSISTS": "Asistencias"
+        },
+        "ACTIONS": {
+            "EDIT": "Editar",
+            "REMOVE": "Eliminar",
+            "VIEW_PROFILE": "Ver Perfil"
+        }
+    },
+    "TEAM_GALLERY": {
+        "TITLE": "Galería",
+        "SUBTITLE": "Fotos y medios del equipo.",
+        "UPLOAD": "Subir Fotos",
+        "UPLOADING": "Subiendo...",
+        "EMPTY": "Sin fotos aún",
+        "EMPTY_SUBTITLE": "Sube fotos para construir la galería del equipo.",
+        "DELETE_CONFIRM": "¿Eliminar esta foto?",
+        "UPLOAD_SUCCESS": "foto(s) subida(s) correctamente",
+        "UPLOAD_ERROR": "Error al subir. Inténtalo de nuevo.",
+        "DELETE_ERROR": "Error al eliminar la foto."
+    },
+    "CREATE_TEAM": {
+        "TITLE": "Crear Equipo",
+        "SUBTITLE": "Rellena los detalles para crear un perfil de equipo",
+        "LOGO": {
+            "LABEL": "Logo del Equipo",
+            "HINT": "Haz clic para subir un logo (PNG, JPG, SVG)",
+            "BROWSE": "Examinar…",
+            "REMOVE": "Eliminar logo"
+        },
+        "FIELDS": {
+            "NAME": "Nombre del Equipo",
+            "SHORT_NAME": "Nombre Corto",
+            "SHORT_NAME_HINT": "(3–5 letras)",
+            "TYPE": "Tipo de Equipo",
+            "TYPE_PLACEHOLDER": "Seleccionar tipo…",
+            "CITY": "Ciudad",
+            "STATE": "Estado/Región",
+            "COUNTRY": "País",
+            "FOUNDED": "Año de Fundación",
+            "FOUNDED_HINT": "(opcional)",
+            "GROUND": "Campo Local",
+            "DESCRIPTION": "Descripción del Equipo"
+        },
+        "PLACEHOLDERS": {
+            "NAME": "ej. Madrid FC",
+            "SHORT_NAME": "ej. MFC",
+            "CITY": "ej. Madrid",
+            "STATE": "ej. Comunidad de Madrid",
+            "COUNTRY": "ej. España",
+            "FOUNDED": "ej. 2005",
+            "GROUND": "ej. Santiago Bernabéu",
+            "DESCRIPTION": "Breve descripción del equipo…"
+        },
+        "REQUIRED_NOTE": "Los campos marcados * son obligatorios",
+        "SUBMIT": "Crear Equipo"
+    },
+    "SETTINGS": {
+        "TITLE": "Ajustes",
+        "NAV": {
+            "ROLES": "Roles",
+            "USERS": "Usuarios",
+            "PERMISSIONS": "Permisos"
+        },
+        "ROLES": {
+            "TITLE": "Roles",
+            "SUBTITLE": "Gestionar roles y niveles de acceso.",
+            "CREATE": "Crear Rol",
+            "EMPTY": "No se encontraron roles."
+        },
+        "USERS": {
+            "TITLE": "Usuarios",
+            "SUBTITLE": "Gestionar administradores.",
+            "CREATE": "Invitar Usuario",
+            "SEARCH": "Buscar usuarios...",
+            "EMPTY": "No se encontraron usuarios."
+        },
+        "PERMISSIONS": {
+            "TITLE": "Permisos",
+            "SUBTITLE": "Configurar permisos de roles.",
+            "EMPTY": "Sin permisos configurados."
+        }
+    },
+    "WIDGETS": {
+        "STANDINGS": {
+            "TITLE": "Clasificación Premier League",
+            "SEASON": "Temporada 2025/26 • Jornada 24",
+            "FULL_TABLE": "Tabla Completa",
+            "CHAMPIONS_LEAGUE": "Liga de Campeones",
+            "EUROPA_LEAGUE": "Liga Europa"
+        },
+        "SCORERS": {
+            "TITLE": "Carrera por la Bota de Oro",
+            "SUBTITLE": "Máximos Goleadores"
+        },
+        "PROMO": {
+            "BADGE": "Función Pro",
+            "TITLE": "Desbloquear Análisis",
+            "SUBTITLE": "Obtén estadísticas detalladas de jugadores y mapas de calor.",
+            "BTN": "Actualizar Ahora"
+        }
+    },
+    "MATCH_FEED_LABELS": {
+        "VENUE": "Estadio",
+        "KICKOFF": "Saque Inicial",
+        "WINNER": "Ganador"
     }
 }
