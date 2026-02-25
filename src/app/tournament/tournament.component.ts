@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LoaderComponent } from '../components/loader/loader.component';
 import { TournamentService, TournamentDTO } from './tournament.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-tournament',
     standalone: true,
-    imports: [CommonModule, FormsModule, LoaderComponent],
+    imports: [CommonModule, FormsModule, LoaderComponent, TranslateModule],
     templateUrl: './tournament.component.html',
 })
 export class TournamentComponent implements OnInit {
@@ -61,131 +62,56 @@ export class TournamentComponent implements OnInit {
         }
     ];
 
+    allTournaments: TournamentDTO[] = [];
+
     ngOnInit() {
-        setTimeout(() => {
-            this.isLoading.set(false);
-        }, 3000);
+        this.loadTournaments();
     }
 
-    tournaments = [
-        {
-            id: 1,
-            title: 'Champions League - Quarter Finals',
-            status: 'LIVE NOW',
-            statusClass: 'text-gold-400 border-gold-400 bg-gold-400/10',
-            schedule: 'Oct 12, 2023',
-            participants: '32 Elite Teams',
-            prizePool: '$2.5M USD',
-            currentRound: 'Matchday 3/8',
-            image: 'https://cdn.example.com/ucl.jpg',
-            tag: 'UCL'
-        },
-        {
-            id: 2,
-            title: 'Premier League Summer Cup',
-            status: 'MATCH IN PROGRESS',
-            statusClass: 'text-gold-400 border-gold-400 bg-gold-400/10',
-            schedule: 'Oct 15, 2023',
-            participants: '20 Pro Clubs',
-            prizePool: '$800k USD',
-            currentRound: 'Group Stage',
-            image: 'https://cdn.example.com/epl.jpg',
-            tag: 'EPL'
-        },
-        {
-            id: 3,
-            title: 'La Liga Youth Series',
-            status: 'LIVE',
-            statusClass: 'text-gold-400 border-gold-400 bg-gold-400/10',
-            schedule: 'Oct 20, 2023',
-            participants: '16 Academies',
-            prizePool: 'Exhibition',
-            currentRound: 'Semifinals',
-            image: 'https://cdn.example.com/laliga.jpg',
-            tag: 'LL'
-        }
-    ];
+    loadTournaments() {
+        this.isLoading.set(true);
+        this.tournamentService.getAll().subscribe({
+            next: (data) => {
+                this.allTournaments = data;
+                this.isLoading.set(false);
+            },
+            error: (err) => {
+                console.error('Failed to load tournaments', err);
+                this.isLoading.set(false);
+                this.showToast('Failed to load tournaments');
+            }
+        });
+    }
 
-    upcomingTournaments = [
-        {
-            id: 4,
-            title: 'World Cup Qualifiers 2026',
-            status: 'STARTS NOV 15',
-            statusClass: 'text-blue-400 border-blue-400 bg-blue-400/10',
-            schedule: 'Nov 15, 2026',
-            participants: '48 National Teams',
-            prizePool: 'Qualification',
-            currentRound: 'Group Stage Draw',
-            image: 'https://cdn.example.com/wcq.jpg',
-            tag: 'WCQ'
-        },
-        {
-            id: 5,
-            title: 'Winter League 2026',
-            status: 'REGISTRATION OPEN',
-            statusClass: 'text-green-400 border-green-400 bg-green-400/10',
-            schedule: 'Dec 01, 2026',
-            participants: '16 Regional Clubs',
-            prizePool: '$150k USD',
-            currentRound: 'Pre-Season',
-            image: 'https://cdn.example.com/winter.jpg',
-            tag: 'WL'
+    manageTournament(id: string | undefined) {
+        if (id) {
+            this.router.navigate(['/tournaments', id]);
         }
-    ];
+    }
 
-    pastTournaments = [
-        {
-            id: 6,
-            title: 'Summer Cup 2025',
-            status: 'COMPLETED',
-            statusClass: 'text-zinc-400 border-zinc-400 bg-zinc-400/10',
-            schedule: 'Aug 20, 2025',
-            participants: '32 Teams',
-            prizePool: '$500k USD',
-            currentRound: 'Winner: Madrid Kings',
-            image: 'https://cdn.example.com/summer.jpg',
-            tag: 'SC'
-        },
-        {
-            id: 7,
-            title: 'Euro 2024',
-            status: 'COMPLETED',
-            statusClass: 'text-zinc-400 border-zinc-400 bg-zinc-400/10',
-            schedule: 'Jul 14, 2024',
-            participants: '24 National Teams',
-            prizePool: '€331M EUR',
-            currentRound: 'Winner: Spain',
-            image: 'https://cdn.example.com/euro.jpg',
-            tag: 'EUR'
-        }
-    ];
+    getStatusLabel(status: string): string {
+        const map: Record<string, string> = {
+            draft: 'Draft',
+            registration_open: 'Registration Open',
+            in_progress: 'In Progress',
+            completed: 'Completed',
+            archived: 'Archived'
+        };
+        return map[status?.toLowerCase()] || status || 'Unknown';
+    }
 
-    archivedTournaments = [
-        {
-            id: 8,
-            title: 'Legacy Cup 2020',
-            status: 'ARCHIVED',
-            statusClass: 'text-zinc-600 border-zinc-600 bg-zinc-600/10',
-            schedule: 'Jan 10, 2020',
-            participants: '16 Teams',
-            prizePool: '$50k USD',
-            currentRound: 'Winner: Old Guard',
-            image: 'https://cdn.example.com/legacy.jpg',
-            tag: 'LC'
-        },
-        {
-            id: 9,
-            title: '2019 Season',
-            status: 'ARCHIVED',
-            statusClass: 'text-zinc-600 border-zinc-600 bg-zinc-600/10',
-            schedule: 'May 20, 2019',
-            participants: '12 Teams',
-            prizePool: '$20k USD',
-            currentRound: 'Winner: Pioneers',
-            image: 'https://cdn.example.com/2019.jpg',
-            tag: 'S19'
-        }
-    ];
+    getStatusClass(status: string): string {
+        const map: Record<string, string> = {
+            draft: 'text-blue-400 border-blue-400/30 bg-blue-400/10',
+            registration_open: 'text-emerald-400 border-emerald-400/30 bg-emerald-400/10',
+            in_progress: 'text-gold-400 border-gold-400/30 bg-gold-400/10',
+            completed: 'text-zinc-400 border-zinc-400/30 bg-zinc-400/10',
+            archived: 'text-zinc-600 border-zinc-600/30 bg-zinc-600/10'
+        };
+        return map[status?.toLowerCase()] || 'text-zinc-400 border-zinc-400/30 bg-zinc-400/10';
+    }
+
+
 
     stats = [
         { label: 'ACTIVE CUPS', value: '24', icon: 'trophy' },
@@ -194,21 +120,27 @@ export class TournamentComponent implements OnInit {
     ];
 
     get activeTournaments() {
-        let list: any[];
+        let list: TournamentDTO[];
         switch (this.currentTab()) {
-            case 'upcoming': list = this.upcomingTournaments; break;
-            case 'past': list = this.pastTournaments; break;
-            case 'archived': list = this.archivedTournaments; break;
-            default: list = this.tournaments;
+            case 'upcoming':
+                list = this.allTournaments.filter(t => t.status === 'draft' || t.status === 'registration_open');
+                break;
+            case 'past':
+            case 'archived':
+                list = this.allTournaments.filter(t => t.status === 'completed');
+                break;
+            case 'live':
+            default:
+                list = this.allTournaments.filter(t => t.status === 'in_progress');
+                break;
         }
 
         // Search filter
         if (this.searchQuery.trim()) {
             const q = this.searchQuery.toLowerCase();
             list = list.filter(t =>
-                t.title.toLowerCase().includes(q) ||
-                t.participants.toLowerCase().includes(q) ||
-                t.tag.toLowerCase().includes(q)
+                t.name.toLowerCase().includes(q) ||
+                (t.maxTeams?.toString().includes(q))
             );
         }
 
@@ -220,25 +152,29 @@ export class TournamentComponent implements OnInit {
         // Date range filter
         if (this.filterDateFrom) {
             const from = new Date(this.filterDateFrom).getTime();
-            list = list.filter(t => new Date(t.schedule).getTime() >= from);
+            list = list.filter(t => t.startDate && new Date(t.startDate).getTime() >= from);
         }
         if (this.filterDateTo) {
             const to = new Date(this.filterDateTo).getTime();
-            list = list.filter(t => new Date(t.schedule).getTime() <= to);
+            list = list.filter(t => t.startDate && new Date(t.startDate).getTime() <= to);
         }
 
         // Sort
         switch (this.sortBy) {
             case 'name':
-                list = [...list].sort((a, b) => a.title.localeCompare(b.title));
+                list = [...list].sort((a, b) => a.name.localeCompare(b.name));
                 break;
             case 'date':
-                list = [...list].sort((a, b) => new Date(a.schedule).getTime() - new Date(b.schedule).getTime());
+                list = [...list].sort((a, b) => {
+                    const dateA = a.startDate ? new Date(a.startDate).getTime() : 0;
+                    const dateB = b.startDate ? new Date(b.startDate).getTime() : 0;
+                    return dateA - dateB;
+                });
                 break;
             case 'participants':
                 list = [...list].sort((a, b) => {
-                    const numA = parseInt(a.participants) || 0;
-                    const numB = parseInt(b.participants) || 0;
+                    const numA = typeof a.maxTeams === 'number' ? a.maxTeams : 0;
+                    const numB = typeof b.maxTeams === 'number' ? b.maxTeams : 0;
                     return numB - numA;
                 });
                 break;

@@ -8,14 +8,14 @@
 
         <!-- Header Row with Create Button -->
         <div class="flex items-center justify-between">
-            <h1 class="text-2xl font-bold text-white">Tournaments</h1>
+            <h1 class="text-2xl font-bold text-white">{{ 'TOURNAMENTS.TITLE' | translate }}</h1>
             <button (click)="openCreateModal()"
                 class="bg-gold-400 hover:bg-gold-400/90 text-black font-bold py-2.5 px-6 rounded-lg transition-all duration-300 hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] flex items-center gap-2 transform hover:-translate-y-0.5">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                 </svg>
-                Create New Tournament
+                {{ 'TOURNAMENTS.CREATE' | translate }}
             </button>
         </div>
 
@@ -29,21 +29,28 @@
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                <input type="text" [(ngModel)]="searchQuery" placeholder="Search tournaments..."
+                <input type="text" [(ngModel)]="searchQuery"
+                    [placeholder]="'TOURNAMENTS.SEARCH_PLACEHOLDER' | translate"
                     class="w-full bg-white/5 border border-black-border rounded-lg pl-10 pr-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all" />
             </div>
 
             <!-- Status Filter -->
             <select [(ngModel)]="filterStatus"
                 class="bg-white/5 border border-black-border rounded-lg px-4 py-2.5 text-sm text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all">
-                <option value="all" class="bg-black-card">All Statuses</option>
-                <option value="live" class="bg-black-card">Live</option>
-                <option value="progress" class="bg-black-card">In Progress</option>
-                <option value="registration" class="bg-black-card">Registration Open</option>
-                <option value="starts" class="bg-black-card">Starting Soon</option>
-                <option value="completed" class="bg-black-card">Completed</option>
-                <option value="draft" class="bg-black-card">Draft</option>
-                <option value="archived" class="bg-black-card">Archived</option>
+                <option value="all" class="bg-black-card">{{ 'TOURNAMENTS.FILTER_STATUSES.ALL' | translate }}</option>
+                <option value="live" class="bg-black-card">{{ 'TOURNAMENTS.FILTER_STATUSES.LIVE' | translate }}</option>
+                <option value="progress" class="bg-black-card">{{ 'TOURNAMENTS.FILTER_STATUSES.IN_PROGRESS' | translate
+                    }}</option>
+                <option value="registration" class="bg-black-card">{{ 'TOURNAMENTS.FILTER_STATUSES.REGISTRATION' |
+                    translate }}</option>
+                <option value="starts" class="bg-black-card">{{ 'TOURNAMENTS.FILTER_STATUSES.STARTING_SOON' | translate
+                    }}</option>
+                <option value="completed" class="bg-black-card">{{ 'TOURNAMENTS.FILTER_STATUSES.COMPLETED' | translate
+                    }}</option>
+                <option value="draft" class="bg-black-card">{{ 'TOURNAMENTS.FILTER_STATUSES.DRAFT' | translate }}
+                </option>
+                <option value="archived" class="bg-black-card">{{ 'TOURNAMENTS.FILTER_STATUSES.ARCHIVED' | translate }}
+                </option>
             </select>
 
             <!-- Date Range -->
@@ -85,9 +92,10 @@
             <!-- Sort By -->
             <select [(ngModel)]="sortBy"
                 class="bg-white/5 border border-black-border rounded-lg px-4 py-2.5 text-sm text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all">
-                <option value="name" class="bg-black-card">Sort: Name</option>
-                <option value="date" class="bg-black-card">Sort: Date</option>
-                <option value="participants" class="bg-black-card">Sort: Participants</option>
+                <option value="name" class="bg-black-card">{{ 'TOURNAMENTS.SORT.NAME' | translate }}</option>
+                <option value="date" class="bg-black-card">{{ 'TOURNAMENTS.SORT.DATE' | translate }}</option>
+                <option value="participants" class="bg-black-card">{{ 'TOURNAMENTS.SORT.PARTICIPANTS' | translate }}
+                </option>
             </select>
 
             <!-- Active Filters Badge & Clear -->
@@ -112,7 +120,8 @@
             <button class="pb-3 text-sm font-bold tracking-wider relative transition-colors"
                 [class.text-gold-400]="currentTab() === 'live'" [class.text-zinc-500]="currentTab() !== 'live'"
                 (click)="switchTab('live')">
-                <span class="inline-block w-2 h-2 rounded-full bg-green-500 mr-1 animate-pulse"></span> LIVE
+                <span class="inline-block w-2 h-2 rounded-full bg-green-500 mr-1 animate-pulse"></span>{{
+                'TOURNAMENTS.TABS.LIVE' | translate | uppercase }}
                 @if (currentTab() === 'live') {
                 <span class="absolute bottom-0 left-0 w-full h-0.5 bg-gold-400"></span>
                 }
@@ -120,7 +129,7 @@
             <button
                 class="pb-3 text-sm font-bold tracking-wider relative transition-colors text-zinc-500 hover:text-white"
                 [class.text-gold-400]="currentTab() === 'upcoming'" (click)="switchTab('upcoming')">
-                UPCOMING
+                {{ 'TOURNAMENTS.TABS.UPCOMING' | translate | uppercase }}
                 @if (currentTab() === 'upcoming') {
                 <span class="absolute bottom-0 left-0 w-full h-0.5 bg-gold-400"></span>
                 }
@@ -128,7 +137,7 @@
             <button
                 class="pb-3 text-sm font-bold tracking-wider relative transition-colors text-zinc-500 hover:text-white"
                 [class.text-gold-400]="currentTab() === 'past'" (click)="switchTab('past')">
-                PAST TOURNAMENTS
+                {{ 'TOURNAMENTS.TABS.PAST' | translate | uppercase }}
                 @if (currentTab() === 'past') {
                 <span class="absolute bottom-0 left-0 w-full h-0.5 bg-gold-400"></span>
                 }
@@ -136,7 +145,7 @@
             <button
                 class="pb-3 text-sm font-bold tracking-wider relative transition-colors text-zinc-500 hover:text-white"
                 [class.text-gold-400]="currentTab() === 'archived'" (click)="switchTab('archived')">
-                ARCHIVED
+                {{ 'TOURNAMENTS.TABS.ARCHIVED' | translate | uppercase }}
                 @if (currentTab() === 'archived') {
                 <span class="absolute bottom-0 left-0 w-full h-0.5 bg-gold-400"></span>
                 }
@@ -154,11 +163,11 @@
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
-                <h3 class="text-lg font-bold text-zinc-400 mb-1">No tournaments found</h3>
-                <p class="text-sm text-zinc-600">Try adjusting your search or filters</p>
+                <h3 class="text-lg font-bold text-zinc-400 mb-1">{{ 'TOURNAMENTS.EMPTY' | translate }}</h3>
+                <p class="text-sm text-zinc-600">{{ 'TOURNAMENTS.TRY_FILTERS' | translate }}</p>
                 @if (activeFilterCount > 0) {
                 <button (click)="clearFilters()" class="mt-4 text-sm font-bold text-gold-400 hover:underline">
-                    Clear all filters
+                    {{ 'TOURNAMENTS.CLEAR_ALL_FILTERS' | translate }}
                 </button>
                 }
             </div>
@@ -175,10 +184,10 @@
                 <div class="lg:w-1/4 relative rounded-lg overflow-hidden bg-zinc-800 aspect-video lg:aspect-auto">
                     <!-- Image Placeholder -->
                     <div class="absolute inset-0 bg-zinc-700/50 flex items-center justify-center">
-                        <span class="text-zinc-500">Image</span>
+                        <span class="text-xs text-zinc-500">{{ 'TOURNAMENTS.IMAGE' | translate }}</span>
                     </div>
                     <div class="absolute bottom-3 left-3 bg-gold-400 text-black text-xs font-bold px-2 py-0.5 rounded">
-                        {{ tournament.tag }}
+                        TRN
                     </div>
                 </div>
 
@@ -186,17 +195,17 @@
                 <div class="flex-1 flex flex-col justify-between">
                     <div class="flex items-start justify-between">
                         <h3 class="text-xl font-bold text-white group-hover:text-gold-400 transition-colors">{{
-                            tournament.title }}</h3>
+                            tournament.name }}</h3>
                         <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded border"
-                            [class]="tournament.statusClass">
-                            {{ tournament.status }}
+                            [class]="getStatusClass(tournament.status)">
+                            {{ getStatusLabel(tournament.status) }}
                         </span>
                     </div>
 
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
                         <div>
                             <div class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-1">
-                                SCHEDULE
+                                {{ 'TOURNAMENTS.CARD.SCHEDULE' | translate }}
                             </div>
                             <div class="text-sm font-semibold text-white flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gold-400" fill="none"
@@ -204,24 +213,24 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
-                                {{ tournament.schedule }}
+                                {{ tournament.startDate | date:'mediumDate' }}
                             </div>
                         </div>
                         <div>
                             <div class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-1">
-                                PARTICIPANTS</div>
+                                {{ 'TOURNAMENTS.CARD.PARTICIPANTS' | translate }}</div>
                             <div class="text-sm font-semibold text-white flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gold-400" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                                 </svg>
-                                {{ tournament.participants }}
+                                {{ tournament.maxTeams || 0 }} Teams
                             </div>
                         </div>
                         <div>
-                            <div class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-1">PRIZE
-                                POOL
+                            <div class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-1">{{
+                                'TOURNAMENTS.PRIZE_POOL' | translate }}
                             </div>
                             <div class="text-sm font-semibold text-gold-400 flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
@@ -229,13 +238,14 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                {{ tournament.prizePool }}
+                                TBA
                             </div>
                         </div>
                         <div>
                             <div class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-1">
-                                @if(currentTab() === 'past' || currentTab() === 'archived') { WINNER } @else {
-                                CURRENT ROUND }
+                                @if(currentTab() === 'past' || currentTab() === 'archived') { {{ 'TOURNAMENTS.WINNER' |
+                                translate }} } @else {
+                                {{ 'TOURNAMENTS.CURRENT_ROUND' | translate }} }
                             </div>
                             <div class="text-sm font-semibold text-white flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gold-400" fill="none"
@@ -243,7 +253,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                                 </svg>
-                                {{ tournament.currentRound }}
+                                N/A
                             </div>
                         </div>
                     </div>
@@ -261,16 +271,16 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
-                        View Details
+                        {{ 'TOURNAMENTS.CARD.VIEW' | translate }}
                     </button>
-                    <button
+                    <button (click)="manageTournament(tournament.id); $event.stopPropagation()"
                         class="flex-1 bg-gold-400 hover:bg-gold-400/90 text-black font-bold py-2.5 px-4 rounded-lg transition-all duration-300 hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] flex items-center justify-center gap-2 transform hover:-translate-y-0.5">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
                                 d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.532 1.532 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
                                 clip-rule="evenodd" />
                         </svg>
-                        Manage
+                        {{ 'TOURNAMENTS.MANAGE' | translate }}
                     </button>
                 </div>
             </div>
@@ -303,7 +313,7 @@
                             d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                     </svg>
                 </div>
-                <h2 class="text-xl font-bold text-white">Create New Tournament</h2>
+                <h2 class="text-xl font-bold text-white">{{ 'TOURNAMENTS.CREATE' | translate }}</h2>
             </div>
             <button (click)="closeCreateModal()"
                 class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition-colors">
@@ -318,32 +328,33 @@
         <div class="p-6 space-y-5">
             <!-- Tournament Name -->
             <div>
-                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Tournament
-                    Name *</label>
-                <input type="text" [(ngModel)]="newTournament.name" placeholder="e.g. Champions League 2026"
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{
+                    'DASHBOARD.MODAL.NAME' | translate }} *</label>
+                <input type="text" [(ngModel)]="newTournament.name"
+                    [placeholder]="'DASHBOARD.MODAL.NAME_PLACEHOLDER' | translate"
                     class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all" />
             </div>
 
             <!-- Description -->
             <div>
-                <label
-                    class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Description</label>
-                <textarea [(ngModel)]="newTournament.description" placeholder="Brief description of the tournament..."
-                    rows="3"
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{
+                    'DASHBOARD.MODAL.DESCRIPTION' | translate }}</label>
+                <textarea [(ngModel)]="newTournament.description"
+                    [placeholder]="'DASHBOARD.MODAL.DESCRIPTION_PLACEHOLDER' | translate" rows="3"
                     class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all resize-none"></textarea>
             </div>
 
             <!-- Dates Row -->
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Start Date
-                        *</label>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{
+                        'DASHBOARD.MODAL.START_DATE' | translate }} *</label>
                     <input type="date" [(ngModel)]="newTournament.startDate"
                         class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all [color-scheme:dark]" />
                 </div>
                 <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">End
-                        Date</label>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{
+                        'DASHBOARD.MODAL.END_DATE' | translate }}</label>
                     <input type="date" [(ngModel)]="newTournament.endDate"
                         class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all [color-scheme:dark]" />
                 </div>
@@ -352,8 +363,8 @@
             <!-- Max Teams & Prize Pool Row -->
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Max
-                        Teams</label>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{
+                        'DASHBOARD.MODAL.MAX_TEAMS' | translate }}</label>
                     <select [(ngModel)]="newTournament.maxTeams"
                         class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all">
                         <option value="8" class="bg-black-card">8 Teams</option>
@@ -365,20 +376,24 @@
                     </select>
                 </div>
                 <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Prize
-                        Pool</label>
-                    <input type="text" [(ngModel)]="newTournament.prizePool" placeholder="e.g. $500k USD"
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{
+                        'DASHBOARD.MODAL.PRIZE_POOL' | translate }}</label>
+                    <input type="text" [(ngModel)]="newTournament.prizePool"
+                        [placeholder]="'DASHBOARD.MODAL.PRIZE_POOL_PLACEHOLDER' | translate"
                         class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all" />
                 </div>
             </div>
 
             <!-- Status -->
             <div>
-                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Status</label>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{
+                    'DASHBOARD.MODAL.STATUS' | translate }}</label>
                 <select [(ngModel)]="newTournament.status"
                     class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all">
-                    <option value="draft" class="bg-black-card">Draft</option>
-                    <option value="registration_open" class="bg-black-card">Registration Open</option>
+                    <option value="draft" class="bg-black-card">{{ 'DASHBOARD.MODAL.STATUS_DRAFT' | translate }}
+                    </option>
+                    <option value="registration_open" class="bg-black-card">{{
+                        'DASHBOARD.MODAL.STATUS_REGISTRATION_OPEN' | translate }}</option>
                 </select>
             </div>
         </div>
@@ -387,7 +402,7 @@
         <div class="flex items-center justify-end gap-3 p-6 border-t border-black-border">
             <button (click)="closeCreateModal()" [disabled]="isCreating()"
                 class="px-6 py-2.5 rounded-lg border border-black-border text-zinc-400 hover:text-white hover:border-zinc-500 font-bold transition-all duration-300 disabled:opacity-40">
-                Cancel
+                {{ 'COMMON.CANCEL' | translate }}
             </button>
             <button (click)="createTournament()"
                 [disabled]="!newTournament.name || !newTournament.startDate || isCreating()"
@@ -400,13 +415,13 @@
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                     </path>
                 </svg>
-                Creating...
+                {{ 'DASHBOARD.MODAL.CREATING' | translate }}
                 } @else {
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                 </svg>
-                Create Tournament
+                {{ 'TOURNAMENTS.CREATE' | translate }}
                 }
             </button>
         </div>

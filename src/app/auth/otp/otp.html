@@ -39,15 +39,17 @@
                 <img src="/images/logo-gold.png" alt="ATB Sports Logo"
                     class="h-16 w-auto object-contain drop-shadow-lg">
             </div>
-            <h2 class="text-3xl font-black text-white leading-tight mb-2 tracking-tight">Security Check</h2>
-            <p class="text-slate-400 text-sm">Please verify your identity to continue.</p>
+            <h2 class="text-3xl font-black text-white leading-tight mb-2 tracking-tight">{{ 'AUTH.OTP.TITLE' | translate
+                }}</h2>
+            <p class="text-slate-400 text-sm">{{ 'AUTH.OTP.SUBTITLE' | translate }}</p>
         </div>
 
         <form [formGroup]="otpForm" (ngSubmit)="verify()" class="space-y-8">
 
             <div class="space-y-4">
                 <div class="text-center bg-white/5 rounded-xl py-3 border border-white/5">
-                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Code sent to</p>
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">{{
+                        'AUTH.OTP.CODE_SENT_TO' | translate }}</p>
                     <p class="text-sm font-bold text-white">{{ email }}</p>
                 </div>
 
@@ -60,10 +62,12 @@
                 @if (otpForm.get('otp')?.invalid && otpForm.get('otp')?.touched) {
                 <div class="text-center animate-in fade-in">
                     @if (otpForm.get('otp')?.errors?.['required']) {
-                    <span class="text-[10px] font-bold text-red-400 uppercase tracking-wider">Code is required</span>
+                    <span class="text-[10px] font-bold text-red-400 uppercase tracking-wider">{{
+                        'AUTH.OTP.CODE_REQUIRED' | translate }}</span>
                     }
                     @if (otpForm.get('otp')?.errors?.['pattern']) {
-                    <span class="text-[10px] font-bold text-red-400 uppercase tracking-wider">Must be 6 digits</span>
+                    <span class="text-[10px] font-bold text-red-400 uppercase tracking-wider">{{
+                        'AUTH.OTP.MUST_BE_6_DIGITS' | translate }}</span>
                     }
                 </div>
                 }
@@ -89,10 +93,10 @@
                                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                             </path>
                         </svg>
-                        Verifying...
+                        {{ 'AUTH.OTP.VERIFYING' | translate }}
                     </span>
                     } @else {
-                    Authenticate
+                    {{ 'AUTH.OTP.SUBMIT' | translate }}
                     }
                 </button>
             </div>
@@ -100,17 +104,17 @@
 
         <div class="mt-8 text-center border-t border-white/5 pt-6">
             <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                Did not receive the code?
+                {{ 'AUTH.OTP.NO_CODE' | translate }}
                 <button (click)="resendOTP()"
-                    class="text-white hover:text-gold-500 ml-1 underline underline-offset-4 transition-colors">Resend
-                    Code</button>
+                    class="text-white hover:text-gold-500 ml-1 underline underline-offset-4 transition-colors">{{
+                    'AUTH.OTP.RESEND' | translate }}</button>
             </p>
         </div>
     </div>
 
     <div class="absolute bottom-6">
         <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest">
-            Secured by ATB Sports Shield
+            {{ 'AUTH.OTP.SECURED_BY' | translate }}
         </p>
     </div>
 </div>

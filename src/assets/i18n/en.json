@@ -1,11 +1,96 @@
 {
+    "AUTH": {
+        "LOGIN": {
+            "HEADLINE": "Command",
+            "TAGLINE": "The League.",
+            "DESCRIPTION": "The ultimate dashboard for modern football management. Orchestrate every match, track every stat, and dominate the season.",
+            "ACTIVE_PLAYERS": "Active Players",
+            "LIVE_MATCHES": "Live Matches",
+            "SYSTEM_ONLINE": "System Online",
+            "TITLE": "Welcome Back",
+            "SUBTITLE": "Enter your credentials to access the dugout.",
+            "EMAIL_LABEL": "Email Address",
+            "PASSWORD_LABEL": "Password",
+            "FORGOT": "Forgot?",
+            "PROCESSING": "Processing",
+            "SUBMIT": "Secure Login",
+            "NO_ACCOUNT": "New Organization?",
+            "REGISTER_LINK": "Register Here",
+            "TOURNAMENT_EDITION": "Tournament Edition"
+        },
+        "REGISTER": {
+            "HEADLINE": "Join",
+            "TAGLINE": "The League.",
+            "DESCRIPTION": "Create your organization account and start managing tournaments like a pro.",
+            "CLUBS_JOINED": "Clubs Joined",
+            "REGISTRATION_OPEN": "Registration Open",
+            "TITLE": "Create Account",
+            "SUBTITLE": "Enter your details to give your organization a home.",
+            "ORG_NAME": "Org Name",
+            "USERNAME": "Username",
+            "PHONE": "Phone",
+            "EMAIL": "Email",
+            "PASSWORD": "Password",
+            "CONFIRM_PASSWORD": "Confirm",
+            "PASSWORDS_MISMATCH": "Passwords do not match",
+            "AGREE_TERMS": "I agree to the",
+            "TERMS_OF_SERVICE": "Terms of Service",
+            "AND": "and",
+            "PRIVACY_POLICY": "Privacy Policy",
+            "PROCESSING": "Processing",
+            "SUBMIT": "Create Account",
+            "HAVE_ACCOUNT": "Already have an account?",
+            "SIGN_IN": "Sign In",
+            "TOURNAMENT_EDITION": "Tournament Edition"
+        },
+        "OTP": {
+            "TITLE": "Security Check",
+            "SUBTITLE": "Please verify your identity to continue.",
+            "CODE_SENT_TO": "Code sent to",
+            "CODE_REQUIRED": "Code is required",
+            "MUST_BE_6_DIGITS": "Must be 6 digits",
+            "VERIFYING": "Verifying...",
+            "SUBMIT": "Authenticate",
+            "NO_CODE": "Did not receive the code?",
+            "RESEND": "Resend Code",
+            "SECURED_BY": "Secured by ATB Sports Shield"
+        }
+    },
     "TOPBAR": {
         "DASHBOARD": "Dashboard",
         "TOURNAMENTS": "Tournaments",
         "TEAMS": "Teams",
         "SETTINGS": "Settings",
         "SEARCH": "Search",
-        "PROFILE": "Profile"
+        "PROFILE": "Profile",
+        "NOTIFICATIONS": "Notifications",
+        "NEW": "new",
+        "MARK_ALL_READ": "Mark all read",
+        "VIEW_ALL_NOTIFICATIONS": "View All Notifications",
+        "MY_PROFILE": "My Profile",
+        "SETTINGS_MENU": "Settings",
+        "LOG_OUT": "Log Out",
+        "NO_EMAIL": "No Email"
+    },
+    "COMMON": {
+        "SAVE": "Save",
+        "CANCEL": "Cancel",
+        "DELETE": "Delete",
+        "EDIT": "Edit",
+        "CREATE": "Create",
+        "SEARCH": "Search",
+        "LOADING": "Loading...",
+        "NO_DATA": "No data found",
+        "STATUS": {
+            "APPROVED": "Approved",
+            "PENDING": "Pending",
+            "REJECTED": "Rejected",
+            "ACTIVE": "Active",
+            "INACTIVE": "Inactive"
+        },
+        "NA": "N/A",
+        "UPLOAD": "Upload",
+        "REMOVE": "Remove"
     },
     "MATCH_FEED": {
         "TABS": {
@@ -25,5 +110,332 @@
             "DETAILS": "Details",
             "STATUS_FT": "FT"
         }
+    },
+    "HERO": {
+        "TITLE": "Tournament",
+        "TITLE_HIGHLIGHT": "Control Center",
+        "SUBTITLE": "Manage brackets, schedule matches, and handle live scores from a single unified dashboard.",
+        "CREATE_BTN": "Create New Tournament"
+    },
+    "DASHBOARD": {
+        "TITLE": "Dashboard",
+        "SUBTITLE": "Welcome back! Here's what's happening today.",
+        "STATS": {
+            "TOTAL_TOURNAMENTS": "Total Tournaments",
+            "FINISHED_TOURNAMENTS": "Finished Tournaments",
+            "TOTAL_TEAMS": "Total Teams / Clubs",
+            "TOTAL_PLAYERS": "Total Players",
+            "LIVE_TOURNAMENTS": "Tournaments Live Now",
+            "LIVE_MATCHES": "Matches Live Now",
+            "UPCOMING_MATCHES": "Today Upcoming Matches",
+            "FINISHED_MATCHES": "Today Finished Matches"
+        },
+        "CREATE_TOURNAMENT": "Create Tournament",
+        "MODAL": {
+            "TITLE": "Create Tournament",
+            "NAME": "Tournament Name",
+            "NAME_PLACEHOLDER": "e.g. Champions League 2026",
+            "DESCRIPTION": "Description",
+            "DESCRIPTION_PLACEHOLDER": "Brief description...",
+            "START_DATE": "Start Date",
+            "END_DATE": "End Date",
+            "STATUS": "Status",
+            "STATUS_DRAFT": "Draft",
+            "STATUS_REGISTRATION_OPEN": "Registration Open",
+            "STATUS_ACTIVE": "Active",
+            "MAX_TEAMS": "Max Teams",
+            "PRIZE_POOL": "Prize Pool",
+            "PRIZE_POOL_PLACEHOLDER": "e.g. $500k USD",
+            "SUBMIT": "Create Tournament",
+            "CREATING": "Creating..."
+        }
+    },
+    "TOURNAMENTS": {
+        "TITLE": "Tournaments",
+        "SUBTITLE": "Manage all competitions",
+        "CREATE": "Create Tournament",
+        "SEARCH_PLACEHOLDER": "Search tournaments...",
+        "FILTER": {
+            "STATUS": "Status",
+            "ALL": "All",
+            "DATE_FROM": "From",
+            "DATE_TO": "To",
+            "SORT_BY": "Sort by",
+            "SORT_NAME": "Name",
+            "SORT_DATE": "Date",
+            "SORT_PARTICIPANTS": "Participants",
+            "CLEAR": "Clear Filters"
+        },
+        "TABS": {
+            "LIVE": "Live",
+            "UPCOMING": "Upcoming",
+            "PAST": "Past",
+            "ARCHIVED": "Archived"
+        },
+        "CARD": {
+            "PARTICIPANTS": "Participants",
+            "PRIZE_POOL": "Prize Pool",
+            "ROUND": "Round",
+            "SCHEDULE": "Schedule",
+            "VIEW": "View"
+        },
+        "EMPTY": "No tournaments found matching your criteria.",
+        "FILTER_STATUSES": {
+            "ALL": "All Statuses",
+            "LIVE": "Live",
+            "IN_PROGRESS": "In Progress",
+            "REGISTRATION": "Registration Open",
+            "STARTING_SOON": "Starting Soon",
+            "COMPLETED": "Completed",
+            "DRAFT": "Draft",
+            "ARCHIVED": "Archived"
+        },
+        "SORT": {
+            "NAME": "Sort: Name",
+            "DATE": "Sort: Date",
+            "PARTICIPANTS": "Sort: Participants"
+        },
+        "CLEAR": "Clear",
+        "TRY_FILTERS": "Try adjusting your search or filters",
+        "CLEAR_ALL_FILTERS": "Clear all filters",
+        "MANAGE": "Manage",
+        "CURRENT_ROUND": "Current Round",
+        "WINNER": "Winner",
+        "PRIZE_POOL": "Prize Pool",
+        "IMAGE": "Image"
+    },
+    "TEAMS": {
+        "TITLE": "Teams",
+        "SUBTITLE": "Manage all participating teams and clubs",
+        "CREATE": "Create Team",
+        "SEARCH_PLACEHOLDER": "Search teams...",
+        "EMPTY": "No teams found matching your search.",
+        "CARD": {
+            "NO_EMAIL": "No email provided",
+            "CAPTAIN": "Captain"
+        }
+    },
+    "TEAM_LAYOUT": {
+        "TEAM_MANAGER": "Team Manager",
+        "NAV": {
+            "OVERVIEW": "Overview",
+            "MEMBERS": "Members",
+            "MATCHES": "Matches",
+            "STATISTICS": "Statistics",
+            "GALLERY": "Gallery"
+        }
+    },
+    "TEAM_OVERVIEW": {
+        "TITLE": "Team Overview",
+        "SUBTITLE": "Team statistics and performance overview.",
+        "PERFORMANCE": {
+            "TITLE": "Performance Overview",
+            "TOTAL_MATCHES": "Total Matches",
+            "WINS": "Wins",
+            "DRAWS": "Draws",
+            "LOSSES": "Losses",
+            "GOALS_SCORED": "Goals Scored",
+            "GOALS_CONCEDED": "Goals Conceded",
+            "CLEAN_SHEETS": "Clean Sheets",
+            "WIN_PERCENTAGE": "Win %"
+        },
+        "RECENT_MATCHES": {
+            "TITLE": "Recent Matches",
+            "OPPONENT": "Opponent",
+            "SCORE": "Score",
+            "RESULT": "Result",
+            "DATE": "Date",
+            "TOURNAMENT": "Tournament Name",
+            "EMPTY": "No recent matches played."
+        }
+    },
+    "TEAM_MATCHES": {
+        "TITLE": "Matches",
+        "SUBTITLE": "View all matches played by this team.",
+        "EMPTY": "No matches yet",
+        "EMPTY_SUBTITLE": "Matches will appear here once scheduled."
+    },
+    "TEAM_STATISTICS": {
+        "TITLE": "Statistics",
+        "SUBTITLE": "Performance stats and analytics for this team.",
+        "STATS": {
+            "PLAYED": "Matches Played",
+            "WINS": "Wins",
+            "DRAWS": "Draws",
+            "LOSSES": "Losses"
+        },
+        "EMPTY": "No data available",
+        "EMPTY_SUBTITLE": "Statistics will populate after matches are played."
+    },
+    "TEAM_MEMBERS": {
+        "PAGE_TITLE": "Team Members",
+        "TOTAL_PLAYERS": "Total Players",
+        "ADD_PLAYER": "Add Player",
+        "ADD_STAFF": "Add Staff",
+        "SEARCH_PLACEHOLDER": "Search by name or jersey...",
+        "FILTER": {
+            "ALL": "All",
+            "PLAYERS": "Players",
+            "STAFF": "Staff",
+            "ACTIVE": "Active",
+            "INJURED": "Injured"
+        },
+        "ROLES": {
+            "CAPTAIN": "Captain",
+            "VICE_CAPTAIN": "Vice Captain",
+            "PLAYER": "Player",
+            "COACH": "Coach",
+            "MANAGER": "Manager"
+        },
+        "STATUS": {
+            "ACTIVE": "Active",
+            "INJURED": "Injured",
+            "SUSPENDED": "Suspended"
+        },
+        "EMPTY_STATE": {
+            "TITLE": "No members added yet",
+            "SUBTITLE": "Start building your team by adding players and staff.",
+            "ADD_FIRST": "Add First Member"
+        },
+        "MODAL": {
+            "ADD_TITLE": "Add New Member",
+            "EDIT_TITLE": "Edit Member",
+            "FULL_NAME": "Full Name",
+            "FULL_NAME_PLACEHOLDER": "e.g. Lionel Messi",
+            "PHOTO": "Profile Photo",
+            "PHOTO_HINT": "Click to upload (PNG, JPG)",
+            "JERSEY": "Jersey Number",
+            "JERSEY_PLACEHOLDER": "e.g. 10",
+            "POSITION": "Position",
+            "POSITION_PLACEHOLDER": "Select Position",
+            "DOB": "Date of Birth",
+            "FOOT": "Preferred Foot",
+            "PHONE": "Phone Number (Optional)",
+            "EMAIL": "Email Address (Optional)",
+            "ROLE": "Role",
+            "STATUS": "Status",
+            "SUBMIT": "Add Member",
+            "UPDATING": "Updating...",
+            "ADDING": "Adding..."
+        },
+        "POSITIONS": {
+            "GK": "Goalkeeper (GK)",
+            "DF": "Defender (DF)",
+            "MF": "Midfielder (MF)",
+            "FW": "Forward (FW)"
+        },
+        "FOOT": {
+            "RIGHT": "Right",
+            "LEFT": "Left",
+            "BOTH": "Both"
+        },
+        "QUICK_STATS": {
+            "MATCHES": "Matches",
+            "GOALS": "Goals",
+            "ASSISTS": "Assists"
+        },
+        "ACTIONS": {
+            "EDIT": "Edit",
+            "REMOVE": "Remove",
+            "VIEW_PROFILE": "View Profile"
+        }
+    },
+    "TEAM_GALLERY": {
+        "TITLE": "Gallery",
+        "SUBTITLE": "Photos and media for this team.",
+        "UPLOAD": "Upload Photos",
+        "UPLOADING": "Uploading...",
+        "EMPTY": "No photos yet",
+        "EMPTY_SUBTITLE": "Upload photos to build the team gallery.",
+        "DELETE_CONFIRM": "Delete this photo?",
+        "UPLOAD_SUCCESS": "photo(s) uploaded successfully",
+        "UPLOAD_ERROR": "Upload failed. Please try again.",
+        "DELETE_ERROR": "Failed to delete photo."
+    },
+    "CREATE_TEAM": {
+        "TITLE": "Register New Team",
+        "SUBTITLE": "Fill in the details to create a team profile",
+        "LOGO": {
+            "LABEL": "Team Logo",
+            "HINT": "Click the box to upload a logo (PNG, JPG, SVG)",
+            "BROWSE": "Browse file…",
+            "REMOVE": "Remove logo"
+        },
+        "FIELDS": {
+            "NAME": "Team Name",
+            "SHORT_NAME": "Short Name",
+            "SHORT_NAME_HINT": "(3–5 letters)",
+            "TYPE": "Team Type",
+            "TYPE_PLACEHOLDER": "Select type…",
+            "CITY": "City",
+            "STATE": "State",
+            "COUNTRY": "Country",
+            "FOUNDED": "Founded Year",
+            "FOUNDED_HINT": "(optional)",
+            "GROUND": "Home Ground",
+            "DESCRIPTION": "Team Description"
+        },
+        "PLACEHOLDERS": {
+            "NAME": "e.g. Manchester FC",
+            "SHORT_NAME": "e.g. MFC",
+            "CITY": "e.g. Mumbai",
+            "STATE": "e.g. Maharashtra",
+            "COUNTRY": "e.g. India",
+            "FOUNDED": "e.g. 2005",
+            "GROUND": "e.g. Wankhede Stadium",
+            "DESCRIPTION": "Brief description about the team…"
+        },
+        "REQUIRED_NOTE": "Fields marked * are required",
+        "SUBMIT": "Create Team"
+    },
+    "SETTINGS": {
+        "TITLE": "Settings",
+        "NAV": {
+            "ROLES": "Roles",
+            "USERS": "Users",
+            "PERMISSIONS": "Permissions"
+        },
+        "ROLES": {
+            "TITLE": "Roles",
+            "SUBTITLE": "Manage user roles and access levels.",
+            "CREATE": "Create Role",
+            "EMPTY": "No roles found."
+        },
+        "USERS": {
+            "TITLE": "Users",
+            "SUBTITLE": "Manage admin users.",
+            "CREATE": "Invite User",
+            "SEARCH": "Search users...",
+            "EMPTY": "No users found."
+        },
+        "PERMISSIONS": {
+            "TITLE": "Permissions",
+            "SUBTITLE": "Configure role permissions.",
+            "EMPTY": "No permissions configured."
+        }
+    },
+    "WIDGETS": {
+        "STANDINGS": {
+            "TITLE": "Premier League Standings",
+            "SEASON": "Season 2025/26 • Matchday 24",
+            "FULL_TABLE": "Full Table",
+            "CHAMPIONS_LEAGUE": "Champions League",
+            "EUROPA_LEAGUE": "Europa League"
+        },
+        "SCORERS": {
+            "TITLE": "Golden Boot Race",
+            "SUBTITLE": "Top Goal Scorers"
+        },
+        "PROMO": {
+            "BADGE": "Pro Feature",
+            "TITLE": "Unlock Analytics",
+            "SUBTITLE": "Get detailed player stats and heatmaps.",
+            "BTN": "Upgrade Now"
+        }
+    },
+    "MATCH_FEED_LABELS": {
+        "VENUE": "Venue",
+        "KICKOFF": "Kickoff",
+        "WINNER": "Winner"
     }
 }
