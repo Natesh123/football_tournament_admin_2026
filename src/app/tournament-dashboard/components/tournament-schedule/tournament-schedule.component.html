@@ -1,0 +1,107 @@
+<div class="space-y-8">
+    <div>
+        <h1 class="text-3xl font-black text-white tracking-tight">Schedule & Timing</h1>
+        <p class="text-zinc-500 mt-1.5">Configure tournament duration, match windows, and auto-scheduling
+            tools.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Tournament Dates & Play Days -->
+        <div class="bg-black-card border border-black-border rounded-xl p-6 space-y-6">
+            <h2 class="text-lg font-bold text-white">Scheduling Window</h2>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Tournament
+                        Start</label>
+                    <input type="date" [(ngModel)]="data.startDate"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all [color-scheme:dark]" />
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Tournament
+                        End</label>
+                    <input type="date" [(ngModel)]="data.endDate"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all [color-scheme:dark]" />
+                </div>
+            </div>
+
+            <div>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Recurring
+                    Match Days</label>
+                <div class="flex flex-wrap gap-2">
+                    @for (day of ['MON','TUE','WED','THU','FRI','SAT','SUN']; track day) {
+                    <button (click)="toggleDay(day)"
+                        class="px-4 py-2 rounded-lg text-xs font-bold transition-all border"
+                        [ngClass]="data.matchDays[day]
+                            ? 'bg-gold-400 text-black border-gold-400 shadow-[0_0_10px_rgba(212,175,55,0.3)]'
+                            : 'bg-white/5 text-zinc-500 border-black-border hover:border-gold-400/30 hover:text-white'">
+                        {{ day }}
+                    </button>
+                    }
+                </div>
+            </div>
+
+            <div>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Allowed
+                    Time Slots</label>
+                <input type="text" [(ngModel)]="data.timeSlots" placeholder="e.g. 18:00, 20:00"
+                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all" />
+                <p class="text-[10px] text-zinc-500 mt-1">Comma separated times</p>
+            </div>
+        </div>
+
+        <!-- Match Durations -->
+        <div class="bg-black-card border border-black-border rounded-xl p-6 space-y-6">
+            <h2 class="text-lg font-bold text-white">Match Timing</h2>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Total
+                        Match Duration</label>
+                    <div class="relative">
+                        <input type="number" [(ngModel)]="data.matchDuration"
+                            class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all pr-12" />
+                        <span
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-xs font-bold">MIN</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Half
+                        Duration</label>
+                    <div class="relative">
+                        <input type="number" [(ngModel)]="data.halfDuration"
+                            class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all pr-12" />
+                        <span
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-xs font-bold">MIN</span>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Break
+                    Time (Halftime)</label>
+                <div class="relative w-1/2">
+                    <input type="number" [(ngModel)]="data.breakTime"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all pr-12" />
+                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-xs font-bold">MIN</span>
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-black-border flex gap-4">
+                <button
+                    class="flex-1 bg-gold-500 hover:bg-gold-400 text-black px-4 py-3 rounded-lg font-bold text-sm transition-colors flex justify-center items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    Auto-Generate Schedule
+                </button>
+                <button
+                    class="flex-1 bg-white/5 border border-black-border hover:border-gold-400/50 hover:bg-white/10 text-white px-4 py-3 rounded-lg font-bold text-sm transition-all flex justify-center items-center gap-2">
+                    Manual Match Editor
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

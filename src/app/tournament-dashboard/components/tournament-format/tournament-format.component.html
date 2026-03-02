@@ -1,0 +1,134 @@
+<div class="space-y-8">
+    <!-- Page Title -->
+    <div>
+        <h1 class="text-3xl font-black text-white tracking-tight">Competition Format</h1>
+        <p class="text-zinc-500 mt-1.5">Define the structural progression, points, and tie-breaker systems.
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Format Type -->
+        <div class="bg-black-card border border-black-border rounded-xl p-6 space-y-6">
+            <h2 class="text-lg font-bold text-white">Structure</h2>
+
+            <div>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Format
+                    Type</label>
+                <select [(ngModel)]="data.type"
+                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all">
+                    <option value="league" class="bg-black-card">League (Round Robin)</option>
+                    <option value="knockout" class="bg-black-card">Knockout</option>
+                    <option value="group_knockout" class="bg-black-card">Group Stage + Knockout</option>
+                    <option value="double_elim" class="bg-black-card">Double Elimination</option>
+                </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Total
+                        Groups</label>
+                    <input type="number" [(ngModel)]="data.numGroups" [disabled]="data.type === 'knockout'"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all disabled:opacity-50" />
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Teams
+                        Per Group</label>
+                    <input type="number" [(ngModel)]="data.teamsPerGroup" [disabled]="data.type === 'knockout'"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all disabled:opacity-50" />
+                </div>
+            </div>
+
+            <div>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Qualification
+                    Rules</label>
+                <select [(ngModel)]="data.qualRules" [disabled]="data.type === 'knockout'"
+                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all disabled:opacity-50">
+                    <option value="Top 1 Advance" class="bg-black-card">Top 1 Advance</option>
+                    <option value="Top 2 Advance" class="bg-black-card">Top 2 Advance</option>
+                    <option value="Top 3 Advance" class="bg-black-card">Top 3 Advance</option>
+                    <option value="All Advance" class="bg-black-card">All Teams Advance</option>
+                </select>
+            </div>
+
+            <div class="pt-2">
+                <label
+                    class="cursor-pointer label flex items-center justify-between bg-white/5 border border-black-border rounded-lg px-4 py-3 hover:border-gold-400/50 transition-all">
+                    <div>
+                        <span class="label-text text-white font-bold block">Home & Away Format</span>
+                        <span class="text-[10px] text-zinc-500 block mt-1">Play every opponent twice</span>
+                    </div>
+                    <input type="checkbox" [(ngModel)]="data.homeAway" class="toggle toggle-warning" />
+                </label>
+            </div>
+        </div>
+
+        <!-- Points & Systems -->
+        <div class="bg-black-card border border-black-border rounded-xl p-6 space-y-6">
+            <h2 class="text-lg font-bold text-white">Points System & Tie-Breakers</h2>
+
+            <div class="grid grid-cols-3 gap-4">
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Win
+                        Points</label>
+                    <input type="number" [(ngModel)]="data.winPoints"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-emerald-400 font-bold focus:border-gold-400 focus:outline-none transition-all text-center" />
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Draw
+                        Points</label>
+                    <input type="number" [(ngModel)]="data.drawPoints"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-gold-400 font-bold focus:border-gold-400 focus:outline-none transition-all text-center" />
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Loss
+                        Points</label>
+                    <input type="number" [(ngModel)]="data.lossPoints"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-red-400 font-bold focus:border-gold-400 focus:outline-none transition-all text-center" />
+                </div>
+            </div>
+
+            <div class="mt-8">
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Tie-Breaker
+                    Priority Order</label>
+                <div class="space-y-2">
+                    <div
+                        class="flex items-center gap-3 bg-white/5 border border-black-border rounded-lg px-4 py-2 hover:border-white/20 transition-all cursor-move">
+                        <span class="text-zinc-500 font-bold text-xs mt-0.5">1</span>
+                        <span class="text-sm font-bold text-white">Points Total</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-auto text-zinc-600" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
+                        </svg>
+                    </div>
+                    <div
+                        class="flex items-center gap-3 bg-white/5 border border-black-border rounded-lg px-4 py-2 hover:border-white/20 transition-all cursor-move">
+                        <span class="text-zinc-500 font-bold text-xs mt-0.5">2</span>
+                        <span class="text-sm font-bold text-white">Goal Difference</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-auto text-zinc-600" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
+                        </svg>
+                    </div>
+                    <div
+                        class="flex items-center gap-3 bg-white/5 border border-black-border rounded-lg px-4 py-2 hover:border-white/20 transition-all cursor-move">
+                        <span class="text-zinc-500 font-bold text-xs mt-0.5">3</span>
+                        <span class="text-sm font-bold text-white">Head-to-head Result</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-auto text-zinc-600" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
+                        </svg>
+                    </div>
+                    <div
+                        class="flex items-center gap-3 bg-white/5 border border-black-border rounded-lg px-4 py-2 hover:border-white/20 transition-all cursor-move">
+                        <span class="text-zinc-500 font-bold text-xs mt-0.5">4</span>
+                        <span class="text-sm font-bold text-white">Goals Scored</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-auto text-zinc-600" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

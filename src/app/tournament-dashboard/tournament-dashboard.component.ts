@@ -4,10 +4,132 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TournamentService, TournamentDTO } from '../tournament/tournament.service';
 
+import { TournamentGeneralComponent } from './components/tournament-general/tournament-general.component';
+import { TournamentParticipantsComponent } from './components/tournament-participants/tournament-participants.component';
+import { TournamentFormatComponent } from './components/tournament-format/tournament-format.component';
+import { TournamentScheduleComponent } from './components/tournament-schedule/tournament-schedule.component';
+import { TournamentRulesComponent } from './components/tournament-rules/tournament-rules.component';
+import { TournamentVenuesComponent } from './components/tournament-venues/tournament-venues.component';
+import { TournamentFinanceComponent } from './components/tournament-finance/tournament-finance.component';
+import { TournamentPresentationComponent } from './components/tournament-presentation/tournament-presentation.component';
+import { TournamentResultsComponent } from './components/tournament-results/tournament-results.component';
+import { TournamentTeamsComponent } from './components/tournament-teams/tournament-teams.component';
+
+export interface TournamentSettings {
+    general: {
+        name: string;
+        shortName: string;
+        description: string;
+        status: string;
+        visibility: string;
+        type: string;
+        logo?: string;
+        coverImage?: string;
+        organizer: {
+            name: string;
+            email: string;
+            phone: string;
+            website: string;
+        };
+        sponsor: {
+            name: string;
+            website: string;
+        };
+    };
+    participants: {
+        type: string;
+        minTeams: number;
+        maxTeams: number;
+        regOpenDate: string;
+        regCloseDate: string;
+        approvalRequired: boolean;
+        regFee: number;
+        playerLimit: number;
+        squadSize: number;
+    };
+    format: {
+        type: string;
+        numGroups: number;
+        teamsPerGroup: number;
+        homeAway: boolean;
+        winPoints: number;
+        drawPoints: number;
+        lossPoints: number;
+        tieBreaker: string;
+        qualRules: string;
+    };
+    schedule: {
+        startDate: string;
+        endDate: string;
+        matchDuration: number;
+        halfDuration: number;
+        breakTime: number;
+        matchDays: Record<string, boolean>;
+        timeSlots: string;
+    };
+    rules: {
+        govBody: string;
+        playersOnField: number;
+        minPlayers: number;
+        subsAllowed: number;
+        offsideRule: boolean;
+        ballSize: number;
+        pitchType: string;
+        extraTimeRule: string;
+        penaltiesRule: boolean;
+        yellowSuspensionLimit: number;
+        redSuspensionLength: number;
+        gkRules: string;
+    };
+    venues: {
+        multipleVenues: boolean;
+        primaryVenue: string;
+        venueAddress: string;
+        pitchCount: number;
+        fieldType: string;
+    };
+    finance: {
+        paymentMethod: string;
+        prizePool: number;
+        prizeMoney: number;
+        paymentInfo: string;
+        prizeDist: string;
+        refundPolicy: string;
+        regFee: number;
+    };
+    presentation: {
+        themeColor: string;
+        urlSlug: string;
+        showStandings: boolean;
+        showPlayerStats: boolean;
+        showTopScorers: boolean;
+        welcomeMsg: string;
+        showLiveScores: boolean;
+        showCommentary: boolean;
+        liveStreamLink: string;
+    };
+    results: {
+        autoPublish: boolean;
+    };
+}
+
 @Component({
     selector: 'app-tournament-dashboard',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [
+        CommonModule,
+        FormsModule,
+        TournamentGeneralComponent,
+        TournamentParticipantsComponent,
+        TournamentFormatComponent,
+        TournamentScheduleComponent,
+        TournamentRulesComponent,
+        TournamentVenuesComponent,
+        TournamentFinanceComponent,
+        TournamentPresentationComponent,
+        TournamentResultsComponent,
+        TournamentTeamsComponent
+    ],
     templateUrl: './tournament-dashboard.component.html',
 })
 export class TournamentDashboardComponent implements OnInit {
@@ -21,24 +143,17 @@ export class TournamentDashboardComponent implements OnInit {
     activeTab = signal<string>('general');
     toastMessage = signal('');
 
-    // Editable form fields
-    editName = '';
-    editDescription = '';
-    editStartDate = '';
-    editEndDate = '';
-    editMaxTeams = 16;
-    editStatus = 'draft';
-
-    // Match days
-    matchDays: Record<string, boolean> = {
-        MON: false, TUE: false, WED: false, THU: false, FRI: false, SAT: false, SUN: false
-    };
+    settings: TournamentSettings = this.getDefaultSettings();
 
     sidebarItems = [
         { id: 'general', label: 'General', icon: 'settings' },
         { id: 'participants', label: 'Participants', icon: 'users' },
+        { id: 'teams', label: 'Teams', icon: 'shield' },
         { id: 'format', label: 'Format', icon: 'grid' },
         { id: 'schedule', label: 'Schedule', icon: 'calendar' },
+        { id: 'rules', label: 'Rules', icon: 'scale-balanced' },
+        { id: 'venues', label: 'Venues', icon: 'map-pin' },
+        { id: 'finance', label: 'Finance', icon: 'coins' },
         { id: 'presentation', label: 'Presentation', icon: 'monitor' },
         { id: 'results', label: 'Results', icon: 'bar-chart' },
     ];
@@ -50,17 +165,112 @@ export class TournamentDashboardComponent implements OnInit {
         }
     }
 
+    getDefaultSettings(): TournamentSettings {
+        return {
+            general: {
+                name: '',
+                shortName: '',
+                description: '',
+                status: 'draft',
+                visibility: 'public',
+                type: '11aside',
+                logo: '',
+                coverImage: '',
+                organizer: {
+                    name: '',
+                    email: '',
+                    phone: '',
+                    website: ''
+                },
+                sponsor: {
+                    name: '',
+                    website: ''
+                }
+            },
+            participants: {
+                type: 'team',
+                minTeams: 8,
+                maxTeams: 16,
+                regOpenDate: '',
+                regCloseDate: '',
+                approvalRequired: true,
+                regFee: 0,
+                playerLimit: 25,
+                squadSize: 18
+            },
+            format: {
+                type: 'knockout',
+                numGroups: 4,
+                teamsPerGroup: 4,
+                homeAway: false,
+                winPoints: 3,
+                drawPoints: 1,
+                lossPoints: 0,
+                tieBreaker: Object.keys({ 'head-to-head': true, 'goal-difference': true, 'goals-scored': true }).join(','),
+                qualRules: 'Top 2 Advance'
+            },
+            schedule: {
+                startDate: '',
+                endDate: '',
+                matchDuration: 90,
+                halfDuration: 45,
+                breakTime: 15,
+                matchDays: { MON: false, TUE: false, WED: false, THU: false, FRI: false, SAT: false, SUN: false },
+                timeSlots: '18:00, 20:00'
+            },
+            rules: {
+                govBody: 'FIFA',
+                playersOnField: 11,
+                minPlayers: 7,
+                subsAllowed: 5,
+                offsideRule: true,
+                ballSize: 5,
+                pitchType: 'Grass',
+                extraTimeRule: 'None',
+                penaltiesRule: true,
+                yellowSuspensionLimit: 3,
+                redSuspensionLength: 1,
+                gkRules: 'Standard'
+            },
+            venues: {
+                multipleVenues: false,
+                primaryVenue: '',
+                venueAddress: '',
+                pitchCount: 1,
+                fieldType: 'grass'
+            },
+            finance: {
+                paymentMethod: 'bank',
+                prizePool: 10000,
+                prizeMoney: 10000,
+                paymentInfo: '',
+                prizeDist: '1st: 60%, 2nd: 30%, 3rd: 10%',
+                refundPolicy: 'No Refunds',
+                regFee: 0
+            },
+            presentation: {
+                themeColor: 'gold',
+                urlSlug: '',
+                showStandings: true,
+                showPlayerStats: true,
+                showTopScorers: true,
+                welcomeMsg: '',
+                showLiveScores: true,
+                showCommentary: false,
+                liveStreamLink: ''
+            },
+            results: {
+                autoPublish: false
+            }
+        };
+    }
+
     loadTournament(id: string) {
         this.isLoading.set(true);
         this.tournamentService.getById(id).subscribe({
             next: (tournament) => {
                 this.tournament.set(tournament);
-                this.editName = tournament.name;
-                this.editDescription = tournament.description || '';
-                this.editStartDate = tournament.startDate?.split('T')[0] || '';
-                this.editEndDate = tournament.endDate?.split('T')[0] || '';
-                this.editMaxTeams = tournament.maxTeams;
-                this.editStatus = tournament.status;
+                this.mergeTournamentToSettings(tournament);
                 this.isLoading.set(false);
             },
             error: (err) => {
@@ -70,12 +280,37 @@ export class TournamentDashboardComponent implements OnInit {
         });
     }
 
-    setTab(tab: string) {
-        this.activeTab.set(tab);
+    mergeTournamentToSettings(tournament: TournamentDTO) {
+        this.settings.general.name = tournament.name;
+        this.settings.general.description = tournament.description || '';
+        this.settings.schedule.startDate = tournament.startDate?.split('T')[0] || '';
+        this.settings.schedule.endDate = tournament.endDate?.split('T')[0] || '';
+        this.settings.participants.maxTeams = tournament.maxTeams || 16;
+        this.settings.general.status = tournament.status || 'draft';
+        this.settings.general.shortName = tournament.shortName || '';
+        this.settings.general.type = tournament.type || '11aside';
+        this.settings.general.visibility = tournament.visibility || 'public';
+        this.settings.general.logo = tournament.logo || '';
+        this.settings.general.coverImage = tournament.coverImage || '';
+        this.settings.participants.type = tournament.participantType || 'team';
+        this.settings.participants.minTeams = tournament.minTeams || 8;
+        this.settings.participants.regOpenDate = tournament.regOpenDate?.split('T')[0] || '';
+        this.settings.participants.regCloseDate = tournament.regCloseDate?.split('T')[0] || '';
+        this.settings.participants.approvalRequired = tournament.approvalRequired !== undefined ? tournament.approvalRequired : true;
+        this.settings.participants.regFee = tournament.regFee || 0;
+        this.settings.participants.playerLimit = tournament.playerLimit || 25;
+        this.settings.participants.squadSize = tournament.squadSize || 18;
+        if (tournament.organizer) {
+            this.settings.general.organizer = tournament.organizer;
+        }
+
+        if (tournament.settings) {
+            this.settings = { ...this.settings, ...tournament.settings };
+        }
     }
 
-    toggleDay(day: string) {
-        this.matchDays[day] = !this.matchDays[day];
+    setTab(tab: string) {
+        this.activeTab.set(tab);
     }
 
     saveChanges() {
@@ -84,12 +319,28 @@ export class TournamentDashboardComponent implements OnInit {
         this.isSaving.set(true);
 
         this.tournamentService.update(t.id, {
-            name: this.editName,
-            description: this.editDescription,
-            startDate: this.editStartDate,
-            endDate: this.editEndDate,
-            maxTeams: this.editMaxTeams,
-            status: this.editStatus,
+            name: this.settings.general.name,
+            description: this.settings.general.description,
+            startDate: this.settings.schedule.startDate,
+            endDate: this.settings.schedule.endDate,
+            maxTeams: this.settings.participants.maxTeams,
+            status: this.settings.general.status,
+            shortName: this.settings.general.shortName,
+            type: this.settings.general.type,
+            visibility: this.settings.general.visibility,
+            logo: this.settings.general.logo,
+            coverImage: this.settings.general.coverImage,
+            sponsors: '1,2,4', // Example comma-separated strings as requested
+            organizer: this.settings.general.organizer,
+            participantType: this.settings.participants.type,
+            minTeams: this.settings.participants.minTeams,
+            regOpenDate: this.settings.participants.regOpenDate,
+            regCloseDate: this.settings.participants.regCloseDate,
+            approvalRequired: this.settings.participants.approvalRequired,
+            regFee: this.settings.participants.regFee,
+            playerLimit: this.settings.participants.playerLimit,
+            squadSize: this.settings.participants.squadSize,
+            settings: this.settings,
         }).subscribe({
             next: (updated) => {
                 this.tournament.set(updated);
@@ -107,12 +358,7 @@ export class TournamentDashboardComponent implements OnInit {
     discardChanges() {
         const t = this.tournament();
         if (!t) return;
-        this.editName = t.name;
-        this.editDescription = t.description || '';
-        this.editStartDate = t.startDate?.split('T')[0] || '';
-        this.editEndDate = t.endDate?.split('T')[0] || '';
-        this.editMaxTeams = t.maxTeams;
-        this.editStatus = t.status;
+        this.mergeTournamentToSettings(t);
         this.showToast('Changes discarded.');
     }
 

@@ -1,0 +1,210 @@
+import { Component, OnInit, inject, signal, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+
+interface Team {
+    id: string;
+    name: string;
+    shortName?: string;
+    teamType?: string;
+    city?: string;
+    logoUrl?: string;
+}
+
+interface TournamentTeam {
+    id: string;
+    status: 'pending' | 'approved' | 'rejected';
+    paymentStatus: 'pending' | 'paid';
+    team: Team;
+}
+
+@Component({
+    selector: 'app-tournament-teams',
+    standalone: true,
+    imports: [CommonModule, FormsModule],
+    templateUrl: './tournament-teams.component.html',
+    styleUrls: []
+})
+export class TournamentTeamsComponent implements OnInit, OnChanges {
+    @Input() tournamentId!: string;
+
+    private http = inject(HttpClient);
+
+    teams = signal<TournamentTeam[]>([]);
+    availableTeams = signal<Team[]>([]); // Teams not in this tournament
+    isLoading = signal(true);
+    isModalOpen = signal(false);
+    isSaving = signal(false);
+    modalMode = signal<'new' | 'existing'>('existing');
+    selectedExistingTeamId = signal<string>('');
+
+    newTeam = signal<Partial<Team>>({
+        name: '',
+        shortName: '',
+        teamType: 'Club',
+        city: '',
+        logoUrl: ''
+    });
+
+    ngOnInit() {
+        if (this.tournamentId) {
+            this.fetchTeams();
+        }
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes['tournamentId'] && !changes['tournamentId'].isFirstChange()) {
+            this.fetchTeams();
+        }
+    }
+
+    fetchTeams() {
+        this.isLoading.set(true);
+
+        // Fetch all teams
+        this.http.get<Team[]>('http://localhost:3000/api/teams').subscribe({
+            next: (allTeams) => {
+                // Fetch tournament registrations
+                this.http.get<{ success: boolean, data: TournamentTeam[] }>(`http://localhost:3000/api/tournaments/${this.tournamentId}/teams`).subscribe({
+                    next: (res) => {
+                        const mappedTeams = res.data || [];
+                        this.teams.set(mappedTeams);
+
+                        // Calculate available teams (teams not in mappedTeams)
+                        const mappedTeamIds = new Set(mappedTeams.map(m => m.team.id));
+                        const unmappedTeams = allTeams.filter(t => !mappedTeamIds.has(t.id));
+                        this.availableTeams.set(unmappedTeams);
+
+                        this.isLoading.set(false);
+                    },
+                    error: (err) => {
+                        console.error('Error fetching tournament teams:', err);
+                        this.isLoading.set(false);
+                    }
+                });
+            },
+            error: (err) => {
+                console.error('Error fetching all teams:', err);
+                this.isLoading.set(false);
+            }
+        });
+    }
+
+    openModal() {
+        this.newTeam.set({
+            name: '',
+            shortName: '',
+            teamType: 'Club',
+            city: '',
+            logoUrl: ''
+        });
+        this.selectedExistingTeamId.set('');
+        this.isModalOpen.set(true);
+    }
+
+    closeModal() {
+        this.isModalOpen.set(false);
+    }
+
+    setModalMode(mode: 'new' | 'existing') {
+        this.modalMode.set(mode);
+    }
+
+    saveTeam() {
+        if (this.modalMode() === 'existing') {
+            const teamId = this.selectedExistingTeamId();
+            if (!teamId) return;
+
+            this.isSaving.set(true);
+            this.http.post<{ success: boolean, data: TournamentTeam }>(`http://localhost:3000/api/tournaments/${this.tournamentId}/teams/${teamId}`, {})
+                .subscribe({
+                    next: (res) => {
+                        this.teams.update(t => [res.data, ...t]);
+                        // Remove assigned team from available list
+                        this.availableTeams.update(av => av.filter(a => a.id !== teamId));
+
+                        this.isSaving.set(false);
+                        this.closeModal();
+                    },
+                    error: (err) => {
+                        console.error('Error assigning team:', err);
+                        this.isSaving.set(false);
+                    }
+                });
+        } else {
+            const teamData = { ...this.newTeam(), tournamentId: this.tournamentId };
+            if (!teamData.name || !teamData.teamType) return;
+
+            this.isSaving.set(true);
+            this.http.post<Team>('http://localhost:3000/api/teams', teamData).subscribe({
+                next: (newTeam) => {
+                    // Step 2: Now map it to the tournament
+                    this.http.post<{ success: boolean, data: TournamentTeam }>(`http://localhost:3000/api/tournaments/${this.tournamentId}/teams/${newTeam.id}`, {})
+                        .subscribe({
+                            next: (res) => {
+                                this.teams.update(t => [res.data, ...t]);
+                                this.isSaving.set(false);
+                                this.closeModal();
+                            },
+                            error: (err) => {
+                                console.error('Error mapping new team to tournament:', err);
+                                this.isSaving.set(false);
+                            }
+                        });
+                },
+                error: (err) => {
+                    console.error('Error saving team:', err);
+                    this.isSaving.set(false);
+                }
+            });
+        }
+    }
+
+    deleteTeam(regId: string, teamId: string) {
+        if (confirm('Are you sure you want to remove this team from the tournament?')) {
+            // Delete the registration link
+            this.http.delete(`http://localhost:3000/api/tournaments/${this.tournamentId}/teams/${teamId}`).subscribe({
+                next: () => {
+                    this.fetchTeams(); // Refetch to update both lists
+                },
+                error: (err) => console.error('Error unassigning team:', err)
+            });
+        }
+    }
+
+    toggleApprovalStatus(reg: TournamentTeam) {
+        const newStatus = reg.status === 'approved' ? 'pending' : 'approved';
+        // Optimistic update
+        const oldStatus = reg.status;
+        reg.status = newStatus;
+
+        this.http.put(`http://localhost:3000/api/tournaments/${this.tournamentId}/teams/${reg.team.id}/status`, { status: newStatus }).subscribe({
+            error: (err) => {
+                console.error('Error updating approval status:', err);
+                reg.status = oldStatus; // Revert on error
+            }
+        });
+    }
+
+    togglePaymentStatus(reg: TournamentTeam) {
+        const newPaymentStatus = reg.paymentStatus === 'paid' ? 'pending' : 'paid';
+        // Optimistic update
+        const oldPaymentStatus = reg.paymentStatus;
+        reg.paymentStatus = newPaymentStatus;
+
+        this.http.put(`http://localhost:3000/api/tournaments/${this.tournamentId}/teams/${reg.team.id}/status`, { paymentStatus: newPaymentStatus }).subscribe({
+            error: (err) => {
+                console.error('Error updating payment status:', err);
+                reg.paymentStatus = oldPaymentStatus; // Revert on error
+            }
+        });
+    }
+
+    getImageUrl(path?: string): string {
+        if (!path) return '';
+        if (path.startsWith('http')) return path;
+        // Prefix with backend URL since Angular runs on 4200
+        return `http://localhost:3000${path.startsWith('/') ? '' : '/'}${path}`;
+    }
+}

@@ -1,0 +1,199 @@
+<div class="space-y-8">
+    <!-- Page Title -->
+    <div>
+        <h1 class="text-3xl font-black text-white tracking-tight">General Identity</h1>
+        <p class="text-zinc-500 mt-1.5">Define the core branding, visibility, and high-level details of your
+            tournament.</p>
+    </div>
+
+    <!-- Branding Card -->
+    <div class="bg-black-card border border-black-border rounded-xl p-6 space-y-6">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gold-400/10 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gold-400" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+            </div>
+            <h2 class="text-lg font-bold text-white">Branding & Media</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Logo -->
+            <div>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Tournament
+                    Logo</label>
+                <div (click)="logoInput.click()"
+                    class="w-32 aspect-square rounded-xl bg-gradient-to-br from-gold-400/10 to-gold-400/5 border-2 border-dashed border-gold-400/20 flex flex-col items-center justify-center cursor-pointer hover:border-gold-400/40 transition-all relative overflow-hidden group">
+                    @if (data.logo) {
+                    <img [src]="getImageUrl(data.logo)" class="w-full h-full object-cover">
+                    <div
+                        class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button (click)="removeImage('logo', $event)" class="text-white hover:text-red-400 p-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
+                    } @else {
+                    <span class="text-xs text-gold-400 font-bold">Upload</span>
+                    }
+                    <input type="file" #logoInput (change)="onFileSelected($event, 'logo')" accept="image/*"
+                        class="hidden">
+                </div>
+            </div>
+            <!-- Cover Image -->
+            <div>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Cover
+                    Image / Banner</label>
+                <div (click)="coverInput.click()"
+                    class="w-full h-32 rounded-xl bg-gradient-to-br from-zinc-800/50 to-zinc-900/50 border-2 border-dashed border-zinc-700/50 flex flex-col items-center justify-center cursor-pointer hover:border-zinc-500 transition-all relative overflow-hidden group">
+                    @if (data.coverImage) {
+                    <img [src]="getImageUrl(data.coverImage)" class="w-full h-full object-cover">
+                    <div
+                        class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button (click)="removeImage('coverImage', $event)" class="text-white hover:text-red-400 p-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
+                    } @else {
+                    <span class="text-xs text-zinc-400 font-bold">1920x1080 Recommended</span>
+                    }
+                    <input type="file" #coverInput (change)="onFileSelected($event, 'coverImage')" accept="image/*"
+                        class="hidden">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Card -->
+    <div class="bg-black-card border border-black-border rounded-xl p-6 space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Name & Short Name -->
+            <div class="space-y-5">
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Tournament
+                        Name</label>
+                    <input type="text" [(ngModel)]="data.name"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all" />
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Short
+                        Name (Acronym)</label>
+                    <input type="text" [(ngModel)]="data.shortName"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all" />
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Tournament
+                        Type</label>
+                    <select [(ngModel)]="data.type"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all">
+                        <option value="futsal" class="bg-black-card">Futsal (5v5)</option>
+                        <option value="7aside" class="bg-black-card">7-a-side</option>
+                        <option value="11aside" class="bg-black-card">11-a-side</option>
+                        <option value="custom" class="bg-black-card">Custom Format</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Description & Organizer -->
+            <div class="space-y-5">
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Public
+                        Description</label>
+                    <textarea [(ngModel)]="data.description" rows="5"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all resize-none"></textarea>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Organizer Card -->
+    <div class="bg-black-card border border-black-border rounded-xl p-6">
+        <h2 class="text-lg font-bold text-white mb-6">Organizer Details</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1 block">Name</label>
+                <input type="text" [(ngModel)]="data.organizer.name" placeholder="e.g. Elite Sports Fed"
+                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-2.5 text-sm text-white focus:border-gold-400 focus:outline-none transition-all" />
+            </div>
+            <div>
+                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1 block">Email</label>
+                <input type="email" [(ngModel)]="data.organizer.email" placeholder="e.g. contact@sportsfed.com"
+                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-2.5 text-sm text-white focus:border-gold-400 focus:outline-none transition-all" />
+            </div>
+            <div>
+                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1 block">Phone</label>
+                <input type="tel" [(ngModel)]="data.organizer.phone" placeholder="e.g. +1 555 123 4567"
+                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-2.5 text-sm text-white focus:border-gold-400 focus:outline-none transition-all" />
+            </div>
+            <div>
+                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1 block">Website / Link
+                    (Optional)</label>
+                <input type="url" [(ngModel)]="data.organizer.website" placeholder="e.g. https://sportsfed.com"
+                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-2.5 text-sm text-white focus:border-gold-400 focus:outline-none transition-all" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Sponsor Card -->
+    <div class="bg-black-card border border-black-border rounded-xl p-6">
+        <h2 class="text-lg font-bold text-white mb-6">Primary Sponsor</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1 block">Sponsor
+                    Name</label>
+                <input type="text" [(ngModel)]="data.sponsor.name" placeholder="e.g. Nike"
+                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-2.5 text-sm text-white focus:border-gold-400 focus:outline-none transition-all" />
+            </div>
+            <div>
+                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1 block">Sponsor Website
+                    (Optional)</label>
+                <input type="url" [(ngModel)]="data.sponsor.website" placeholder="e.g. https://nike.com"
+                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-2.5 text-sm text-white focus:border-gold-400 focus:outline-none transition-all" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Control Card -->
+    <div class="bg-black-card border border-black-border rounded-xl p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Tournament
+                    Status</label>
+                <select [(ngModel)]="data.status"
+                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all">
+                    <option value="draft" class="bg-black-card">Draft Mode (Hidden)</option>
+                    <option value="registration_open" class="bg-black-card">Registration Open</option>
+                    <option value="in_progress" class="bg-black-card">Live / In Progress</option>
+                    <option value="completed" class="bg-black-card">Completed</option>
+                </select>
+            </div>
+            <div>
+                <label
+                    class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Visibility</label>
+                <div class="flex gap-4 mt-2">
+                    <label class="cursor-pointer label flex items-center gap-2">
+                        <input type="radio" name="visibility" value="public" [(ngModel)]="data.visibility"
+                            class="radio border-gold-400 checked:bg-gold-400" />
+                        <span class="label-text text-white">Public (Searchable)</span>
+                    </label>
+                    <label class="cursor-pointer label flex items-center gap-2">
+                        <input type="radio" name="visibility" value="private" [(ngModel)]="data.visibility"
+                            class="radio border-gold-400 checked:bg-gold-400" />
+                        <span class="label-text text-white">Private (Invite Only)</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

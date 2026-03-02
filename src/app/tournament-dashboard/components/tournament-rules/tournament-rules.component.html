@@ -1,0 +1,123 @@
+<div class="space-y-8">
+    <div>
+        <h1 class="text-3xl font-black text-white tracking-tight">Match Rules</h1>
+        <p class="text-zinc-500 mt-1.5">Define exactly how the game is played on the pitch.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Gameplay Rules -->
+        <div class="bg-black-card border border-black-border rounded-xl p-6 space-y-6">
+            <h2 class="text-lg font-bold text-white">General & Gameplay</h2>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Governing
+                        Body</label>
+                    <input type="text" [(ngModel)]="data.govBody"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all" />
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Ball
+                        Size</label>
+                    <select [(ngModel)]="data.ballSize"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all">
+                        <option [ngValue]="3" class="bg-black-card">Size 3</option>
+                        <option [ngValue]="4" class="bg-black-card">Size 4</option>
+                        <option [ngValue]="5" class="bg-black-card">Size 5</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Players
+                        on Field</label>
+                    <input type="number" [(ngModel)]="data.playersOnField"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all" />
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Minimum
+                        Players</label>
+                    <input type="number" [(ngModel)]="data.minPlayers"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all" />
+                </div>
+            </div>
+
+            <div>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Substitution
+                    Rules</label>
+                <select [(ngModel)]="data.subsAllowed"
+                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all">
+                    <option [ngValue]="3" class="bg-black-card">3 Substitutions</option>
+                    <option [ngValue]="5" class="bg-black-card">5 Substitutions</option>
+                    <option [ngValue]="99" class="bg-black-card">Rolling / Unlimited</option>
+                </select>
+            </div>
+
+            <div class="pt-2 flex flex-col gap-3">
+                <label
+                    class="cursor-pointer label flex items-center justify-between bg-white/5 border border-black-border rounded-lg px-4 py-3 hover:border-gold-400/50 transition-all">
+                    <div><span class="label-text text-white font-bold block">Apply Offside Rule</span></div>
+                    <input type="checkbox" [(ngModel)]="data.offsideRule" class="toggle toggle-warning" />
+                </label>
+            </div>
+        </div>
+
+        <!-- Tie & Discipline -->
+        <div class="bg-black-card border border-black-border rounded-xl p-6 space-y-6">
+            <h2 class="text-lg font-bold text-white">Discipline & Tie Resolutions</h2>
+
+            <div class="grid grid-cols-2 gap-4 border-b border-black-border pb-6">
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Extra
+                        Time Rules</label>
+                    <select [(ngModel)]="data.extraTimeRule"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all">
+                        <option value="None" class="bg-black-card">No Extra Time</option>
+                        <option value="2x15" class="bg-black-card">2 x 15 mins</option>
+                        <option value="Golden Goal" class="bg-black-card">Golden Goal</option>
+                    </select>
+                </div>
+                <div class="flex items-end pb-2">
+                    <label class="cursor-pointer label flex items-center gap-3">
+                        <input type="checkbox" [(ngModel)]="data.penaltiesRule"
+                            class="checkbox checkbox-warning border-gold-400" />
+                        <span class="label-text text-white font-bold">Penalties Shootout</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Yellow
+                        Card Suspension</label>
+                    <div class="flex items-center gap-3">
+                        <input type="number" [(ngModel)]="data.yellowSuspensionLimit"
+                            class="w-24 bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all text-center" />
+                        <span class="text-sm text-zinc-400">accumulated yellows = 1 match ban</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Red
+                        Card Penalty</label>
+                    <div class="flex items-center gap-3">
+                        <input type="number" [(ngModel)]="data.redSuspensionLength"
+                            class="w-24 bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all text-center" />
+                        <span class="text-sm text-zinc-400">match ban automatically</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Goalkeeper
+                        Rules</label>
+                    <select [(ngModel)]="data.gkRules"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all">
+                        <option value="Standard" class="bg-black-card">Standard (FIFA)</option>
+                        <option value="No Pass Back" class="bg-black-card">Strict No Pass Back</option>
+                        <option value="Futsal Throw" class="bg-black-card">Futsal Rules (Hand throw only)
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

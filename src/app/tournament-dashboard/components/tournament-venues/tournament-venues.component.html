@@ -1,0 +1,81 @@
+<div class="space-y-8">
+    <!-- Page Title -->
+    <div>
+        <h1 class="text-3xl font-black text-white tracking-tight">Venues & Facilities</h1>
+        <p class="text-zinc-500 mt-1.5">Manage locations where matches will be played.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Venue Configuration -->
+        <div class="bg-black-card border border-black-border rounded-xl p-6 space-y-6">
+            <div class="flex items-center justify-between border-b border-black-border pb-4">
+                <h2 class="text-lg font-bold text-white">Locations Setup</h2>
+                <label class="cursor-pointer label flex items-center gap-2 m-0 p-0">
+                    <span class="label-text text-zinc-400 font-bold mr-2">Multiple Venues</span>
+                    <input type="checkbox" [(ngModel)]="data.multipleVenues" class="toggle toggle-warning" />
+                </label>
+            </div>
+
+            <div class="space-y-5">
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Primary
+                        Venue Name</label>
+                    <input type="text" [(ngModel)]="data.primaryVenue" placeholder="e.g. National Stadium"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all" />
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Venue
+                        Address</label>
+                    <textarea rows="2" [(ngModel)]="data.venueAddress" placeholder="Full physical address or map link"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all resize-none"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Total
+                            Pitches/Courts</label>
+                        <input type="number" [(ngModel)]="data.pitchCount"
+                            class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all" />
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Field
+                            Type</label>
+                        <select [(ngModel)]="data.fieldType"
+                            class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all">
+                            <option value="grass" class="bg-black-card">Natural Grass</option>
+                            <option value="turf" class="bg-black-card">Artificial Turf (3G/4G)</option>
+                            <option value="indoor" class="bg-black-card">Indoor Hardcourt</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pitches List placeholder -->
+        <div class="bg-black-card border border-black-border rounded-xl flex flex-col">
+            <div class="p-6 border-b border-black-border flex items-center justify-between">
+                <h2 class="text-base font-bold text-white">Managed Pitches</h2>
+                <button
+                    class="text-gold-400 hover:text-white transition-colors text-sm font-bold flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Add Pitch
+                </button>
+            </div>
+            <div class="p-12 flex-1 flex flex-col items-center justify-center text-center">
+                <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-zinc-600" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-1">No separate pitches mapped</h3>
+                <p class="text-sm text-zinc-500">Configure distinct pitches to schedule concurrent matches.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

@@ -10,6 +10,22 @@ export interface TournamentDTO {
     endDate: string;
     maxTeams: number;
     status: string;
+    shortName?: string;
+    type?: string;
+    visibility?: string;
+    logo?: string;
+    coverImage?: string;
+    sponsors?: string;
+    organizer?: any;
+    participantType?: string;
+    minTeams?: number;
+    regOpenDate?: string;
+    regCloseDate?: string;
+    approvalRequired?: boolean;
+    regFee?: number;
+    playerLimit?: number;
+    squadSize?: number;
+    settings?: any;
     createdAt?: string;
     updatedAt?: string;
 }
