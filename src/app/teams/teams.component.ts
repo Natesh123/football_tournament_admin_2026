@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { TeamService, Team } from './team.service';
 import { CreateTeamModalComponent } from './components/create-team-modal/create-team-modal.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-teams',
@@ -131,6 +132,6 @@ export class TeamsComponent {
   getImageUrl(path?: string): string {
     if (!path) return '';
     if (path.startsWith('http')) return path;
-    return `http://localhost:3000${path.startsWith('/') ? '' : '/'}${path}`;
+    return `${environment.apiBaseUrl}${path.startsWith('/') ? '' : '/'}${path}`;
   }
 }

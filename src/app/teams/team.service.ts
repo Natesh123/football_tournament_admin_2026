@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface Team {
     id: string;
@@ -25,7 +26,7 @@ export interface Team {
 })
 export class TeamService {
     private http = inject(HttpClient);
-    readonly BASE_URL = 'http://localhost:3000';
+    readonly BASE_URL = environment.apiBaseUrl;
     private apiUrl = `${this.BASE_URL}/api/teams`;
 
     getAll(search?: string): Observable<Team[]> {

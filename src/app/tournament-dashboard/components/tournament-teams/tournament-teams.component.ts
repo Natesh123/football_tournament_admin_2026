@@ -1,7 +1,8 @@
-import { Component, OnInit, inject, signal, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
 
 interface Team {
     id: string;
@@ -47,6 +48,31 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
         logoUrl: ''
     });
 
+    // Data Table State
+    searchQuery = signal('');
+    columns = signal([
+        { key: 'team', label: 'Team', visible: true },
+        { key: 'type', label: 'Type', visible: true },
+        { key: 'location', label: 'Location', visible: true },
+        { key: 'status', label: 'Status', visible: true },
+        { key: 'payment', label: 'Payment', visible: true },
+        { key: 'actions', label: 'Actions', visible: true }
+    ]);
+
+    // Computed filtered list
+    filteredTeams = computed(() => {
+        const query = this.searchQuery().toLowerCase().trim();
+        const currentTeams = this.teams();
+        if (!query) return currentTeams;
+
+        return currentTeams.filter(reg => {
+            const team = reg.team;
+            return team.name.toLowerCase().includes(query) ||
+                (team.shortName && team.shortName.toLowerCase().includes(query)) ||
+                (team.city && team.city.toLowerCase().includes(query));
+        });
+    });
+
     ngOnInit() {
         if (this.tournamentId) {
             this.fetchTeams();
@@ -63,10 +89,10 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
         this.isLoading.set(true);
 
         // Fetch all teams
-        this.http.get<Team[]>('http://localhost:3000/api/teams').subscribe({
+        this.http.get<Team[]>(`${environment.apiBaseUrl}/api/teams`).subscribe({
             next: (allTeams) => {
                 // Fetch tournament registrations
-                this.http.get<{ success: boolean, data: TournamentTeam[] }>(`http://localhost:3000/api/tournaments/${this.tournamentId}/teams`).subscribe({
+                this.http.get<{ success: boolean, data: TournamentTeam[] }>(`${environment.apiBaseUrl}/api/tournaments/${this.tournamentId}/teams`).subscribe({
                     next: (res) => {
                         const mappedTeams = res.data || [];
                         this.teams.set(mappedTeams);
@@ -117,7 +143,7 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
             if (!teamId) return;
 
             this.isSaving.set(true);
-            this.http.post<{ success: boolean, data: TournamentTeam }>(`http://localhost:3000/api/tournaments/${this.tournamentId}/teams/${teamId}`, {})
+            this.http.post<{ success: boolean, data: TournamentTeam }>(`${environment.apiBaseUrl}/api/tournaments/${this.tournamentId}/teams/${teamId}`, {})
                 .subscribe({
                     next: (res) => {
                         this.teams.update(t => [res.data, ...t]);
@@ -137,10 +163,10 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
             if (!teamData.name || !teamData.teamType) return;
 
             this.isSaving.set(true);
-            this.http.post<Team>('http://localhost:3000/api/teams', teamData).subscribe({
+            this.http.post<Team>(`${environment.apiBaseUrl}/api/teams`, teamData).subscribe({
                 next: (newTeam) => {
                     // Step 2: Now map it to the tournament
-                    this.http.post<{ success: boolean, data: TournamentTeam }>(`http://localhost:3000/api/tournaments/${this.tournamentId}/teams/${newTeam.id}`, {})
+                    this.http.post<{ success: boolean, data: TournamentTeam }>(`${environment.apiBaseUrl}/api/tournaments/${this.tournamentId}/teams/${newTeam.id}`, {})
                         .subscribe({
                             next: (res) => {
                                 this.teams.update(t => [res.data, ...t]);
@@ -164,7 +190,7 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
     deleteTeam(regId: string, teamId: string) {
         if (confirm('Are you sure you want to remove this team from the tournament?')) {
             // Delete the registration link
-            this.http.delete(`http://localhost:3000/api/tournaments/${this.tournamentId}/teams/${teamId}`).subscribe({
+            this.http.delete(`${environment.apiBaseUrl}/api/tournaments/${this.tournamentId}/teams/${teamId}`).subscribe({
                 next: () => {
                     this.fetchTeams(); // Refetch to update both lists
                 },
@@ -179,7 +205,7 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
         const oldStatus = reg.status;
         reg.status = newStatus;
 
-        this.http.put(`http://localhost:3000/api/tournaments/${this.tournamentId}/teams/${reg.team.id}/status`, { status: newStatus }).subscribe({
+        this.http.put(`${environment.apiBaseUrl}/api/tournaments/${this.tournamentId}/teams/${reg.team.id}/status`, { status: newStatus }).subscribe({
             error: (err) => {
                 console.error('Error updating approval status:', err);
                 reg.status = oldStatus; // Revert on error
@@ -193,7 +219,7 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
         const oldPaymentStatus = reg.paymentStatus;
         reg.paymentStatus = newPaymentStatus;
 
-        this.http.put(`http://localhost:3000/api/tournaments/${this.tournamentId}/teams/${reg.team.id}/status`, { paymentStatus: newPaymentStatus }).subscribe({
+        this.http.put(`${environment.apiBaseUrl}/api/tournaments/${this.tournamentId}/teams/${reg.team.id}/status`, { paymentStatus: newPaymentStatus }).subscribe({
             error: (err) => {
                 console.error('Error updating payment status:', err);
                 reg.paymentStatus = oldPaymentStatus; // Revert on error
@@ -205,6 +231,13 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
         if (!path) return '';
         if (path.startsWith('http')) return path;
         // Prefix with backend URL since Angular runs on 4200
-        return `http://localhost:3000${path.startsWith('/') ? '' : '/'}${path}`;
+        return `${environment.apiBaseUrl}${path.startsWith('/') ? '' : '/'}${path}`;
+    }
+
+    // Data Table Logic
+    toggleColumn(key: string) {
+        this.columns.update(cols =>
+            cols.map(c => c.key === key ? { ...c, visible: !c.visible } : c)
+        );
     }
 }

@@ -195,11 +195,13 @@
             }
 
             @if (activeTab() === 'format') {
-            <app-tournament-format [data]="settings.format"></app-tournament-format>
+            <app-tournament-format [data]="settings.format"
+                (formatChange)="onFormatChange($event)"></app-tournament-format>
             }
 
             @if (activeTab() === 'schedule') {
-            <app-tournament-schedule [data]="settings.schedule"></app-tournament-schedule>
+            <app-tournament-schedule [data]="settings.schedule"
+                [tournamentId]="tournament()?.id || ''"></app-tournament-schedule>
             }
 
             @if (activeTab() === 'rules') {
@@ -219,7 +221,8 @@
             }
 
             @if (activeTab() === 'results') {
-            <app-tournament-results [data]="settings.results"></app-tournament-results>
+            <app-tournament-results [data]="settings.results"
+                [tournamentId]="tournament()?.id || ''"></app-tournament-results>
             }
         </div>
     </main>

@@ -4,14 +4,13 @@ import { TranslateModule } from '@ngx-translate/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../auth.service';
-import { PhysicsBallDirective } from '../physics-ball.directive';
 
 @Component({
     selector: 'app-login',
     templateUrl: './login.html',
     styleUrl: './login.css',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, RouterLink, PhysicsBallDirective, TranslateModule]
+    imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslateModule]
 })
 export class LoginComponent implements OnInit {
 

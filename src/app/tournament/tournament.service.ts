@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface TournamentDTO {
     id?: string;
@@ -39,7 +40,7 @@ interface ApiResponse<T> {
 @Injectable({ providedIn: 'root' })
 export class TournamentService {
     private http = inject(HttpClient);
-    private baseUrl = 'http://localhost:3000/api/tournaments';
+    private baseUrl = `${environment.apiBaseUrl}/api/tournaments`;
 
     getAll(): Observable<TournamentDTO[]> {
         return this.http.get<ApiResponse<TournamentDTO[]>>(this.baseUrl).pipe(
@@ -67,5 +68,17 @@ export class TournamentService {
 
     delete(id: string): Observable<void> {
         return this.http.delete<void>(`${this.baseUrl}/${id}`);
+    }
+
+    generateStructure(id: string): Observable<any> {
+        return this.http.post<ApiResponse<any>>(`${this.baseUrl}/${id}/generate-structure`, {}).pipe(
+            map(res => res.data)
+        );
+    }
+
+    getStructure(id: string): Observable<any> {
+        return this.http.get<ApiResponse<any>>(`${this.baseUrl}/${id}/structure`).pipe(
+            map(res => res.data)
+        );
     }
 }

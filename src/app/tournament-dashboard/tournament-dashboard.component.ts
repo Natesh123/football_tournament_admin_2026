@@ -142,6 +142,7 @@ export class TournamentDashboardComponent implements OnInit {
     isSaving = signal(false);
     activeTab = signal<string>('general');
     toastMessage = signal('');
+    formatChanged = false;
 
     settings: TournamentSettings = this.getDefaultSettings();
 
@@ -313,6 +314,11 @@ export class TournamentDashboardComponent implements OnInit {
         this.activeTab.set(tab);
     }
 
+    onFormatChange(newFormat: any) {
+        this.settings.format = newFormat;
+        this.formatChanged = true;
+    }
+
     saveChanges() {
         const t = this.tournament();
         if (!t || !t.id) return;
@@ -344,8 +350,25 @@ export class TournamentDashboardComponent implements OnInit {
         }).subscribe({
             next: (updated) => {
                 this.tournament.set(updated);
-                this.isSaving.set(false);
-                this.showToast('Changes saved successfully!');
+
+                // If format changed, also let's generate the structure
+                if (this.formatChanged && t.id) {
+                    this.tournamentService.generateStructure(t.id).subscribe({
+                        next: () => {
+                            this.formatChanged = false;
+                            this.isSaving.set(false);
+                            this.showToast('Changes saved & structure generated!');
+                        },
+                        error: (err) => {
+                            console.error('Failed to generate structure:', err);
+                            this.isSaving.set(false);
+                            this.showToast('Saved changes, but structure generation failed.');
+                        }
+                    });
+                } else {
+                    this.isSaving.set(false);
+                    this.showToast('Changes saved successfully!');
+                }
             },
             error: (err) => {
                 console.error('Failed to save:', err);
