@@ -138,19 +138,7 @@
             }
         </nav>
 
-        <!-- Preview Button at Bottom -->
-        <div class="p-4 border-t border-black-border">
-            <button
-                class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-white/5 border border-black-border text-zinc-400 hover:text-white hover:bg-white/10 font-bold text-sm transition-all">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-                Preview Live
-            </button>
-        </div>
+
     </aside>
 
     <!-- Main Content -->
@@ -196,41 +184,29 @@
             </div>
         </div>
 
-        <!-- Football Loader (shown while loading) -->
+        <!-- Skeleton Content (shown while loading) -->
         @if (isLoading()) {
-        <div class="flex flex-col items-center justify-center h-[calc(100%-73px)] gap-6">
-            <!-- Football SVG with bounce animation -->
-            <div class="relative flex flex-col items-center">
-                <div style="animation: footballBounce 0.8s ease-in-out infinite alternate;">
-                    <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="28" cy="28" r="27" fill="white" stroke="#27272a" stroke-width="2"/>
-                        <!-- Centre pentagon -->
-                        <polygon points="28,14 37,21 33.5,33 22.5,33 19,21" fill="#18181b"/>
-                        <!-- Surrounding pentagons (5) -->
-                        <polygon points="28,3 35,9 37,21 19,21 21,9" fill="#18181b" opacity="0.18"/>
-                        <polygon points="44,16 49,26 37,21 35,9" fill="#18181b" opacity="0.18"/>
-                        <polygon points="42,40 33.5,33 37,21 49,26" fill="#18181b" opacity="0.18"/>
-                        <polygon points="14,40 22.5,33 33.5,33 42,40 28,47" fill="#18181b" opacity="0.18"/>
-                        <polygon points="7,26 19,21 22.5,33 14,40" fill="#18181b" opacity="0.18"/>
-                    </svg>
-                </div>
-                <!-- Shadow that shrinks when ball is up -->
-                <div class="w-10 h-2 rounded-full bg-black/30 mt-2"
-                    style="animation: shadowPulse 0.8s ease-in-out infinite alternate;"></div>
+        <div class="p-8 space-y-8">
+            <div class="space-y-3">
+                <div class="h-8 w-64 skeleton"></div>
+                <div class="h-4 w-96 skeleton opacity-50"></div>
             </div>
-            <p class="text-zinc-500 text-sm font-bold tracking-wider uppercase">Loading Tournament...</p>
-        </div>
 
-        <style>
-            @keyframes footballBounce {
-                from { transform: translateY(0px); }
-                to   { transform: translateY(-28px); }
-            }
-            @keyframes shadowPulse {
-                from { transform: scaleX(1); opacity: 0.3; }
-                to   { transform: scaleX(0.55); opacity: 0.1; }
-            }
-        </style>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="h-48 rounded-2xl skeleton opacity-30"></div>
+                <div class="h-48 rounded-2xl skeleton opacity-30"></div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="h-10 w-48 skeleton"></div>
+                <div class="h-64 rounded-2xl skeleton opacity-20"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="h-40 rounded-2xl skeleton opacity-20"></div>
+                <div class="h-40 rounded-2xl skeleton opacity-20"></div>
+            </div>
+        </div>
         }
 
         <!-- Tab Content (only when loaded) -->
@@ -275,12 +251,11 @@
             }
 
             @if (activeTab() === 'presentation') {
-            <app-tournament-presentation [data]="settings.presentation"></app-tournament-presentation>
+            <app-tournament-presentation [data]="settings.presentation" [tournamentId]="tournament()?.id || ''"></app-tournament-presentation>
             }
 
             @if (activeTab() === 'results') {
-            <app-tournament-results [data]="settings.results"
-                [tournamentId]="tournament()?.id || ''"></app-tournament-results>
+            <app-tournament-results [tournamentId]="tournament()?.id || ''"></app-tournament-results>
             }
         </div>
         }

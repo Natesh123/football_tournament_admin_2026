@@ -7,19 +7,19 @@
 
         <!-- Match Status Tabs -->
         <div class="flex items-center gap-2 p-1 bg-black-card border border-black-border rounded-xl w-fit">
-            <button (click)="activeTab.set('scheduled')"
-                [class]="activeTab() === 'scheduled' ? 'bg-white/10 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5'"
-                class="px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2">
+            <button (click)="activeTab.set('upcoming')"
+                [class]="activeTab() === 'upcoming' ? 'bg-white/10 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5'"
+                class="px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                Scheduled
+                Upcoming
             </button>
             <button (click)="activeTab.set('live')"
                 [class]="activeTab() === 'live' ? 'bg-gold-500/20 text-gold-400 border-gold-500/30' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5 border-transparent'"
-                class="px-4 py-2 rounded-lg text-sm font-bold transition-all border flex items-center gap-2">
+                class="px-4 py-2 rounded-lg text-sm font-bold transition-all border flex items-center gap-2 cursor-pointer">
                 <span class="relative flex h-2 w-2">
                     <span *ngIf="activeTab() === 'live'"
                         class="animate-ping absolute inline-flex h-full w-full rounded-full bg-gold-400 opacity-75"></span>
@@ -28,27 +28,29 @@
                 </span>
                 Live
             </button>
-            <button (click)="activeTab.set('completed')"
-                [class]="activeTab() === 'completed' ? 'bg-white/10 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5'"
-                class="px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2">
+            <button (click)="activeTab.set('past')"
+                [class]="activeTab() === 'past' ? 'bg-white/10 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5'"
+                class="px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Completed
+                Past
             </button>
         </div>
     </div>
     @if (isLoading()) {
-    <div class="flex items-center justify-center py-12">
-        <div class="w-8 h-8 rounded-full border-2 border-gold-400 border-t-transparent animate-spin"></div>
+    <div class="space-y-4">
+        @for (i of [1,2,3,4,5]; track $index) {
+        <div class="h-20 bg-black-card border border-black-border rounded-xl skeleton opacity-30"></div>
+        }
     </div>
     } @else if (structure()?.matches && structure()?.matches?.length > 0) {
     <div *ngIf="filteredMatches().length > 0" class="bg-black-card border border-black-border rounded-xl">
         <div class="divide-y divide-black-border">
             @for (match of filteredMatches(); track match.id) {
-            <div class="p-4 flex items-center justify-between hover:bg-white/5 transition-colors">
+            <div (click)="openMatchDetails(match.id)" class="p-4 flex items-center justify-between hover:bg-zinc-800/80 transition-colors cursor-pointer group">
                 <div class="flex items-center gap-4 flex-1">
                     <span class="text-xs font-bold text-zinc-500 w-24 text-center">{{match.stage?.name ||
                         'Match'}}</span>
@@ -71,8 +73,8 @@
                     </div>
 
                     <div class="ml-4 flex items-center gap-2">
-                        <button (click)="openMatchDetails(match.id)"
-                            class="px-4 py-2 rounded-lg bg-white/5 border border-black-border hover:bg-gold-500 hover:text-black font-bold text-[10px] uppercase tracking-wider text-zinc-400 transition-all shadow-[0_4px_10px_rgba(0,0,0,0.5)]">
+                        <button (click)="openMatchDetails(match.id); $event.stopPropagation()"
+                            class="px-4 py-2 rounded-lg bg-white/5 border border-black-border group-hover:bg-gold-500 group-hover:text-black font-bold text-[10px] uppercase tracking-wider text-zinc-400 transition-all shadow-[0_4px_10px_rgba(0,0,0,0.5)]">
                             Manage Result
                         </button>
                     </div>
@@ -107,7 +109,7 @@
     <div *ngIf="filteredMatches().length === 0"
         class="mt-8 bg-black-card border border-black-border rounded-xl p-8 flex flex-col items-center justify-center text-center">
         <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
-            <svg *ngIf="activeTab() === 'scheduled'" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-zinc-600"
+            <svg *ngIf="activeTab() === 'upcoming'" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-zinc-600"
                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -119,7 +121,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <svg *ngIf="activeTab() === 'completed'" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-zinc-600"
+            <svg *ngIf="activeTab() === 'past'" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-zinc-600"
                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />

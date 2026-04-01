@@ -39,11 +39,17 @@
                     <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Event
                         Type</label>
                     <select [(ngModel)]="formData.type"
-                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all appearance-none cursor-pointer">
-                        <option value="goal" class="bg-black text-white">Goal</option>
-                        <option value="yellow_card" class="bg-black text-white">Yellow Card</option>
-                        <option value="red_card" class="bg-black text-white">Red Card</option>
-                        <option value="substitution" class="bg-black text-white">Substitution</option>
+                        class="select select-bordered w-full bg-black-card border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all hover:border-gold-400/50 cursor-pointer">
+                        <option value="goal" class="bg-black text-white">⚽ Goal</option>
+                        <option value="own_goal" class="bg-black text-white">↩️ Own Goal</option>
+                        <option value="yellow_card" class="bg-black text-white">🟨 Yellow Card</option>
+                        <option value="red_card" class="bg-black text-white">🟥 Red Card</option>
+                        <option value="substitution" class="bg-black text-white">🔄 Substitution</option>
+                        <option value="penalty" class="bg-black text-white">⚡ Penalty</option>
+                        <option value="corner" class="bg-black text-white">🚩 Corner</option>
+                        <option value="foul" class="bg-black text-white">🤜 Foul</option>
+                        <option value="offside" class="bg-black text-white">🚫 Offside</option>
+                        <option value="free_kick" class="bg-black text-white">🎯 Free Kick</option>
                     </select>
                 </div>
                 <div>
@@ -51,7 +57,7 @@
                             class="text-red-500">*</span></label>
                     <div class="relative">
                         <input type="number" [(ngModel)]="formData.minute"
-                            class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all pl-10"
+                            class="input input-bordered w-full bg-black-card border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all pl-10"
                             placeholder="e.g. 45" />
                         <span
                             class="absolute left-4 top-1/2 transform -translate-y-1/2 text-zinc-400 font-black text-xs">'</span>
@@ -64,58 +70,77 @@
                 <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Select
                     Team</label>
                 <div class="flex gap-2">
-                    <button (click)="formData.team = 'home'" [class.bg-gold-400]="formData.team === 'home'"
-                        [class.text-black]="formData.team === 'home'" [class.bg-white_5]="formData.team !== 'home'"
-                        [class.text-zinc-400]="formData.team !== 'home'"
-                        class="flex-1 py-3 px-4 rounded-lg border border-black-border text-sm font-bold transition-all truncate text-center">
+                    <button (click)="onTeamSwitch('home')" 
+                        [class.btn-warning]="formData.team === 'home'"
+                        [class.btn-outline]="formData.team !== 'home'"
+                        class="btn flex-1 border-black-border text-sm font-bold transition-all truncate">
                         {{ match?.homeTeam?.shortName || match?.homeTeam?.name || 'Home Team' }}
                     </button>
-                    <button (click)="formData.team = 'away'" [class.bg-gold-400]="formData.team === 'away'"
-                        [class.text-black]="formData.team === 'away'" [class.bg-white_5]="formData.team !== 'away'"
-                        [class.text-zinc-400]="formData.team !== 'away'"
-                        class="flex-1 py-3 px-4 rounded-lg border border-black-border text-sm font-bold transition-all truncate text-center">
+                    <button (click)="onTeamSwitch('away')" 
+                        [class.btn-warning]="formData.team === 'away'"
+                        [class.btn-outline]="formData.team !== 'away'"
+                        class="btn flex-1 border-black-border text-sm font-bold transition-all truncate">
                         {{ match?.awayTeam?.shortName || match?.awayTeam?.name || 'Away Team' }}
                     </button>
                 </div>
             </div>
 
-            <!-- Player Name -->
+            <!-- Player Name (Dropdown) -->
             <div>
-                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">
-                    {{ formData.type === 'substitution' ? 'Player In' : 'Player Name' }} <span
-                        class="text-red-500">*</span>
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">
+                    Player Name <span class="text-gold-400">*</span>
                 </label>
-                <input type="text" [(ngModel)]="formData.playerName"
-                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all"
-                    placeholder="Enter player's name" />
+                <select [(ngModel)]="formData.playerName" name="playerName" required
+                    class="select select-bordered w-full bg-black-card border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all hover:border-gold-400/50 cursor-pointer">
+                    <option value="" disabled class="bg-black">Select Player</option>
+                    @for (p of currentTeamPlayers; track p.id) {
+                    <option [value]="p.name" class="bg-black">
+                        {{ p.name }} {{ p.jerseyNumber ? '(#' + p.jerseyNumber + ')' : '' }}
+                    </option>
+                    }
+                </select>
             </div>
 
-            <!-- Details (Optional) -->
+            <!-- Details / Assist (Dropdown + Optional Text) -->
             <div>
-                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">
-                    {{ formData.type === 'substitution' ? 'Player Out' : 'Details / Assist (Optional)' }}
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">
+                    Details / {{ formData.type === 'goal' ? 'Assist' : '' }} (Optional)
                 </label>
-                <input type="text" [(ngModel)]="formData.details"
-                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all"
-                    [placeholder]="formData.type === 'substitution' ? 'Name of player going out' : (formData.type === 'goal' ? 'e.g. Penalty, Header, or Assist: Messi' : 'e.g. Foul')" />
+                
+                <!-- If Goal, show Assist Dropdown -->
+                @if (formData.type === 'goal') {
+                <div class="space-y-3">
+                    <select [(ngModel)]="formData.assistPlayerName" name="assistPlayerName"
+                        class="select select-bordered w-full bg-black-card border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all hover:border-gold-400/50 cursor-pointer">
+                        <option value="" class="bg-black">No Assist (Select Player)</option>
+                        @for (p of currentTeamPlayers; track p.id) {
+                        <option [value]="p.name" [disabled]="p.name === formData.playerName" class="bg-black">
+                            {{ p.name }}
+                        </option>
+                        }
+                    </select>
+                    <input type="text" [(ngModel)]="formData.details" name="details"
+                        class="input input-bordered w-full bg-black-card border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all"
+                        placeholder="Extra goal details (e.g. Header, Penalty)" />
+                </div>
+                } @else {
+                <input type="text" [(ngModel)]="formData.details" name="details"
+                    class="input input-bordered w-full bg-black-card border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all"
+                    placeholder="e.g. Foul type, substitution details" />
+                }
             </div>
         </div>
 
         <!-- Footer -->
         <div class="p-6 border-t border-black-border bg-black-card/50 flex justify-end gap-3">
             <button (click)="onClose()"
-                class="px-6 py-2.5 rounded-lg border border-black-border text-zinc-400 hover:text-white hover:border-zinc-500 font-bold text-sm transition-all">
+                class="btn btn-ghost text-zinc-400 hover:text-white font-bold text-sm">
                 Cancel
             </button>
             <button (click)="onSubmit()" [disabled]="isSubmitting"
-                class="px-6 py-2.5 rounded-lg bg-gold-400 hover:bg-gold-400/90 text-black font-bold text-sm transition-all hover:shadow-[0_0_15px_rgba(212,175,55,0.4)] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none flex items-center gap-2">
+                class="btn bg-gold-400 hover:bg-gold-400/90 text-black border-none font-bold text-sm transition-all shadow-[0_0_15px_rgba(212,175,55,0.4)] flex items-center gap-2">
                 @if (isSubmitting) {
-                <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                    </path>
-                </svg>
+                <span class="loading loading-spinner loading-xs"></span>
                 Saving...
                 } @else {
                 {{ eventData ? 'Save Changes' : 'Add Event' }}

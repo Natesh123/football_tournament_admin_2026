@@ -5,7 +5,7 @@
     <button (click)="logout()" class="logout-btn">Logout</button> -->
 
     <!-- System Overview & Live Activity -->
-    <app-stats-board [platformStats]="platformStats" [activityStats]="activityStats"
+    <app-stats-board [platformStats]="platformStats()" [activityStats]="activityStats()"
         [showAllSections]="true"></app-stats-board>
 
     <!-- Main Content Grid -->

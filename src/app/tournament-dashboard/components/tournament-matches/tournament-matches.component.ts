@@ -18,13 +18,49 @@ export class TournamentMatchesComponent implements OnInit {
     structure = signal<any>(null);
     isLoading = signal(true);
 
-    activeTab = signal<'scheduled' | 'live' | 'completed'>('scheduled');
+    activeTab = signal<'upcoming' | 'live' | 'past'>('upcoming');
 
     filteredMatches = computed(() => {
         const matches = this.structure()?.matches || [];
+        const now = new Date();
+        const tab = this.activeTab();
+
         return matches.filter((match: any) => {
-            const status = match.status || 'scheduled';
-            return status === this.activeTab();
+            const status = (match.status || 'scheduled').toLowerCase();
+            const startTime = match.startTime ? new Date(match.startTime) : null;
+            let category = 'upcoming';
+
+            if (status === 'completed' || status === 'finished' || status === 'past') {
+                category = 'past';
+            } else if (status === 'live' || status === 'in_progress') {
+                // Primary is status, secondary is time validation for stuck matches
+                if (startTime) {
+                    const maxEndTime = new Date(startTime.getTime() + 300 * 60000); // 5 hours max for live
+                    if (now > maxEndTime) {
+                        category = 'past';
+                    } else {
+                        category = 'live';
+                    }
+                } else {
+                    category = 'live';
+                }
+            } else {
+                // Not started (scheduled)
+                if (!startTime) {
+                    category = 'upcoming';
+                } else {
+                    const endTime = new Date(startTime.getTime() + 150 * 60000); // 2.5 hours assumed duration
+                    if (now > endTime) {
+                        category = 'past';
+                    } else if (now >= startTime && now <= endTime) {
+                        category = 'live';
+                    } else {
+                        category = 'upcoming';
+                    }
+                }
+            }
+
+            return category === tab;
         });
     });
 

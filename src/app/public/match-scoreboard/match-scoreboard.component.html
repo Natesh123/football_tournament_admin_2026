@@ -1,18 +1,55 @@
 <div class="min-h-screen bg-black text-white font-sans flex flex-col" *ngIf="data() as portal" [style.--brand-color]="portal.presentation.brandColor">
     
-    <!-- Loading State -->
-    <div *ngIf="isLoading()" class="flex-grow flex items-center justify-center">
-        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4" style="border-color: var(--brand-color)"></div>
+    <!-- Real-time Event Alert -->
+    <div *ngIf="recentEvent()" class="fixed top-8 left-1/2 -translate-x-1/2 z-[100] w-full max-w-md animate-[slideDown_0.5s_ease-out]">
+        <div class="mx-4 p-6 bg-black/90 backdrop-blur-xl border-2 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.8)] flex items-center gap-6 overflow-hidden relative" [style.border-color]="portal.presentation.brandColor">
+            <!-- Glow background -->
+            <div class="absolute inset-0 opacity-20" [style.background]="portal.presentation.brandColor"></div>
+            
+            <div class="relative z-10 w-20 h-20 rounded-full bg-black border-2 flex items-center justify-center shrink-0" [style.border-color]="portal.presentation.brandColor">
+                <span class="text-3xl font-black" [style.color]="portal.presentation.brandColor">{{ recentEvent().minute }}'</span>
+            </div>
+            
+            <div class="relative z-10 flex-grow">
+                <div class="flex items-center gap-2 mb-1">
+                    <span *ngIf="recentEvent().type === 'goal'" class="text-2xl">⚽</span>
+                    <span *ngIf="recentEvent().type === 'yellow_card'" class="w-4 h-5 bg-yellow-500 rounded-sm inline-block"></span>
+                    <span *ngIf="recentEvent().type === 'red_card'" class="w-4 h-5 bg-red-500 rounded-sm inline-block"></span>
+                    <h4 class="text-xl font-black uppercase text-white tracking-tight">{{ recentEvent().type | titlecase }}!</h4>
+                </div>
+                <p class="text-2xl font-black text-white uppercase italic leading-none">{{ recentEvent().playerName }}</p>
+                <p class="text-sm font-bold text-zinc-500 uppercase tracking-widest mt-1">{{ recentEvent().teamName }}</p>
+            </div>
+        </div>
     </div>
-
+    
+    @if (isLoading()) {
+<div class="min-h-screen bg-black-bg p-8 sm:p-12 lg:p-20">
+    <!-- Scoreboard Header Skeleton -->
+    <div class="max-w-[1400px] mx-auto h-64 sm:h-80 bg-black-card border border-black-border rounded-3xl skeleton opacity-40"></div>
+    
+    <!-- Content Grid Skeleton -->
+    <div class="max-w-[1400px] mx-auto mt-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <div class="lg:col-span-2 space-y-6">
+            <div class="h-10 w-48 skeleton"></div>
+            <div *ngFor="let i of [1,2,3,4,5]" class="h-20 w-full skeleton"></div>
+        </div>
+        <div class="space-y-6">
+            <div class="h-10 w-48 skeleton"></div>
+            <div class="h-96 w-full rounded-2xl skeleton opacity-30"></div>
+        </div>
+    </div>
+</div>
+} @else if (error()) {
     <!-- Error State -->
-    <div *ngIf="error()" class="flex-grow flex flex-col items-center justify-center text-center p-6">
+    <div class="flex-grow flex flex-col items-center justify-center text-center p-6">
         <div class="w-16 h-16 rounded-full bg-red-500/10 text-red-500 flex items-center justify-center mb-4">
             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
         </div>
         <h2 class="text-3xl font-bold text-white mb-2">Unavailable</h2>
         <p class="text-zinc-400 text-lg max-w-sm">{{ error() }}</p>
     </div>
+}
 
     <ng-container *ngIf="!isLoading() && !error()">
         
@@ -38,9 +75,12 @@
                 
                 <!-- Home Team -->
                 <div class="flex flex-col items-center flex-1 max-w-sm">
-                    <div class="w-32 h-32 md:w-64 md:h-64 rounded-full bg-black border-4 shadow-2xl overflow-hidden flex items-center justify-center mb-8 p-4 shrink-0" style="border-color: var(--brand-color)">
-                        <img *ngIf="portal.match.homeTeamLogo" [src]="portal.match.homeTeamLogo" class="w-full h-full object-contain drop-shadow-lg">
-                        <span *ngIf="!portal.match.homeTeamLogo" class="text-5xl md:text-7xl font-black text-zinc-600 truncate">{{ portal.match.homeTeamName?.substring(0,3) }}</span>
+                    <div class="relative group">
+                        <div class="absolute inset-0 rounded-full blur-2xl opacity-30 group-hover:opacity-50 transition-opacity" style="background: var(--brand-color)"></div>
+                        <div class="w-32 h-32 md:w-64 md:h-64 rounded-full bg-black border-4 shadow-2xl overflow-hidden flex items-center justify-center mb-8 p-4 shrink-0 relative z-10" style="border-color: var(--brand-color)">
+                            <img *ngIf="portal.match.homeTeamLogo" [src]="portal.match.homeTeamLogo" class="w-full h-full object-contain drop-shadow-lg">
+                            <span *ngIf="!portal.match.homeTeamLogo" class="text-5xl md:text-7xl font-black text-zinc-600 truncate">{{ portal.match.homeTeamName?.substring(0,3) }}</span>
+                        </div>
                     </div>
                     <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-white text-center uppercase tracking-tighter truncate w-full" [title]="portal.match.homeTeamName">
                         {{ portal.match.homeTeamName }}
@@ -50,25 +90,29 @@
                 <!-- SCORE & TIMER CENTER -->
                 <div class="flex flex-col items-center shrink-0 w-[300px] md:w-[400px]">
                     <!-- Live Timer Badge -->
-                    <div class="px-8 py-3 bg-red-600/20 text-red-500 font-bold uppercase tracking-widest text-2xl lg:text-3xl rounded-full border border-red-500/30 flex items-center justify-center gap-3 mb-6 shadow-[0_0_30px_rgba(239,68,68,0.3)]">
+                    <div class="px-8 py-3 bg-red-600/10 text-red-500 font-bold uppercase tracking-widest text-2xl lg:text-3xl rounded-full border border-red-500/30 flex items-center justify-center gap-3 mb-6 shadow-[0_0_30px_rgba(239,68,68,0.2)]">
                         <span class="w-4 h-4 rounded-full bg-red-500 animate-pulse border border-white/20"></span>
                         <span *ngIf="portal.match.status === 'live'">LIVE {{ portal.match.minute ? portal.match.minute + ' min' : '' }}</span>
                         <span *ngIf="portal.match.status !== 'live'">{{ portal.match.status }}</span>
                     </div>
 
                     <!-- Huge Scores -->
-                    <div class="flex items-center justify-center gap-8 md:gap-12 bg-black/60 backdrop-blur-md px-12 py-8 rounded-[3rem] border border-white/10 shadow-2xl min-w-full">
-                        <span class="text-8xl md:text-9xl lg:text-[12rem] font-black leading-none tracking-tighter" [ngClass]="{'text-white': portal.match.homeScore > portal.match.awayScore, 'text-zinc-500': portal.match.homeScore < portal.match.awayScore, 'text-zinc-300': portal.match.homeScore === portal.match.awayScore}">{{ portal.match.homeScore }}</span>
-                        <span class="text-6xl text-zinc-600 pb-4 font-black">-</span>
-                        <span class="text-8xl md:text-9xl lg:text-[12rem] font-black leading-none tracking-tighter" [ngClass]="{'text-white': portal.match.awayScore > portal.match.homeScore, 'text-zinc-500': portal.match.awayScore < portal.match.homeScore, 'text-zinc-300': portal.match.awayScore === portal.match.homeScore}">{{ portal.match.awayScore }}</span>
+                    <div class="flex items-center justify-center gap-8 md:gap-12 bg-black/60 backdrop-blur-md px-12 py-8 rounded-[3rem] border border-white/10 shadow-2xl min-w-full relative overflow-hidden">
+                        <div class="absolute inset-0 opacity-5 pointer-events-none" style="background: radial-gradient(circle at center, var(--brand-color) 0%, transparent 100%)"></div>
+                        <span class="text-8xl md:text-9xl lg:text-[12rem] font-black leading-none tracking-tighter relative z-10" [ngClass]="{'text-white': portal.match.homeScore > portal.match.awayScore, 'text-zinc-500': portal.match.homeScore < portal.match.awayScore, 'text-zinc-300': portal.match.homeScore === portal.match.awayScore}">{{ portal.match.homeScore }}</span>
+                        <span class="text-6xl text-zinc-600 pb-4 font-black relative z-10">-</span>
+                        <span class="text-8xl md:text-9xl lg:text-[12rem] font-black leading-none tracking-tighter relative z-10" [ngClass]="{'text-white': portal.match.awayScore > portal.match.homeScore, 'text-zinc-500': portal.match.awayScore < portal.match.homeScore, 'text-zinc-300': portal.match.awayScore === portal.match.homeScore}">{{ portal.match.awayScore }}</span>
                     </div>
                 </div>
 
                 <!-- Away Team -->
                 <div class="flex flex-col items-center flex-1 max-w-sm">
-                    <div class="w-32 h-32 md:w-64 md:h-64 rounded-full bg-black border-4 shadow-2xl overflow-hidden flex items-center justify-center mb-8 p-4 shrink-0" style="border-color: var(--brand-color)">
-                        <img *ngIf="portal.match.awayTeamLogo" [src]="portal.match.awayTeamLogo" class="w-full h-full object-contain drop-shadow-lg">
-                        <span *ngIf="!portal.match.awayTeamLogo" class="text-5xl md:text-7xl font-black text-zinc-600 truncate">{{ portal.match.awayTeamName?.substring(0,3) }}</span>
+                    <div class="relative group">
+                        <div class="absolute inset-0 rounded-full blur-2xl opacity-30 group-hover:opacity-50 transition-opacity" style="background: var(--brand-color)"></div>
+                        <div class="w-32 h-32 md:w-64 md:h-64 rounded-full bg-black border-4 shadow-2xl overflow-hidden flex items-center justify-center mb-8 p-4 shrink-0 relative z-10" style="border-color: var(--brand-color)">
+                            <img *ngIf="portal.match.awayTeamLogo" [src]="portal.match.awayTeamLogo" class="w-full h-full object-contain drop-shadow-lg">
+                            <span *ngIf="!portal.match.awayTeamLogo" class="text-5xl md:text-7xl font-black text-zinc-600 truncate">{{ portal.match.awayTeamName?.substring(0,3) }}</span>
+                        </div>
                     </div>
                     <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-white text-center uppercase tracking-tighter truncate w-full" [title]="portal.match.awayTeamName">
                         {{ portal.match.awayTeamName }}

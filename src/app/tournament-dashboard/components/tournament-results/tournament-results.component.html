@@ -7,22 +7,7 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-black-card border border-black-border rounded-xl p-6 space-y-6">
-            <h2 class="text-lg font-bold text-white">Publishing Rules</h2>
 
-            <div class="pt-2">
-                <label
-                    class="cursor-pointer label flex items-center justify-between bg-white/5 border border-black-border rounded-lg px-4 py-3 hover:border-gold-400/50 transition-all">
-                    <div>
-                        <span class="label-text text-white font-bold block">Auto-Publish Match
-                            Results</span>
-                        <span class="text-[10px] text-zinc-500 block mt-1">Make scores public right after
-                            match ends</span>
-                    </div>
-                    <input type="checkbox" [(ngModel)]="data.autoPublish" class="toggle toggle-warning" />
-                </label>
-            </div>
-        </div>
 
         <div *ngIf="groups.length === 0"
             class="bg-black-card border border-black-border rounded-xl flex flex-col items-center justify-center p-12 text-center h-full">

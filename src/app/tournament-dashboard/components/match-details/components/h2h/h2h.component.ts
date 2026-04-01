@@ -11,6 +11,7 @@ export class H2hComponent implements OnInit {
     @Input() homeTeam: any;
     @Input() awayTeam: any;
     @Input() h2hData: any;
+    @Input() mode: 'all' | 'form' | 'h2h' | 'standings' = 'all';
 
     homeForm: string[] = [];
     awayForm: string[] = [];

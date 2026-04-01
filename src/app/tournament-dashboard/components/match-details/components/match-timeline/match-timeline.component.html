@@ -33,16 +33,16 @@
         <div class="space-y-6">
             @for (event of sortedEvents; track event.id) {
             <div class="relative flex items-center md:justify-between flex-col md:flex-row gap-4"
-                [ngClass]="{'md:flex-row-reverse': event.teamId === match?.awayTeam?.id?.toString() || event.team === 'away'}">
+                [ngClass]="{'md:flex-row-reverse': event.teamSide === 'away'}">
 
                 <!-- Event Details Side -->
                 <div class="w-full pl-12 md:pl-0 md:w-5/12 group relative"
-                    [ngClass]="{'md:text-right': event.teamId === match?.homeTeam?.id?.toString() || event.team === 'home', 'md:text-left': event.teamId === match?.awayTeam?.id?.toString() || event.team === 'away'}">
+                    [ngClass]="{'md:text-right': event.teamSide === 'home', 'md:text-left': event.teamSide === 'away'}">
                     <div
                         class="bg-black border border-white/5 rounded-xl p-4 shadow-lg hover:border-gold-400/30 transition-all">
 
                         <div class="flex items-center gap-2 mb-2"
-                            [ngClass]="{'md:flex-row-reverse': event.teamId === match?.homeTeam?.id?.toString() || event.team === 'home'}">
+                            [ngClass]="{'md:flex-row-reverse': event.teamSide === 'home'}">
                             <span class="text-sm font-bold text-white">{{ event.playerName }}</span>
 
                             @if(event.type === 'goal') {
@@ -53,6 +53,8 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
+                            } @else if (event.type === 'own_goal') {
+                            <span class="text-xs font-black text-red-400 shrink-0">OG</span>
                             } @else if (event.type === 'yellow_card') {
                             <div class="w-3 h-4 bg-yellow-400 rounded-sm shrink-0"></div>
                             } @else if (event.type === 'red_card') {
@@ -63,17 +65,27 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                             </svg>
+                            } @else if (event.type === 'penalty') {
+                            <span class="text-xs font-black text-purple-400 shrink-0">P</span>
+                            } @else if (event.type === 'corner') {
+                            <span class="text-xs font-black text-blue-400 shrink-0">🚩</span>
+                            } @else if (event.type === 'foul') {
+                            <span class="text-xs font-black text-orange-400 shrink-0">🤜</span>
+                            } @else if (event.type === 'offside') {
+                            <span class="text-xs font-black text-zinc-400 shrink-0">🚫</span>
+                            } @else if (event.type === 'free_kick') {
+                            <span class="text-xs font-black text-cyan-400 shrink-0">🎯</span>
                             }
                         </div>
                         <div class="text-xs text-zinc-500 font-bold uppercase"
-                            [ngClass]="{'md:text-right': event.teamId === match?.homeTeam?.id?.toString() || event.team === 'home', 'md:text-left': event.teamId === match?.awayTeam?.id?.toString() || event.team === 'away'}">
+                            [ngClass]="{'md:text-right': event.teamSide === 'home', 'md:text-left': event.teamSide === 'away'}">
                             {{ event.type.replace('_', ' ') }}
                             @if(event.details) { <span class="capitalize pl-1">({{ event.details }})</span> }
                         </div>
 
                         <!-- Hover Actions -->
                         <div class="absolute top-2 right-2 md:top-auto md:bottom-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2"
-                            [ngClass]="{'md:left-2 md:right-auto': event.teamId === match?.homeTeam?.id?.toString() || event.team === 'home', 'md:right-2 md:left-auto': event.teamId === match?.awayTeam?.id?.toString() || event.team === 'away'}">
+                            [ngClass]="{'md:left-2 md:right-auto': event.teamSide === 'home', 'md:right-2 md:left-auto': event.teamSide === 'away'}">
                             <button (click)="onEditEvent(event)" class="text-zinc-500 hover:text-white p-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">

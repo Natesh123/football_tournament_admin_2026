@@ -107,12 +107,11 @@ export interface TournamentSettings {
         showTopScorers: boolean;
         welcomeMsg: string;
         showLiveScores: boolean;
+        showRecentResults: boolean;
         showCommentary: boolean;
         liveStreamLink: string;
     };
-    results: {
-        autoPublish: boolean;
-    };
+
 }
 
 @Component({
@@ -160,7 +159,7 @@ export class TournamentDashboardComponent implements OnInit {
         { id: 'venues', label: 'Venues', icon: 'map-pin' },
         { id: 'finance', label: 'Finance', icon: 'coins' },
         { id: 'presentation', label: 'Presentation', icon: 'monitor' },
-        { id: 'results', label: 'Results', icon: 'bar-chart' },
+        { id: 'results', label: 'Results', icon: 'bar-chart' }
     ];
 
     ngOnInit() {
@@ -173,7 +172,7 @@ export class TournamentDashboardComponent implements OnInit {
     }
 
     setActiveTab(tabId: string) {
-        this.activeTab.set(tabId);
+        this.setTab(tabId);
     }
 
     getDefaultSettings(): TournamentSettings {
@@ -268,10 +267,8 @@ export class TournamentDashboardComponent implements OnInit {
                 welcomeMsg: '',
                 showLiveScores: true,
                 showCommentary: false,
-                liveStreamLink: ''
-            },
-            results: {
-                autoPublish: false
+                liveStreamLink: '',
+                showRecentResults: true
             }
         };
     }
@@ -316,19 +313,42 @@ export class TournamentDashboardComponent implements OnInit {
         }
 
         if (tournament.settings) {
-            this.settings = { ...this.settings, ...tournament.settings };
+            // Deep merge to avoid losing fields like general.type if settings.general is partially returned
+            this.settings.rules = { ...this.settings.rules, ...(tournament.settings.rules || {}) };
+            this.settings.venues = { ...this.settings.venues, ...(tournament.settings.venues || {}) };
+            this.settings.finance = { ...this.settings.finance, ...(tournament.settings.finance || {}) };
+            this.settings.presentation = { ...this.settings.presentation, ...(tournament.settings.presentation || {}) };
         }
 
         // Ensure we load the format entity data directly if available
         if (tournament.format) {
+            // Normalize backend (plural/mismatched) to frontend naming
+            let normalizedType = tournament.format.format_type || (tournament.format as any).type || this.settings.format.type;
+            if (normalizedType === 'groups') normalizedType = 'group';
+            if (normalizedType === 'groups_knockout') normalizedType = 'group_knockout';
+
+            let incomingFormatData = tournament.format.format_data;
+            if (typeof incomingFormatData === 'string') {
+              try {
+                incomingFormatData = JSON.parse(incomingFormatData);
+              } catch (e) {
+                console.error('[TournamentDashboard] Failed to parse format_data:', e);
+              }
+            }
+
+            // If incoming format_data is valid, use it. Otherwise keep what we have if it exists.
+            const finalFormatData = (incomingFormatData && Array.isArray(incomingFormatData) && incomingFormatData.length > 0)
+              ? incomingFormatData
+              : (this.settings.format.format_data || []);
+
             this.settings.format = {
                 ...this.settings.format,
-                type: tournament.format.format_type || this.settings.format.type,
-                format_data: tournament.format.format_data || (this.settings.format as any).format_data,
-                homeAway: tournament.format.home_away_enabled !== undefined ? tournament.format.home_away_enabled : this.settings.format.homeAway,
-                winPoints: tournament.format.win_points ?? this.settings.format.winPoints,
-                drawPoints: tournament.format.draw_points ?? this.settings.format.drawPoints,
-                lossPoints: tournament.format.loss_points ?? this.settings.format.lossPoints
+                type: normalizedType,
+                format_data: finalFormatData,
+                homeAway: tournament.format.home_away_enabled !== undefined ? tournament.format.home_away_enabled : (tournament.format as any).homeAway ?? this.settings.format.homeAway,
+                winPoints: tournament.format.win_points ?? (tournament.format as any).winPoints ?? this.settings.format.winPoints,
+                drawPoints: tournament.format.draw_points ?? (tournament.format as any).drawPoints ?? this.settings.format.drawPoints,
+                lossPoints: tournament.format.loss_points ?? (tournament.format as any).lossPoints ?? this.settings.format.lossPoints
             };
         }
     }
@@ -380,13 +400,15 @@ export class TournamentDashboardComponent implements OnInit {
             squadSize: this.settings.participants.squadSize,
             settings: this.settings,
             format: {
-                format_type: this.settings.format.type,
+                format_type: this.settings.format.type === 'group' ? 'groups' : 
+                             this.settings.format.type === 'group_knockout' ? 'groups_knockout' : 
+                             this.settings.format.type,
                 format_data: (this.settings.format as any).format_data,
                 home_away_enabled: this.settings.format.homeAway,
                 win_points: this.settings.format.winPoints,
                 draw_points: this.settings.format.drawPoints,
                 loss_points: this.settings.format.lossPoints
-            }
+            },
         }).subscribe({
             next: (updated) => {
                 this.tournament.set(updated);

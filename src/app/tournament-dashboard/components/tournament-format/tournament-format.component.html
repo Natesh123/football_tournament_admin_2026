@@ -13,28 +13,37 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- A. Group Phase Only -->
         <button (click)="selectFormat('group')"
-            class="group relative bg-black-card border rounded-2xl p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_-10px_rgba(212,175,55,0.15)] overflow-hidden border-black-border hover:border-zinc-700">
+            class="group relative bg-black-card border rounded-2xl p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_-10px_rgba(212,175,55,0.15)] overflow-hidden"
+            [ngClass]="selectedFormat === 'group' ? 'border-gold-400 shadow-[0_0_20px_rgba(212,175,55,0.1)]' : 'border-black-border hover:border-zinc-700'">
             <div
-                class="h-32 mb-6 rounded-xl bg-gradient-to-br from-zinc-800/50 to-zinc-900 flex items-center justify-center border border-white/5">
+                class="h-32 mb-6 rounded-xl bg-gradient-to-br from-zinc-800/50 to-zinc-900 flex items-center justify-center border border-white/5"
+                [ngClass]="{'from-gold-400/10 to-gold-400/5 border-gold-400/20': selectedFormat === 'group'}">
                 <svg xmlns="http://www.w3.org/2000/svg"
-                    class="w-16 h-16 text-zinc-600 group-hover:text-gold-400/60 transition-colors" fill="none"
+                    class="w-16 h-16 transition-colors" 
+                    [ngClass]="selectedFormat === 'group' ? 'text-gold-400' : 'text-zinc-600 group-hover:text-gold-400/60'"
+                    fill="none"
                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                 </svg>
             </div>
-            <h3 class="text-xl font-bold text-white mb-2 group-hover:text-gold-400 transition-colors">Group Phase Only
+            <div *ngIf="selectedFormat === 'group'" class="absolute top-4 right-4 animate-pulse">
+                <span class="flex h-2 w-2 rounded-full bg-gold-400"></span>
+            </div>
+            <h3 class="text-xl font-bold mb-2 transition-colors" [ngClass]="selectedFormat === 'group' ? 'text-gold-400' : 'text-white group-hover:text-gold-400'">Group Phase Only
             </h3>
             <p class="text-sm text-zinc-500">Teams play in groups with standings based on points.</p>
-            <p class="mt-4 text-xs text-gold-400/70 font-bold">Configure →</p>
+            <p class="mt-4 text-xs font-bold" [ngClass]="selectedFormat === 'group' ? 'text-gold-400' : 'text-gold-400/70'">{{ selectedFormat === 'group' ? 'Currently Selected' : 'Configure →' }}</p>
         </button>
 
         <!-- B. Groups + Knockout -->
         <button (click)="selectFormat('group_knockout')"
-            class="group relative bg-black-card border rounded-2xl p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_-10px_rgba(212,175,55,0.15)] overflow-hidden border-black-border hover:border-zinc-700">
+            class="group relative bg-black-card border rounded-2xl p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_-10px_rgba(212,175,55,0.15)] overflow-hidden"
+            [ngClass]="selectedFormat === 'group_knockout' ? 'border-gold-400 shadow-[0_0_20px_rgba(212,175,55,0.1)]' : 'border-black-border hover:border-zinc-700'">
             <div
-                class="h-32 mb-6 rounded-xl bg-gradient-to-br from-zinc-800/50 to-zinc-900 flex items-center justify-center border border-white/5">
-                <div class="flex items-center gap-2 text-zinc-600 group-hover:text-gold-400/60 transition-colors">
+                class="h-32 mb-6 rounded-xl bg-gradient-to-br from-zinc-800/50 to-zinc-900 flex items-center justify-center border border-white/5"
+                [ngClass]="{'from-gold-400/10 to-gold-400/5 border-gold-400/20': selectedFormat === 'group_knockout'}">
+                <div class="flex items-center gap-2 transition-colors" [ngClass]="selectedFormat === 'group_knockout' ? 'text-gold-400' : 'text-zinc-600 group-hover:text-gold-400/60'">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -51,28 +60,37 @@
                     </svg>
                 </div>
             </div>
-            <h3 class="text-xl font-bold text-white mb-2 group-hover:text-gold-400 transition-colors">Groups + Knockout
+            <div *ngIf="selectedFormat === 'group_knockout'" class="absolute top-4 right-4 animate-pulse">
+                <span class="flex h-2 w-2 rounded-full bg-gold-400"></span>
+            </div>
+            <h3 class="text-xl font-bold mb-2 transition-colors" [ngClass]="selectedFormat === 'group_knockout' ? 'text-gold-400' : 'text-white group-hover:text-gold-400'">Groups + Knockout
             </h3>
             <p class="text-sm text-zinc-500">Teams qualify from groups into elimination rounds.</p>
-            <p class="mt-4 text-xs text-gold-400/70 font-bold">Configure →</p>
+            <p class="mt-4 text-xs font-bold" [ngClass]="selectedFormat === 'group_knockout' ? 'text-gold-400' : 'text-gold-400/70'">{{ selectedFormat === 'group_knockout' ? 'Currently Selected' : 'Configure →' }}</p>
         </button>
 
         <!-- C. Knockout Only -->
         <button (click)="selectFormat('knockout')"
-            class="group relative bg-black-card border rounded-2xl p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_-10px_rgba(212,175,55,0.15)] overflow-hidden border-black-border hover:border-zinc-700">
+            class="group relative bg-black-card border rounded-2xl p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_-10px_rgba(212,175,55,0.15)] overflow-hidden"
+            [ngClass]="selectedFormat === 'knockout' ? 'border-gold-400 shadow-[0_0_20px_rgba(212,175,55,0.1)]' : 'border-black-border hover:border-zinc-700'">
             <div
-                class="h-32 mb-6 rounded-xl bg-gradient-to-br from-zinc-800/50 to-zinc-900 flex items-center justify-center border border-white/5">
+                class="h-32 mb-6 rounded-xl bg-gradient-to-br from-zinc-800/50 to-zinc-900 flex items-center justify-center border border-white/5"
+                [ngClass]="{'from-gold-400/10 to-gold-400/5 border-gold-400/20': selectedFormat === 'knockout'}">
                 <svg xmlns="http://www.w3.org/2000/svg"
-                    class="w-16 h-16 text-zinc-600 group-hover:text-gold-400/60 transition-colors" fill="none"
+                    class="w-16 h-16 transition-colors"
+                    [ngClass]="selectedFormat === 'knockout' ? 'text-gold-400' : 'text-zinc-600 group-hover:text-gold-400/60'"
+                    fill="none"
                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
             </div>
-            <h3 class="text-xl font-bold text-white mb-2 group-hover:text-gold-400 transition-colors">Knockout Phase
-                Only</h3>
+            <div *ngIf="selectedFormat === 'knockout'" class="absolute top-4 right-4 animate-pulse">
+                <span class="flex h-2 w-2 rounded-full bg-gold-400"></span>
+            </div>
+            <h3 class="text-xl font-bold mb-2 transition-colors" [ngClass]="selectedFormat === 'knockout' ? 'text-gold-400' : 'text-white group-hover:text-gold-400'">Knockout Phase Only</h3>
             <p class="text-sm text-zinc-500">Single elimination until a winner is decided.</p>
-            <p class="mt-4 text-xs text-gold-400/70 font-bold">Configure →</p>
+            <p class="mt-4 text-xs font-bold" [ngClass]="selectedFormat === 'knockout' ? 'text-gold-400' : 'text-gold-400/70'">{{ selectedFormat === 'knockout' ? 'Currently Selected' : 'Configure →' }}</p>
         </button>
     </div>
 

@@ -32,8 +32,8 @@ export class LineupEditorComponent implements OnInit {
     pickerType: 'starting' | 'subs' = 'starting';
     selectedInPicker: Set<string> = new Set(); // Stores player names
 
-    get playerLimit(): number {
-        return (this.match as any)?.tournament?.playerLimit || 11;
+    get playersOnField(): number {
+        return (this.match as any)?.tournament?.rules?.playersOnField || 11;
     }
 
     get squadSize(): number {
@@ -41,7 +41,7 @@ export class LineupEditorComponent implements OnInit {
     }
 
     get subsLimit(): number {
-        return Math.max(0, this.squadSize - this.playerLimit);
+        return Math.max(0, this.squadSize - this.playersOnField);
     }
 
     get currentStartingCount(): number {
@@ -53,7 +53,7 @@ export class LineupEditorComponent implements OnInit {
     }
 
     get canAddMoreStarting(): boolean {
-        return this.currentStartingCount < this.playerLimit;
+        return this.currentStartingCount < this.playersOnField;
     }
 
     get canAddMoreSubs(): boolean {
@@ -132,9 +132,10 @@ export class LineupEditorComponent implements OnInit {
         if (this.selectedInPicker.has(playerName)) {
             this.selectedInPicker.delete(playerName);
         } else {
+            if (this.isPlayerSelected(playerName)) return;
             // Check limit
             const currentCount = this.pickerType === 'starting' ? this.currentStartingCount : this.currentSubsCount;
-            const limit = this.pickerType === 'starting' ? this.playerLimit : this.subsLimit;
+            const limit = this.pickerType === 'starting' ? this.playersOnField : this.subsLimit;
             const projectedCount = currentCount + this.selectedInPicker.size + 1;
             
             if (projectedCount > limit) {
@@ -211,13 +212,17 @@ export class LineupEditorComponent implements OnInit {
     }
 
     onSave() {
-        if (this.homeData.starting.length > this.playerLimit || this.awayData.starting.length > this.playerLimit) {
-            alert(`Starting XI cannot exceed ${this.playerLimit} players.`);
+        if (this.homeData.starting.length !== this.playersOnField) {
+            alert(`Home Team Starting XI must have exactly ${this.playersOnField} players.`);
+            return;
+        }
+        if (this.awayData.starting.length !== this.playersOnField) {
+            alert(`Away Team Starting XI must have exactly ${this.playersOnField} players.`);
             return;
         }
         
-        const homeSubsLimit = (this.match as any)?.tournament?.squadSize - this.playerLimit || 11;
-        const awaySubsLimit = (this.match as any)?.tournament?.squadSize - this.playerLimit || 11;
+        const homeSubsLimit = (this.match as any)?.tournament?.squadSize - this.playersOnField || 0;
+        const awaySubsLimit = (this.match as any)?.tournament?.squadSize - this.playersOnField || 0;
         
         if (this.homeData.subs.length > homeSubsLimit || this.awayData.subs.length > awaySubsLimit) {
             alert(`Substitutes cannot exceed ${homeSubsLimit} players.`);

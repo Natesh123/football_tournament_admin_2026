@@ -10,7 +10,6 @@ import { TournamentService } from '../../../tournament/tournament.service';
     templateUrl: './tournament-results.component.html'
 })
 export class TournamentResultsComponent implements OnInit {
-    @Input() data!: any;
     @Input() tournamentId!: string;
 
     private tournamentService = inject(TournamentService);

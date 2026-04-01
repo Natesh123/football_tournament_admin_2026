@@ -25,3 +25,40 @@ body {
     height: 100%;
     @apply bg-neutral-950 text-gold-100;
 }
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #27272a;
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #d4af37;
+}
+
+/* Skeleton Loading Support */
+.skeleton {
+    @apply bg-white/5 animate-pulse rounded-md;
+    pointer-events: none;
+    user-select: none;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

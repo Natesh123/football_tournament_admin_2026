@@ -18,6 +18,8 @@ export interface PortalData {
         showStandings: boolean;
         showTopScorers: boolean;
         showLiveMatches: boolean;
+        showRecentResults: boolean;
+        liveStreamLink?: string;
     };
     standings: any[];
     liveMatches: any[];

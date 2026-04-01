@@ -1,12 +1,12 @@
 <div class="space-y-8">
 
     <!-- RECENT FORM -->
+    @if (mode === 'all' || mode === 'form') {
     <div class="bg-black-card border border-black-border rounded-xl p-6 md:p-8">
         <h3 class="text-sm font-black text-white uppercase tracking-wider border-b border-black-border pb-4 mb-6">Recent
             Form</h3>
-
+        
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 divide-y md:divide-y-0 md:divide-x divide-black-border">
-
             <!-- Home Team Form -->
             <div class="flex flex-col items-center pt-2 md:pt-0">
                 <div class="flex items-center gap-3 mb-4">
@@ -54,11 +54,12 @@
                     </ng-template>
                 </div>
             </div>
-
         </div>
     </div>
+    }
 
     <!-- PREVIOUS ENCOUNTERS -->
+    @if (mode === 'all' || mode === 'h2h') {
     <div class="bg-black-card border border-black-border rounded-xl overflow-hidden">
         <div class="p-6 md:p-8 border-b border-black-border">
             <h3 class="text-sm font-black text-white uppercase tracking-wider">Head-To-Head Matches</h3>
@@ -116,18 +117,23 @@
                 </div>
             </ng-template>
         </div>
-</div>
+    </div>
+    }
 
     <!-- GROUP STANDINGS (IF APPLICABLE) -->
+    @if (mode === 'all' || mode === 'standings') {
     <div *ngIf="groupStandings" class="bg-black-card border border-black-border rounded-xl mt-8 overflow-hidden">
         <div class="px-6 py-4 border-b border-black-border flex justify-between items-center bg-zinc-900/50">
             <h3 class="text-sm font-black text-white uppercase tracking-wider">Group Standings</h3>
-            <span class="text-xs font-bold text-zinc-500 bg-black px-3 py-1 rounded-full border border-black-border uppercase tracking-widest">{{ groupStandings.groupName }}</span>
+            <span
+                class="text-xs font-bold text-zinc-500 bg-black px-3 py-1 rounded-full border border-black-border uppercase tracking-widest">{{
+                groupStandings.groupName }}</span>
         </div>
-        
+
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm whitespace-nowrap">
-                <thead class="text-[10px] text-zinc-500 font-black uppercase tracking-wider bg-black border-b border-black-border">
+                <thead
+                    class="text-[10px] text-zinc-500 font-black uppercase tracking-wider bg-black border-b border-black-border">
                     <tr>
                         <th class="px-4 py-3 w-10 text-center">Pos</th>
                         <th class="px-4 py-3">Team</th>
@@ -140,23 +146,25 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-black-border text-xs sm:text-sm">
-                    <tr *ngFor="let team of groupStandings.standings; let i = index" 
-                        class="hover:bg-white/5 transition-colors"
+                    <tr *ngFor="let team of groupStandings.standings; let i = index" class="hover:bg-white/5 transition-colors"
                         [ngClass]="(team.teamId === homeTeam?.id || team.teamId === awayTeam?.id) ? 'bg-zinc-800/40 border-l-2 border-l-gold-500' : ''">
-                        
-                        <td class="px-4 py-3 text-center font-bold"
-                            [ngClass]="i < 2 ? 'text-gold-400' : 'text-zinc-500'">
+
+                        <td class="px-4 py-3 text-center font-bold" [ngClass]="i < 2 ? 'text-gold-400' : 'text-zinc-500'">
                             {{ team.position }}
                         </td>
                         <td class="px-4 py-3 font-bold flex items-center gap-3"
                             [ngClass]="(team.teamId === homeTeam?.id || team.teamId === awayTeam?.id) ? 'text-white' : 'text-zinc-300'">
-                            <div class="w-6 h-6 rounded-full bg-black border border-zinc-700 flex items-center justify-center overflow-hidden shrink-0">
+                            <div
+                                class="w-6 h-6 rounded-full bg-black border border-zinc-700 flex items-center justify-center overflow-hidden shrink-0">
                                 <img *ngIf="team.teamLogo" [src]="team.teamLogo" class="w-full h-full object-cover">
-                                <span *ngIf="!team.teamLogo" class="text-zinc-500 text-[10px]">{{ team.teamName?.substring(0,2) || 'TM' }}</span>
+                                <span *ngIf="!team.teamLogo" class="text-zinc-500 text-[10px]">{{
+                                    team.teamName?.substring(0,2) || 'TM' }}</span>
                             </div>
                             <span class="truncate max-w-[120px] sm:max-w-[200px]">{{ team.teamName }}</span>
-                            <span *ngIf="team.teamId === homeTeam?.id" class="hidden sm:inline-block text-[9px] bg-white/10 text-white px-2 py-0.5 rounded-sm uppercase tracking-widest font-black ml-2">Home</span>
-                            <span *ngIf="team.teamId === awayTeam?.id" class="hidden sm:inline-block text-[9px] bg-white/10 text-white px-2 py-0.5 rounded-sm uppercase tracking-widest font-black ml-2">Away</span>
+                            <span *ngIf="team.teamId === homeTeam?.id"
+                                class="hidden sm:inline-block text-[9px] bg-white/10 text-white px-2 py-0.5 rounded-sm uppercase tracking-widest font-black ml-2">Home</span>
+                            <span *ngIf="team.teamId === awayTeam?.id"
+                                class="hidden sm:inline-block text-[9px] bg-white/10 text-white px-2 py-0.5 rounded-sm uppercase tracking-widest font-black ml-2">Away</span>
                         </td>
                         <td class="px-3 py-3 text-center text-zinc-400 font-medium">{{ team.played }}</td>
                         <td class="px-3 py-3 text-center text-emerald-500/80">{{ team.wins }}</td>
@@ -172,5 +180,6 @@
             </table>
         </div>
     </div>
+    }
 
 </div>

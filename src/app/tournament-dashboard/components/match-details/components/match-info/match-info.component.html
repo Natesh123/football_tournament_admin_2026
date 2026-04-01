@@ -48,6 +48,12 @@
                 <div>
                     <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Tournament Stage</p>
                     <p class="font-bold text-base text-white">{{ match?.stage?.name || 'TBD' }}</p>
+                    <p class="text-xs text-zinc-400 mt-0.5" *ngIf="match?.tournament?.format?.format_type">
+                        Format: {{ match?.tournament?.format?.format_type === 'groups' ? 'League/Groups' : 
+                                   match?.tournament?.format?.format_type === 'knockout' ? 'Knockout' : 
+                                   match?.tournament?.format?.format_type === 'groups_knockout' ? 'Groups + KO' : 
+                                   match.tournament.format.format_type }}
+                    </p>
                 </div>
             </div>
         </div>

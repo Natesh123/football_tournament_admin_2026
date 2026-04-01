@@ -21,15 +21,17 @@
         <div class="flex-1 overflow-y-auto p-6 space-y-8 no-scrollbar bg-black-bg">
 
             <!-- Team Selector -->
-            <div class="flex p-1 bg-black rounded-lg border border-zinc-800 shrink-0 w-full max-w-sm mx-auto">
+            <div class="flex p-1 bg-black rounded-lg border border-zinc-800 shrink-0 w-full max-w-sm mx-auto gap-1">
                 <button (click)="activeTeam = 'home'"
-                    [class]="activeTeam === 'home' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'"
-                    class="flex-1 px-4 py-2 text-sm font-bold rounded-md transition-all">
+                    [class.btn-warning]="activeTeam === 'home'"
+                    [class.btn-ghost]="activeTeam !== 'home'"
+                    class="btn btn-sm flex-1 font-bold transition-all">
                     {{ match?.homeTeam?.name || 'Home' }}
                 </button>
                 <button (click)="activeTeam = 'away'"
-                    [class]="activeTeam === 'away' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'"
-                    class="flex-1 px-4 py-2 text-sm font-bold rounded-md transition-all">
+                    [class.btn-warning]="activeTeam === 'away'"
+                    [class.btn-ghost]="activeTeam !== 'away'"
+                    class="btn btn-sm flex-1 font-bold transition-all">
                     {{ match?.awayTeam?.name || 'Away' }}
                 </button>
             </div>
@@ -39,14 +41,14 @@
                 <div>
                     <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Formation</label>
                     <input type="text" [(ngModel)]="currentData.formation"
-                        class="w-full bg-black border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold-500 transition-colors"
+                        class="input input-bordered w-full bg-black border-zinc-800 text-sm text-white focus:outline-none focus:border-gold-500 transition-colors"
                         placeholder="e.g. 4-3-3">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Coach
                         Name</label>
                     <input type="text" [(ngModel)]="currentData.coach"
-                        class="w-full bg-black border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold-500 transition-colors"
+                        class="input input-bordered w-full bg-black border-zinc-800 text-sm text-white focus:outline-none focus:border-gold-500 transition-colors"
                         placeholder="Enter coach name">
                 </div>
             </div>
@@ -57,18 +59,18 @@
                     <div class="flex items-baseline gap-2">
                         <h4 class="text-sm font-black text-white uppercase tracking-wider">Starting XI</h4>
                         <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 uppercase">
-                            {{ currentStartingCount }} / {{ playerLimit }} Players
+                            {{ currentStartingCount }} / {{ playersOnField }} Players
                         </span>
                     </div>
                     <div class="flex gap-2">
                         <button (click)="openPicker('starting')" [disabled]="!canAddMoreStarting"
                             [class.opacity-50]="!canAddMoreStarting"
-                            class="px-3 py-1.5 rounded-lg bg-gold-500/10 text-gold-400 border border-gold-500/20 text-xs font-bold hover:bg-gold-500/20 transition-colors flex items-center gap-1">
+                            class="btn btn-sm bg-gold-500/10 text-gold-400 border border-gold-500/20 hover:bg-gold-500/20 transition-colors flex items-center gap-1">
                             Bulk Add
                         </button>
                         <button (click)="addPlayer('starting')" [disabled]="!canAddMoreStarting"
                             [class.opacity-50]="!canAddMoreStarting"
-                            class="px-3 py-1.5 rounded-lg bg-white/5 text-white border border-white/10 text-xs font-bold hover:bg-white/10 transition-colors flex items-center gap-1">
+                            class="btn btn-sm btn-ghost border border-white/10 hover:bg-white/10 transition-colors flex items-center gap-1">
                             + Add Player
                         </button>
                     </div>
@@ -79,25 +81,25 @@
                         class="flex gap-2 items-center bg-black border border-zinc-800 p-2 rounded-lg">
                         <!-- Starting XI Select -->
                         <input type="number" [(ngModel)]="p.number" placeholder="#"
-                            class="w-16 bg-zinc-900 border border-zinc-700 rounded p-2 text-sm text-white focus:border-gold-500 text-center">
+                            class="input input-bordered w-16 bg-zinc-900 border-zinc-700 p-2 text-sm text-white focus:border-gold-500 text-center">
                         <select [(ngModel)]="p.name" (ngModelChange)="onPlayerSelect($event, 'starting', i)"
-                            class="flex-1 bg-zinc-900 border border-zinc-700 rounded p-2 text-sm text-white focus:border-gold-500 cursor-pointer">
-                            <option value="">Select Player</option>
-                            <option *ngFor="let player of getAvailablePlayers('starting', i)" [value]="player.name">
+                            class="select select-bordered flex-1 bg-zinc-900 border-zinc-700 p-2 text-sm text-white focus:border-gold-500 hover:border-gold-500/50 cursor-pointer">
+                            <option value="" class="bg-black">Select Player</option>
+                            <option *ngFor="let player of getAvailablePlayers('starting', i)" [value]="player.name" class="bg-black">
                                 {{ player.name }} ({{ player.jerseyNumber || 'N/A' }})
                             </option>
                         </select>
                         <select [(ngModel)]="p.position"
-                            class="w-24 bg-zinc-900 border border-zinc-700 rounded p-2 text-sm text-white focus:border-gold-500 cursor-pointer">
-                            <option value="OUTFIELD">Field</option>
-                            <option value="GK">GK</option>
-                            <option value="DF">DF</option>
-                            <option value="MF">MF</option>
-                            <option value="FW">FW</option>
+                            class="select select-bordered w-24 bg-zinc-900 border-zinc-700 p-2 text-sm text-white focus:border-gold-500 hover:border-gold-500/50 cursor-pointer">
+                            <option value="OUTFIELD" class="bg-black">Field</option>
+                            <option value="GK" class="bg-black">GK</option>
+                            <option value="DF" class="bg-black">DF</option>
+                            <option value="MF" class="bg-black">MF</option>
+                            <option value="FW" class="bg-black">FW</option>
                         </select>
                         <label class="flex items-center gap-2 text-xs text-zinc-400 px-2 cursor-pointer">
                             <input type="checkbox" [(ngModel)]="p.isCaptain"
-                                class="form-checkbox bg-zinc-900 border-zinc-700 rounded text-gold-500 focus:ring-gold-500 focus:ring-offset-zinc-900">
+                                class="checkbox checkbox-xs checkbox-warning border-zinc-700">
                             Capt
                         </label>
                         <button (click)="removePlayer('starting', i)"
@@ -127,12 +129,12 @@
                     <div class="flex gap-2">
                         <button (click)="openPicker('subs')" [disabled]="!canAddMoreSubs"
                             [class.opacity-50]="!canAddMoreSubs"
-                            class="px-3 py-1.5 rounded-lg bg-gold-500/10 text-gold-400 border border-gold-500/20 text-xs font-bold hover:bg-gold-500/20 transition-colors flex items-center gap-1">
+                            class="btn btn-sm bg-gold-500/10 text-gold-400 border border-gold-500/20 hover:bg-gold-500/20 transition-colors flex items-center gap-1">
                             Bulk Add
                         </button>
                         <button (click)="addPlayer('subs')" [disabled]="!canAddMoreSubs"
                             [class.opacity-50]="!canAddMoreSubs"
-                            class="px-3 py-1.5 rounded-lg bg-white/5 text-white border border-white/10 text-xs font-bold hover:bg-white/10 transition-colors flex items-center gap-1">
+                            class="btn btn-sm btn-ghost border border-white/10 hover:bg-white/10 transition-colors flex items-center gap-1">
                             + Add Sub
                         </button>
                     </div>
@@ -142,21 +144,21 @@
                     <div *ngFor="let p of currentData.subs; let i = index"
                         class="flex gap-2 items-center bg-black border border-zinc-800 p-2 rounded-lg">
                         <input type="number" [(ngModel)]="p.number" placeholder="#"
-                            class="w-16 bg-zinc-900 border border-zinc-700 rounded p-2 text-sm text-white text-center">
+                            class="input input-bordered w-16 bg-zinc-900 border-zinc-700 p-2 text-sm text-white text-center">
                         <select [(ngModel)]="p.name" (ngModelChange)="onPlayerSelect($event, 'subs', i)"
-                            class="flex-1 bg-zinc-900 border border-zinc-700 rounded p-2 text-sm text-white cursor-pointer">
-                            <option value="">Select Player</option>
-                            <option *ngFor="let player of getAvailablePlayers('subs', i)" [value]="player.name">
+                            class="select select-bordered flex-1 bg-zinc-900 border-zinc-700 p-2 text-sm text-white hover:border-gold-500/50 cursor-pointer">
+                            <option value="" class="bg-black">Select Player</option>
+                            <option *ngFor="let player of getAvailablePlayers('subs', i)" [value]="player.name" class="bg-black">
                                 {{ player.name }} ({{ player.jerseyNumber || 'N/A' }})
                             </option>
                         </select>
                         <select [(ngModel)]="p.position"
-                            class="w-24 bg-zinc-900 border border-zinc-700 rounded p-2 text-sm text-white cursor-pointer">
-                            <option value="OUTFIELD">Field</option>
-                            <option value="GK">GK</option>
-                            <option value="DF">DF</option>
-                            <option value="MF">MF</option>
-                            <option value="FW">FW</option>
+                            class="select select-bordered w-24 bg-zinc-900 border-zinc-700 p-2 text-sm text-white hover:border-gold-500/50 cursor-pointer">
+                            <option value="OUTFIELD" class="bg-black">Field</option>
+                            <option value="GK" class="bg-black">GK</option>
+                            <option value="DF" class="bg-black">DF</option>
+                            <option value="MF" class="bg-black">MF</option>
+                            <option value="FW" class="bg-black">FW</option>
                         </select>
                         <button (click)="removePlayer('subs', i)"
                             class="p-2 text-red-400 hover:bg-red-400/10 rounded transition-colors ml-14">
@@ -178,11 +180,11 @@
         <!-- Footer -->
         <div class="px-6 py-4 border-t border-zinc-800 flex justify-end gap-3 shrink-0 bg-black/50">
             <button (click)="close.emit()"
-                class="px-4 py-2 hover:bg-white/5 text-zinc-400 border border-transparent hover:border-white/10 rounded-lg text-sm font-bold transition-all">
+                class="btn btn-ghost text-zinc-400 hover:text-white font-bold text-sm">
                 Cancel
             </button>
             <button (click)="onSave()"
-                class="px-6 py-2 bg-gold-500 hover:bg-gold-400 text-black border border-transparent rounded-lg text-sm font-bold transition-all shadow-lg hover:shadow-gold-500/20">
+                class="btn bg-gold-500 hover:bg-gold-400 text-black border-none font-bold text-sm transition-all shadow-lg hover:shadow-gold-500/20">
                 Save Lineups
             </button>
         </div>
@@ -199,7 +201,7 @@
                 <h4 class="text-sm font-black text-white uppercase tracking-wider">Select {{ pickerType === 'starting' ? 'Starting XI' : 'Substitutes' }}</h4>
                 <p class="text-[10px] text-zinc-500 uppercase font-bold mt-0.5">
                     {{ pickerType === 'starting' 
-                        ? (currentStartingCount + selectedInPicker.size) + ' / ' + playerLimit + ' Max' 
+                        ? (currentStartingCount + selectedInPicker.size) + ' / ' + playersOnField + ' Max' 
                         : (currentSubsCount + selectedInPicker.size) + ' / ' + subsLimit + ' Max' }}
                 </p>
             </div>
@@ -214,6 +216,8 @@
             <div *ngFor="let p of currentTeamPlayers" 
                 (click)="toggleInPicker(p.name)"
                 [class.opacity-50]="isPlayerSelected(p.name) && !selectedInPicker.has(p.name)"
+                [class.cursor-not-allowed]="isPlayerSelected(p.name) && !selectedInPicker.has(p.name)"
+                [class.pointer-events-none]="isPlayerSelected(p.name) && !selectedInPicker.has(p.name)"
                 [class.bg-gold-500/10]="selectedInPicker.has(p.name)"
                 [class.border-gold-500/20]="selectedInPicker.has(p.name)"
                 class="flex items-center justify-between p-3 rounded-lg border border-transparent hover:bg-white/5 transition-all cursor-pointer group">

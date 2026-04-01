@@ -136,7 +136,6 @@ export class TournamentFormatComponent implements OnInit, OnChanges {
                 const approved = (res.data || []).filter(t => t.status === 'approved');
                 this.registeredTeams = approved;
                 this.teamNames = ['EMPTY SLOT', ...approved.map(r => r.team.name)];
-                console.log('[TournamentFormat] Loaded approved teams:', this.teamNames);
                 this.recomputeSlotOptions();
                 this.cdr.detectChanges();
             },
@@ -147,11 +146,60 @@ export class TournamentFormatComponent implements OnInit, OnChanges {
     private initializeFromData() {
         if (!this.data) return;
 
-        const incomingData = this.data.format_data || (this.data as any).format?.format_data;
-        if (incomingData && incomingData.length > 0) {
+        let incomingData = this.data.format_data || (this.data as any).format?.format_data;
+        
+        if (typeof incomingData === 'string') {
+            try {
+                incomingData = JSON.parse(incomingData);
+            } catch (e) {
+                // Ignore parse error
+            }
+        }
+
+        // Handle the case where format_data is { phases: [...] }
+        if (incomingData && !Array.isArray(incomingData) && incomingData.phases && Array.isArray(incomingData.phases)) {
+            incomingData = incomingData.phases;
+        }
+
+        if (incomingData && Array.isArray(incomingData) && incomingData.length > 0) {
             this.boardPhases = incomingData;
             this.showBoard = true;
             this.selectedFormat = this.data.type || this.data.format?.type || 'group';
+            this.cdr.detectChanges();
+        } else {
+            // Also ensure selectedFormat is set even if board isn't shown
+            this.selectedFormat = this.data.type || this.data.format?.type || null;
+            
+            if (this.selectedFormat && this.selectedFormat !== 'custom') {
+                // If the format is already chosen, show the figures (board).
+                // Auto-generate default structure based on selected format since `format_data` is missing
+                if (this.selectedFormat === 'group') {
+                    this.boardPhases = [{
+                        id: 'phase-group', name: 'Group phase', kind: 'group',
+                        groups: this.buildGroups(this.groupOnly_numGroups || 4, this.groupOnly_teamsPerGroup || 4)
+                    }];
+                } else if (this.selectedFormat === 'group_knockout') {
+                    this.boardPhases = [
+                        {
+                            id: 'phase-group', name: 'Group phase', kind: 'group',
+                            groups: this.buildGroups(this.gk_numGroups || 4, this.gk_teamsPerGroup || 4)
+                        },
+                        {
+                            id: 'phase-knockout', name: 'Knockout phase', kind: 'knockout',
+                            rounds: this.buildKnockoutRounds((this.gk_numGroups || 4) * (this.gk_advancingTeams || 2) || 8)
+                        }
+                    ];
+                } else if (this.selectedFormat === 'knockout') {
+                    this.boardPhases = [{
+                        id: 'phase-knockout', name: 'Knockout phase', kind: 'knockout',
+                        rounds: this.buildKnockoutRounds(this.knockout_totalTeams || 16)
+                    }];
+                }
+                this.showBoard = true;
+                this.emitChange();
+            } else {
+                this.showBoard = false;
+            }
             this.cdr.detectChanges();
         }
     }
@@ -258,6 +306,7 @@ export class TournamentFormatComponent implements OnInit, OnChanges {
     resetFormat() {
         this.showBoard = false;
         this.selectedFormat = null;
+        this.data.type = null;
         this.boardPhases = [];
         this.customStages = [];
         this.emitChange();

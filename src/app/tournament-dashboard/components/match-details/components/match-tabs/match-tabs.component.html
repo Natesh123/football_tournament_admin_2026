@@ -1,23 +1,35 @@
 <div
     class="flex items-center gap-2 p-1.5 bg-black-card border border-black-border rounded-xl w-full sm:w-fit overflow-x-auto no-scrollbar">
-    <!-- Lineups Tab -->
-    <button (click)="onTabClick('lineups')" [class.bg-white_10]="activeTab === 'lineups'"
-        [class.text-white]="activeTab === 'lineups'" [class.shadow-sm]="activeTab === 'lineups'"
-        [class.text-zinc-500]="activeTab !== 'lineups'" [class.hover:text-zinc-300]="activeTab !== 'lineups'"
-        [class.hover:bg-white_5]="activeTab !== 'lineups'"
+    
+    <!-- Timeline Tab -->
+    <button (click)="onTabClick('timeline')" [class.bg-white/10]="activeTab === 'timeline'"
+        [class.text-white]="activeTab === 'timeline'" [class.shadow-sm]="activeTab === 'timeline'"
+        [class.text-zinc-500]="activeTab !== 'timeline'" [class.hover:text-zinc-300]="activeTab !== 'timeline'"
+        [class.hover:bg-white/5]="activeTab !== 'timeline'"
         class="flex-1 sm:flex-none px-6 py-2.5 rounded-lg text-sm font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        Lineups
+        Timeline
+    </button>
+
+    <!-- Stats Tab -->
+    <button (click)="onTabClick('stats')" [class.bg-white/10]="activeTab === 'stats'"
+        [class.text-white]="activeTab === 'stats'" [class.shadow-sm]="activeTab === 'stats'"
+        [class.text-zinc-500]="activeTab !== 'stats'" [class.hover:text-zinc-300]="activeTab !== 'stats'"
+        [class.hover:bg-white/5]="activeTab !== 'stats'"
+        class="flex-1 sm:flex-none px-6 py-2.5 rounded-lg text-sm font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+        Stats
     </button>
 
     <!-- Match Info Tab -->
-    <button (click)="onTabClick('info')" [class.bg-white_10]="activeTab === 'info'"
+    <button (click)="onTabClick('info')" [class.bg-white/10]="activeTab === 'info'"
         [class.text-white]="activeTab === 'info'" [class.shadow-sm]="activeTab === 'info'"
         [class.text-zinc-500]="activeTab !== 'info'" [class.hover:text-zinc-300]="activeTab !== 'info'"
-        [class.hover:bg-white_5]="activeTab !== 'info'"
+        [class.hover:bg-white/5]="activeTab !== 'info'"
         class="flex-1 sm:flex-none px-6 py-2.5 rounded-lg text-sm font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -26,11 +38,35 @@
         Match Info
     </button>
 
+    <!-- Recent Form Tab -->
+    <button (click)="onTabClick('form')" [class.bg-white/10]="activeTab === 'form'"
+        [class.text-white]="activeTab === 'form'" [class.shadow-sm]="activeTab === 'form'"
+        [class.text-zinc-500]="activeTab !== 'form'" [class.hover:text-zinc-300]="activeTab !== 'form'"
+        [class.hover:bg-white/5]="activeTab !== 'form'"
+        class="flex-1 sm:flex-none px-6 py-2.5 rounded-lg text-sm font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+        </svg>
+        Recent Form
+    </button>
+
+    <!-- Standings Tab -->
+    <button (click)="onTabClick('standings')" [class.bg-white/10]="activeTab === 'standings'"
+        [class.text-white]="activeTab === 'standings'" [class.shadow-sm]="activeTab === 'standings'"
+        [class.text-zinc-500]="activeTab !== 'standings'" [class.hover:text-zinc-300]="activeTab !== 'standings'"
+        [class.hover:bg-white/5]="activeTab !== 'standings'"
+        class="flex-1 sm:flex-none px-6 py-2.5 rounded-lg text-sm font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+        </svg>
+        Standings
+    </button>
+
     <!-- H2H Tab -->
-    <button (click)="onTabClick('h2h')" [class.bg-white_10]="activeTab === 'h2h'"
+    <button (click)="onTabClick('h2h')" [class.bg-white/10]="activeTab === 'h2h'"
         [class.text-white]="activeTab === 'h2h'" [class.shadow-sm]="activeTab === 'h2h'"
         [class.text-zinc-500]="activeTab !== 'h2h'" [class.hover:text-zinc-300]="activeTab !== 'h2h'"
-        [class.hover:bg-white_5]="activeTab !== 'h2h'"
+        [class.hover:bg-white/5]="activeTab !== 'h2h'"
         class="flex-1 sm:flex-none px-6 py-2.5 rounded-lg text-sm font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { SocketService } from '../../core/services/socket.service';
 
 export interface PublicMatchData {
     match: {
@@ -20,6 +21,7 @@ export interface PublicMatchData {
     };
     presentation: {
         brandColor: string;
+        liveStreamLink?: string;
     };
     events: any[];
 }
@@ -33,11 +35,13 @@ export interface PublicMatchData {
 export class MatchScoreboardComponent implements OnInit {
     private route = inject(ActivatedRoute);
     private http = inject(HttpClient);
+    private socketService = inject(SocketService);
     
     data = signal<PublicMatchData | null>(null);
     isLoading = signal(true);
     error = signal('');
     tournamentId = signal<string | null>(null);
+    recentEvent = signal<any>(null);
 
     ngOnInit() {
         this.route.paramMap.subscribe(params => {
@@ -48,12 +52,28 @@ export class MatchScoreboardComponent implements OnInit {
 
             if (id) {
                 this.loadMatchData(id);
-                // Setup auto-refresh for live screen
-                setInterval(() => {
-                    this.silentReload(id);
-                }, 10000); // 10s auto-refresh
+                // Listen for real-time updates
+                this.socketService.on(`match_update_${id}`, (updatedData: any) => {
+                    console.log('Real-time update received:', updatedData);
+                    
+                    // Handle specific event types for alerts
+                    if (updatedData.type === 'event_added') {
+                        this.showEventAlert(updatedData.event);
+                        this.silentReload(id);
+                    } else if (updatedData.status) {
+                        // Full match object update (score, status, etc.)
+                        this.data.update(curr => curr ? { ...curr, match: updatedData } : null);
+                        
+                        // If score changed, maybe show an alert too (if it wasn't an event_added)
+                    }
+                });
             }
         });
+    }
+
+    showEventAlert(event: any) {
+        this.recentEvent.set(event);
+        setTimeout(() => this.recentEvent.set(null), 5000); // Hide after 5s
     }
 
     loadMatchData(id: string) {

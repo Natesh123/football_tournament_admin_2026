@@ -17,8 +17,7 @@
                 </svg>
             </div>
             <div>
-                <div class="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-0.5">{{ stat.label
-                    }}</div>
+                <div class="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-0.5">{{ stat.label | translate }}</div>
                 <div class="text-2xl font-bold text-white">{{ stat.value }}</div>
             </div>
         </div>
@@ -41,8 +40,7 @@
             </div>
 
             <div>
-                <div class="text-[10px] font-bold uppercase tracking-wider text-white/70 mb-1">{{ activity.label }}
-                </div>
+                <div class="text-[10px] font-bold uppercase tracking-wider text-white/70 mb-1">{{ activity.label | translate }}</div>
                 <div class="text-3xl font-bold" [class]="activity.colorClass">{{ activity.value }}</div>
             </div>
 
