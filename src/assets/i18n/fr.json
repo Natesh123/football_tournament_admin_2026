@@ -96,7 +96,11 @@
         "TITLE": "Tournoi",
         "TITLE_HIGHLIGHT": "Centre de Contrôle",
         "SUBTITLE": "Gérez les tableaux, planifiez les matchs et gérez les scores en direct depuis un tableau de bord unifié.",
-        "CREATE_BTN": "Créer Nouveau Tournoi"
+        "CREATE_BTN": "Créer Nouveau Tournoi",
+        "VIEW_TOURNAMENTS": "Voir Mes Tournois",
+        "ORGANIZER_TITLE": "Mes",
+        "ORGANIZER_TITLE_HIGHLIGHT": "Tournois",
+        "ORGANIZER_SUBTITLE": "Gérez et suivez les tournois qui vous sont assignés. Coordonnez les calendriers, mettez à jour les scores."
     },
     "MATCH_FEED": {
         "TABS": {
@@ -424,13 +428,33 @@
         },
         "SCORERS": {
             "TITLE": "Course au Soulier d'Or",
-            "SUBTITLE": "Meilleurs Buteurs"
+            "SUBTITLE": "Meilleurs Buteurs",
+            "VIEW_ALL": "Voir Tous les Tournois"
+        },
+        "ADMIN_PANEL": {
+            "TITLE": "Actions Admin",
+            "SUBTITLE": "Gestion Système",
+            "CREATE_TOURNAMENT": "Créer un Tournoi",
+            "USERS": "Utilisateurs",
+            "ROLES": "Rôles & Droits",
+            "TOURNAMENTS": "Tous les Tournois",
+            "SETTINGS": "Paramètres"
+        },
+        "ORGANIZER_PANEL": {
+            "TITLE": "Hub Organisateur",
+            "SUBTITLE": "Accès Rapide",
+            "MY_TOURNAMENTS": "Mes Tournois",
+            "MY_TOURNAMENTS_DESC": "Voir et gérer les tournois assignés",
+            "MY_TEAMS": "Mes Équipes",
+            "MY_TEAMS_DESC": "Parcourir et gérer les équipes",
+            "SCHEDULE": "Calendrier",
+            "SCHEDULE_DESC": "Voir les prochains matchs"
         },
         "PROMO": {
-            "BADGE": "Fonctionnalité Pro",
-            "TITLE": "Débloquer les Analyses",
-            "SUBTITLE": "Obtenez des statistiques détaillées et des cartes de chaleur.",
-            "BTN": "Mettre à Niveau"
+            "BADGE": "Fonctionnalit\u00e9 Pro",
+            "TITLE": "D\u00e9bloquer les Analyses",
+            "SUBTITLE": "Obtenez des statistiques d\u00e9taill\u00e9es et des cartes de chaleur.",
+            "BTN": "Mettre \u00e0 Niveau"
         }
     },
     "MATCH_FEED_LABELS": {

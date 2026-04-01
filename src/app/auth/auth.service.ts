@@ -19,6 +19,18 @@ export class AuthService {
         return this.userSignal()?.email;
     }
 
+    get userRole(): string {
+        return this.userSignal()?.role || 'user';
+    }
+
+    get isAdmin(): boolean {
+        return this.userRole === 'admin';
+    }
+
+    get isOrganizer(): boolean {
+        return this.userRole === 'organizer';
+    }
+
     register(data: any) {
         return this.http.post(`${this.baseUrl}/register`, data);
     }

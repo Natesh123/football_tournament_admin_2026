@@ -115,7 +115,11 @@
         "TITLE": "Tournament",
         "TITLE_HIGHLIGHT": "Control Center",
         "SUBTITLE": "Manage brackets, schedule matches, and handle live scores from a single unified dashboard.",
-        "CREATE_BTN": "Create New Tournament"
+        "CREATE_BTN": "Create New Tournament",
+        "VIEW_TOURNAMENTS": "View My Tournaments",
+        "ORGANIZER_TITLE": "My",
+        "ORGANIZER_TITLE_HIGHLIGHT": "Tournaments",
+        "ORGANIZER_SUBTITLE": "Manage and track the tournaments assigned to you. Coordinate schedules, update scores, and keep the action flowing."
     },
     "DASHBOARD": {
         "TITLE": "Dashboard",
@@ -424,7 +428,27 @@
         },
         "SCORERS": {
             "TITLE": "Golden Boot Race",
-            "SUBTITLE": "Top Goal Scorers"
+            "SUBTITLE": "Top Goal Scorers",
+            "VIEW_ALL": "View All Tournaments"
+        },
+        "ADMIN_PANEL": {
+            "TITLE": "Admin Quick Actions",
+            "SUBTITLE": "System Management",
+            "CREATE_TOURNAMENT": "Create Tournament",
+            "USERS": "Users",
+            "ROLES": "Roles & Perms",
+            "TOURNAMENTS": "All Tournaments",
+            "SETTINGS": "Settings"
+        },
+        "ORGANIZER_PANEL": {
+            "TITLE": "Organizer Hub",
+            "SUBTITLE": "Quick Access",
+            "MY_TOURNAMENTS": "My Tournaments",
+            "MY_TOURNAMENTS_DESC": "View & manage assigned tournaments",
+            "MY_TEAMS": "My Teams",
+            "MY_TEAMS_DESC": "Browse and manage registered teams",
+            "SCHEDULE": "Match Schedule",
+            "SCHEDULE_DESC": "View upcoming and live matches"
         },
         "PROMO": {
             "BADGE": "Pro Feature",

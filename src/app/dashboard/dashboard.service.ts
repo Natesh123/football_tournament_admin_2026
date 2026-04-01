@@ -64,6 +64,7 @@ export interface TopScorer {
     name: string;
     team: string;
     goals: number;
+    assists?: number;
 }
 
 @Injectable({ providedIn: 'root' })

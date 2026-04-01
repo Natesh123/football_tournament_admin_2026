@@ -96,7 +96,11 @@
         "TITLE": "Turnier",
         "TITLE_HIGHLIGHT": "Kontrollzentrum",
         "SUBTITLE": "Verwalten Sie Brackets, planen Sie Spiele und bearbeiten Sie Live-Ergebnisse von einem einheitlichen Dashboard.",
-        "CREATE_BTN": "Neues Turnier Erstellen"
+        "CREATE_BTN": "Neues Turnier Erstellen",
+        "VIEW_TOURNAMENTS": "Meine Turniere Anzeigen",
+        "ORGANIZER_TITLE": "Meine",
+        "ORGANIZER_TITLE_HIGHLIGHT": "Turniere",
+        "ORGANIZER_SUBTITLE": "Verwalten und verfolgen Sie die Ihnen zugewiesenen Turniere. Koordinieren Sie Spielpläne und aktualisieren Sie Ergebnisse."
     },
     "MATCH_FEED": {
         "TABS": {
@@ -424,7 +428,27 @@
         },
         "SCORERS": {
             "TITLE": "Torjäger-Rennen",
-            "SUBTITLE": "Beste Torschützen"
+            "SUBTITLE": "Beste Torschützen",
+            "VIEW_ALL": "Alle Turniere Anzeigen"
+        },
+        "ADMIN_PANEL": {
+            "TITLE": "Admin Schnellzugriff",
+            "SUBTITLE": "Systemverwaltung",
+            "CREATE_TOURNAMENT": "Turnier Erstellen",
+            "USERS": "Benutzer",
+            "ROLES": "Rollen & Rechte",
+            "TOURNAMENTS": "Alle Turniere",
+            "SETTINGS": "Einstellungen"
+        },
+        "ORGANIZER_PANEL": {
+            "TITLE": "Organizer Hub",
+            "SUBTITLE": "Schnellzugriff",
+            "MY_TOURNAMENTS": "Meine Turniere",
+            "MY_TOURNAMENTS_DESC": "Zugewiesene Turniere anzeigen",
+            "MY_TEAMS": "Meine Mannschaften",
+            "MY_TEAMS_DESC": "Registrierte Mannschaften verwalten",
+            "SCHEDULE": "Spielplan",
+            "SCHEDULE_DESC": "Bevorstehende Spiele anzeigen"
         },
         "PROMO": {
             "BADGE": "Pro-Funktion",

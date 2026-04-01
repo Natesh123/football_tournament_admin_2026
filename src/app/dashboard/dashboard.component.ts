@@ -51,6 +51,7 @@ export class DashboardComponent implements OnInit {
         { label: 'DASHBOARD.STATS.FINISHED_MATCHES', labelKey: true, value: '—', type: 'finished', colorClass: 'text-green-500', bgClass: 'bg-green-500/10', borderClass: 'border-green-500/20', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
     ]);
 
+
     constructor(private router: Router, public auth: AuthService) {
         if (!this.auth.isAuthenticated()) {
             this.router.navigate(['/auth/login']);

@@ -96,7 +96,11 @@
         "TITLE": "Torneo",
         "TITLE_HIGHLIGHT": "Centro de Control",
         "SUBTITLE": "Gestiona brackets, programa partidos y maneja puntuaciones en vivo desde un panel unificado.",
-        "CREATE_BTN": "Crear Nuevo Torneo"
+        "CREATE_BTN": "Crear Nuevo Torneo",
+        "VIEW_TOURNAMENTS": "Ver Mis Torneos",
+        "ORGANIZER_TITLE": "Mis",
+        "ORGANIZER_TITLE_HIGHLIGHT": "Torneos",
+        "ORGANIZER_SUBTITLE": "Gestiona y sigue los torneos asignados a ti. Coordina calendarios, actualiza puntuaciones y mantén la acción en marcha."
     },
     "MATCH_FEED": {
         "TABS": {
@@ -424,7 +428,27 @@
         },
         "SCORERS": {
             "TITLE": "Carrera por la Bota de Oro",
-            "SUBTITLE": "Máximos Goleadores"
+            "SUBTITLE": "Máximos Goleadores",
+            "VIEW_ALL": "Ver Todos los Torneos"
+        },
+        "ADMIN_PANEL": {
+            "TITLE": "Acciones Rápidas Admin",
+            "SUBTITLE": "Gestión del Sistema",
+            "CREATE_TOURNAMENT": "Crear Torneo",
+            "USERS": "Usuarios",
+            "ROLES": "Roles & Permisos",
+            "TOURNAMENTS": "Todos los Torneos",
+            "SETTINGS": "Ajustes"
+        },
+        "ORGANIZER_PANEL": {
+            "TITLE": "Hub del Organizador",
+            "SUBTITLE": "Acceso Rápido",
+            "MY_TOURNAMENTS": "Mis Torneos",
+            "MY_TOURNAMENTS_DESC": "Ver y gestionar torneos asignados",
+            "MY_TEAMS": "Mis Equipos",
+            "MY_TEAMS_DESC": "Explorar y gestionar equipos registrados",
+            "SCHEDULE": "Calendario de Partidos",
+            "SCHEDULE_DESC": "Ver próximos partidos en vivo"
         },
         "PROMO": {
             "BADGE": "Función Pro",
