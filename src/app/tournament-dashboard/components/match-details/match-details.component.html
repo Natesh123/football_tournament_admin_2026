@@ -1,0 +1,415 @@
+@if (isLoading()) {
+<div class="min-h-screen bg-black-bg p-8">
+    <div class="max-w-[1500px] mx-auto space-y-8">
+        <!-- Header Skeleton -->
+        <div class="h-48 bg-black-card border border-black-border rounded-2xl overflow-hidden relative">
+            <div class="skeleton w-full h-full opacity-50"></div>
+            <div class="absolute inset-0 p-8 flex items-center justify-between">
+                <div class="flex items-center gap-6">
+                    <div class="w-20 h-20 rounded-full skeleton"></div>
+                    <div class="space-y-3">
+                        <div class="h-6 w-48 skeleton"></div>
+                        <div class="h-4 w-32 skeleton"></div>
+                    </div>
+                </div>
+                <div class="flex flex-col items-center gap-3">
+                    <div class="h-12 w-24 skeleton"></div>
+                    <div class="h-4 w-16 skeleton"></div>
+                </div>
+                <div class="flex items-center gap-6">
+                    <div class="space-y-3 text-right">
+                        <div class="h-6 w-48 skeleton"></div>
+                        <div class="h-4 w-32 skeleton"></div>
+                    </div>
+                    <div class="w-20 h-20 rounded-full skeleton"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+            <!-- Sidebar Skeletons -->
+            <div class="lg:col-span-1 space-y-4">
+                <div class="h-10 w-full skeleton mb-4"></div>
+                <div *ngFor="let i of [1,2,3,4,5,6,7,8]" class="h-16 w-full skeleton"></div>
+            </div>
+
+            <!-- Main Content Skeleton -->
+            <div class="lg:col-span-3 space-y-8">
+                <div class="h-12 w-full skeleton rounded-xl"></div>
+                <div class="h-64 w-full skeleton rounded-xl"></div>
+                <div class="space-y-4">
+                    <div *ngFor="let i of [1,2,3]" class="h-20 w-full skeleton"></div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-1 space-y-4">
+                <div class="h-10 w-full skeleton mb-4"></div>
+                <div *ngFor="let i of [1,2,3,4,5,6,7,8]" class="h-16 w-full skeleton"></div>
+            </div>
+        </div>
+    </div>
+</div>
+} @else if (match()) {
+
+<div class="min-h-screen bg-black-bg flex flex-col">
+    <!-- Top Bar with Breadcrumb -->
+    <div
+        class="flex items-center justify-between px-8 py-4 border-b border-black-border bg-black-card/80 backdrop-blur-md sticky top-0 z-20 shrink-0">
+        <div class="flex items-center gap-2 text-sm">
+            <button (click)="goBack()" class="text-zinc-500 hover:text-white transition-colors">Tournament
+                Dashboard</button>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-zinc-600" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+            <span class="text-gold-400 font-bold">Match Details</span>
+        </div>
+
+        <button (click)="openEditModal()"
+            class="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-lg text-sm font-bold transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-zinc-400" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            Edit Match
+        </button>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto p-8 relative">
+        <div class="max-w-[1500px] mx-auto">
+            <!-- Persistent Header: Always visible at the top -->
+            <div class="mb-8">
+                <app-match-header [match]="match()" (editMatch)="openEditModal()" (addLineup)="openLineupModal()"
+                    (startMatch)="handleStartMatch()" (completeMatch)="handleCompleteMatch()">
+                </app-match-header>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                <!-- Left Sidebar: Home Squad -->
+                <div class="lg:col-span-1 space-y-6">
+                    @if (homePlayers()?.length) {
+                    <div class="bg-black-card border border-black-border rounded-xl overflow-hidden sticky top-8">
+                        <div class="px-4 py-3 bg-white/5 border-b border-black-border flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-gold-400"></div>
+                            <h3 class="text-[10px] font-black text-white uppercase tracking-widest">{{ match().homeTeam?.shortName || 'Home' }} Squad</h3>
+                        </div>
+                        <div class="p-4 space-y-3 max-h-[calc(100vh-250px)] overflow-y-auto custom-scrollbar">
+                            @for (player of homePlayers(); track player.id) {
+                            <div class="flex items-center gap-3 p-2 rounded-lg bg-white/[0.02] border border-white/[0.05] group hover:bg-white/[0.05] transition-all">
+                                <div class="relative flex-shrink-0">
+                                    <div class="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 overflow-hidden">
+                                        @if (player.photoUrl) {
+                                            <img [src]="player.photoUrl" class="w-full h-full object-cover">
+                                        } @else {
+                                            <div class="w-full h-full flex items-center justify-center text-xs font-black text-zinc-600">
+                                                {{ player.name.charAt(0) }}
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-gold-400 rounded-full flex items-center justify-center text-[10px] font-black text-black">
+                                        {{ player.jerseyNumber || '?' }}
+                                    </div>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-sm font-bold text-white truncate">{{ player.name }}</p>
+                                    <p class="text-[9px] text-zinc-500 font-bold uppercase">{{ player.position || 'Player' }}</p>
+                                </div>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                    }
+                </div>
+
+                <!-- Center Content: Main Management -->
+                <div class="lg:col-span-3 space-y-8">
+                    <div class="mt-4">
+                        <app-match-tabs [activeTab]="activeTab()" (tabChange)="activeTab.set($event)">
+                        </app-match-tabs>
+                    </div>
+
+                    @if (match().status !== 'scheduled') {
+                    <div class="bg-black-card border border-black-border rounded-xl p-8 w-full shadow-xl">
+                        <div class="flex items-center gap-3 mb-8">
+                            <div class="w-10 h-10 rounded-xl bg-gold-400/10 flex items-center justify-center border border-gold-400/20">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-black text-white tracking-tight">Add Match Event</h3>
+                        </div>
+
+                        <div class="space-y-6">
+                            <!-- Event Type Grid -->
+                            <div>
+                                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-3 block">Match Event Type</label>
+                                <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                                    <!-- Goal -->
+                                    <button (click)="eventFormType.set('goal')"
+                                        [class.bg-gold-400]="eventFormType() === 'goal'"
+                                        [class.text-black]="eventFormType() === 'goal'"
+                                        [class.border-gold-400]="eventFormType() === 'goal'"
+                                        [class.shadow-[0_0_15px_rgba(212,175,55,0.3)]]="eventFormType() === 'goal'"
+                                        [class.bg-black-card]="eventFormType() !== 'goal'"
+                                        [class.text-white]="eventFormType() !== 'goal'"
+                                        [class.border-zinc-800]="eventFormType() !== 'goal'"
+                                        class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border text-[10px] font-black uppercase tracking-tight transition-all hover:border-gold-400/50 group">
+                                        <span class="text-xl group-hover:scale-110 transition-transform">⚽</span>
+                                        <span>Goal</span>
+                                    </button>
+
+                                    <!-- Own Goal -->
+                                    <button (click)="eventFormType.set('own_goal')"
+                                        [class.bg-gold-400]="eventFormType() === 'own_goal'"
+                                        [class.text-black]="eventFormType() === 'own_goal'"
+                                        [class.border-gold-400]="eventFormType() === 'own_goal'"
+                                        [class.shadow-[0_0_15px_rgba(212,175,55,0.3)]]="eventFormType() === 'own_goal'"
+                                        [class.bg-black-card]="eventFormType() !== 'own_goal'"
+                                        [class.text-white]="eventFormType() !== 'own_goal'"
+                                        [class.border-zinc-800]="eventFormType() !== 'own_goal'"
+                                        class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border text-[10px] font-black uppercase tracking-tight transition-all hover:border-gold-400/50 group">
+                                        <span class="text-xl group-hover:scale-110 transition-transform">↩️</span>
+                                        <span>Own Goal</span>
+                                    </button>
+
+                                    <!-- Yellow Card -->
+                                    <button (click)="eventFormType.set('yellow_card')"
+                                        [class.bg-gold-400]="eventFormType() === 'yellow_card'"
+                                        [class.text-black]="eventFormType() === 'yellow_card'"
+                                        [class.border-gold-400]="eventFormType() === 'yellow_card'"
+                                        [class.shadow-[0_0_15px_rgba(212,175,55,0.3)]]="eventFormType() === 'yellow_card'"
+                                        [class.bg-black-card]="eventFormType() !== 'yellow_card'"
+                                        [class.text-white]="eventFormType() !== 'yellow_card'"
+                                        [class.border-zinc-800]="eventFormType() !== 'yellow_card'"
+                                        class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border text-[10px] font-black uppercase tracking-tight transition-all hover:border-gold-400/50 group">
+                                        <span class="text-xl group-hover:scale-110 transition-transform">🟨</span>
+                                        <span>Yellow</span>
+                                    </button>
+
+                                    <!-- Red Card -->
+                                    <button (click)="eventFormType.set('red_card')"
+                                        [class.bg-gold-400]="eventFormType() === 'red_card'"
+                                        [class.text-black]="eventFormType() === 'red_card'"
+                                        [class.border-gold-400]="eventFormType() === 'red_card'"
+                                        [class.shadow-[0_0_15px_rgba(212,175,55,0.3)]]="eventFormType() === 'red_card'"
+                                        [class.bg-black-card]="eventFormType() !== 'red_card'"
+                                        [class.text-white]="eventFormType() !== 'red_card'"
+                                        [class.border-zinc-800]="eventFormType() !== 'red_card'"
+                                        class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border text-[10px] font-black uppercase tracking-tight transition-all hover:border-gold-400/50 group">
+                                        <span class="text-xl group-hover:scale-110 transition-transform">🟥</span>
+                                        <span>Red Card</span>
+                                    </button>
+
+                                    <!-- Substitution -->
+                                    <button (click)="eventFormType.set('substitution')"
+                                        [class.bg-gold-400]="eventFormType() === 'substitution'"
+                                        [class.text-black]="eventFormType() === 'substitution'"
+                                        [class.border-gold-400]="eventFormType() === 'substitution'"
+                                        [class.shadow-[0_0_15px_rgba(212,175,55,0.3)]]="eventFormType() === 'substitution'"
+                                        [class.bg-black-card]="eventFormType() !== 'substitution'"
+                                        [class.text-white]="eventFormType() !== 'substitution'"
+                                        [class.border-zinc-800]="eventFormType() !== 'substitution'"
+                                        class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border text-[10px] font-black uppercase tracking-tight transition-all hover:border-gold-400/50 group">
+                                        <span class="text-xl group-hover:scale-110 transition-transform">🔄</span>
+                                        <span>Sub</span>
+                                    </button>
+
+                                    <!-- Penalty -->
+                                    <button (click)="eventFormType.set('penalty')"
+                                        [class.bg-gold-400]="eventFormType() === 'penalty'"
+                                        [class.text-black]="eventFormType() === 'penalty'"
+                                        [class.border-gold-400]="eventFormType() === 'penalty'"
+                                        [class.shadow-[0_0_15px_rgba(212,175,55,0.3)]]="eventFormType() === 'penalty'"
+                                        [class.bg-black-card]="eventFormType() !== 'penalty'"
+                                        [class.text-white]="eventFormType() !== 'penalty'"
+                                        [class.border-zinc-800]="eventFormType() !== 'penalty'"
+                                        class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border text-[10px] font-black uppercase tracking-tight transition-all hover:border-gold-400/50 group">
+                                        <span class="text-xl group-hover:scale-110 transition-transform">⚡</span>
+                                        <span>Penalty</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Minute Selection -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                                <div>
+                                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Match Minute</label>
+                                    <div class="relative">
+                                        <input type="number" [ngModel]="eventFormMinute()" (ngModelChange)="eventFormMinute.set($event)"
+                                            class="input input-bordered w-full bg-black border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all hover:border-gold-400/50 hover:bg-white/[0.02] pl-10"
+                                            placeholder="e.g. 45" />
+                                        <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-zinc-400 font-black text-xs">'</span>
+                                    </div>
+                                </div>
+
+                                <!-- Team Selection -->
+                                <div>
+                                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Select Team</label>
+                                    <div class="flex gap-3">
+                                        <button (click)="onDirectTeamSwitch('home')" 
+                                            [class.bg-gold-400]="eventFormTeam() === 'home'"
+                                            [class.text-black]="eventFormTeam() === 'home'"
+                                            [class.bg-black]="eventFormTeam() !== 'home'"
+                                            [class.text-zinc-400]="eventFormTeam() !== 'home'"
+                                            [class.border-gold-400]="eventFormTeam() === 'home'"
+                                            [class.border-black-border]="eventFormTeam() !== 'home'"
+                                            class="btn flex-1 border font-black text-sm transition-all truncate hover:border-gold-400/50 hover:shadow-[0_0_10px_rgba(212,175,55,0.1)]">
+                                            {{ match().homeTeam?.shortName || 'Home' }}
+                                        </button>
+                                        <button (click)="onDirectTeamSwitch('away')" 
+                                            [class.bg-gold-400]="eventFormTeam() === 'away'"
+                                            [class.text-black]="eventFormTeam() === 'away'"
+                                            [class.bg-black]="eventFormTeam() !== 'away'"
+                                            [class.text-zinc-400]="eventFormTeam() !== 'away'"
+                                            [class.border-gold-400]="eventFormTeam() === 'away'"
+                                            [class.border-black-border]="eventFormTeam() !== 'away'"
+                                            class="btn flex-1 border font-black text-sm transition-all truncate hover:border-gold-400/50 hover:shadow-[0_0_10px_rgba(212,175,55,0.1)]">
+                                            {{ match().awayTeam?.shortName || 'Away' }}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Player & Details -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Player Name</label>
+                                    <select [ngModel]="eventFormPlayerName()" (ngModelChange)="eventFormPlayerName.set($event)"
+                                        class="select select-bordered w-full bg-black border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all hover:border-gold-400/50 hover:shadow-[0_0_10px_rgba(212,175,55,0.1)] hover:bg-white/[0.02] cursor-pointer">
+                                        <option value="" disabled selected class="bg-black">Select Player</option>
+                                        @for (p of directEventTeamPlayers; track p.id) {
+                                        <option [value]="p.name" class="bg-black">
+                                            {{ p.name }} {{ p.jerseyNumber ? '(#' + p.jerseyNumber + ')' : '' }}
+                                        </option>
+                                        }
+                                    </select>
+                                </div>
+                                @if (eventFormType() === 'goal') {
+                                <div>
+                                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Assist By (Optional)</label>
+                                    <select [ngModel]="eventFormAssistPlayerName()" (ngModelChange)="eventFormAssistPlayerName.set($event)"
+                                        class="select select-bordered w-full bg-black border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all hover:border-gold-400/50 hover:shadow-[0_0_10px_rgba(212,175,55,0.1)] hover:bg-white/[0.02] cursor-pointer">
+                                        <option value="" class="bg-black">No Assist</option>
+                                        @for (p of directEventTeamPlayers; track p.id) {
+                                        <option [value]="p.name" [disabled]="p.name === eventFormPlayerName()" class="bg-black">
+                                            {{ p.name }}
+                                        </option>
+                                        }
+                                    </select>
+                                </div>
+                                } @else {
+                                <div>
+                                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Extra Details</label>
+                                    <input type="text" [ngModel]="eventFormDetails()" (ngModelChange)="eventFormDetails.set($event)"
+                                        class="input input-bordered w-full bg-black border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all hover:border-gold-400/50 hover:shadow-[0_0_10px_rgba(212,175,55,0.1)] hover:bg-white/[0.02]"
+                                        placeholder="e.g. Header, tactical foul" />
+                                </div>
+                                }
+                            </div>
+
+                            <div class="pt-4 flex justify-end">
+                                <button (click)="submitDirectEvent()" [disabled]="isSaving()"
+                                    class="btn bg-gold-400 hover:bg-gold-400/90 text-black border-none font-black px-12 transition-all shadow-[0_0_20px_rgba(212,175,55,0.4)]">
+                                    @if (isSaving()) {
+                                    <span class="loading loading-spinner loading-sm"></span>
+                                    Saving...
+                                    } @else {
+                                    Add Event
+                                    }
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    }
+
+                    <div class="mt-4">
+                        @if (activeTab() === 'timeline') {
+                        <app-match-timeline [match]="match()" [events]="events()" (addEvent)="openEventModal()"
+                            (editEvent)="openEventModal($event)" (deleteEvent)="handleDeleteEvent($event)">
+                        </app-match-timeline>
+                        } @else if (activeTab() === 'stats') {
+                        <app-match-stats [matchId]="matchId()"></app-match-stats>
+                        } @else if (activeTab() === 'info') {
+                        <app-match-info [match]="match()"></app-match-info>
+                        } @else if (activeTab() === 'h2h') {
+                        <app-h2h [homeTeam]="match()?.homeTeam" [awayTeam]="match()?.awayTeam" [h2hData]="h2hData()" mode="h2h">
+                        </app-h2h>
+                        } @else if (activeTab() === 'form') {
+                        <app-h2h [homeTeam]="match()?.homeTeam" [awayTeam]="match()?.awayTeam" [h2hData]="h2hData()" mode="form">
+                        </app-h2h>
+                        } @else if (activeTab() === 'standings') {
+                        <app-h2h [homeTeam]="match()?.homeTeam" [awayTeam]="match()?.awayTeam" [h2hData]="h2hData()" mode="standings">
+                        </app-h2h>
+                        }
+                    </div>
+                </div>
+
+                <!-- Right Sidebar: Away Squad -->
+                <div class="lg:col-span-1 space-y-6">
+                    @if (awayPlayers()?.length) {
+                    <div class="bg-black-card border border-black-border rounded-xl overflow-hidden sticky top-8">
+                        <div class="px-4 py-3 bg-white/5 border-b border-black-border flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-gold-400"></div>
+                            <h3 class="text-[10px] font-black text-white uppercase tracking-widest">{{ match().awayTeam?.shortName || 'Away' }} Squad</h3>
+                        </div>
+                        <div class="p-4 space-y-3 max-h-[calc(100vh-250px)] overflow-y-auto custom-scrollbar">
+                            @for (player of awayPlayers(); track player.id) {
+                            <div class="flex items-center gap-3 p-2 rounded-lg bg-white/[0.02] border border-white/[0.05] group hover:bg-white/[0.05] transition-all">
+                                <div class="relative flex-shrink-0">
+                                    <div class="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 overflow-hidden">
+                                        @if (player.photoUrl) {
+                                            <img [src]="player.photoUrl" class="w-full h-full object-cover">
+                                        } @else {
+                                            <div class="w-full h-full flex items-center justify-center text-xs font-black text-zinc-600">
+                                                {{ player.name.charAt(0) }}
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-gold-400 rounded-full flex items-center justify-center text-[10px] font-black text-black">
+                                        {{ player.jerseyNumber || '?' }}
+                                    </div>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-sm font-bold text-white truncate">{{ player.name }}</p>
+                                    <p class="text-[9px] text-zinc-500 font-bold uppercase">{{ player.position || 'Player' }}</p>
+                                </div>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Modals (moved outside the grid for better z-index handling) -->
+            <app-match-edit-modal [isOpen]="isEditModalOpen()" [match]="match()" (close)="closeEditModal()"
+                (save)="handleSaveMatchMetadata($event)">
+            </app-match-edit-modal>
+
+            <app-match-event-editor-modal [isOpen]="isEventModalOpen()" [match]="match()"
+                [eventData]="selectedEventData()" (close)="closeEventModal()" (save)="handleSaveEvent($event)">
+            </app-match-event-editor-modal>
+
+            <app-lineup-editor [isOpen]="isLineupModalOpen()" [match]="match()" [lineups]="lineups()"
+                (close)="closeLineupModal()" (save)="handleSaveLineups($event)">
+            </app-lineup-editor>
+        </div>
+    </main>
+</div>
+}
+
+<!-- Toast -->
+@if (toastMessage()) {
+<div
+    class="fixed bottom-6 right-6 z-50 bg-black-card border border-gold-400/30 rounded-xl px-5 py-3 shadow-[0_0_30px_rgba(0,0,0,0.5)] flex items-center gap-3 animate-[slideUp_0.3s_ease-out]">
+    <div class="w-8 h-8 rounded-full bg-gold-400/20 flex items-center justify-center shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gold-400" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+    </div>
+    <span class="text-sm text-white font-bold">{{ toastMessage() }}</span>
+</div>
+}

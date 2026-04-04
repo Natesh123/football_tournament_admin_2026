@@ -1,0 +1,91 @@
+@if (isOpen) {
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity" (click)="onClose()"></div>
+
+    <!-- Modal Panel -->
+    <div
+        class="relative bg-black border border-black-border rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden animate-[scaleIn_0.2s_ease-out]">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between p-6 border-b border-black-border bg-black-card/50">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 rounded-xl bg-gold-400/10 flex items-center justify-center border border-gold-400/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gold-400" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                </div>
+                <h2 class="text-xl font-black text-white tracking-tight">Edit Match Details</h2>
+            </div>
+            <button (click)="onClose()"
+                class="text-zinc-500 hover:text-white transition-colors p-2 hover:bg-white/5 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Form Body -->
+        <div class="p-6 md:p-8 space-y-6">
+            <!-- Date & Time -->
+            <div>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Match Date & Time
+                    <span class="text-red-500">*</span></label>
+                <input type="datetime-local" [(ngModel)]="formData.startTime"
+                    class="input input-bordered w-full bg-black-card border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all [color-scheme:dark]" />
+            </div>
+
+            <!-- Status -->
+            <div>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Match
+                    Status</label>
+                <select [(ngModel)]="formData.status"
+                    class="select select-bordered w-full bg-black-card border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all hover:border-gold-400/50 cursor-pointer">
+                    <option value="scheduled" class="bg-black text-white">Scheduled</option>
+                    <option value="live" class="bg-black text-white">Live / In Progress</option>
+                    <option value="completed" class="bg-black text-white">Completed / Full Time</option>
+                </select>
+            </div>
+
+            <!-- Venue -->
+            <div>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Venue /
+                    Pitch</label>
+                <input type="text" [(ngModel)]="formData.venue"
+                    class="input input-bordered w-full bg-black-card border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all"
+                    placeholder="e.g. Main Stadium" />
+            </div>
+
+            <!-- Referees -->
+            <div>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Match Officials /
+                    Referees</label>
+                <input type="text" [(ngModel)]="formData.matchReferees"
+                    class="input input-bordered w-full bg-black-card border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all"
+                    placeholder="e.g. John Doe, Jane Smith" />
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="p-6 border-t border-black-border bg-black-card/50 flex justify-end gap-3">
+            <button (click)="onClose()"
+                class="btn btn-ghost text-zinc-400 hover:text-white font-bold text-sm">
+                Cancel
+            </button>
+            <button (click)="onSubmit()" [disabled]="isSubmitting"
+                class="btn bg-gold-400 hover:bg-gold-400/90 text-black border-none font-bold text-sm transition-all shadow-[0_0_15px_rgba(212,175,55,0.4)] flex items-center gap-2">
+                @if (isSubmitting) {
+                <span class="loading loading-spinner loading-xs"></span>
+                Saving...
+                } @else {
+                Save Changes
+                }
+            </button>
+        </div>
+    </div>
+</div>
+}

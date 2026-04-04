@@ -1,0 +1,135 @@
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
+    <!-- HOME TEAM LINEUP -->
+    <div
+        class="bg-black-card border border-black-border rounded-xl overflow-hidden shadow-lg border-l-4 border-l-gold-500">
+        <div class="p-4 border-b border-black-border bg-black/50 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 rounded-full bg-black border border-zinc-800 flex items-center justify-center p-1">
+                    <img *ngIf="homeTeam?.logo" [src]="homeTeam.logo" alt="Home Team"
+                        class="w-full h-full object-contain" />
+                </div>
+                <div>
+                    <h3 class="font-black text-white text-base">{{ homeTeam?.name || 'Home Team' }}</h3>
+                    <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-wide">{{ homeLineup?.formation ||
+                        'Formation TBD' }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4">
+            <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3">Starting XI</h4>
+            <div class="space-y-1">
+                <ng-container *ngIf="homeStarting.length > 0; else noHomeStarting">
+                    <div *ngFor="let player of homeStarting"
+                        class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors">
+                        <span class="w-6 text-center font-black text-xs text-zinc-500">{{ player.number || '-' }}</span>
+                        <div class="flex-1 flex items-center gap-2">
+                            <span class="font-bold text-sm text-white">{{ player.name }}</span>
+                            <span *ngIf="player.isCaptain"
+                                class="px-1.5 py-0.5 rounded bg-gold-500/10 text-gold-400 border border-gold-500/20 text-[9px] font-black uppercase"
+                                title="Captain">C</span>
+                            <span *ngIf="player.position === 'GK'"
+                                class="px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[9px] font-black uppercase"
+                                title="Goalkeeper">GK</span>
+                        </div>
+                    </div>
+                </ng-container>
+                <ng-template #noHomeStarting>
+                    <div class="py-4 text-center text-sm font-bold text-zinc-600">Starting XI not announced</div>
+                </ng-template>
+            </div>
+
+            <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3 mt-6">Substitutes</h4>
+            <div class="space-y-1">
+                <ng-container *ngIf="homeSubs.length > 0; else noHomeSubs">
+                    <div *ngFor="let player of homeSubs"
+                        class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors">
+                        <span class="w-6 text-center font-bold text-xs text-zinc-600">{{ player.number || '-' }}</span>
+                        <div class="flex-1 flex items-center gap-2">
+                            <span class="font-medium text-sm text-zinc-300">{{ player.name }}</span>
+                            <span *ngIf="player.position === 'GK'"
+                                class="px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[9px] font-black uppercase"
+                                title="Goalkeeper">GK</span>
+                        </div>
+                    </div>
+                </ng-container>
+                <ng-template #noHomeSubs>
+                    <div class="py-2 text-center text-sm font-bold text-zinc-600">Subs not announced</div>
+                </ng-template>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-black-border">
+                <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Coach</p>
+                <p class="font-black text-sm text-white">{{ homeLineup?.coach || 'TBD' }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- AWAY TEAM LINEUP -->
+    <div
+        class="bg-black-card border border-black-border rounded-xl overflow-hidden shadow-lg border-r-4 border-r-zinc-500">
+        <div class="p-4 border-b border-black-border bg-black/50 flex items-center justify-between flex-row-reverse">
+            <div class="flex items-center gap-3 flex-row-reverse text-right">
+                <div
+                    class="w-10 h-10 rounded-full bg-black border border-zinc-800 flex items-center justify-center p-1">
+                    <img *ngIf="awayTeam?.logo" [src]="awayTeam.logo" alt="Away Team"
+                        class="w-full h-full object-contain" />
+                </div>
+                <div>
+                    <h3 class="font-black text-white text-base">{{ awayTeam?.name || 'Away Team' }}</h3>
+                    <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-wide">{{ awayLineup?.formation ||
+                        'Formation TBD' }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4">
+            <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3 text-right">Starting XI</h4>
+            <div class="space-y-1">
+                <ng-container *ngIf="awayStarting.length > 0; else noAwayStarting">
+                    <div *ngFor="let player of awayStarting"
+                        class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors flex-row-reverse text-right">
+                        <span class="w-6 text-center font-black text-xs text-zinc-500">{{ player.number || '-' }}</span>
+                        <div class="flex-1 flex items-center justify-end gap-2 flex-row-reverse">
+                            <span class="font-bold text-sm text-white">{{ player.name }}</span>
+                            <span *ngIf="player.isCaptain"
+                                class="px-1.5 py-0.5 rounded bg-gold-500/10 text-gold-400 border border-gold-500/20 text-[9px] font-black uppercase"
+                                title="Captain">C</span>
+                            <span *ngIf="player.position === 'GK'"
+                                class="px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[9px] font-black uppercase"
+                                title="Goalkeeper">GK</span>
+                        </div>
+                    </div>
+                </ng-container>
+                <ng-template #noAwayStarting>
+                    <div class="py-4 text-center text-sm font-bold text-zinc-600">Starting XI not announced</div>
+                </ng-template>
+            </div>
+
+            <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3 mt-6 text-right">Substitutes</h4>
+            <div class="space-y-1">
+                <ng-container *ngIf="awaySubs.length > 0; else noAwaySubs">
+                    <div *ngFor="let player of awaySubs"
+                        class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors flex-row-reverse text-right">
+                        <span class="w-6 text-center font-bold text-xs text-zinc-600">{{ player.number || '-' }}</span>
+                        <div class="flex-1 flex items-center justify-end gap-2 flex-row-reverse">
+                            <span class="font-medium text-sm text-zinc-300">{{ player.name }}</span>
+                            <span *ngIf="player.position === 'GK'"
+                                class="px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[9px] font-black uppercase"
+                                title="Goalkeeper">GK</span>
+                        </div>
+                    </div>
+                </ng-container>
+                <ng-template #noAwaySubs>
+                    <div class="py-2 text-center text-sm font-bold text-zinc-600">Subs not announced</div>
+                </ng-template>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-black-border text-right">
+                <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Coach</p>
+                <p class="font-black text-sm text-white">{{ awayLineup?.coach || 'TBD' }}</p>
+            </div>
+        </div>
+    </div>
+</div>

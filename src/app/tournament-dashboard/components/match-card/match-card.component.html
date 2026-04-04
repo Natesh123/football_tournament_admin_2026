@@ -1,0 +1,72 @@
+<div (click)="onClick()"
+    class="group cursor-pointer bg-black-card border border-black-border rounded-xl p-5 hover:border-gold-500/30 hover:bg-white/5 transition-all shadow-lg flex flex-col md:flex-row items-center gap-6 relative">
+
+    <!-- Left: Metadata -->
+    <div class="w-full md:w-48 shrink-0 flex flex-col items-center md:items-start text-center md:text-left gap-1">
+        <span class="px-2.5 py-1 bg-white/5 text-zinc-400 text-[10px] font-black uppercase tracking-widest rounded">
+            {{ match?.stage?.name || 'Group Stage' }}
+        </span>
+        <div class="flex items-center gap-1.5 text-xs text-zinc-500 font-bold uppercase mt-2">
+            {{ match?.startTime | date:'MMM d, h:mm a' }}
+        </div>
+    </div>
+
+    <!-- Center: Teams & Score -->
+    <div class="flex-1 w-full flex items-center justify-between lg:px-12 relative">
+        <!-- LIVE badge if active -->
+        <div *ngIf="activeTab === 'live'"
+            class="absolute -top-6 left-1/2 -transform -translate-x-1/2 flex items-center gap-1.5 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded text-[10px] text-red-500 font-black tracking-widest uppercase shadow-lg">
+            <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+            Live
+        </div>
+
+        <!-- Home Team -->
+        <div class="flex flex-col md:flex-row items-center gap-3 w-[40%] text-right md:justify-end">
+            <span class="font-bold text-white order-2 md:order-1 hidden md:block w-full truncate">{{
+                match?.homeTeam?.name || 'TBD' }}</span>
+            <span class="font-bold text-white order-2 md:order-1 block md:hidden text-xs text-center truncate">{{
+                match?.homeTeam?.shortName || match?.homeTeam?.name || 'TBD' }}</span>
+            <div
+                class="w-12 h-12 rounded-full border border-black-border bg-black flex items-center justify-center overflow-hidden shrink-0 order-1 md:order-2 shadow-inner">
+                <img *ngIf="match?.homeTeam?.logo" [src]="match.homeTeam.logo" alt=""
+                    class="w-full h-full object-cover">
+                <span *ngIf="!match?.homeTeam?.logo" class="text-zinc-600 font-black text-xs">HT</span>
+            </div>
+        </div>
+
+        <!-- Score -->
+        <div class="flex flex-col items-center justify-center shrink-0 w-24">
+            <div
+                class="bg-black border border-black-border px-4 py-2 rounded-lg text-2xl font-black tracking-widest text-white shadow-inner min-w-[5rem] text-center">
+                <span *ngIf="match?.homeScore !== null && match?.awayScore !== null">{{match.homeScore}} -
+                    {{match.awayScore}}</span>
+                <span *ngIf="match?.homeScore === null || match?.awayScore === null">vs</span>
+            </div>
+        </div>
+
+        <!-- Away Team -->
+        <div class="flex flex-col md:flex-row items-center gap-3 w-[40%] text-left md:justify-start">
+            <div
+                class="w-12 h-12 rounded-full border border-black-border bg-black flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
+                <img *ngIf="match?.awayTeam?.logo" [src]="match.awayTeam.logo" alt=""
+                    class="w-full h-full object-cover">
+                <span *ngIf="!match?.awayTeam?.logo" class="text-zinc-600 font-black text-xs">AT</span>
+            </div>
+            <span class="font-bold text-white w-full hidden md:block truncate">{{ match?.awayTeam?.name || 'TBD'
+                }}</span>
+            <span class="font-bold text-white block md:hidden text-xs text-center truncate">{{
+                match?.awayTeam?.shortName || match?.awayTeam?.name || 'TBD' }}</span>
+        </div>
+    </div>
+
+    <!-- Right: Arrow/Action -->
+    <div class="hidden md:flex shrink-0">
+        <div
+            class="w-10 h-10 rounded-full border border-black-border bg-white/5 flex items-center justify-center group-hover:bg-gold-500 group-hover:border-gold-500 group-hover:text-black text-zinc-500 transition-all shadow-lg transform group-hover:scale-110 group-hover:rotate-12">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+        </div>
+    </div>
+</div>

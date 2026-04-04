@@ -1,0 +1,98 @@
+<div class="space-y-8">
+    <!-- Page Title -->
+    <div>
+        <h1 class="text-3xl font-black text-white tracking-tight">Participants</h1>
+        <p class="text-zinc-500 mt-1.5">Manage teams, players, registration dates, and entry requirements.
+        </p>
+    </div>
+
+    <!-- Setup & Dates -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Registration Requirements -->
+        <div class="bg-black-card border border-black-border rounded-xl p-6">
+            <h2 class="text-lg font-bold text-white mb-6">Entry Limits</h2>
+            <div class="space-y-5">
+                <div>
+                    <label
+                        class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Participation
+                        Type</label>
+                    <select [(ngModel)]="data.type"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all">
+                        <option value="team" class="bg-black-card">Team Based</option>
+                        <option value="individual" class="bg-black-card">Individual (Draft System)</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Min
+                            Teams</label>
+                        <input type="number" [(ngModel)]="data.minTeams"
+                            class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all" />
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Max
+                            Teams</label>
+                        <input type="number" [(ngModel)]="data.maxTeams"
+                            class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all" />
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Squad
+                            Size</label>
+                        <input type="number" [(ngModel)]="data.squadSize"
+                            class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all" />
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Max
+                            Registration Limit</label>
+                        <input type="number" [(ngModel)]="data.playerLimit"
+                            class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dates & Access -->
+        <div class="bg-black-card border border-black-border rounded-xl p-6">
+            <h2 class="text-lg font-bold text-white mb-6">Dates & Access</h2>
+            <div class="space-y-5">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Reg
+                            Open Date</label>
+                        <input type="date" [(ngModel)]="data.regOpenDate"
+                            class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all [color-scheme:dark]" />
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Reg
+                            Close Date</label>
+                        <input type="date" [(ngModel)]="data.regCloseDate"
+                            class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all [color-scheme:dark]" />
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Base
+                        Entry Fee</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 font-bold">€</span>
+                        <input type="number" [(ngModel)]="data.regFee"
+                            class="w-full bg-white/5 border border-black-border rounded-lg pl-8 pr-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all" />
+                    </div>
+                </div>
+                <div class="pt-2">
+                    <label
+                        class="cursor-pointer label flex items-center justify-between bg-white/5 border border-black-border rounded-lg px-4 py-3 hover:border-gold-400/50 transition-all">
+                        <div>
+                            <span class="label-text text-white font-bold block">Approval Required</span>
+                            <span class="text-[10px] text-zinc-500 block mt-1">Require manual admin approval
+                                for new teams</span>
+                        </div>
+                        <input type="checkbox" [(ngModel)]="data.approvalRequired" class="toggle toggle-warning" />
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

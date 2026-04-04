@@ -1,0 +1,296 @@
+<div class="space-y-8">
+    <div>
+        <h1 class="text-3xl font-black text-white tracking-tight">Schedule & Timing</h1>
+        <p class="text-zinc-500 mt-1.5">Configure tournament duration, match windows, and auto-scheduling
+            tools.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Tournament Dates & Play Days -->
+        <div class="bg-black-card border border-black-border rounded-xl p-6 space-y-6">
+            <h2 class="text-lg font-bold text-white">Scheduling Window</h2>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Tournament
+                        Start</label>
+                    <input type="date" [(ngModel)]="data.startDate"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all [color-scheme:dark]" />
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Tournament
+                        End</label>
+                    <input type="date" [(ngModel)]="data.endDate"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all [color-scheme:dark]" />
+                </div>
+            </div>
+
+            <div>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Recurring
+                    Match Days</label>
+                <div class="flex flex-wrap gap-2">
+                    @for (day of ['MON','TUE','WED','THU','FRI','SAT','SUN']; track day) {
+                    <button (click)="toggleDay(day)"
+                        class="px-4 py-2 rounded-lg text-xs font-bold transition-all border"
+                        [ngClass]="data.matchDays[day]
+                            ? 'bg-gold-400 text-black border-gold-400 shadow-[0_0_10px_rgba(212,175,55,0.3)]'
+                            : 'bg-white/5 text-zinc-500 border-black-border hover:border-gold-400/30 hover:text-white'">
+                        {{ day }}
+                    </button>
+                    }
+                </div>
+            </div>
+
+            <div>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Allowed
+                    Time Slots</label>
+                <input type="text" [(ngModel)]="data.timeSlots" placeholder="e.g. 18:00, 20:00"
+                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all" />
+                <p class="text-[10px] text-zinc-500 mt-1">Comma separated times</p>
+            </div>
+        </div>
+
+        <!-- Match Durations -->
+        <div class="bg-black-card border border-black-border rounded-xl p-6 space-y-6">
+            <h2 class="text-lg font-bold text-white">Match Timing</h2>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Total
+                        Match Duration</label>
+                    <div class="relative">
+                        <input type="number" [(ngModel)]="data.matchDuration"
+                            class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all pr-12" />
+                        <span
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-xs font-bold">MIN</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Half
+                        Duration</label>
+                    <div class="relative">
+                        <input type="number" [(ngModel)]="data.halfDuration"
+                            class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all pr-12" />
+                        <span
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-xs font-bold">MIN</span>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Break
+                    Time (Halftime)</label>
+                <div class="relative w-1/2">
+                    <input type="number" [(ngModel)]="data.breakTime"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all pr-12" />
+                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-xs font-bold">MIN</span>
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-black-border flex gap-4">
+                <button (click)="generateSchedule()" [disabled]="isLoadingStructure()"
+                    class="flex-1 bg-gold-500 hover:bg-gold-400 text-black px-4 py-3 rounded-lg font-bold text-sm transition-colors flex justify-center items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    {{ isLoadingStructure() ? 'Generating...' : 'Auto-Generate Schedule' }}
+                </button>
+                <button (click)="startManualEditor()"
+                    class="flex-1 bg-white/5 border border-black-border hover:border-gold-400/50 hover:bg-white/10 text-white px-4 py-3 rounded-lg font-bold text-sm transition-all flex justify-center items-center gap-2">
+                    Manual Match Editor
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Match Preview -->
+    @if (structure()?.matches && structure()?.matches?.length > 0) {
+    <div class="mt-8">
+        <h2 class="text-xl font-bold text-white mb-4">Generated Matches ({{structure().matches.length}})</h2>
+        <div class="bg-black-card border border-black-border rounded-xl">
+            <div class="divide-y divide-black-border">
+                @for (match of structure().matches; track match.id) {
+                <div class="p-4 flex items-center justify-between hover:bg-white/5 transition-colors">
+                    <div class="flex items-center gap-4 flex-1">
+                        <span class="text-xs font-bold text-zinc-500 w-24 text-center">{{match.stage?.name ||
+                            'Match'}}</span>
+
+                        <div class="flex-1 flex justify-end items-center gap-2">
+                            <span class="text-sm font-bold text-white">{{match.homeTeam?.name || 'TBD'}}</span>
+                        </div>
+                        <div
+                            class="bg-zinc-900 border border-zinc-800 px-3 py-1 rounded text-sm font-black text-white w-16 text-center shrink-0 shadow-inner">
+                            <span
+                                *ngIf="match.homeScore !== undefined && match.homeScore !== null">{{match.homeScore}}</span>
+                            <span *ngIf="match.homeScore === undefined || match.homeScore === null">-</span>
+                            :
+                            <span
+                                *ngIf="match.awayScore !== undefined && match.homeScore !== null">{{match.awayScore}}</span>
+                            <span *ngIf="match.awayScore === undefined || match.homeScore === null">-</span>
+                        </div>
+                        <div class="flex-1 flex justify-start items-center gap-2">
+                            <span class="text-sm font-bold text-white">{{match.awayTeam?.name || 'TBD'}}</span>
+                        </div>
+
+                        <div class="ml-4 flex items-center">
+                            <button (click)="openMatchEditor(match)"
+                                class="p-2 rounded-lg text-zinc-500 hover:text-gold-400 hover:bg-gold-500/10 transition-colors"
+                                title="Edit Match Schedule">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Added Schedule Details Row -->
+                    <div *ngIf="match.startTime || match.venue"
+                        class="mt-2 flex items-center justify-center gap-4 text-[10px] text-zinc-500 font-bold uppercase tracking-wider">
+                        <div *ngIf="match.startTime" class="flex items-center gap-1.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gold-500/70" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            {{ match.startTime | date:'medium' }}
+                        </div>
+                        <div *ngIf="match.venue" class="flex items-center gap-1.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gold-500/70" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            {{ match.venue }}
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+    } @else {
+    <div
+        class="mt-8 bg-black-card border border-black-border rounded-xl p-8 flex flex-col items-center justify-center text-center">
+        <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-zinc-600" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2">No Matches Scheduled Yet</h3>
+        <p class="text-sm text-zinc-500 max-w-md">Click "Auto-Generate Schedule" above to generate your tournament
+            matches. Once generated, you can edit venue, time, and referees for each individual match.</p>
+    </div>
+    }
+</div>
+
+<!-- ============================================================ -->
+<!-- MATCH SCHEDULING MODAL                                      -->
+<!-- ============================================================ -->
+<div *ngIf="editingMatch" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="closeMatchEditor()"></div>
+
+    <!-- Modal Content -->
+    <div
+        class="relative w-full max-w-lg bg-black-card border border-black-border rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <!-- Header -->
+        <div class="px-6 py-5 border-b border-black-border bg-zinc-900/50 flex items-center justify-between">
+            <div>
+                <h3 class="text-lg font-black text-white">Edit Schedule</h3>
+                <p class="text-sm text-zinc-400 mt-1">{{ editingMatch.homeTeam?.name || 'TBD' }} vs {{
+                    editingMatch.awayTeam?.name || 'TBD' }}</p>
+            </div>
+            <button (click)="closeMatchEditor()" class="text-zinc-500 hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6 overflow-y-auto space-y-5">
+            <!-- Start Time -->
+            <div>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Match Date &
+                    Time</label>
+                <input type="datetime-local" [(ngModel)]="editingMatch.matchTime"
+                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all [color-scheme:dark]" />
+            </div>
+
+            <!-- Venue -->
+            <div>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Venue /
+                    Pitch</label>
+                <input type="text" [(ngModel)]="editingMatch.venue" placeholder="e.g. Main Stadium"
+                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all" />
+            </div>
+
+            <!-- Break Duration -->
+            <div>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Extra Break
+                    Duration (Minutes)</label>
+                <input type="number" [(ngModel)]="editingMatch.breakDuration" placeholder="e.g. 15"
+                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all" />
+            </div>
+
+            <!-- Referees -->
+            <div>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Match
+                    Referees</label>
+                <input type="text" [(ngModel)]="editingMatch.matchReferees" placeholder="e.g. John Doe, Jane Smith"
+                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all" />
+            </div>
+
+            <!-- Events -->
+            <div>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Events /
+                    Notes</label>
+                <textarea [(ngModel)]="editingMatch.events" rows="3"
+                    placeholder="Any special events or notes for this match..."
+                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all resize-none"></textarea>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="px-6 py-4 border-t border-black-border bg-zinc-900/50 flex items-center justify-between gap-3">
+            <div class="flex gap-2">
+                <button (click)="editPrevMatch()" [disabled]="!hasPrevMatch"
+                    class="px-3 py-2 bg-white/5 disabled:opacity-30 border border-black-border rounded-lg text-white hover:bg-white/10 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <button (click)="editNextMatch()" [disabled]="!hasNextMatch"
+                    class="px-3 py-2 bg-white/5 disabled:opacity-30 border border-black-border rounded-lg text-white hover:bg-white/10 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="flex gap-3">
+                <button (click)="closeMatchEditor()"
+                    class="px-4 py-2 rounded-lg text-sm font-bold text-zinc-400 hover:text-white transition-colors">
+                    Cancel
+                </button>
+                <button (click)="saveMatchSchedule()" [disabled]="isSavingMatch()"
+                    class="px-6 py-2 bg-gold-500 hover:bg-gold-400 text-black rounded-lg text-sm font-bold transition-colors flex items-center gap-2">
+                    <span *ngIf="isSavingMatch()"
+                        class="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin"></span>
+                    {{ isSavingMatch() ? 'Saving...' : 'Save Schedule' }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

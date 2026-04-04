@@ -1,0 +1,79 @@
+<div class="px-6 py-8 mx-auto max-w-5xl">
+    <div class="mb-8 flex flex-col items-center justify-center text-center">
+        <h1 class="text-4xl font-black text-white tracking-tight uppercase">Match Center</h1>
+        <p class="text-zinc-500 mt-2 tracking-wide text-sm font-bold uppercase">Tournament Live Coverage</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex justify-center mb-8">
+        <div class="bg-black border border-black-border rounded-xl p-1.5 flex gap-1 shadow-2xl">
+            <button (click)="setTab('scheduled')" [class.bg-white]="activeTab() === 'scheduled'"
+                [class.text-black]="activeTab() === 'scheduled'" [class.text-zinc-500]="activeTab() !== 'scheduled'"
+                [class.hover:text-white]="activeTab() !== 'scheduled'"
+                class="px-6 py-2.5 rounded-lg text-sm font-bold transition-all relative">
+                Scheduled
+            </button>
+            <button (click)="setTab('live')" [class.bg-gold-500]="activeTab() === 'live'"
+                [class.text-black]="activeTab() === 'live'" [class.text-zinc-500]="activeTab() !== 'live'"
+                [class.hover:text-white]="activeTab() !== 'live'"
+                class="px-6 py-2.5 rounded-lg text-sm font-bold transition-all overflow-hidden relative">
+                Live
+                <span *ngIf="activeTab() === 'live'" class="absolute top-1 right-2 flex h-2 w-2">
+                    <span
+                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
+                </span>
+            </button>
+            <button (click)="setTab('completed')" [class.bg-white]="activeTab() === 'completed'"
+                [class.text-black]="activeTab() === 'completed'" [class.text-zinc-500]="activeTab() !== 'completed'"
+                [class.hover:text-white]="activeTab() !== 'completed'"
+                class="px-6 py-2.5 rounded-lg text-sm font-bold transition-all relative">
+                Completed
+            </button>
+        </div>
+    </div>
+
+    <!-- Match List -->
+    <div class="space-y-4 relative min-h-[400px]">
+        @if (isLoading()) {
+        <div class="absolute inset-0 flex items-center justify-center">
+            <div class="w-10 h-10 rounded-full border-4 border-gold-400 border-t-transparent animate-spin"></div>
+        </div>
+        } @else if (matches().length === 0) {
+        <div
+            class="absolute inset-0 flex flex-col items-center justify-center text-center p-8 bg-black-card border border-black-border rounded-xl">
+            <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-zinc-600" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2 uppercase tracking-wide">No Matches</h3>
+            <p class="text-sm text-zinc-500 max-w-sm">No {{activeTab()}} matches found for this tournament.</p>
+        </div>
+        } @else {
+            @if (activeTab() === 'scheduled') {
+                @for (group of matches(); track group.date) {
+                    <div class="mb-8">
+                        <div class="flex items-center gap-4 mb-4">
+                            <h4 class="text-sm font-black text-zinc-400 uppercase tracking-widest">{{ group.date | date:'mediumDate' }}</h4>
+                            <div class="flex-1 h-px bg-black-border"></div>
+                        </div>
+                        <div class="space-y-4">
+                            @for (match of group.matches; track match.id) {
+                                <app-match-card [match]="match" [activeTab]="activeTab()" (cardClick)="goToDetails($event)">
+                                </app-match-card>
+                            }
+                        </div>
+                    </div>
+                }
+            } @else {
+                @for (match of matches(); track match.id) {
+                    <app-match-card [match]="match" [activeTab]="activeTab()" (cardClick)="goToDetails($event)">
+                    </app-match-card>
+                }
+            }
+        }
+    </div>
+</div>

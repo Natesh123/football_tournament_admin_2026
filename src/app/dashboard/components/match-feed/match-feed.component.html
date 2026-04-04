@@ -1,0 +1,205 @@
+<div>
+    <!-- Loading State -->
+    @if (isLoading()) {
+    <div class="space-y-4 mt-6 animate-pulse">
+        @for (i of [1,2,3]; track i) {
+        <div class="bg-black-card border border-black-border rounded-xl p-6 h-32"></div>
+        }
+    </div>
+    } @else {
+
+    <!-- Section Tabs -->
+    <div class="flex items-center gap-6 border-b border-black-border pb-2">
+        <button (click)="switchTab('live')" class="font-bold pb-2 relative flex items-center gap-2 transition-colors"
+            [ngClass]="{'text-gold-400 border-b-2 border-gold-400': currentTab() === 'live', 'text-text-muted hover:text-text-main': currentTab() !== 'live'}">
+            {{ 'MATCH_FEED.TABS.LIVE' | translate }}
+            @if(currentTab() === 'live') {
+            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            }
+        </button>
+        <button (click)="switchTab('upcoming')" class="font-bold pb-2 transition-colors"
+            [ngClass]="{'text-gold-400 border-b-2 border-gold-400': currentTab() === 'upcoming', 'text-text-muted hover:text-text-main': currentTab() !== 'upcoming'}">
+            {{ 'MATCH_FEED.TABS.UPCOMING' | translate }}
+        </button>
+        <button (click)="switchTab('past')" class="font-bold pb-2 transition-colors"
+            [ngClass]="{'text-gold-400 border-b-2 border-gold-400': currentTab() === 'past', 'text-text-muted hover:text-text-main': currentTab() !== 'past'}">
+            {{ 'MATCH_FEED.TABS.PAST' | translate }}
+        </button>
+        <div class="ml-auto">
+            <a [routerLink]="['/matches']"
+                class="text-xs font-bold text-text-muted hover:text-white hover:underline flex items-center gap-1 transition-colors">
+                {{ 'MATCH_FEED.VIEW_ALL' | translate }}
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+            </a>
+        </div>
+    </div>
+
+    <!-- LIVE MATCHES -->
+    @if (currentTab() === 'live') {
+    @if (liveMatches().length === 0) {
+    <div class="mt-10 text-center text-text-muted py-12">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-3 opacity-30" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+        </svg>
+        <p class="font-bold">No live matches right now</p>
+        <p class="text-sm mt-1">Check back soon or view upcoming matches</p>
+    </div>
+    } @else {
+    <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6 mt-6">
+        @for (match of liveMatches(); track match.id) {
+        <a [routerLink]="['/tournaments', match.tournamentId, 'matches', match.id]"
+            class="bg-black-card border border-black-border rounded-xl p-6 relative group transition-all duration-300 transform hover:border-gold-400 hover:border-2 hover:-translate-y-2 hover:shadow-[0_0_30px_rgba(250,204,21,0.3)] block cursor-pointer">
+            <!-- Live badge -->
+            <div
+                class="absolute top-4 right-4 bg-zinc-800 text-xs px-2 py-1 rounded text-gold-400 font-mono border border-black-border flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse inline-block"></span>
+                {{ 'MATCH_FEED.LIVE_MATCH.STATUS' | translate }} • {{ match.liveMinute }}'
+            </div>
+            <div class="mb-4">
+                <div class="text-gold-400 text-xs font-bold uppercase tracking-wider">{{ match.tournament }}</div>
+            </div>
+            <!-- Score Row -->
+            <div class="flex items-center justify-between">
+                <div class="text-center w-1/3">
+                    <div class="w-14 h-14 mx-auto bg-zinc-800 rounded-full mb-3 flex items-center justify-center border border-zinc-700">
+                        <span class="text-sm font-bold text-zinc-400">{{ match.homeTeam.charAt(0) }}</span>
+                    </div>
+                    <div class="font-bold text-sm truncate">{{ match.homeTeam }}</div>
+                </div>
+                <div class="text-center w-1/3">
+                    <div class="text-4xl font-extrabold italic font-mono text-white">{{ match.homeScore }} - {{ match.awayScore }}</div>
+                </div>
+                <div class="text-center w-1/3">
+                    <div class="w-14 h-14 mx-auto bg-zinc-800 rounded-full mb-3 flex items-center justify-center border border-zinc-700">
+                        <span class="text-sm font-bold text-zinc-400">{{ match.awayTeam.charAt(0) }}</span>
+                    </div>
+                    <div class="font-bold text-sm truncate">{{ match.awayTeam }}</div>
+                </div>
+            </div>
+            <!-- Goal Scorers -->
+            @if (match.goalScorers.length > 0) {
+            <div class="mt-4 pt-4 border-t border-black-border text-xs text-text-muted truncate">
+                ⚽ {{ match.goalScorers.join(' · ') }}
+            </div>
+            }
+            @if (match.venue) {
+            <div class="mt-2 text-xs text-text-muted">📍 {{ match.venue }}</div>
+            }
+        </a>
+        }
+    </div>
+    }
+    }
+
+    <!-- UPCOMING MATCHES -->
+    @if (currentTab() === 'upcoming') {
+    @if (upcomingGrouped().length === 0) {
+    <div class="mt-10 text-center text-text-muted py-12">
+        <p class="font-bold">No upcoming matches scheduled</p>
+    </div>
+    } @else {
+    <div class="space-y-6 mt-6">
+        @for (group of upcomingGrouped(); track group.date) {
+        <div>
+            <h3 class="text-gold-400 font-bold uppercase tracking-wider text-sm mb-3 pl-1">{{ group.date }}</h3>
+            <div class="divide-y divide-black-border">
+                @for (match of group.matches; track match.id) {
+                <a [routerLink]="['/tournaments', match.tournamentId, 'matches', match.id]" class="group p-4 flex flex-col transition-all duration-500 relative first:rounded-t-xl last:rounded-b-xl hover:z-10 bg-black-card border border-transparent hover:border-gold-400 hover:border-2 hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(250,204,21,0.2)] block cursor-pointer">
+                    <div class="flex items-center justify-between w-full">
+                        <div class="flex items-center gap-4 text-xs font-mono text-text-muted w-24">
+                            <span class="font-bold text-text-main">{{ match.time }}</span>
+                        </div>
+                        <div class="flex items-center gap-8 flex-1 justify-center">
+                            <span class="font-bold text-right w-1/3">{{ match.homeTeam }}</span>
+                            <span class="text-gold-400 text-xs font-bold">VS</span>
+                            <span class="font-bold text-left w-1/3">{{ match.awayTeam }}</span>
+                        </div>
+                        <div class="w-24 flex justify-end">
+                            <button class="text-xs border border-gold-400 text-gold-400 px-3 py-1 rounded hover:bg-gold-400 hover:text-black transition-colors font-bold uppercase tracking-wider">
+                                {{ 'MATCH_FEED.UPCOMING_MATCH.REMIND' | translate }}
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Expanded Details on hover -->
+                    <div class="max-h-0 overflow-hidden group-hover:max-h-20 transition-all duration-500 ease-in-out opacity-0 group-hover:opacity-100 w-full border-t border-white/10 mt-0 group-hover:mt-4">
+                        <div class="pt-3 flex justify-between text-xs">
+                            <div class="flex flex-col">
+                                <span class="text-gold-400 uppercase tracking-wider text-[10px] font-bold">{{ 'MATCH_FEED_LABELS.VENUE' | translate }}</span>
+                                <span class="text-white font-mono">{{ match.venue || '—' }}</span>
+                            </div>
+                            <div class="flex flex-col text-right">
+                                <span class="text-gold-400 uppercase tracking-wider text-[10px] font-bold">{{ 'MATCH_FEED_LABELS.KICKOFF' | translate }}</span>
+                                <span class="text-white font-mono">{{ match.time }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                }
+            </div>
+        </div>
+        }
+    </div>
+    }
+    }
+
+    <!-- PAST MATCHES -->
+    @if (currentTab() === 'past') {
+    @if (pastGrouped().length === 0) {
+    <div class="mt-10 text-center text-text-muted py-12">
+        <p class="font-bold">No past matches found</p>
+    </div>
+    } @else {
+    <div class="space-y-6 mt-6">
+        @for (group of pastGrouped(); track group.date) {
+        <div>
+            <h3 class="text-text-muted font-bold uppercase tracking-wider text-sm mb-3 pl-1">{{ group.date }}</h3>
+            <div class="divide-y divide-black-border">
+                @for (match of group.matches; track match.id) {
+                <a [routerLink]="['/tournaments', match.tournamentId, 'matches', match.id]" class="group p-4 flex flex-col transition-all duration-500 relative first:rounded-t-xl last:rounded-b-xl hover:z-10 bg-black-card border border-transparent hover:border-gold-400 hover:border-2 hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(250,204,21,0.2)] block cursor-pointer">
+                    <div class="flex items-center justify-between w-full">
+                        <div class="flex items-center gap-4 text-xs font-mono text-text-muted w-24">
+                            <span class="px-2 py-0.5 rounded bg-zinc-800 text-[10px]">{{ match.status }}</span>
+                        </div>
+                        <div class="flex items-center gap-8 flex-1 justify-center">
+                            <span class="font-bold text-right w-1/3 text-text-muted">{{ match.homeTeam }}</span>
+                            <span class="text-white text-lg font-bold font-mono">{{ match.score }}</span>
+                            <span class="font-bold text-left w-1/3 text-text-muted">{{ match.awayTeam }}</span>
+                        </div>
+                        <div class="w-24 flex justify-end">
+                            <span class="text-xs text-text-muted group-hover:text-white transition-colors font-bold uppercase tracking-wider flex items-center gap-1">
+                                {{ 'MATCH_FEED.PAST_MATCH.DETAILS' | translate }}
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+                    <!-- Expanded Details on hover -->
+                    <div class="max-h-0 overflow-hidden group-hover:max-h-20 transition-all duration-500 ease-in-out opacity-0 group-hover:opacity-100 w-full border-t border-white/10 mt-0 group-hover:mt-4">
+                        <div class="pt-3 flex justify-between text-xs">
+                            <div class="flex flex-col">
+                                <span class="text-gold-400 uppercase tracking-wider text-[10px] font-bold">{{ 'MATCH_FEED_LABELS.VENUE' | translate }}</span>
+                                <span class="text-white font-mono">{{ match.venue || '—' }}</span>
+                            </div>
+                            <div class="flex flex-col text-right">
+                                <span class="text-gold-400 uppercase tracking-wider text-[10px] font-bold">{{ 'MATCH_FEED_LABELS.WINNER' | translate }}</span>
+                                <span class="text-white font-mono">{{ match.winner }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                }
+            </div>
+        </div>
+        }
+    </div>
+    }
+    }
+
+    } <!-- end @else (not loading) -->
+</div>

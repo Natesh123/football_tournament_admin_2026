@@ -1,0 +1,203 @@
+<div class="space-y-8">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+            <h1 class="text-3xl font-black text-white tracking-tight">Tournament Matches</h1>
+            <p class="text-zinc-500 mt-1.5">View and manage all matches scheduled for this tournament.</p>
+        </div>
+
+        <!-- Match Status Tabs -->
+        <div class="flex items-center gap-2 p-1 bg-black-card border border-black-border rounded-xl w-fit">
+            <button (click)="activeTab.set('upcoming')"
+                [class]="activeTab() === 'upcoming' ? 'bg-white/10 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5'"
+                class="px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Upcoming
+            </button>
+            <button (click)="activeTab.set('live')"
+                [class]="activeTab() === 'live' ? 'bg-gold-500/20 text-gold-400 border-gold-500/30' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5 border-transparent'"
+                class="px-4 py-2 rounded-lg text-sm font-bold transition-all border flex items-center gap-2 cursor-pointer">
+                <span class="relative flex h-2 w-2">
+                    <span *ngIf="activeTab() === 'live'"
+                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-gold-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2"
+                        [class]="activeTab() === 'live' ? 'bg-gold-500' : 'bg-zinc-500'"></span>
+                </span>
+                Live
+            </button>
+            <button (click)="activeTab.set('past')"
+                [class]="activeTab() === 'past' ? 'bg-white/10 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5'"
+                class="px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Past
+            </button>
+        </div>
+    </div>
+    @if (isLoading()) {
+    <div class="space-y-4">
+        @for (i of [1,2,3,4,5]; track $index) {
+        <div class="h-20 bg-black-card border border-black-border rounded-xl skeleton opacity-30"></div>
+        }
+    </div>
+    } @else if (structure()?.matches && structure()?.matches?.length > 0) {
+    <div *ngIf="filteredMatches().length > 0" class="bg-black-card border border-black-border rounded-xl">
+        <div class="divide-y divide-black-border">
+            @for (match of filteredMatches(); track match.id) {
+            <div (click)="openMatchDetails(match.id)" class="p-4 flex items-center justify-between hover:bg-zinc-800/80 transition-colors cursor-pointer group">
+                <div class="flex items-center gap-4 flex-1">
+                    <span class="text-xs font-bold text-zinc-500 w-24 text-center">{{match.stage?.name ||
+                        'Match'}}</span>
+
+                    <div class="flex-1 flex justify-end items-center gap-2">
+                        <span class="text-sm font-bold text-white">{{match.homeTeam?.name || 'TBD'}}</span>
+                    </div>
+                    <div
+                        class="bg-zinc-900 border border-zinc-800 px-3 py-1 rounded text-sm font-black text-white w-16 text-center shrink-0 shadow-inner">
+                        <span
+                            *ngIf="match.homeScore !== undefined && match.homeScore !== null">{{match.homeScore}}</span>
+                        <span *ngIf="match.homeScore === undefined || match.homeScore === null">-</span>
+                        :
+                        <span
+                            *ngIf="match.awayScore !== undefined && match.homeScore !== null">{{match.awayScore}}</span>
+                        <span *ngIf="match.awayScore === undefined || match.homeScore === null">-</span>
+                    </div>
+                    <div class="flex-1 flex justify-start items-center gap-2">
+                        <span class="text-sm font-bold text-white">{{match.awayTeam?.name || 'TBD'}}</span>
+                    </div>
+
+                    <div class="ml-4 flex items-center gap-2">
+                        <button (click)="openMatchDetails(match.id); $event.stopPropagation()"
+                            class="px-4 py-2 rounded-lg bg-white/5 border border-black-border group-hover:bg-gold-500 group-hover:text-black font-bold text-[10px] uppercase tracking-wider text-zinc-400 transition-all shadow-[0_4px_10px_rgba(0,0,0,0.5)]">
+                            Manage Result
+                        </button>
+                    </div>
+                </div>
+
+                <div *ngIf="match.startTime || match.venue"
+                    class="mt-2 flex items-center justify-center gap-4 flex-col lg:flex-row text-[10px] text-zinc-500 font-bold uppercase tracking-wider">
+                    <div *ngIf="match.startTime" class="flex items-center gap-1.5 min-w-[max-content]">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gold-500/70" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {{ match.startTime | date:'medium' }}
+                    </div>
+                    <div *ngIf="match.venue" class="flex items-center gap-1.5 min-w-[max-content]">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gold-500/70" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        {{ match.venue }}
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+
+    <div *ngIf="filteredMatches().length === 0"
+        class="mt-8 bg-black-card border border-black-border rounded-xl p-8 flex flex-col items-center justify-center text-center">
+        <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+            <svg *ngIf="activeTab() === 'upcoming'" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-zinc-600"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <svg *ngIf="activeTab() === 'live'" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-zinc-600"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <svg *ngIf="activeTab() === 'past'" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-zinc-600"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2">No {{ activeTab() | titlecase }} Matches</h3>
+        <p class="text-sm text-zinc-500 max-w-md">There are no {{ activeTab() }} matches for this tournament at the
+            moment.</p>
+    </div>
+
+    } @else {
+    <div
+        class="mt-8 bg-black-card border border-black-border rounded-xl p-8 flex flex-col items-center justify-center text-center">
+        <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-zinc-600" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2">No Matches Found</h3>
+        <p class="text-sm text-zinc-500 max-w-md">There are no matches scheduled for this tournament yet. Generate a
+            schedule first.</p>
+    </div>
+    }
+</div>
+
+<!-- MATCH SCHEDULING MODAL -->
+<div *ngIf="editingMatch" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="closeMatchEditor()"></div>
+    <div
+        class="relative w-full max-w-lg bg-black-card border border-black-border rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div class="px-6 py-5 border-b border-black-border bg-zinc-900/50 flex items-center justify-between">
+            <div>
+                <h3 class="text-lg font-black text-white">Edit Match</h3>
+                <p class="text-sm text-zinc-400 mt-1">{{ editingMatch.homeTeam?.name || 'TBD' }} vs {{
+                    editingMatch.awayTeam?.name || 'TBD' }}</p>
+            </div>
+            <button (click)="closeMatchEditor()" class="text-zinc-500 hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="p-6 overflow-y-auto space-y-5">
+            <div>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Match Date &
+                    Time</label>
+                <input type="datetime-local" [(ngModel)]="editingMatch.matchTime"
+                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all [color-scheme:dark]" />
+            </div>
+            <div>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Venue /
+                    Pitch</label>
+                <input type="text" [(ngModel)]="editingMatch.venue" placeholder="e.g. Main Stadium"
+                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all" />
+            </div>
+            <div>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Match
+                    Referees</label>
+                <input type="text" [(ngModel)]="editingMatch.matchReferees" placeholder="e.g. John Doe"
+                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all" />
+            </div>
+        </div>
+
+        <div class="px-6 py-4 border-t border-black-border bg-zinc-900/50 flex justify-end gap-3">
+            <button (click)="closeMatchEditor()"
+                class="px-4 py-2 rounded-lg text-sm font-bold text-zinc-400 hover:text-white transition-colors">Cancel</button>
+            <button (click)="saveMatchSchedule()" [disabled]="isSavingMatch()"
+                class="px-6 py-2 bg-gold-500 hover:bg-gold-400 text-black rounded-lg text-sm font-bold transition-colors flex items-center gap-2">
+                <span *ngIf="isSavingMatch()"
+                    class="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin"></span>
+                {{ isSavingMatch() ? 'Saving...' : 'Save' }}
+            </button>
+        </div>
+    </div>
+</div>
