@@ -1,7 +1,8 @@
-import { Component, Input, OnInit, signal, inject } from '@angular/core';
+import { Component, Input, OnInit, signal, inject, HostListener, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TournamentService } from '../../../tournament/tournament.service';
+import { UiService } from '../../../services/ui.service';
 
 @Component({
     selector: 'app-tournament-schedule',
@@ -14,63 +15,130 @@ export class TournamentScheduleComponent implements OnInit {
     @Input() tournamentId!: string;
 
     private tournamentService = inject(TournamentService);
+    public ui = inject(UiService);
+    private elRef = inject(ElementRef);
+
     structure = signal<any>(null);
     isLoadingStructure = signal(false);
+    isSavingMatch = signal(false);
 
-    ngOnInit() {
-        if (this.tournamentId) {
-            this.loadStructure();
+    // ─── Time Slot Dropdown ──────────────────────────────────────────────────
+    isTimeSlotDropdownOpen = signal(false);
+    timeSlotSearchQuery = signal('');
+
+    availableTimeSlots = Array.from({ length: 48 }, (_, i) => {
+        const hours = Math.floor(i / 2).toString().padStart(2, '0');
+        const minutes = i % 2 === 0 ? '00' : '30';
+        return `${hours}:${minutes}`;
+    });
+
+    @HostListener('document:click', ['$event'])
+    onClickOutside(event: any) {
+        if (event?.target && !this.elRef.nativeElement.contains(event.target)) {
+            this.isTimeSlotDropdownOpen.set(false);
         }
+    }
+
+    toggleDropdown() {
+        this.isTimeSlotDropdownOpen.set(!this.isTimeSlotDropdownOpen());
+    }
+
+    updateSearchQuery(val: string) {
+        this.timeSlotSearchQuery.set(val);
+    }
+
+    get filteredTimeSlots() {
+        const query = this.timeSlotSearchQuery().toLowerCase().trim();
+        return this.availableTimeSlots.filter(t => t.toLowerCase().includes(query));
+    }
+
+    get selectedTimeSlots(): string[] {
+        if (!this.data?.timeSlots) return [];
+        return this.data.timeSlots.split(',').map((s: string) => s.trim()).filter((s: string) => s.length > 0);
+    }
+
+    toggleTimeSlot(slot: string) {
+        let selected = [...this.selectedTimeSlots];
+        if (selected.includes(slot)) {
+            selected = selected.filter(s => s !== slot);
+        } else {
+            selected.push(slot);
+            selected.sort();
+        }
+        this.data.timeSlots = selected.join(', ');
+    }
+
+    removeTimeSlot(slot: string, event: Event) {
+        event.stopPropagation();
+        this.toggleTimeSlot(slot);
+    }
+
+    onTimeSlotsChange(event: Event) {
+        const select = event.target as HTMLSelectElement;
+        const selected: string[] = [];
+        for (let i = 0; i < select.options.length; i++) {
+            if (select.options[i].selected) selected.push(select.options[i].value);
+        }
+        this.data.timeSlots = selected.join(', ');
+    }
+
+    // ─── Lifecycle ───────────────────────────────────────────────────────────
+    ngOnInit() {
+        if (this.tournamentId) this.loadStructure();
     }
 
     loadStructure() {
         this.isLoadingStructure.set(true);
         this.tournamentService.getStructure(this.tournamentId).subscribe({
-            next: (data: any) => {
-                this.structure.set(data);
-                this.isLoadingStructure.set(false);
-            },
-            error: (err: any) => {
-                console.error("Failed to load tournament structure", err);
-                this.isLoadingStructure.set(false);
-            }
+            next: (data: any) => { this.structure.set(data); this.isLoadingStructure.set(false); },
+            error: () => { this.isLoadingStructure.set(false); }
         });
     }
 
+    // ─── Auto Generate ───────────────────────────────────────────────────────
     generateSchedule() {
         if (!this.tournamentId) return;
-        this.isLoadingStructure.set(true);
+
+        if (!this.data?.startDate) {
+            this.ui.showToast('Please select a Tournament Start Date.', 'error');
+            return;
+        }
+        if (this.selectedTimeSlots.length === 0) {
+            this.ui.showToast('Please select at least one Allowed Time Slot.', 'error');
+            return;
+        }
+
+        this.ui.startAction();
         this.tournamentService.generateStructure(this.tournamentId, this.data).subscribe({
             next: (data: any) => {
                 this.structure.set(data);
-                this.isLoadingStructure.set(false);
+                this.ui.endAction();
+                this.ui.showToast('Schedule generated successfully!', 'success');
             },
             error: (err: any) => {
-                console.error("Failed to generate tournament structure", err);
-                this.isLoadingStructure.set(false);
+                this.ui.endAction();
+                this.ui.showToast(err?.error?.message || 'Failed to generate schedule', 'error');
             }
         });
     }
 
     toggleDay(day: string) {
-        this.data.matchDays[day] = !this.data.matchDays[day];
+        if (this.data?.matchDays) this.data.matchDays[day] = !this.data.matchDays[day];
     }
 
-    // ─── Match Scheduling Modal ──────────────────────────────────────────────
+    // ─── Match Editor Modal ───────────────────────────────────────────────────
     editingMatch: any = null;
-    isSavingMatch = signal(false);
 
     startManualEditor() {
-        if (this.structure()?.matches && this.structure().matches.length > 0) {
-            this.openMatchEditor(this.structure().matches[0]);
+        const matches = this.structure()?.matches;
+        if (matches && matches.length > 0) {
+            this.openMatchEditor(matches[0]);
         }
     }
 
     openMatchEditor(match: any) {
-        // Create a copy to edit without affecting the list until saved
         this.editingMatch = {
             ...match,
-            // ensure date is formatted for datetime-local input
             matchTime: match.startTime ? new Date(match.startTime).toISOString().slice(0, 16) : ''
         };
     }
@@ -81,8 +149,7 @@ export class TournamentScheduleComponent implements OnInit {
 
     get hasPrevMatch(): boolean {
         if (!this.editingMatch || !this.structure()?.matches) return false;
-        const idx = this.structure().matches.findIndex((m: any) => m.id === this.editingMatch.id);
-        return idx > 0;
+        return this.structure().matches.findIndex((m: any) => m.id === this.editingMatch.id) > 0;
     }
 
     get hasNextMatch(): boolean {
@@ -107,31 +174,41 @@ export class TournamentScheduleComponent implements OnInit {
 
     saveMatchSchedule() {
         if (!this.editingMatch) return;
+
+        const matchId = this.editingMatch.id;
+        if (!matchId) {
+            this.ui.showToast('Cannot save: match ID is missing', 'error');
+            return;
+        }
+
         this.isSavingMatch.set(true);
 
         const payload = {
-            venue: this.editingMatch.venue,
+            venue: this.editingMatch.venue ?? null,
             matchTime: this.editingMatch.matchTime || null,
-            breakDuration: this.editingMatch.breakDuration,
-            events: this.editingMatch.events,
-            matchReferees: this.editingMatch.matchReferees
+            breakDuration: this.editingMatch.breakDuration ?? null,
+            matchReferees: this.editingMatch.matchReferees ?? null
         };
 
-        this.tournamentService.updateMatchSchedule(this.editingMatch.id, payload).subscribe({
-            next: (updatedMatch: any) => {
-                // Update local structure with the updated match
+        this.tournamentService.updateMatchSchedule(matchId, payload).subscribe({
+            next: (res: any) => {
+                const updated = res?.data || res;
                 const struct = this.structure();
-                if (struct && struct.matches) {
-                    const idx = struct.matches.findIndex((m: any) => m.id === this.editingMatch.id);
+                if (struct?.matches) {
+                    const idx = struct.matches.findIndex((m: any) => m.id === matchId);
                     if (idx !== -1) {
-                        struct.matches[idx] = { ...struct.matches[idx], ...updatedMatch.data };
-                        // Trigger reactivity
+                        struct.matches[idx] = { ...struct.matches[idx], ...updated };
                         this.structure.set({ ...struct });
                     }
                 }
                 this.isSavingMatch.set(false);
+                this.ui.showToast('Schedule saved successfully', 'success');
+                this.closeMatchEditor();
             },
-            error: () => this.isSavingMatch.set(false)
+            error: (err: any) => {
+                this.isSavingMatch.set(false);
+                this.ui.showToast(err?.error?.message || 'Failed to save schedule', 'error');
+            }
         });
     }
 }

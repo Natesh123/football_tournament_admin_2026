@@ -37,16 +37,9 @@
             </div>
 
             <!-- General Info -->
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 gap-4">
                 <div>
-                    <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Formation</label>
-                    <input type="text" [(ngModel)]="currentData.formation"
-                        class="input input-bordered w-full bg-black border-zinc-800 text-sm text-white focus:outline-none focus:border-gold-500 transition-colors"
-                        placeholder="e.g. 4-3-3">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Coach
-                        Name</label>
+                    <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Coach Name</label>
                     <input type="text" [(ngModel)]="currentData.coach"
                         class="input input-bordered w-full bg-black border-zinc-800 text-sm text-white focus:outline-none focus:border-gold-500 transition-colors"
                         placeholder="Enter coach name">
@@ -57,7 +50,7 @@
             <div>
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-baseline gap-2">
-                        <h4 class="text-sm font-black text-white uppercase tracking-wider">Starting XI</h4>
+                        <h4 class="text-sm font-black text-white uppercase tracking-wider">Starting {{ startingLabel }}</h4>
                         <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 uppercase">
                             {{ currentStartingCount }} / {{ playersOnField }} Players
                         </span>
@@ -198,7 +191,7 @@
     <div class="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
         <div class="p-4 border-b border-zinc-800 flex items-center justify-between bg-black/20">
             <div>
-                <h4 class="text-sm font-black text-white uppercase tracking-wider">Select {{ pickerType === 'starting' ? 'Starting XI' : 'Substitutes' }}</h4>
+                <h4 class="text-sm font-black text-white uppercase tracking-wider">Select {{ startingLabel }}</h4>
                 <p class="text-[10px] text-zinc-500 uppercase font-bold mt-0.5">
                     {{ pickerType === 'starting' 
                         ? (currentStartingCount + selectedInPicker.size) + ' / ' + playersOnField + ' Max' 

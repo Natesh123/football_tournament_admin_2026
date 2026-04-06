@@ -114,6 +114,11 @@ export class TopBarComponent {
         this.auth.logout();
     }
 
+    openProfileModal() {
+        this.showProfileModal.set(true);
+        this.showProfile.set(false);
+    }
+
     @HostListener('document:click', ['$event'])
     onDocumentClick(event: Event) {
         const target = event.target as HTMLElement;

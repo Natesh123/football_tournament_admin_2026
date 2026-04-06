@@ -143,6 +143,7 @@
                         <th class="px-3 py-3 text-center">L</th>
                         <th class="px-3 py-3 text-center hidden sm:table-cell">GD</th>
                         <th class="px-4 py-3 text-center text-gold-400">Pts</th>
+                        <th class="px-4 py-3 text-center">Form</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-black-border text-xs sm:text-sm">
@@ -175,6 +176,13 @@
                             {{ team.goalDifference > 0 ? '+' : '' }}{{ team.goalDifference }}
                         </td>
                         <td class="px-4 py-3 text-center font-black text-gold-400 bg-gold-400/5">{{ team.points }}</td>
+                        <td class="px-4 py-3 text-center">
+                            <div class="flex items-center gap-1 justify-center">
+                                <div *ngFor="let res of team.form" [ngClass]="getFormColor(res)" class="w-5 h-5 rounded-sm text-[9px] flex items-center justify-center font-black border">
+                                    {{ res }}
+                                </div>
+                            </div>
+                        </td>
                     </tr>
                 </tbody>
             </table>

@@ -55,6 +55,7 @@ interface TournamentTeam {
 export class TournamentFormatComponent implements OnInit, OnChanges {
     @Input() data!: any;
     @Input() tournamentId!: string;
+    @Input() maxTeams: number = 16;
     @Output() formatChange = new EventEmitter<any>();
 
     private cdr = inject(ChangeDetectorRef);
@@ -106,12 +107,17 @@ export class TournamentFormatComponent implements OnInit, OnChanges {
 
     ngOnInit() {
         if (!this.data) { this.data = {}; }
+        this.calculateDefaults();
         this.initializeFromData();
         this.loadTeams();
     }
 
     ngOnChanges(changes: SimpleChanges) {
+        if (changes['maxTeams'] && !changes['data']?.isFirstChange()) {
+            this.calculateDefaults();
+        }
         if (changes['data']) {
+            this.calculateDefaults();
             this.initializeFromData();
             // Also load teams if tournamentId is already available but teams haven't loaded yet
             if (this.tournamentId && this.teamNames.length <= 1) {
@@ -121,6 +127,53 @@ export class TournamentFormatComponent implements OnInit, OnChanges {
         if (changes['tournamentId'] && this.tournamentId) {
             this.loadTeams();
         }
+    }
+
+    private calculateDefaults() {
+        if (!this.maxTeams) this.maxTeams = 16;
+        
+        let groups = 4;
+        let teamsPerG = 4;
+
+        if (this.maxTeams <= 4) {
+            groups = 1;
+            teamsPerG = this.maxTeams;
+        } else if (this.maxTeams <= 8) {
+            groups = 2;
+            teamsPerG = Math.floor(this.maxTeams / 2);
+        } else if (this.maxTeams <= 12) {
+            groups = 4;
+            teamsPerG = 3;
+        } else if (this.maxTeams <= 24) {
+            groups = 4;
+            teamsPerG = Math.floor(this.maxTeams / 4);
+        } else if (this.maxTeams <= 32) {
+            groups = 8;
+            teamsPerG = Math.floor(this.maxTeams / 8);
+        } else {
+            groups = 8;
+            teamsPerG = Math.floor(this.maxTeams / 8);
+        }
+
+        this.groupOnly_numGroups = groups;
+        this.groupOnly_teamsPerGroup = teamsPerG;
+        
+        this.gk_numGroups = groups;
+        this.gk_teamsPerGroup = teamsPerG;
+        // Default advancing: top 2 if possible, else 1
+        this.gk_advancingTeams = teamsPerG > 2 ? 2 : 1; 
+
+        // Knockout must be a power of 2
+        let koTeams = 2;
+        while (koTeams * 2 <= this.maxTeams) {
+            koTeams *= 2;
+        }
+        if (this.maxTeams === 4) koTeams = 4;
+        this.knockout_totalTeams = koTeams;
+
+        // Custom defaults
+        this.customGroup_numTeams = this.groupOnly_numGroups * this.groupOnly_teamsPerGroup;
+        this.customKnockout_numTeams = koTeams;
     }
 
     private loadTeams() {

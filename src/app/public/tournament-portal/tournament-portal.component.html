@@ -142,6 +142,7 @@
                                     <th class="pb-3 text-center w-12">L</th>
                                     <th class="pb-3 text-center w-12">GD</th>
                                     <th class="pb-3 text-center w-12 text-white">Pts</th>
+                                    <th class="pb-3 text-center w-24">Form</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -160,6 +161,17 @@
                                     <td class="py-4 text-center text-zinc-400">{{ team.lost }}</td>
                                     <td class="py-4 text-center text-zinc-400">{{ team.goalDifference > 0 ? '+' : '' }}{{ team.goalDifference }}</td>
                                     <td class="py-4 text-center font-black text-lg" style="color: var(--brand-color)">{{ team.points }}</td>
+                                    <td class="py-4">
+                                        <div class="flex items-center gap-1 justify-center">
+                                            <div *ngFor="let res of team.form" 
+                                                class="w-4 h-4 rounded-full text-[8px] flex items-center justify-center font-black text-black border border-black/20"
+                                                [class.bg-emerald-500]="res === 'W'"
+                                                [class.bg-rose-500]="res === 'L'"
+                                                [class.bg-zinc-500]="res === 'D'">
+                                                {{ res }}
+                                            </div>
+                                        </div>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>

@@ -25,28 +25,75 @@
                 </div>
             </div>
 
-            <div>
-                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Recurring
-                    Match Days</label>
-                <div class="flex flex-wrap gap-2">
-                    @for (day of ['MON','TUE','WED','THU','FRI','SAT','SUN']; track day) {
-                    <button (click)="toggleDay(day)"
-                        class="px-4 py-2 rounded-lg text-xs font-bold transition-all border"
-                        [ngClass]="data.matchDays[day]
-                            ? 'bg-gold-400 text-black border-gold-400 shadow-[0_0_10px_rgba(212,175,55,0.3)]'
-                            : 'bg-white/5 text-zinc-500 border-black-border hover:border-gold-400/30 hover:text-white'">
-                        {{ day }}
-                    </button>
-                    }
-                </div>
-            </div>
 
-            <div>
-                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Allowed
-                    Time Slots</label>
-                <input type="text" [(ngModel)]="data.timeSlots" placeholder="e.g. 18:00, 20:00"
-                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all" />
-                <p class="text-[10px] text-zinc-500 mt-1">Comma separated times</p>
+
+            <!-- Allowed Time Slots Custom Dropdown -->
+            <div class="relative">
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">
+                    Allowed Time Slots
+                </label>
+
+                <!-- Trigger -->
+                <div (click)="toggleDropdown(); $event.stopPropagation()"
+                    class="w-full min-h-[46px] bg-white/5 border border-black-border rounded-lg px-4 py-2 flex items-center justify-between cursor-pointer transition-colors hover:border-gold-400/50"
+                    [class.border-gold-400]="isTimeSlotDropdownOpen()">
+                    <div class="flex flex-wrap gap-1.5 flex-1 py-0.5">
+                        @if (selectedTimeSlots.length === 0) {
+                            <span class="text-sm text-zinc-500">Select time slots...</span>
+                        }
+                        @for (slot of selectedTimeSlots; track slot) {
+                            <span class="inline-flex items-center gap-1 bg-gold-400/10 border border-gold-400/30 text-gold-400 text-xs font-bold px-2 py-0.5 rounded-md">
+                                {{ slot }}
+                                <button type="button" (click)="removeTimeSlot(slot, $event)" class="hover:text-white transition-colors leading-none">&times;</button>
+                            </span>
+                        }
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-zinc-500 ml-2 shrink-0 transition-transform duration-200"
+                         [class.rotate-180]="isTimeSlotDropdownOpen()" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </div>
+
+                <!-- Dropdown panel -->
+                @if (isTimeSlotDropdownOpen()) {
+                    <div class="absolute z-50 w-full mt-1 top-full bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl overflow-hidden flex flex-col"
+                         style="max-height: 260px;" (click)="$event.stopPropagation()">
+                        <!-- Search -->
+                        <div class="p-2 border-b border-zinc-800 relative">
+                            <svg class="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            <input type="text" [ngModel]="timeSlotSearchQuery()" (ngModelChange)="updateSearchQuery($event)"
+                                placeholder="Search (e.g. 18:00)..."
+                                class="w-full bg-black border border-zinc-700 rounded-lg py-1.5 pl-9 pr-3 text-sm text-white focus:outline-none focus:border-gold-400 transition-colors" />
+                        </div>
+                        <!-- Options -->
+                        <div class="overflow-y-auto flex-1 p-1">
+                            @for (slot of filteredTimeSlots; track slot) {
+                                <label class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-zinc-800 cursor-pointer transition-colors">
+                                    <span class="relative flex items-center justify-center w-4 h-4 shrink-0">
+                                        <input type="checkbox" class="appearance-none w-4 h-4 rounded border border-zinc-600 bg-black transition-colors"
+                                               [class.border-gold-400]="selectedTimeSlots.includes(slot)"
+                                               [class.bg-gold-400]="selectedTimeSlots.includes(slot)"
+                                               [checked]="selectedTimeSlots.includes(slot)"
+                                               (change)="toggleTimeSlot(slot)" />
+                                        @if (selectedTimeSlots.includes(slot)) {
+                                            <svg class="absolute h-3 w-3 text-black pointer-events-none" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                            </svg>
+                                        }
+                                    </span>
+                                    <span class="text-sm font-semibold" [class.text-gold-400]="selectedTimeSlots.includes(slot)" [class.text-zinc-300]="!selectedTimeSlots.includes(slot)">
+                                        {{ slot }}
+                                    </span>
+                                </label>
+                            }
+                            @if (filteredTimeSlots.length === 0) {
+                                <p class="text-center text-zinc-500 text-sm py-4">No results for "{{ timeSlotSearchQuery() }}"</p>
+                            }
+                        </div>
+                    </div>
+                }
             </div>
         </div>
 
