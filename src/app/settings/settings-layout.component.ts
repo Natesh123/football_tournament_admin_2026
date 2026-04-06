@@ -17,7 +17,7 @@ import { TranslateModule } from '@ngx-translate/core';
             <h3 class="font-bold text-white uppercase tracking-wider text-sm">{{ 'SETTINGS.TITLE' | translate }}</h3>
           </div>
           <nav class="flex flex-col p-2 space-y-1">
-            <a routerLink="roles" 
+            <a *ngIf="auth.hasPermission('can_roles')" routerLink="roles" 
                routerLinkActive="bg-gold-400/10 text-gold-400 border-gold-400/50" 
                class="flex items-center gap-3 px-4 py-3 rounded-lg text-zinc-400 hover:text-white hover:bg-white/5 border border-transparent transition-all font-medium">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -25,7 +25,7 @@ import { TranslateModule } from '@ngx-translate/core';
               </svg>
               {{ 'SETTINGS.NAV.ROLES' | translate }}
             </a>
-            <a routerLink="users" 
+            <a *ngIf="auth.hasPermission('can_users')" routerLink="users" 
                routerLinkActive="bg-gold-400/10 text-gold-400 border-gold-400/50" 
                class="flex items-center gap-3 px-4 py-3 rounded-lg text-zinc-400 hover:text-white hover:bg-white/5 border border-transparent transition-all font-medium">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -33,7 +33,7 @@ import { TranslateModule } from '@ngx-translate/core';
               </svg>
               {{ 'SETTINGS.NAV.USERS' | translate }}
             </a>
-            <a routerLink="permissions" 
+            <a *ngIf="auth.hasPermission('can_permissions')" routerLink="permissions" 
                routerLinkActive="bg-gold-400/10 text-gold-400 border-gold-400/50" 
                class="flex items-center gap-3 px-4 py-3 rounded-lg text-zinc-400 hover:text-white hover:bg-white/5 border border-transparent transition-all font-medium">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

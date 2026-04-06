@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
+import { ProfileModalComponent } from '../shared/profile-modal.component';
 
 @Component({
     selector: 'app-top-bar',
     standalone: true,
-    imports: [CommonModule, TranslateModule, RouterLink, RouterLinkActive],
+    imports: [CommonModule, TranslateModule, RouterLink, RouterLinkActive, ProfileModalComponent],
     templateUrl: './top-bar.component.html'
 })
 export class TopBarComponent {
@@ -19,6 +20,7 @@ export class TopBarComponent {
     isDropdownOpen = signal(false);
     showNotifications = signal(false);
     showProfile = signal(false);
+    showProfileModal = signal(false);
 
     user = computed(() => this.auth.user);
 

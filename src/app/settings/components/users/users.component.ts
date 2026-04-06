@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SettingsService } from '../../settings.service';
 import { ConfirmModalComponent } from '../../../components/shared/confirm-modal.component';
+import { ProfileModalComponent } from '../../../components/shared/profile-modal.component';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, ConfirmModalComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, ConfirmModalComponent, ProfileModalComponent],
   template: `
     <div class="space-y-6">
       <div class="flex items-center justify-between">
@@ -160,6 +161,11 @@ import { ConfirmModalComponent } from '../../../components/shared/confirm-modal.
                 </td>
                 <td class="px-6 py-4">
                   <div class="flex items-center space-x-1">
+                    <button (click)="viewProfile(user)" class="p-2 text-gold-400 hover:bg-gold-400/20 rounded-md transition-all active:scale-90" title="View Profile">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    </button>
                     <button (click)="editUser(user)" class="p-2 text-gold-400 hover:bg-gold-400/20 rounded-md transition-all active:scale-90" title="Edit User">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -187,6 +193,12 @@ import { ConfirmModalComponent } from '../../../components/shared/confirm-modal.
         (onConfirm)="confirmDelete()"
         (onCancel)="showDeleteConfirm = false"
       ></app-confirm-modal>
+
+      <app-profile-modal
+        [show]="showProfileModal()"
+        [user]="userForProfile"
+        (onClose)="showProfileModal.set(false)"
+      ></app-profile-modal>
     </div>
   `
 })
@@ -206,6 +218,8 @@ export class UsersComponent implements OnInit {
   // Custom Dropdown State
   showRoleDropdown = signal(false);
   showStatusDropdown = signal(false);
+  showProfileModal = signal(false);
+  userForProfile: any = null;
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
@@ -268,6 +282,11 @@ export class UsersComponent implements OnInit {
     event.stopPropagation();
     this.showStatusDropdown.set(!this.showStatusDropdown());
     this.showRoleDropdown.set(false);
+  }
+
+  viewProfile(user: any) {
+    this.userForProfile = user;
+    this.showProfileModal.set(true);
   }
 
   selectRole(roleId: number | null) {
