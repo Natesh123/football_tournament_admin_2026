@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TournamentService } from '../../../tournament/tournament.service';
+import { UiService } from '../../../services/ui.service';
 @Component({
     selector: 'app-tournament-matches',
     standalone: true,
@@ -14,6 +15,7 @@ export class TournamentMatchesComponent implements OnInit {
 
     private router = inject(Router);
     private tournamentService = inject(TournamentService);
+    public ui = inject(UiService);
     structure = signal<any>(null);
     isLoading = signal(true);
 
@@ -85,7 +87,6 @@ export class TournamentMatchesComponent implements OnInit {
 
     // Modal state for viewing/editing match
     editingMatch: any = null;
-    isSavingMatch = signal(false);
 
     openMatchDetails(matchId: string) {
         if (!this.tournamentId) return;
@@ -105,7 +106,7 @@ export class TournamentMatchesComponent implements OnInit {
 
     saveMatchSchedule() {
         if (!this.editingMatch) return;
-        this.isSavingMatch.set(true);
+        this.ui.startAction();
 
         const payload = {
             venue: this.editingMatch.venue,
@@ -125,10 +126,15 @@ export class TournamentMatchesComponent implements OnInit {
                         this.structure.set({ ...struct });
                     }
                 }
-                this.isSavingMatch.set(false);
+                this.ui.endAction();
+                this.ui.showToast('Match schedule updated successfully!', 'success');
                 this.closeMatchEditor();
             },
-            error: () => this.isSavingMatch.set(false)
+            error: (err: any) => {
+                console.error("Failed to update schedule:", err);
+                this.ui.endAction();
+                this.ui.showToast('Failed to update match schedule.', 'error');
+            }
         });
     }
 }

@@ -5,13 +5,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TournamentService } from '../../../tournament/tournament.service';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
+import { UiService } from '../../../services/ui.service';
 
 import { MatchTimelineComponent } from './components/match-timeline/match-timeline.component';
 import { MatchEventEditorModalComponent } from './components/match-event-editor-modal/match-event-editor-modal.component';
 import { MatchEditModalComponent } from './components/match-edit-modal/match-edit-modal.component';
 import { MatchHeaderComponent } from './components/match-header/match-header.component';
 import { MatchTabsComponent } from './components/match-tabs/match-tabs.component';
-import { LineupComponent } from './components/lineup/lineup.component';
 import { MatchInfoComponent } from './components/match-info/match-info.component';
 import { H2hComponent } from './components/h2h/h2h.component';
 import { LineupEditorComponent } from './components/lineup-editor/lineup-editor.component';
@@ -29,7 +29,6 @@ import { TeamMemberService, TeamMember } from '../../../teams/team-member.servic
         MatchEditModalComponent,
         MatchHeaderComponent,
         MatchTabsComponent,
-        LineupComponent,
         MatchInfoComponent,
         H2hComponent,
         LineupEditorComponent,
@@ -43,14 +42,12 @@ export class MatchDetailsComponent implements OnInit {
     private tournamentService = inject(TournamentService);
     private http = inject(HttpClient);
     private teamMemberService = inject(TeamMemberService);
+    public ui = inject(UiService);
 
     tournamentId = signal<string>('');
     matchId = signal<string>('');
     match = signal<any>(null);
     isLoading = signal<boolean>(true);
-
-    isSaving = signal<boolean>(false);
-    toastMessage = signal<string>('');
 
     // Team Members (for photos)
     homePlayers = signal<TeamMember[]>([]);
@@ -210,46 +207,55 @@ export class MatchDetailsComponent implements OnInit {
 
     // Handlers
     handleSaveMatchMetadata(data: any) {
+        this.ui.startAction();
         this.http.put<{ success: boolean, data: any }>(`${environment.apiBaseUrl}/api/matches/${this.matchId()}`, data).subscribe({
             next: (res) => {
                 this.match.set(res.data);
                 this.closeEditModal();
-                this.showToast('Match details updated successfully!');
+                this.ui.endAction();
+                this.showToast('Match details updated successfully!', 'success');
             },
             error: (err) => {
                 console.error("Failed to update match", err);
-                this.showToast('Failed to update match details.');
+                this.ui.endAction();
+                this.showToast('Failed to update match details.', 'error');
             }
         });
     }
 
     handleSaveLineups(lineupsData: { homeLineup: any, awayLineup: any }) {
+        this.ui.startAction();
         this.http.put<{ success: boolean, data: any }>(`${environment.apiBaseUrl}/api/matches/${this.matchId()}`, lineupsData).subscribe({
             next: (res) => {
                 this.match.set(res.data);
                 this.lineups.set({ homeLineup: lineupsData.homeLineup, awayLineup: lineupsData.awayLineup });
                 this.closeLineupModal();
-                this.showToast('Lineups updated successfully!');
+                this.ui.endAction();
+                this.showToast('Lineups updated successfully!', 'success');
             },
             error: (err) => {
                 console.error("Failed to update lineups", err);
-                this.showToast('Failed to update lineups.');
+                this.ui.endAction();
+                this.showToast('Failed to update lineups.', 'error');
             }
         });
     }
 
     handleSaveEvent(data: any) {
+        this.ui.startAction();
         if (data.id) {
             // Edit existing event
             this.tournamentService.updateMatchEvent(this.matchId(), data.id, data).subscribe({
                 next: () => {
                     this.loadMatchDetails(); // reload to get new scores & events
                     this.closeEventModal();
-                    this.showToast('Event updated successfully!');
+                    this.ui.endAction();
+                    this.showToast('Event updated successfully!', 'success');
                 },
-                error: (err) => {
+                error: (err: any) => {
                     console.error("Failed to update event", err);
-                    this.showToast('Failed to update event.');
+                    this.ui.endAction();
+                    this.showToast('Failed to update event.', 'error');
                 }
             });
         } else {
@@ -258,11 +264,13 @@ export class MatchDetailsComponent implements OnInit {
                 next: () => {
                     this.loadMatchDetails(); // reload to get new scores & events
                     this.closeEventModal();
-                    this.showToast('Event added successfully!');
+                    this.ui.endAction();
+                    this.showToast('Event added successfully!', 'success');
                 },
-                error: (err) => {
+                error: (err: any) => {
                     console.error("Failed to add event", err);
-                    this.showToast('Failed to add event.');
+                    this.ui.endAction();
+                    this.showToast('Failed to add event.', 'error');
                 }
             });
         }
@@ -300,49 +308,55 @@ export class MatchDetailsComponent implements OnInit {
             data.assistPlayerName = this.eventFormAssistPlayerName();
         }
 
-        this.isSaving.set(true);
+        this.ui.startAction();
         this.tournamentService.addMatchEvent(this.matchId(), data).subscribe({
             next: () => {
                 this.loadMatchDetails(); // reload to get new scores & events
-                this.isSaving.set(false);
-                this.showToast('Event added successfully!');
+                this.ui.endAction();
+                this.showToast('Event added successfully!', 'success');
                 // Reset form fields but keep team
                 this.eventFormPlayerName.set('');
                 this.eventFormAssistPlayerName.set('');
                 this.eventFormDetails.set('');
             },
-            error: (err) => {
+            error: (err: any) => {
                 console.error("Failed to add event", err);
-                this.isSaving.set(false);
-                this.showToast('Failed to add event.');
+                this.ui.endAction();
+                this.showToast('Failed to add event.', 'error');
             }
         });
     }
 
     handleDeleteEvent(eventId: string) {
+        this.ui.startAction();
         this.tournamentService.deleteMatchEvent(this.matchId(), eventId).subscribe({
             next: () => {
                 this.loadMatchDetails();
-                this.showToast('Event deleted successfully!');
+                this.ui.endAction();
+                this.showToast('Event deleted successfully!', 'success');
             },
-            error: (err) => {
+            error: (err: any) => {
                 console.error("Failed to delete event", err);
-                this.showToast('Failed to delete event.');
+                this.ui.endAction();
+                this.showToast('Failed to delete event.', 'error');
             }
         });
     }
  
     handleStartMatch() {
+        this.ui.startAction();
         this.http.put<{ success: boolean, data: any }>(`${environment.apiBaseUrl}/api/matches/${this.matchId()}`, {
             status: 'live'
         }).subscribe({
             next: (res) => {
                 this.match.set(res.data);
-                this.showToast('Match started!');
+                this.ui.endAction();
+                this.showToast('Match started!', 'success');
             },
-            error: (err) => {
+            error: (err: any) => {
                 console.error("Failed to start match", err);
-                this.showToast('Failed to start match.');
+                this.ui.endAction();
+                this.showToast('Failed to start match.', 'error');
             }
         });
     }
@@ -350,17 +364,20 @@ export class MatchDetailsComponent implements OnInit {
     handleCompleteMatch() {
         if (!confirm('Are you sure you want to complete this match?')) return;
         
+        this.ui.startAction();
         this.http.put<{ success: boolean, data: any }>(`${environment.apiBaseUrl}/api/matches/${this.matchId()}`, {
             status: 'completed'
         }).subscribe({
             next: (res) => {
                 this.match.set(res.data);
-                this.showToast('Match completed!');
+                this.ui.endAction();
+                this.showToast('Match completed!', 'success');
                 this.loadMatchDetails(); // Refresh all data to see finalized standings/events
             },
-            error: (err) => {
+            error: (err: any) => {
                 console.error("Failed to complete match", err);
-                this.showToast('Failed to complete match.');
+                this.ui.endAction();
+                this.showToast('Failed to complete match.', 'error');
             }
         });
     }
@@ -371,20 +388,20 @@ export class MatchDetailsComponent implements OnInit {
             return;
         }
 
-        this.isSaving.set(true);
+        this.ui.startAction();
         this.http.post<{ success: boolean, data: any }>(`${environment.apiBaseUrl}/api/matches/${this.matchId()}/result`, {
             homeScore: this.homeScore(),
             awayScore: this.awayScore()
         }).subscribe({
             next: (res) => {
                 this.match.set(res.data);
-                this.isSaving.set(false);
-                this.showToast('Match result saved successfully!');
+                this.ui.endAction();
+                this.showToast('Match result saved successfully!', 'success');
             },
-            error: (err) => {
+            error: (err: any) => {
                 console.error("Failed to save match result", err);
-                this.isSaving.set(false);
-                this.showToast('Failed to save match result.');
+                this.ui.endAction();
+                this.showToast('Failed to save match result.', 'error');
             }
         });
     }
@@ -394,8 +411,7 @@ export class MatchDetailsComponent implements OnInit {
         this.router.navigate(['/tournaments', this.tournamentId()], { queryParams: { tab: 'matches' } });
     }
 
-    showToast(message: string) {
-        this.toastMessage.set(message);
-        setTimeout(() => this.toastMessage.set(''), 3000);
+    showToast(message: string, type: 'success' | 'error' | 'info' = 'success') {
+        this.ui.showToast(message, type);
     }
 }

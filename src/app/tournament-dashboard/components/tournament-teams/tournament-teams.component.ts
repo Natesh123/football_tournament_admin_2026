@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
+import { UiService } from '../../../services/ui.service';
 
 interface Team {
     id: string;
@@ -31,12 +32,12 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
     @Input() tournamentId!: string;
 
     private http = inject(HttpClient);
+    public ui = inject(UiService);
 
     teams = signal<TournamentTeam[]>([]);
     availableTeams = signal<Team[]>([]); // Teams not in this tournament
     isLoading = signal(true);
     isModalOpen = signal(false);
-    isSaving = signal(false);
     modalMode = signal<'new' | 'existing'>('existing');
     selectedExistingTeamIds = signal<string[]>([]);
 
@@ -152,7 +153,7 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
             const teamIds = this.selectedExistingTeamIds();
             if (!teamIds || teamIds.length === 0) return;
 
-            this.isSaving.set(true);
+            this.ui.startAction();
             this.http.post<{ success: boolean, data: TournamentTeam[] }>(`${environment.apiBaseUrl}/api/tournaments/${this.tournamentId}/teams/bulk`, { teamIds })
                 .subscribe({
                     next: (res) => {
@@ -163,19 +164,21 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
                         const addedSet = new Set(teamIds);
                         this.availableTeams.update(av => av.filter(a => !addedSet.has(a.id)));
 
-                        this.isSaving.set(false);
+                        this.ui.endAction();
+                        this.ui.showToast('Existing teams successfully added to tournament', 'success');
                         this.closeModal();
                     },
                     error: (err) => {
                         console.error('Error assigning teams:', err);
-                        this.isSaving.set(false);
+                        this.ui.endAction();
+                        this.ui.showToast('Failed to add existing teams.', 'error');
                     }
                 });
         } else {
             const teamData = { ...this.newTeam(), tournamentId: this.tournamentId };
             if (!teamData.name || !teamData.teamType) return;
 
-            this.isSaving.set(true);
+            this.ui.startAction();
             this.http.post<Team>(`${environment.apiBaseUrl}/api/teams`, teamData).subscribe({
                 next: (newTeam) => {
                     // Step 2: Now map it to the tournament
@@ -183,18 +186,21 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
                         .subscribe({
                             next: (res) => {
                                 this.teams.update(t => [res.data, ...t]);
-                                this.isSaving.set(false);
+                                this.ui.endAction();
+                                this.ui.showToast('New team created and added successfully', 'success');
                                 this.closeModal();
                             },
                             error: (err) => {
                                 console.error('Error mapping new team to tournament:', err);
-                                this.isSaving.set(false);
+                                this.ui.endAction();
+                                this.ui.showToast('Created team but failed to add to tournament.', 'error');
                             }
                         });
                 },
                 error: (err) => {
                     console.error('Error saving team:', err);
-                    this.isSaving.set(false);
+                    this.ui.endAction();
+                    this.ui.showToast('Failed to create new team.', 'error');
                 }
             });
         }
@@ -202,12 +208,19 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
 
     deleteTeam(regId: string, teamId: string) {
         if (confirm('Are you sure you want to remove this team from the tournament?')) {
+            this.ui.startAction();
             // Delete the registration link
             this.http.delete(`${environment.apiBaseUrl}/api/tournaments/${this.tournamentId}/teams/${teamId}`).subscribe({
                 next: () => {
+                    this.ui.showToast('Team removed from tournament successfully.', 'success');
                     this.fetchTeams(); // Refetch to update both lists
+                    this.ui.endAction();
                 },
-                error: (err) => console.error('Error unassigning team:', err)
+                error: (err) => {
+                    console.error('Error unassigning team:', err);
+                    this.ui.showToast('Failed to remove team.', 'error');
+                    this.ui.endAction();
+                }
             });
         }
     }
@@ -218,10 +231,17 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
         const oldStatus = reg.status;
         reg.status = newStatus;
 
+        this.ui.startAction();
         this.http.put(`${environment.apiBaseUrl}/api/tournaments/${this.tournamentId}/teams/${reg.team.id}/status`, { status: newStatus }).subscribe({
+            next: () => {
+                this.ui.endAction();
+                this.ui.showToast(`Team approval status updated to ${newStatus}.`, 'success');
+            },
             error: (err) => {
                 console.error('Error updating approval status:', err);
                 reg.status = oldStatus; // Revert on error
+                this.ui.endAction();
+                this.ui.showToast('Failed to update approval status.', 'error');
             }
         });
     }
@@ -232,10 +252,17 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
         const oldPaymentStatus = reg.paymentStatus;
         reg.paymentStatus = newPaymentStatus;
 
+        this.ui.startAction();
         this.http.put(`${environment.apiBaseUrl}/api/tournaments/${this.tournamentId}/teams/${reg.team.id}/status`, { paymentStatus: newPaymentStatus }).subscribe({
+            next: () => {
+                this.ui.endAction();
+                this.ui.showToast(`Team payment status updated to ${newPaymentStatus}.`, 'success');
+            },
             error: (err) => {
                 console.error('Error updating payment status:', err);
                 reg.paymentStatus = oldPaymentStatus; // Revert on error
+                this.ui.endAction();
+                this.ui.showToast('Failed to update payment status.', 'error');
             }
         });
     }

@@ -425,17 +425,17 @@
 
             <!-- Conditional Save Button Logic depending on mode -->
             @if (modalMode() === 'existing') {
-            <button (click)="saveTeam()" [disabled]="selectedExistingTeamIds().length === 0 || isSaving()"
+            <button (click)="saveTeam()" [disabled]="selectedExistingTeamIds().length === 0 || ui.isLoadingAction()"
                 class="px-5 py-2 rounded-lg font-bold text-black-main bg-gold-400 hover:bg-gold-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 uppercase text-xs shadow-[0_0_15px_rgba(255,215,0,0.2)]">
-                @if (isSaving()) {
+                @if (ui.isLoadingAction()) {
                 <span class="loading loading-spinner w-3 h-3"></span>
                 }
                 Add Selected Team{{ selectedExistingTeamIds().length > 1 ? 's' : '' }}
             </button>
             } @else {
-            <button (click)="saveTeam()" [disabled]="!newTeam().name || isSaving()"
+            <button (click)="saveTeam()" [disabled]="!newTeam().name || ui.isLoadingAction()"
                 class="px-5 py-2 rounded-lg font-bold text-black-main bg-gold-400 hover:bg-gold-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 uppercase text-xs shadow-[0_0_15px_rgba(255,215,0,0.2)]">
-                @if (isSaving()) {
+                @if (ui.isLoadingAction()) {
                 <span class="loading loading-spinner w-3 h-3"></span>
                 }
                 Create & Map Team
