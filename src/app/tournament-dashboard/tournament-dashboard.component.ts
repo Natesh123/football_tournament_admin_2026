@@ -15,6 +15,9 @@ import { TournamentPresentationComponent } from './components/tournament-present
 import { TournamentResultsComponent } from './components/tournament-results/tournament-results.component';
 import { TournamentTeamsComponent } from './components/tournament-teams/tournament-teams.component';
 import { TournamentMatchesComponent } from './components/tournament-matches/tournament-matches.component';
+import { LoaderComponent } from '../components/loader/loader.component';
+
+import { UiService } from '../services/ui.service';
 
 export interface TournamentSettings {
     general: {
@@ -32,10 +35,7 @@ export interface TournamentSettings {
             phone: string;
             website: string;
         };
-        sponsor: {
-            name: string;
-            website: string;
-        };
+        sponsors: string[];
     };
     participants: {
         type: string;
@@ -130,7 +130,8 @@ export interface TournamentSettings {
         TournamentPresentationComponent,
         TournamentResultsComponent,
         TournamentTeamsComponent,
-        TournamentMatchesComponent
+        TournamentMatchesComponent,
+        LoaderComponent
     ],
     templateUrl: './tournament-dashboard.component.html',
 })
@@ -138,12 +139,11 @@ export class TournamentDashboardComponent implements OnInit {
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private tournamentService = inject(TournamentService);
+    public ui = inject(UiService);
 
     tournament = signal<TournamentDTO | null>(null);
     isLoading = signal(true);
-    isSaving = signal(false);
     activeTab = signal<string>('general');
-    toastMessage = signal('');
     formatChanged = false;
 
     settings: TournamentSettings = this.getDefaultSettings();
@@ -172,7 +172,17 @@ export class TournamentDashboardComponent implements OnInit {
     }
 
     setActiveTab(tabId: string) {
+        this.syncRegFee();
         this.setTab(tabId);
+    }
+
+    private syncRegFee() {
+        // Synchronize the registration fee across sub-settings before switching tabs or saving
+        if (this.activeTab() === 'participants') {
+            if (this.settings.finance) this.settings.finance.regFee = this.settings.participants.regFee;
+        } else if (this.activeTab() === 'finance') {
+            if (this.settings.participants) this.settings.participants.regFee = this.settings.finance.regFee;
+        }
     }
 
     getDefaultSettings(): TournamentSettings {
@@ -192,10 +202,7 @@ export class TournamentDashboardComponent implements OnInit {
                     phone: '',
                     website: ''
                 },
-                sponsor: {
-                    name: '',
-                    website: ''
-                }
+                sponsors: [] as string[]
             },
             participants: {
                 type: 'team',
@@ -225,7 +232,7 @@ export class TournamentDashboardComponent implements OnInit {
                 matchDuration: 90,
                 halfDuration: 45,
                 breakTime: 15,
-                matchDays: { MON: false, TUE: false, WED: false, THU: false, FRI: false, SAT: false, SUN: false },
+                matchDays: { MON: true, TUE: true, WED: true, THU: true, FRI: true, SAT: true, SUN: true },
                 timeSlots: '18:00, 20:00'
             },
             rules: {
@@ -312,13 +319,29 @@ export class TournamentDashboardComponent implements OnInit {
             this.settings.general.organizer = tournament.organizer;
         }
 
+        if (tournament.sponsors) {
+            try {
+                this.settings.general.sponsors = JSON.parse(tournament.sponsors);
+            } catch (e) {
+                this.settings.general.sponsors = tournament.sponsors.split(',').map(s => s.trim()).filter(Boolean);
+            }
+        } else {
+            this.settings.general.sponsors = [];
+        }
+
         if (tournament.settings) {
             // Deep merge to avoid losing fields like general.type if settings.general is partially returned
             this.settings.rules = { ...this.settings.rules, ...(tournament.settings.rules || {}) };
+            this.settings.schedule = { ...this.settings.schedule, ...(tournament.settings.schedule || {}) };
             this.settings.venues = { ...this.settings.venues, ...(tournament.settings.venues || {}) };
             this.settings.finance = { ...this.settings.finance, ...(tournament.settings.finance || {}) };
             this.settings.presentation = { ...this.settings.presentation, ...(tournament.settings.presentation || {}) };
         }
+
+        // Force sync regFee from top-level to all sub-settings
+        const unifiedRegFee = tournament.regFee || 0;
+        this.settings.participants.regFee = unifiedRegFee;
+        this.settings.finance.regFee = unifiedRegFee;
 
         // Ensure we load the format entity data directly if available
         if (tournament.format) {
@@ -363,6 +386,28 @@ export class TournamentDashboardComponent implements OnInit {
 
     handleSettingsUpdate(key: keyof TournamentSettings, data: any) {
         this.settings[key] = { ...this.settings[key], ...data };
+        
+        // If tournament type changed, update playersOnField and other relevant rules
+        if (key === 'general' && data.type) {
+            const type = data.type;
+            if (type === 'futsal') {
+                this.settings.rules.playersOnField = 5;
+                this.settings.rules.minPlayers = 3;
+                this.settings.rules.subsAllowed = 99; // Rolling
+                this.settings.participants.squadSize = 12;
+            } else if (type === '7aside') {
+                this.settings.rules.playersOnField = 7;
+                this.settings.rules.minPlayers = 5;
+                this.settings.rules.subsAllowed = 5;
+                this.settings.participants.squadSize = 14;
+            } else if (type === '11aside') {
+                this.settings.rules.playersOnField = 11;
+                this.settings.rules.minPlayers = 7;
+                this.settings.rules.subsAllowed = 5;
+                this.settings.participants.squadSize = 25;
+            }
+        }
+        
         this.formatChanged = true;
     }
 
@@ -374,7 +419,8 @@ export class TournamentDashboardComponent implements OnInit {
     saveChanges() {
         const t = this.tournament();
         if (!t || !t.id) return;
-        this.isSaving.set(true);
+        this.syncRegFee();
+        this.ui.startAction();
 
         this.tournamentService.update(t.id, {
             name: this.settings.general.name,
@@ -388,7 +434,7 @@ export class TournamentDashboardComponent implements OnInit {
             visibility: this.settings.general.visibility,
             logo: this.settings.general.logo,
             coverImage: this.settings.general.coverImage,
-            sponsors: '1,2,4', // Example comma-separated strings as requested
+            sponsors: JSON.stringify(this.settings.general.sponsors),
             organizer: this.settings.general.organizer,
             participantType: this.settings.participants.type,
             minTeams: this.settings.participants.minTeams,
@@ -418,24 +464,24 @@ export class TournamentDashboardComponent implements OnInit {
                     this.tournamentService.generateStructure(t.id).subscribe({
                         next: () => {
                             this.formatChanged = false;
-                            this.isSaving.set(false);
-                            this.showToast('Changes saved & structure generated!');
+                            this.ui.endAction();
+                            this.showToast('Changes saved & structure generated!', 'success');
                         },
                         error: (err) => {
                             console.error('Failed to generate structure:', err);
-                            this.isSaving.set(false);
-                            this.showToast('Saved changes, but structure generation failed.');
+                            this.ui.endAction();
+                            this.showToast('Saved changes, but structure generation failed.', 'error');
                         }
                     });
                 } else {
-                    this.isSaving.set(false);
-                    this.showToast('Changes saved successfully!');
+                    this.ui.endAction();
+                    this.showToast('Changes saved successfully!', 'success');
                 }
             },
             error: (err) => {
                 console.error('Failed to save:', err);
-                this.isSaving.set(false);
-                this.showToast('Failed to save changes.');
+                this.ui.endAction();
+                this.showToast('Failed to save changes.', 'error');
             }
         });
     }
@@ -444,16 +490,15 @@ export class TournamentDashboardComponent implements OnInit {
         const t = this.tournament();
         if (!t) return;
         this.mergeTournamentToSettings(t);
-        this.showToast('Changes discarded.');
+        this.showToast('Changes discarded.', 'info');
     }
 
     goBack() {
         this.router.navigate(['/tournaments']);
     }
 
-    showToast(message: string) {
-        this.toastMessage.set(message);
-        setTimeout(() => this.toastMessage.set(''), 3000);
+    showToast(text: string, type: 'success' | 'error' | 'info' = 'success') {
+        this.ui.showToast(text, type);
     }
 
     getStatusLabel(status: string): string {

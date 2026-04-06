@@ -1,28 +1,38 @@
-<nav class="bg-black-main/80 backdrop-blur-md border-b border-black-border sticky top-0 z-50">
+<!-- Spacer to preserve layout flow since nav is fixed -->
+<div class="h-28 w-full block"></div>
+<nav class="bg-black-main/80 backdrop-blur-md border-b border-black-border fixed top-0 left-0 w-full z-50">
     <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-28">
             <!-- Logo -->
             <a routerLink="/dashboard" class="flex items-center gap-4 cursor-pointer">
-                <img src="images/logo-gold.png" alt="Gold Manager Logo"
+                <img src="/images/logo-gold.png" alt="Gold Manager Logo"
                     class="h-24 w-auto object-contain mix-blend-screen">
                 <span class="text-2xl font-bold tracking-tight text-gold-400 ml-2">ATB SPORTS</span>
             </a>
 
             <!-- Navigation Links -->
             <div class="flex items-center gap-8">
-                <a *ngIf="auth.hasPermission('can_dashboard')" routerLink="/dashboard" routerLinkActive="!text-gold-400 border-b-2 border-gold-400"
+                @if (auth.hasPermission('can_dashboard')) {
+                <a routerLink="/dashboard" routerLinkActive="!text-gold-400 border-b-2 border-gold-400"
                     [routerLinkActiveOptions]="{ exact: true }"
                     class="text-lg font-bold uppercase tracking-wider text-white hover:text-gold-400 transition-all duration-300 cursor-pointer pb-1">{{
                     'TOPBAR.DASHBOARD' | translate }}</a>
-                <a *ngIf="auth.hasPermission('can_tournaments')" routerLink="/tournaments" routerLinkActive="!text-gold-400 border-b-2 border-gold-400"
+                }
+                @if (auth.hasPermission('can_tournaments')) {
+                <a routerLink="/tournaments" routerLinkActive="!text-gold-400 border-b-2 border-gold-400"
                     class="text-lg font-bold uppercase tracking-wider text-white hover:text-gold-400 transition-all duration-300 cursor-pointer pb-1">{{
                     'TOPBAR.TOURNAMENTS' | translate }}</a>
-                <a *ngIf="auth.hasPermission('can_teams')" routerLink="/teams" routerLinkActive="!text-gold-400 border-b-2 border-gold-400"
+                }
+                @if (auth.hasPermission('can_teams')) {
+                <a routerLink="/teams" routerLinkActive="!text-gold-400 border-b-2 border-gold-400"
                     class="text-lg font-bold uppercase tracking-wider text-white hover:text-gold-400 transition-all duration-300 pb-1">{{
                     'TOPBAR.TEAMS' | translate }}</a>
-                <a *ngIf="auth.hasPermission('can_settings')" routerLink="/settings" routerLinkActive="!text-gold-400 border-b-2 border-gold-400"
+                }
+                @if (auth.hasPermission('can_settings')) {
+                <a routerLink="/settings" routerLinkActive="!text-gold-400 border-b-2 border-gold-400"
                     class="text-lg font-bold uppercase tracking-wider text-white hover:text-gold-400 transition-all duration-300 pb-1 cursor-pointer">{{
                     'TOPBAR.SETTINGS' | translate }}</a>
+                }
             </div>
 
             <!-- Right Actions -->
@@ -154,7 +164,7 @@
                             <div
                                 class="w-10 rounded-full ring ring-offset-black-main ring-offset-2 transition-all duration-300 bg-black-card"
                                 [ngClass]="auth.isAdmin ? 'ring-gold-400 group-hover:ring-gold-300' : auth.isOrganizer ? 'ring-emerald-400 group-hover:ring-emerald-300' : 'ring-zinc-600'">
-                                <img src="images/logo-gold.png" alt="Profile" />
+                                <img src="/images/logo-gold.png" alt="Profile" />
                             </div>
                         </div>
                         @if (auth.isAdmin) {
@@ -240,10 +250,11 @@
         </div>
     </div>
     
+    @if (auth.hasPermission('view_profile')) {
     <app-profile-modal
-        *ngIf="auth.hasPermission('view_profile')"
         [show]="showProfileModal()"
         [user]="user()"
         (onClose)="showProfileModal.set(false)"
     ></app-profile-modal>
+    }
 </nav>

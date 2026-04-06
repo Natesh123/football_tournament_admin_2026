@@ -21,8 +21,8 @@ export class LineupEditorComponent implements OnInit {
 
     activeTeam: 'home' | 'away' = 'home';
 
-    homeData: any = { formation: '4-3-3', coach: '', starting: [], subs: [] };
-    awayData: any = { formation: '4-3-3', coach: '', starting: [], subs: [] };
+    homeData: any = { coach: '', starting: [], subs: [] };
+    awayData: any = { coach: '', starting: [], subs: [] };
 
     homePlayers: TeamMember[] = [];
     awayPlayers: TeamMember[] = [];
@@ -33,15 +33,49 @@ export class LineupEditorComponent implements OnInit {
     selectedInPicker: Set<string> = new Set(); // Stores player names
 
     get playersOnField(): number {
-        return (this.match as any)?.tournament?.rules?.playersOnField || 11;
+        const tournament = (this.match as any)?.tournament;
+        if (!tournament) return 11;
+
+        // 1. Check rules relation (raw entity)
+        if (tournament.rules?.playersOnField) return tournament.rules.playersOnField;
+
+        // 2. Check remapped settings rules (from TournamentService)
+        if (tournament.settings?.rules?.playersOnField) return tournament.settings.rules.playersOnField;
+
+        // 3. Fallback to tournament type defaults if rules are not populated
+        const type = tournament.type?.toLowerCase();
+        if (type === 'futsal') return 5;
+        if (type === '7aside') return 7;
+        if (type === '11aside') return 11;
+
+        return 11;
     }
 
     get squadSize(): number {
-        return (this.match as any)?.tournament?.squadSize || 18;
+        const tournament = (this.match as any)?.tournament;
+        if (!tournament) return 25;
+
+        // 1. Check direct squadSize (Tournament Entity)
+        if (tournament.squadSize) return tournament.squadSize;
+
+        // 2. Check remapped settings rules squadSize
+        if (tournament.settings?.rules?.squadSize) return tournament.settings.rules.squadSize;
+
+        // 3. Fallback to tournament type defaults
+        const type = tournament.type?.toLowerCase();
+        if (type === 'futsal') return 12;
+        if (type === '7aside') return 14;
+
+        return 25;
     }
 
     get subsLimit(): number {
         return Math.max(0, this.squadSize - this.playersOnField);
+    }
+
+    get startingLabel(): string {
+        if (this.pickerType === 'subs') return 'Substitutes';
+        return this.playersOnField === 11 ? 'XI' : this.playersOnField.toString();
     }
 
     get currentStartingCount(): number {
@@ -75,13 +109,13 @@ export class LineupEditorComponent implements OnInit {
         if (this.lineups?.homeLineup) {
             this.homeData = JSON.parse(JSON.stringify(this.lineups.homeLineup));
         } else {
-            this.homeData = { formation: '4-3-3', coach: '', starting: [], subs: [] };
+            this.homeData = { coach: '', starting: [], subs: [] };
         }
 
         if (this.lineups?.awayLineup) {
             this.awayData = JSON.parse(JSON.stringify(this.lineups.awayLineup));
         } else {
-            this.awayData = { formation: '4-3-3', coach: '', starting: [], subs: [] };
+            this.awayData = { coach: '', starting: [], subs: [] };
         }
     }
 
@@ -213,11 +247,11 @@ export class LineupEditorComponent implements OnInit {
 
     onSave() {
         if (this.homeData.starting.length !== this.playersOnField) {
-            alert(`Home Team Starting XI must have exactly ${this.playersOnField} players.`);
+            alert(`Home Team Starting ${this.startingLabel} must have exactly ${this.playersOnField} players.`);
             return;
         }
         if (this.awayData.starting.length !== this.playersOnField) {
-            alert(`Away Team Starting XI must have exactly ${this.playersOnField} players.`);
+            alert(`Away Team Starting ${this.startingLabel} must have exactly ${this.playersOnField} players.`);
             return;
         }
         
