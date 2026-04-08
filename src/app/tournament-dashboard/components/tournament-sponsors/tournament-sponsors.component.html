@@ -1,0 +1,143 @@
+<div class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h2 class="text-2xl font-black text-white tracking-tight uppercase">Tournament Sponsors</h2>
+            <p class="text-zinc-500 text-sm mt-1">Manage sponsors and partners specifically for this tournament.</p>
+        </div>
+        <button (click)="openAssignModal()" 
+                class="flex items-center gap-2 px-6 py-2.5 bg-gold-400 hover:bg-gold-500 text-black font-black text-xs uppercase tracking-widest rounded-xl transition-all hover:shadow-[0_0_20px_rgba(212,175,55,0.3)] active:scale-95">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
+            </svg>
+            Assign Sponsor
+        </button>
+    </div>
+
+    <!-- Content -->
+    <div class="bg-black-card/50 border border-black-border rounded-2xl overflow-hidden backdrop-blur-sm">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-black-border bg-white/[0.02]">
+                        <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-zinc-500">Logo</th>
+                        <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-zinc-500">Sponsor Name</th>
+                        <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-zinc-500">Type</th>
+                        <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-zinc-500">Assigned At</th>
+                        <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-zinc-500 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-black-border/50">
+                    @for (mapping of mappings(); track mapping.id) {
+                        <tr class="hover:bg-white/[0.02] transition-colors group">
+                            <td class="px-6 py-4">
+                                <div class="w-10 h-10 rounded-lg bg-zinc-900 border border-black-border overflow-hidden p-1.5 flex items-center justify-center shrink-0">
+                                    <img *ngIf="mapping.sponsor?.logo" 
+                                         [src]="apiUrl + mapping.sponsor?.logo" 
+                                         class="w-full h-full object-contain"
+                                         [alt]="mapping.sponsor?.name">
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-white">{{ mapping.sponsor?.name }}</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter"
+                                      [ngClass]="{
+                                          'bg-gold-400/10 text-gold-400': mapping.sponsor?.type === 'Gold' || mapping.sponsor?.type === 'Platinum',
+                                          'bg-zinc-400/10 text-zinc-400': mapping.sponsor?.type === 'Silver',
+                                          'bg-emerald-400/10 text-emerald-400': mapping.sponsor?.type === 'Partner'
+                                      }">
+                                    {{ mapping.sponsor?.type || 'N/A' }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-zinc-400 text-sm">
+                                {{ mapping.created_at | date:'mediumDate' }}
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <button (click)="openRemoveConfirm(mapping)" 
+                                        class="p-2 text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
+                                        title="Remove from tournament">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                    @if (mappings().length === 0 && !isLoading()) {
+                        <tr>
+                            <td colspan="5" class="px-6 py-12 text-center text-zinc-500">
+                                <div class="flex flex-col items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                    </svg>
+                                    <p class="font-bold text-sm">No sponsors assigned to this tournament.</p>
+                                    <p class="text-xs opacity-50 uppercase tracking-widest">Click 'Assign Sponsor' to get started</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Assign Modal -->
+@if (isAssignModalOpen()) {
+    <div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
+        <div class="bg-black-card border-2 border-gold-400/30 rounded-3xl w-full max-w-md shadow-[0_0_100px_rgba(212,175,55,0.15)] overflow-hidden">
+            <!-- Header -->
+            <div class="p-8 border-b border-white/5 bg-gradient-to-br from-gold-400/5 to-transparent">
+                <h3 class="text-2xl font-black text-white uppercase tracking-tight">Assign Sponsor</h3>
+                <p class="text-zinc-500 text-sm mt-1">Select an active sponsor to partner with this tournament.</p>
+            </div>
+
+            <div class="p-8 space-y-6">
+                <div>
+                    <label class="block text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-2">Select Sponsor</label>
+                    <select [(ngModel)]="selectedSponsorId" 
+                            class="w-full bg-zinc-900/50 border border-black-border rounded-xl px-4 py-3 text-white focus:border-gold-400 outline-none transition-all appearance-none cursor-pointer">
+                        <option [ngValue]="null" disabled selected>Choose a sponsor...</option>
+                        @for (sponsor of availableSponsors(); track sponsor.id) {
+                            <option [value]="sponsor.id">{{ sponsor.name }} ({{ sponsor.type }})</option>
+                        }
+                    </select>
+                    @if (availableSponsors().length === 0) {
+                        <p class="text-xs text-red-400/60 mt-2 font-bold uppercase tracking-tighter">No more active sponsors available to assign.</p>
+                    }
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="p-6 bg-white/[0.02] flex items-center justify-end gap-3 px-8">
+                <button (click)="isAssignModalOpen.set(false)" 
+                        class="px-6 py-2.5 rounded-xl text-zinc-500 hover:text-white transition-all text-xs font-black uppercase tracking-widest uppercase tracking-widest">
+                    Cancel
+                </button>
+                <button (click)="assignSponsor()" 
+                        [disabled]="ui.isLoadingAction() || !selectedSponsorId()"
+                        class="px-8 py-2.5 bg-white text-black rounded-xl hover:bg-gold-400 transition-all text-xs font-black uppercase tracking-widest shadow-xl shadow-gold-400/10 active:scale-95 disabled:opacity-30 flex items-center gap-2">
+                    @if (ui.isLoadingAction()) {
+                        <svg class="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Assigning...
+                    } @else {
+                        Assign
+                    }
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+<app-confirm-modal *ngIf="showRemoveConfirm"
+                  [show]="showRemoveConfirm"
+                  [title]="'Remove Sponsor'"
+                  [message]="'Are you sure you want to remove this sponsor from the tournament? This will not delete the sponsor globally.'"
+                  (onConfirm)="removeMapping()"
+                  (onCancel)="showRemoveConfirm = false">
+</app-confirm-modal>

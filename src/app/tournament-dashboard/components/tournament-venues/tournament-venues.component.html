@@ -1,49 +1,45 @@
 <div class="space-y-8">
     <!-- Page Title -->
     <div>
-        <h1 class="text-3xl font-black text-white tracking-tight">Venues & Facilities</h1>
-        <p class="text-zinc-500 mt-1.5">Manage locations where matches will be played.</p>
+        <h1 class="text-3xl font-black text-white tracking-tight">{{ 'TOURNAMENT_DASHBOARD.VENUES.TITLE' | translate }}</h1>
+        <p class="text-zinc-500 mt-1.5">{{ 'TOURNAMENT_DASHBOARD.VENUES.SUBTITLE' | translate }}</p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Venue Configuration -->
         <div class="bg-black-card border border-black-border rounded-xl p-6 space-y-6">
             <div class="flex items-center justify-between border-b border-black-border pb-4">
-                <h2 class="text-lg font-bold text-white">Locations Setup</h2>
+                <h2 class="text-lg font-bold text-white">{{ 'TOURNAMENT_DASHBOARD.VENUES.LOCATIONS_SETUP' | translate }}</h2>
                 <label class="cursor-pointer label flex items-center gap-2 m-0 p-0">
-                    <span class="label-text text-zinc-400 font-bold mr-2">Multiple Pitches</span>
+                    <span class="label-text text-zinc-400 font-bold mr-2">{{ 'TOURNAMENT_DASHBOARD.VENUES.MULTIPLE_PITCHES' | translate }}</span>
                     <input type="checkbox" [(ngModel)]="data.multipleVenues" class="toggle toggle-warning" />
                 </label>
             </div>
 
             <div class="space-y-5">
                 <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Primary
-                        Venue Name</label>
-                    <input type="text" [(ngModel)]="data.primaryVenue" placeholder="e.g. National Stadium"
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.VENUES.PRIMARY_VENUE' | translate }}</label>
+                    <input type="text" [(ngModel)]="data.primaryVenue" [placeholder]="'TOURNAMENT_DASHBOARD.VENUES.PLACEHOLDERS.PRIMARY_VENUE' | translate"
                         class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all" />
                 </div>
                 <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Venue
-                        Address</label>
-                    <textarea rows="2" [(ngModel)]="data.venueAddress" placeholder="Full physical address or map link"
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.VENUES.VENUE_ADDRESS' | translate }}</label>
+                    <textarea rows="2" [(ngModel)]="data.venueAddress" [placeholder]="'TOURNAMENT_DASHBOARD.VENUES.PLACEHOLDERS.VENUE_ADDRESS' | translate"
                         class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all resize-none"></textarea>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Total
-                            Pitches/Courts</label>
+                        <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.VENUES.TOTAL_PITCHES' | translate }}</label>
                         <input type="number" [(ngModel)]="data.pitchCount" [disabled]="data.multipleVenues" [class.opacity-50]="data.multipleVenues"
                             class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all" />
                     </div>
                     <div>
-                        <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Field
-                            Type</label>
+                        <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.VENUES.FIELD_TYPE' | translate }}</label>
                         <select [(ngModel)]="data.fieldType"
                             class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all">
-                            <option value="grass" class="bg-black-card">Natural Grass</option>
-                            <option value="turf" class="bg-black-card">Artificial Turf (3G/4G)</option>
-                            <option value="indoor" class="bg-black-card">Indoor Hardcourt</option>
+                            <option value="grass" class="bg-black-card">{{ 'TOURNAMENT_DASHBOARD.VENUES.NATURAL_GRASS' | translate }}</option>
+                            <option value="turf" class="bg-black-card">{{ 'TOURNAMENT_DASHBOARD.VENUES.ARTIFICIAL_TURF' | translate }}</option>
+                            <option value="indoor" class="bg-black-card">{{ 'TOURNAMENT_DASHBOARD.VENUES.INDOOR_HARDCOURT' | translate }}</option>
                         </select>
                     </div>
                 </div>
@@ -53,14 +49,14 @@
         <!-- Pitches List placeholder -->
         <div class="bg-black-card border border-black-border rounded-xl flex flex-col" [class.opacity-50]="!data.multipleVenues" [class.pointer-events-none]="!data.multipleVenues">
             <div class="p-6 border-b border-black-border flex items-center justify-between">
-                <h2 class="text-base font-bold text-white">Managed Pitches</h2>
+                <h2 class="text-base font-bold text-white">{{ 'TOURNAMENT_DASHBOARD.VENUES.MANAGED_PITCHES' | translate }}</h2>
                 <button (click)="addPitch()"
                     class="text-gold-400 hover:text-white transition-colors text-sm font-bold flex items-center gap-1">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
-                    Add Pitch
+                    {{ 'TOURNAMENT_DASHBOARD.VENUES.ADD_PITCH' | translate }}
                 </button>
             </div>
             @if (!data.pitches || data.pitches.length === 0) {
@@ -73,24 +69,24 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                 </div>
-                <h3 class="text-lg font-bold text-white mb-1">No separate pitches mapped</h3>
-                <p class="text-sm text-zinc-500">Configure distinct pitches to schedule concurrent matches.</p>
+                <h3 class="text-lg font-bold text-white mb-1">{{ 'TOURNAMENT_DASHBOARD.VENUES.NO_PITCHES' | translate }}</h3>
+                <p class="text-sm text-zinc-500">{{ 'TOURNAMENT_DASHBOARD.VENUES.NO_PITCHES_DESC' | translate }}</p>
             </div>
             } @else {
             <div class="p-6 flex-1 overflow-y-auto">
                 <div class="space-y-3">
                     @for (pitch of data.pitches; track pitch.id; let i = $index) {
                     <div class="flex items-center gap-3 bg-white/5 border border-black-border rounded-lg p-3 transition-colors hover:border-zinc-700">
-                        <input type="text" [(ngModel)]="pitch.name" placeholder="Pitch Name (e.g. Field 1)"
+                        <input type="text" [(ngModel)]="pitch.name" [placeholder]="'TOURNAMENT_DASHBOARD.VENUES.PITCH_NAME_PLACEHOLDER' | translate"
                             class="flex-1 bg-transparent border-none text-white text-sm focus:outline-none placeholder-zinc-600" />
                         
                         <div class="w-px h-6 bg-black-border"></div>
                         
                         <select [(ngModel)]="pitch.type" 
                             class="bg-transparent border-none text-zinc-400 text-sm focus:outline-none cursor-pointer">
-                            <option value="grass" class="bg-black">Grass</option>
-                            <option value="turf" class="bg-black">Turf</option>
-                            <option value="indoor" class="bg-black">Indoor</option>
+                            <option value="grass" class="bg-black">{{ 'TOURNAMENT_DASHBOARD.VENUES.TYPE_GRASS' | translate }}</option>
+                            <option value="turf" class="bg-black">{{ 'TOURNAMENT_DASHBOARD.VENUES.TYPE_TURF' | translate }}</option>
+                            <option value="indoor" class="bg-black">{{ 'TOURNAMENT_DASHBOARD.VENUES.TYPE_INDOOR' | translate }}</option>
                         </select>
 
                         <button (click)="removePitch(i)" class="text-zinc-500 hover:text-red-500 transition-colors p-1 ml-2">

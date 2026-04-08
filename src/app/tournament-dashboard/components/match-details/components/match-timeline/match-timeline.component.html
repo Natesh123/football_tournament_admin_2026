@@ -1,14 +1,16 @@
 <div class="bg-black-card border border-black-border rounded-xl p-6 md:p-8">
     <div class="flex items-center justify-between mb-8">
-        <h3 class="text-xl font-black text-white uppercase tracking-tight">Match Timeline</h3>
+        <h3 class="text-xl font-black text-white uppercase tracking-tight">{{ 'MATCH_DETAILS.TIMELINE.TITLE' | translate }}</h3>
+        @if (match?.status !== 'scheduled') {
         <button (click)="onAddEvent()"
             class="flex items-center gap-2 px-4 py-2 bg-gold-400/10 hover:bg-gold-400 text-gold-400 hover:text-black border border-gold-400/30 font-bold rounded-lg text-sm transition-all shadow-lg hover:shadow-[0_0_15px_rgba(212,175,55,0.4)]">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
-            Add Event
+            {{ 'COMMON.ADD_EVENT' | translate }}
         </button>
+        }
     </div>
 
     @if (events.length === 0) {
@@ -21,83 +23,101 @@
                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
         </div>
-        <p class="text-zinc-500 font-bold mb-2 uppercase text-sm">No Events Recorded</p>
-        <p class="text-xs text-zinc-600 max-w-xs mx-auto">Add goals, cards, and substitutions to build the match
-            timeline.</p>
+        <p class="text-zinc-500 font-bold mb-2 uppercase text-sm">{{ 'MATCH_DETAILS.TIMELINE.EMPTY' | translate }}</p>
+        <p class="text-xs text-zinc-600 max-w-xs mx-auto">{{ 'MATCH_DETAILS.TIMELINE.EMPTY_DESC' | translate }}</p>
     </div>
     } @else {
-    <div class="relative pl-6 md:pl-0">
-        <!-- Central Line for Desktop, Left Line for Mobile -->
-        <div class="absolute left-6 md:left-1/2 top-0 bottom-0 w-px bg-white/10 transform md:-translate-x-1/2"></div>
+    <div class="relative">
+        <!-- Central Line for all screens -->
+        <div class="absolute left-1/2 top-0 bottom-0 w-px bg-white/10 transform -translate-x-1/2"></div>
 
         <div class="space-y-6">
             @for (event of sortedEvents; track event.id) {
-            <div class="relative flex items-center md:justify-between flex-col md:flex-row gap-4"
-                [ngClass]="{'md:flex-row-reverse': event.teamSide === 'away'}">
+            @if (event.type === 'lineup_announced') {
+            <div class="relative flex items-center justify-center py-4 w-full">
+                <!-- Special centered chip for lineups -->
+                <div class="z-10 bg-black-card border border-gold-400/20 rounded-full px-4 sm:px-6 py-2 flex items-center gap-2 sm:gap-3 shadow-lg hover:border-gold-400/50 transition-all">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gold-400/10 flex items-center justify-center shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-[10px] sm:text-xs font-black text-white uppercase tracking-wider">{{ event.playerName | translate }}</p>
+                        <p class="text-[8px] sm:text-[9px] text-zinc-500 uppercase">{{ event.details | translate }}</p>
+                    </div>
+                </div>
+            </div>
+            } @else {
+            <div class="relative flex items-center justify-between flex-row gap-2 sm:gap-4 w-full"
+                [ngClass]="{'flex-row-reverse': getEventSide(event) === 'away'}">
 
                 <!-- Event Details Side -->
-                <div class="w-full pl-12 md:pl-0 md:w-5/12 group relative"
-                    [ngClass]="{'md:text-right': event.teamSide === 'home', 'md:text-left': event.teamSide === 'away'}">
+                <div class="w-[45%] group relative"
+                    [ngClass]="getEventSide(event) === 'home' ? 'text-right' : 'text-left'">
                     <div
-                        class="bg-black border border-white/5 rounded-xl p-4 shadow-lg hover:border-gold-400/30 transition-all">
+                        class="bg-black border border-white/5 rounded-xl p-3 sm:p-4 shadow-lg hover:border-gold-400/30 transition-all">
 
-                        <div class="flex items-center gap-2 mb-2"
-                            [ngClass]="{'md:flex-row-reverse': event.teamSide === 'home'}">
-                            <span class="text-sm font-bold text-white">{{ event.playerName }}</span>
+                        <div class="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2"
+                            [ngClass]="{'flex-row-reverse': getEventSide(event) === 'home'}">
+                            
+                            @if (event.type === 'substitution') {
+                            <div class="flex flex-col" [ngClass]="getEventSide(event) === 'home' ? 'items-end' : 'items-start'">
+                                <span class="text-xs sm:text-sm font-bold text-white truncate">
+                                    <span class="text-emerald-500 font-black mr-1 text-[10px]">▲</span>{{ event.assistPlayerName || ('MATCH_DETAILS.TIMELINE.SUB_IN' | translate) }}
+                                </span>
+                                <span class="text-[10px] sm:text-xs font-medium text-zinc-400 truncate">
+                                    <span class="text-red-500 font-black mr-1 text-[8px]">▼</span>{{ event.playerName }}
+                                </span>
+                            </div>
+                            } @else {
+                            <span class="text-xs sm:text-sm font-bold text-white truncate max-w-[80px] sm:max-w-none">{{ event.playerName }}</span>
+                            }
 
                             @if(event.type === 'goal') {
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gold-400 shrink-0" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 sm:h-4 sm:w-4 text-gold-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
                             } @else if (event.type === 'own_goal') {
-                            <span class="text-xs font-black text-red-400 shrink-0">OG</span>
+                            <span class="text-[10px] sm:text-xs font-black text-red-400 shrink-0">OG</span>
                             } @else if (event.type === 'yellow_card') {
-                            <div class="w-3 h-4 bg-yellow-400 rounded-sm shrink-0"></div>
+                            <div class="w-2 h-3 sm:w-3 sm:h-4 bg-yellow-400 rounded-sm shrink-0"></div>
                             } @else if (event.type === 'red_card') {
-                            <div class="w-3 h-4 bg-red-500 rounded-sm shrink-0"></div>
+                            <div class="w-2 h-3 sm:w-3 sm:h-4 bg-red-500 rounded-sm shrink-0"></div>
                             } @else if (event.type === 'substitution') {
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 shrink-0"
-                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 sm:h-4 sm:w-4 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                             </svg>
                             } @else if (event.type === 'penalty') {
-                            <span class="text-xs font-black text-purple-400 shrink-0">P</span>
+                            <span class="text-[10px] sm:text-xs font-black text-purple-400 shrink-0">P</span>
                             } @else if (event.type === 'corner') {
-                            <span class="text-xs font-black text-blue-400 shrink-0">🚩</span>
+                            <span class="text-[10px] sm:text-xs font-black text-blue-400 shrink-0">🚩</span>
                             } @else if (event.type === 'foul') {
-                            <span class="text-xs font-black text-orange-400 shrink-0">🤜</span>
+                            <span class="text-[10px] sm:text-xs font-black text-orange-400 shrink-0">🤜</span>
                             } @else if (event.type === 'offside') {
-                            <span class="text-xs font-black text-zinc-400 shrink-0">🚫</span>
+                            <span class="text-[10px] sm:text-xs font-black text-zinc-400 shrink-0">🚫</span>
                             } @else if (event.type === 'free_kick') {
-                            <span class="text-xs font-black text-cyan-400 shrink-0">🎯</span>
+                            <span class="text-[10px] sm:text-xs font-black text-cyan-400 shrink-0">🎯</span>
                             }
                         </div>
-                        <div class="text-xs text-zinc-500 font-bold uppercase"
-                            [ngClass]="{'md:text-right': event.teamSide === 'home', 'md:text-left': event.teamSide === 'away'}">
-                            {{ event.type.replace('_', ' ') }}
-                            @if(event.details) { <span class="capitalize pl-1">({{ event.details }})</span> }
+                        <div class="text-[9px] sm:text-xs text-zinc-500 font-bold uppercase truncate"
+                            [ngClass]="getEventSide(event) === 'home' ? 'text-right' : 'text-left'">
+                            {{ 'COMMON.' + event.type.toUpperCase() | translate }}
+                            @if(event.type !== 'substitution' && event.details) { <span class="capitalize pl-0.5 sm:pl-1">({{ event.details }})</span> }
                         </div>
 
                         <!-- Hover Actions -->
-                        <div class="absolute top-2 right-2 md:top-auto md:bottom-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2"
-                            [ngClass]="{'md:left-2 md:right-auto': event.teamSide === 'home', 'md:right-2 md:left-auto': event.teamSide === 'away'}">
-                            <button (click)="onEditEvent(event)" class="text-zinc-500 hover:text-white p-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        <div class="absolute top-1 sm:top-auto bottom-1 sm:bottom-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 sm:gap-2"
+                            [ngClass]="getEventSide(event) === 'home' ? 'left-1 sm:left-2 right-auto' : 'right-1 sm:right-2 left-auto'">
+                            <button (click)="onEditEvent(event)" [disabled]="isLoading" class="text-zinc-500 hover:text-white p-1 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 sm:h-3.5 sm:w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                 </svg>
                             </button>
-                            <button (click)="onDeleteEvent(event.id)" class="text-zinc-500 hover:text-red-500 p-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            <button (click)="onDeleteEvent(event.id)" [disabled]="isLoading" class="text-zinc-500 hover:text-red-500 p-1 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 sm:h-3.5 sm:w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                 </svg>
                             </button>
                         </div>
@@ -106,17 +126,17 @@
                 </div>
 
                 <!-- Center Marker -->
-                <div
-                    class="absolute left-6 md:static md:w-2/12 flex justify-center shrink-0 w-8 md:w-auto transform -translate-x-1/2 md:translate-x-0 z-10">
+                <div class="w-[10%] flex justify-center shrink-0 z-10">
                     <div
-                        class="w-8 h-8 rounded-full bg-black border-[3px] border-black-border text-[10px] font-black text-white flex items-center justify-center shadow-[0_0_10px_rgba(0,0,0,0.5)]">
+                        class="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-black border-[2px] sm:border-[3px] border-black-border text-[9px] sm:text-[10px] font-black text-white flex items-center justify-center shadow-[0_0_10px_rgba(0,0,0,0.5)]">
                         {{ event.minute }}'
                     </div>
                 </div>
 
                 <!-- Empty space for layout balance -->
-                <div class="hidden md:block md:w-5/12"></div>
+                <div class="w-[45%]"></div>
             </div>
+            }
             }
         </div>
     </div>

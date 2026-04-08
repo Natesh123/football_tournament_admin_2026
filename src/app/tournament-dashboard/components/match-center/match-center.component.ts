@@ -90,6 +90,6 @@ export class MatchCenterComponent implements OnInit, OnDestroy {
     }
 
     goToDetails(matchId: number) {
-        this.router.navigate(['/tournaments', this.tournamentId, 'matches', matchId]);
+        this.router.navigate(['/admin/tournaments', this.tournamentId, 'matches', matchId]);
     }
 }

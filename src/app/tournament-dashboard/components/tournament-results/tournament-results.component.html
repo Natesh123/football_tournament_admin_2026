@@ -1,9 +1,8 @@
 <div class="space-y-8">
     <!-- Page Title -->
     <div>
-        <h1 class="text-3xl font-black text-white tracking-tight">Results & Analytics</h1>
-        <p class="text-zinc-500 mt-1.5">Configure how results are published and manage the standing tables.
-        </p>
+        <h1 class="text-3xl font-black text-white tracking-tight">{{ 'TOURNAMENT_DASHBOARD.RESULTS.TITLE' | translate }}</h1>
+        <p class="text-zinc-500 mt-1.5">{{ 'TOURNAMENT_DASHBOARD.RESULTS.SUBTITLE' | translate }}</p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -18,8 +17,8 @@
                         d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
             </div>
-            <h3 class="text-lg font-bold text-white mb-1">Standings data empty</h3>
-            <p class="text-sm text-zinc-500 mb-4">Match results will appear here once games are played.</p>
+            <h3 class="text-lg font-bold text-white mb-1">{{ 'TOURNAMENT_DASHBOARD.RESULTS.STANDINGS_EMPTY' | translate }}</h3>
+            <p class="text-sm text-zinc-500 mb-4">{{ 'TOURNAMENT_DASHBOARD.RESULTS.MATCH_RESULTS_HINT' | translate }}</p>
         </div>
 
         <div *ngIf="groups.length > 0" class="col-span-1 lg:col-span-2 space-y-6">
@@ -27,7 +26,7 @@
 
             <!-- GROUP STANDINGS SECTION -->
             <div class="mt-8">
-                <h2 class="text-xl font-bold text-white mb-4">Group Standings</h2>
+                <h2 class="text-xl font-bold text-white mb-4">{{ 'TOURNAMENT_DASHBOARD.RESULTS.GROUP_STANDINGS' | translate }}</h2>
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
                     @for (group of groups; track group.id) {
                     <div class="bg-black-card border border-black-border rounded-xl overflow-hidden">
@@ -40,15 +39,15 @@
                                     class="text-[10px] text-zinc-500 font-black uppercase tracking-wider bg-white/5 border-b border-black-border">
                                     <tr>
                                         <th class="px-4 py-3 w-10 text-center">#</th>
-                                        <th class="px-4 py-3 w-full">Club</th>
-                                        <th class="px-3 py-3 text-center">MP</th>
-                                        <th class="px-3 py-3 text-center">W</th>
-                                        <th class="px-3 py-3 text-center">D</th>
-                                        <th class="px-3 py-3 text-center">L</th>
-                                        <th class="px-3 py-3 text-center hidden sm:table-cell">GF</th>
-                                        <th class="px-3 py-3 text-center hidden sm:table-cell">GA</th>
-                                        <th class="px-3 py-3 text-center">GD</th>
-                                        <th class="px-4 py-3 text-center text-gold-400">Pts</th>
+                                        <th class="px-4 py-3 w-full">{{ 'TOURNAMENT_DASHBOARD.RESULTS.CLUB' | translate }}</th>
+                                        <th class="px-3 py-3 text-center">{{ 'TOURNAMENT_DASHBOARD.RESULTS.MP' | translate }}</th>
+                                        <th class="px-3 py-3 text-center">{{ 'TOURNAMENT_DASHBOARD.RESULTS.W' | translate }}</th>
+                                        <th class="px-3 py-3 text-center">{{ 'TOURNAMENT_DASHBOARD.RESULTS.D' | translate }}</th>
+                                        <th class="px-3 py-3 text-center">{{ 'TOURNAMENT_DASHBOARD.RESULTS.L' | translate }}</th>
+                                        <th class="px-3 py-3 text-center hidden sm:table-cell">{{ 'TOURNAMENT_DASHBOARD.RESULTS.GF' | translate }}</th>
+                                        <th class="px-3 py-3 text-center hidden sm:table-cell">{{ 'TOURNAMENT_DASHBOARD.RESULTS.GA' | translate }}</th>
+                                        <th class="px-3 py-3 text-center">{{ 'TOURNAMENT_DASHBOARD.RESULTS.GD' | translate }}</th>
+                                        <th class="px-4 py-3 text-center text-gold-400">{{ 'TOURNAMENT_DASHBOARD.RESULTS.PTS' | translate }}</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-black-border/50">
@@ -67,7 +66,7 @@
                                                 </svg>
                                             </div>
                                             <span class="truncate max-w-[120px] sm:max-w-[200px]">{{ teamRow.team?.name ||
-                                                'TBD' }}</span>
+                                                ('TOURNAMENT_DASHBOARD.RESULTS.TBD' | translate) }}</span>
                                         </td>
                                         <td class="px-3 py-3 text-center text-zinc-400">{{ teamRow.played }}</td>
                                         <td class="px-3 py-3 text-center text-emerald-500/80">{{ teamRow.wins }}</td>

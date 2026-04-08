@@ -18,8 +18,9 @@
                             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
-                <h2 class="text-xl font-black text-white tracking-tight">{{ eventData ? 'Edit Event' : 'Add Match Event'
-                    }}</h2>
+                <h2 class="text-xl font-black text-white tracking-tight">
+                    {{ (eventData ? 'MATCH_DETAILS.TIMELINE.MODAL.TITLE_EDIT' : 'MATCH_DETAILS.TIMELINE.MODAL.TITLE_ADD') | translate }}
+                </h2>
             </div>
             <button (click)="onClose()"
                 class="text-zinc-500 hover:text-white transition-colors p-2 hover:bg-white/5 rounded-lg">
@@ -36,29 +37,31 @@
             <!-- Event Type & Time -->
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Event
-                        Type</label>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">
+                        {{ 'MATCH_DETAILS.TIMELINE.MODAL.TYPE' | translate }}
+                    </label>
                     <select [(ngModel)]="formData.type"
                         class="select select-bordered w-full bg-black-card border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all hover:border-gold-400/50 cursor-pointer">
-                        <option value="goal" class="bg-black text-white">⚽ Goal</option>
-                        <option value="own_goal" class="bg-black text-white">↩️ Own Goal</option>
-                        <option value="yellow_card" class="bg-black text-white">🟨 Yellow Card</option>
-                        <option value="red_card" class="bg-black text-white">🟥 Red Card</option>
-                        <option value="substitution" class="bg-black text-white">🔄 Substitution</option>
-                        <option value="penalty" class="bg-black text-white">⚡ Penalty</option>
-                        <option value="corner" class="bg-black text-white">🚩 Corner</option>
-                        <option value="foul" class="bg-black text-white">🤜 Foul</option>
-                        <option value="offside" class="bg-black text-white">🚫 Offside</option>
-                        <option value="free_kick" class="bg-black text-white">🎯 Free Kick</option>
+                        <option value="goal" class="bg-black text-white">{{ 'COMMON.GOAL' | translate }}</option>
+                        <option value="own_goal" class="bg-black text-white">{{ 'COMMON.OWN_GOAL' | translate }}</option>
+                        <option value="yellow_card" class="bg-black text-white">{{ 'COMMON.YELLOW_CARD' | translate }}</option>
+                        <option value="red_card" class="bg-black text-white">{{ 'COMMON.RED_CARD' | translate }}</option>
+                        <option value="substitution" class="bg-black text-white">{{ 'COMMON.SUBSTITUTION' | translate }}</option>
+                        <option value="penalty" class="bg-black text-white">{{ 'COMMON.PENALTY' | translate }}</option>
+                        <option value="corner" class="bg-black text-white">{{ 'COMMON.CORNER' | translate }}</option>
+                        <option value="foul" class="bg-black text-white">{{ 'COMMON.FOUL' | translate }}</option>
+                        <option value="offside" class="bg-black text-white">{{ 'COMMON.OFFSIDE' | translate }}</option>
+                        <option value="free_kick" class="bg-black text-white">{{ 'COMMON.FREE_KICK' | translate }}</option>
                     </select>
                 </div>
                 <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Minute <span
-                            class="text-red-500">*</span></label>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">
+                        {{ 'MATCH_DETAILS.TIMELINE.MODAL.MINUTE' | translate }} <span class="text-red-500">*</span>
+                    </label>
                     <div class="relative">
                         <input type="number" [(ngModel)]="formData.minute"
                             class="input input-bordered w-full bg-black-card border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all pl-10"
-                            placeholder="e.g. 45" />
+                            [placeholder]="'MATCH_DETAILS.TIMELINE.MODAL.PLACEHOLDER_MINUTE' | translate" />
                         <span
                             class="absolute left-4 top-1/2 transform -translate-y-1/2 text-zinc-400 font-black text-xs">'</span>
                     </div>
@@ -67,20 +70,21 @@
 
             <!-- Team Selection -->
             <div>
-                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Select
-                    Team</label>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">
+                    {{ 'MATCH_DETAILS.TIMELINE.MODAL.TEAM' | translate }}
+                </label>
                 <div class="flex gap-2">
                     <button (click)="onTeamSwitch('home')" 
                         [class.btn-warning]="formData.team === 'home'"
                         [class.btn-outline]="formData.team !== 'home'"
                         class="btn flex-1 border-black-border text-sm font-bold transition-all truncate">
-                        {{ match?.homeTeam?.shortName || match?.homeTeam?.name || 'Home Team' }}
+                        {{ match?.homeTeam?.shortName || match?.homeTeam?.name || ('MATCH_DETAILS.INFO.HOME' | translate) }}
                     </button>
                     <button (click)="onTeamSwitch('away')" 
                         [class.btn-warning]="formData.team === 'away'"
                         [class.btn-outline]="formData.team !== 'away'"
                         class="btn flex-1 border-black-border text-sm font-bold transition-all truncate">
-                        {{ match?.awayTeam?.shortName || match?.awayTeam?.name || 'Away Team' }}
+                        {{ match?.awayTeam?.shortName || match?.awayTeam?.name || ('MATCH_DETAILS.INFO.AWAY' | translate) }}
                     </button>
                 </div>
             </div>
@@ -88,12 +92,12 @@
             <!-- Player Name (Dropdown) -->
             <div>
                 <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">
-                    Player Name <span class="text-gold-400">*</span>
+                    {{ (formData.type === 'substitution' ? 'MATCH_DETAILS.TIMELINE.MODAL.SUB_OUT_PLAYER' : 'MATCH_DETAILS.TIMELINE.MODAL.PLAYER') | translate }} <span class="text-red-500">*</span>
                 </label>
                 <select [(ngModel)]="formData.playerName" name="playerName" required
                     class="select select-bordered w-full bg-black-card border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all hover:border-gold-400/50 cursor-pointer">
-                    <option value="" disabled class="bg-black">Select Player</option>
-                    @for (p of currentTeamPlayers; track p.id) {
+                    <option value="" disabled class="bg-black">{{ 'MATCH_DETAILS.DIRECT_FORM.SELECT_PLAYER' | translate }}</option>
+                    @for (p of (formData.type === 'substitution' ? currentTeamStartingPlayers : currentTeamPlayers); track p.id) {
                     <option [value]="p.name" class="bg-black">
                         {{ p.name }} {{ p.jerseyNumber ? '(#' + p.jerseyNumber + ')' : '' }}
                     </option>
@@ -104,29 +108,33 @@
             <!-- Details / Assist (Dropdown + Optional Text) -->
             <div>
                 <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">
-                    Details / {{ formData.type === 'goal' ? 'Assist' : '' }} (Optional)
+                    {{ (formData.type === 'substitution' ? 'MATCH_DETAILS.TIMELINE.MODAL.SUB_IN_PLAYER' : (formData.type === 'goal' ? 'MATCH_DETAILS.TIMELINE.MODAL.ASSIST' : 'MATCH_DETAILS.TIMELINE.MODAL.DETAILS')) | translate }}
+                    @if (formData.type === 'substitution') {
+                    <span class="text-red-500">*</span>
+                    }
                 </label>
                 
-                <!-- If Goal, show Assist Dropdown -->
-                @if (formData.type === 'goal') {
+                @if (formData.type === 'goal' || formData.type === 'substitution') {
                 <div class="space-y-3">
                     <select [(ngModel)]="formData.assistPlayerName" name="assistPlayerName"
                         class="select select-bordered w-full bg-black-card border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all hover:border-gold-400/50 cursor-pointer">
-                        <option value="" class="bg-black">No Assist (Select Player)</option>
-                        @for (p of currentTeamPlayers; track p.id) {
+                        <option value="" class="bg-black">{{ (formData.type === 'substitution' ? 'MATCH_DETAILS.TIMELINE.MODAL.SELECT_SUB' : 'MATCH_DETAILS.TIMELINE.MODAL.NO_ASSIST') | translate }}</option>
+                        @for (p of (formData.type === 'substitution' ? currentTeamSubPlayers : currentTeamPlayers); track p.id) {
                         <option [value]="p.name" [disabled]="p.name === formData.playerName" class="bg-black">
                             {{ p.name }}
                         </option>
                         }
                     </select>
+                    @if (formData.type === 'goal') {
                     <input type="text" [(ngModel)]="formData.details" name="details"
                         class="input input-bordered w-full bg-black-card border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all"
-                        placeholder="Extra goal details (e.g. Header, Penalty)" />
+                        [placeholder]="'MATCH_DETAILS.TIMELINE.MODAL.PLACEHOLDER_DETAILS_GOAL' | translate" />
+                    }
                 </div>
                 } @else {
                 <input type="text" [(ngModel)]="formData.details" name="details"
                     class="input input-bordered w-full bg-black-card border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all"
-                    placeholder="e.g. Foul type, substitution details" />
+                    [placeholder]="'MATCH_DETAILS.TIMELINE.MODAL.PLACEHOLDER_DETAILS_GENERAL' | translate" />
                 }
             </div>
         </div>
@@ -135,15 +143,15 @@
         <div class="p-6 border-t border-black-border bg-black-card/50 flex justify-end gap-3">
             <button (click)="onClose()"
                 class="btn btn-ghost text-zinc-400 hover:text-white font-bold text-sm">
-                Cancel
+                {{ 'COMMON.CANCEL' | translate }}
             </button>
             <button (click)="onSubmit()" [disabled]="isSubmitting"
                 class="btn bg-gold-400 hover:bg-gold-400/90 text-black border-none font-bold text-sm transition-all shadow-[0_0_15px_rgba(212,175,55,0.4)] flex items-center gap-2">
                 @if (isSubmitting) {
                 <span class="loading loading-spinner loading-xs"></span>
-                Saving...
+                {{ 'MATCH_DETAILS.TIMELINE.MODAL.SUBMITTING' | translate }}
                 } @else {
-                {{ eventData ? 'Save Changes' : 'Add Event' }}
+                {{ (eventData ? 'MATCH_DETAILS.TIMELINE.MODAL.SUBMIT_EDIT' : 'MATCH_DETAILS.TIMELINE.MODAL.SUBMIT_ADD') | translate }}
                 }
             </button>
         </div>

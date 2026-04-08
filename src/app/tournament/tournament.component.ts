@@ -20,7 +20,7 @@ export class TournamentComponent implements OnInit {
     isLoading = signal(true);
     showCreateModal = signal(false);
     isCreating = signal(false);
-    toastMessage = signal('');
+    toastMessage = signal<{text: string, type: 'success' | 'error' | 'info'} | null>(null);
 
     // Filters
     searchQuery = '';
@@ -36,7 +36,8 @@ export class TournamentComponent implements OnInit {
         endDate: '',
         status: 'draft',
         maxTeams: 16,
-        prizePool: ''
+        minTeams: 3,
+        type: 'group'
     };
 
     platformStats = [
@@ -78,20 +79,20 @@ export class TournamentComponent implements OnInit {
             error: (err) => {
                 console.error('Failed to load tournaments', err);
                 this.isLoading.set(false);
-                this.showToast('Failed to load tournaments');
+                this.showToast('Failed to load tournaments', 'error');
             }
         });
     }
 
     manageTournament(id: string | undefined) {
         if (id) {
-            this.router.navigate(['/tournaments', id]);
+            this.router.navigate(['/admin/tournaments', id]);
         }
     }
 
     viewMatchCenter(id: string | undefined) {
         if (id) {
-            this.router.navigate(['/tournaments', id, 'match-center']);
+            this.router.navigate(['/admin/tournaments', id, 'match-center']);
         }
     }
 
@@ -229,26 +230,29 @@ export class TournamentComponent implements OnInit {
             description: this.newTournament.description,
             startDate: this.newTournament.startDate,
             endDate: this.newTournament.endDate || this.newTournament.startDate,
-            maxTeams: this.newTournament.maxTeams,
+            maxTeams: Number(this.newTournament.maxTeams),
+            minTeams: this.newTournament.minTeams,
             status: this.newTournament.status,
+            type: this.newTournament.type,
         }).subscribe({
             next: (created) => {
                 this.isCreating.set(false);
                 this.closeCreateModal();
+                this.showToast('Tournament created successfully!', 'success');
                 // Navigate to the tournament dashboard
                 this.router.navigate(['/tournaments', created.id]);
             },
             error: (err) => {
                 console.error('Failed to create tournament:', err);
                 this.isCreating.set(false);
-                this.showToast('Failed to create tournament. Please try again.');
+                this.showToast('Failed to create tournament. Please try again.', 'error');
             }
         });
     }
 
-    showToast(message: string) {
-        this.toastMessage.set(message);
-        setTimeout(() => this.toastMessage.set(''), 3000);
+    showToast(text: string, type: 'success' | 'error' | 'info' = 'success') {
+        this.toastMessage.set({ text, type });
+        setTimeout(() => this.toastMessage.set(null), 3000);
     }
 
     resetForm() {
@@ -259,7 +263,23 @@ export class TournamentComponent implements OnInit {
             endDate: '',
             status: 'draft',
             maxTeams: 16,
-            prizePool: ''
+            minTeams: 3,
+            type: 'group'
         };
+    }
+
+    onFormatChange() {
+        switch (this.newTournament.type) {
+            case 'group':
+                this.newTournament.minTeams = 3;
+                break;
+            case 'knockout':
+            case 'group_knockout':
+                this.newTournament.minTeams = 4;
+                break;
+            default:
+                this.newTournament.minTeams = 2;
+                break;
+        }
     }
 }

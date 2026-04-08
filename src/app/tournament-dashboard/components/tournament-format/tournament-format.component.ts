@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 
@@ -49,12 +50,13 @@ interface TournamentTeam {
 @Component({
     selector: 'app-tournament-format',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, TranslateModule],
     templateUrl: './tournament-format.component.html'
 })
 export class TournamentFormatComponent implements OnInit, OnChanges {
     @Input() data!: any;
     @Input() tournamentId!: string;
+    @Input() maxTeams: number = 16;
     @Output() formatChange = new EventEmitter<any>();
 
     private cdr = inject(ChangeDetectorRef);
@@ -89,7 +91,7 @@ export class TournamentFormatComponent implements OnInit, OnChanges {
     customGroup_numTeams: number = 4;
     customGroup_encounters: number = 1;
     customKnockout_numTeams: number = 8;
-    customKnockout_roundNames: string[] = ['Quarter Final', 'Semi Final', 'Final'];
+    customKnockout_roundNames: string[] = ['MATCH_DETAILS.ROUNDS.QUARTER_FINAL', 'MATCH_DETAILS.ROUNDS.SEMI_FINAL', 'MATCH_DETAILS.ROUNDS.FINAL'];
 
     // ─── Group Phase Only config ─────────────────────────────────────────────
     groupOnly_numGroups: number = 4;
@@ -106,12 +108,17 @@ export class TournamentFormatComponent implements OnInit, OnChanges {
 
     ngOnInit() {
         if (!this.data) { this.data = {}; }
+        this.calculateDefaults();
         this.initializeFromData();
         this.loadTeams();
     }
 
     ngOnChanges(changes: SimpleChanges) {
+        if (changes['maxTeams'] && !changes['data']?.isFirstChange()) {
+            this.calculateDefaults();
+        }
         if (changes['data']) {
+            this.calculateDefaults();
             this.initializeFromData();
             // Also load teams if tournamentId is already available but teams haven't loaded yet
             if (this.tournamentId && this.teamNames.length <= 1) {
@@ -121,6 +128,53 @@ export class TournamentFormatComponent implements OnInit, OnChanges {
         if (changes['tournamentId'] && this.tournamentId) {
             this.loadTeams();
         }
+    }
+
+    private calculateDefaults() {
+        if (!this.maxTeams) this.maxTeams = 16;
+        
+        let groups = 4;
+        let teamsPerG = 4;
+
+        if (this.maxTeams <= 4) {
+            groups = 1;
+            teamsPerG = this.maxTeams;
+        } else if (this.maxTeams <= 8) {
+            groups = 2;
+            teamsPerG = Math.floor(this.maxTeams / 2);
+        } else if (this.maxTeams <= 12) {
+            groups = 4;
+            teamsPerG = 3;
+        } else if (this.maxTeams <= 24) {
+            groups = 4;
+            teamsPerG = Math.floor(this.maxTeams / 4);
+        } else if (this.maxTeams <= 32) {
+            groups = 8;
+            teamsPerG = Math.floor(this.maxTeams / 8);
+        } else {
+            groups = 8;
+            teamsPerG = Math.floor(this.maxTeams / 8);
+        }
+
+        this.groupOnly_numGroups = groups;
+        this.groupOnly_teamsPerGroup = teamsPerG;
+        
+        this.gk_numGroups = groups;
+        this.gk_teamsPerGroup = teamsPerG;
+        // Default advancing: top 2 if possible, else 1
+        this.gk_advancingTeams = teamsPerG > 2 ? 2 : 1; 
+
+        // Knockout must be a power of 2
+        let koTeams = 2;
+        while (koTeams * 2 <= this.maxTeams) {
+            koTeams *= 2;
+        }
+        if (this.maxTeams === 4) koTeams = 4;
+        this.knockout_totalTeams = koTeams;
+
+        // Custom defaults
+        this.customGroup_numTeams = this.groupOnly_numGroups * this.groupOnly_teamsPerGroup;
+        this.customKnockout_numTeams = koTeams;
     }
 
     private loadTeams() {
@@ -175,23 +229,23 @@ export class TournamentFormatComponent implements OnInit, OnChanges {
                 // Auto-generate default structure based on selected format since `format_data` is missing
                 if (this.selectedFormat === 'group') {
                     this.boardPhases = [{
-                        id: 'phase-group', name: 'Group phase', kind: 'group',
+                        id: 'phase-group', name: 'TOURNAMENT_DASHBOARD.FORMAT.MODAL_GENERIC_GROUPS_TITLE', kind: 'group',
                         groups: this.buildGroups(this.groupOnly_numGroups || 4, this.groupOnly_teamsPerGroup || 4)
                     }];
                 } else if (this.selectedFormat === 'group_knockout') {
                     this.boardPhases = [
                         {
-                            id: 'phase-group', name: 'Group phase', kind: 'group',
+                            id: 'phase-group', name: 'TOURNAMENT_DASHBOARD.FORMAT.MODAL_GENERIC_GROUPS_TITLE', kind: 'group',
                             groups: this.buildGroups(this.gk_numGroups || 4, this.gk_teamsPerGroup || 4)
                         },
                         {
-                            id: 'phase-knockout', name: 'Knockout phase', kind: 'knockout',
+                            id: 'phase-knockout', name: 'TOURNAMENT_DASHBOARD.FORMAT.MODAL_GENERIC_KO_TITLE', kind: 'knockout',
                             rounds: this.buildKnockoutRounds((this.gk_numGroups || 4) * (this.gk_advancingTeams || 2) || 8)
                         }
                     ];
                 } else if (this.selectedFormat === 'knockout') {
                     this.boardPhases = [{
-                        id: 'phase-knockout', name: 'Knockout phase', kind: 'knockout',
+                        id: 'phase-knockout', name: 'TOURNAMENT_DASHBOARD.FORMAT.MODAL_GENERIC_KO_TITLE', kind: 'knockout',
                         rounds: this.buildKnockoutRounds(this.knockout_totalTeams || 16)
                     }];
                 }
@@ -335,8 +389,8 @@ export class TournamentFormatComponent implements OnInit, OnChanges {
     private buildKnockoutRounds(totalTeams: number, matchIdOffset: number = 1): BoardRound[] {
         if (totalTeams < 2) return [];
         const roundNames: Record<number, string> = {
-            2: 'Final', 4: 'Semi Final', 8: 'Quarter Final',
-            16: 'Round of 16', 32: 'Round of 32', 64: 'Round of 64'
+            2: 'MATCH_DETAILS.ROUNDS.FINAL', 4: 'MATCH_DETAILS.ROUNDS.SEMI_FINAL', 8: 'MATCH_DETAILS.ROUNDS.QUARTER_FINAL',
+            16: 'MATCH_DETAILS.ROUNDS.R16', 32: 'MATCH_DETAILS.ROUNDS.R32', 64: 'MATCH_DETAILS.ROUNDS.R64'
         };
         const rounds: BoardRound[] = [];
         let teams = totalTeams;
@@ -381,7 +435,7 @@ export class TournamentFormatComponent implements OnInit, OnChanges {
             this.customStages = [];
             this.activeModal = null;
             this.boardPhases = [{
-                id: 'phase-group', name: 'Group phase', kind: 'group',
+                id: 'phase-group', name: 'TOURNAMENT_DASHBOARD.FORMAT.MODAL_GENERIC_GROUPS_TITLE', kind: 'group',
                 groups: this.buildGroups(this.groupOnly_numGroups, this.groupOnly_teamsPerGroup)
             }];
             this.showBoard = true;
@@ -407,7 +461,7 @@ export class TournamentFormatComponent implements OnInit, OnChanges {
                     groups: this.buildGroups(this.gk_numGroups, this.gk_teamsPerGroup)
                 },
                 {
-                    id: 'phase-knockout', name: 'Knockout phase', kind: 'knockout',
+                    id: 'phase-knockout', name: 'TOURNAMENT_DASHBOARD.FORMAT.MODAL_GENERIC_KO_TITLE', kind: 'knockout',
                     rounds: this.buildKnockoutRounds(totalKnockoutTeams)
                 }
             ];
@@ -421,8 +475,8 @@ export class TournamentFormatComponent implements OnInit, OnChanges {
         const rounds: string[] = [];
         let teams = this.knockout_totalTeams;
         const names: Record<number, string> = {
-            2: 'Final', 4: 'Semi Final', 8: 'Quarter Final',
-            16: 'Round of 16', 32: 'Round of 32', 64: 'Round of 64'
+            2: 'MATCH_DETAILS.ROUNDS.FINAL', 4: 'MATCH_DETAILS.ROUNDS.SEMI_FINAL', 8: 'MATCH_DETAILS.ROUNDS.QUARTER_FINAL',
+            16: 'MATCH_DETAILS.ROUNDS.R16', 32: 'MATCH_DETAILS.ROUNDS.R32', 64: 'MATCH_DETAILS.ROUNDS.R64'
         };
         while (teams >= 2) { rounds.push(names[teams] ?? `Round of ${teams}`); teams = Math.floor(teams / 2); }
         return rounds;
@@ -435,7 +489,7 @@ export class TournamentFormatComponent implements OnInit, OnChanges {
             this.customStages = [];
             this.activeModal = null;
             this.boardPhases = [{
-                id: 'phase-knockout', name: 'Knockout phase', kind: 'knockout',
+                id: 'phase-knockout', name: 'TOURNAMENT_DASHBOARD.FORMAT.MODAL_GENERIC_KO_TITLE', kind: 'knockout',
                 rounds: this.buildKnockoutRounds(this.knockout_totalTeams)
             }];
             this.showBoard = true;
@@ -538,7 +592,7 @@ export class TournamentFormatComponent implements OnInit, OnChanges {
         const idx = this.boardPhases.length;
         this.boardPhases.push({
             id: `phase-knockout-${idx}`,
-            name: 'Knockout phase',
+            name: 'TOURNAMENT_DASHBOARD.FORMAT.MODAL_GENERIC_KO_TITLE',
             kind: 'knockout',
             rounds: this.buildKnockoutRounds(this.gk_numGroups * this.gk_advancingTeams || 8)
         });
@@ -595,8 +649,8 @@ export class TournamentFormatComponent implements OnInit, OnChanges {
         const rounds: string[] = [];
         let teams = this.customKnockout_numTeams;
         const names: Record<number, string> = {
-            2: 'Final', 4: 'Semi Final', 8: 'Quarter Final',
-            16: 'Round of 16', 32: 'Round of 32', 64: 'Round of 64'
+            2: 'MATCH_DETAILS.ROUNDS.FINAL', 4: 'MATCH_DETAILS.ROUNDS.SEMI_FINAL', 8: 'MATCH_DETAILS.ROUNDS.QUARTER_FINAL',
+            16: 'MATCH_DETAILS.ROUNDS.R16', 32: 'MATCH_DETAILS.ROUNDS.R32', 64: 'MATCH_DETAILS.ROUNDS.R64'
         };
         while (teams >= 2) { rounds.push(names[teams] ?? `Round of ${teams}`); teams = Math.floor(teams / 2); }
         return rounds;

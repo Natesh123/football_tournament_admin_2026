@@ -1,17 +1,59 @@
-import { Component, Input, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, Input, ChangeDetectorRef, inject, HostListener, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { environment } from '../../../../environments/environment';
 
 @Component({
     selector: 'app-tournament-general',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [
+        CommonModule,
+        FormsModule,
+        TranslateModule
+    ],
     templateUrl: './tournament-general.component.html'
 })
 export class TournamentGeneralComponent {
-    @Input() data!: any;
+    private translate = inject(TranslateService);
+    @Input() data: any;
     private cdr = inject(ChangeDetectorRef);
+
+    availableSponsors = [
+        'Nike', 'Adidas', 'Puma', 'Under Armour', 'Red Bull', 
+        'Qatar Airways', 'Emirates', 'Heineken', 'Coca-Cola', 
+        'Pepsi', 'Visa', 'Mastercard', 'Local Partner'
+    ];
+
+    sponsorDropdownOpen = false;
+    sponsorSearchQuery = '';
+
+    @ViewChild('sponsorDropdown') sponsorDropdown!: ElementRef;
+
+    @HostListener('document:click', ['$event'])
+    onClickOutside(event: Event) {
+        if (this.sponsorDropdownOpen && this.sponsorDropdown && !this.sponsorDropdown.nativeElement.contains(event.target)) {
+            this.sponsorDropdownOpen = false;
+            this.cdr.detectChanges();
+        }
+    }
+
+    get filteredSponsors() {
+        if (!this.sponsorSearchQuery) return this.availableSponsors;
+        const q = this.sponsorSearchQuery.toLowerCase();
+        return this.availableSponsors.filter(s => s.toLowerCase().includes(q));
+    }
+
+    toggleSponsor(sponsor: string) {
+        if (!this.data.sponsors) this.data.sponsors = [];
+        const index = this.data.sponsors.indexOf(sponsor);
+        if (index === -1) {
+            this.data.sponsors.push(sponsor);
+        } else {
+            this.data.sponsors.splice(index, 1);
+        }
+        this.cdr.detectChanges();
+    }
 
     onFileSelected(event: any, field: 'logo' | 'coverImage') {
         const input = event.target;

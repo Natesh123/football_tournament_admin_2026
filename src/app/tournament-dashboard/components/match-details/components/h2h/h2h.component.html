@@ -3,8 +3,9 @@
     <!-- RECENT FORM -->
     @if (mode === 'all' || mode === 'form') {
     <div class="bg-black-card border border-black-border rounded-xl p-6 md:p-8">
-        <h3 class="text-sm font-black text-white uppercase tracking-wider border-b border-black-border pb-4 mb-6">Recent
-            Form</h3>
+        <h3 class="text-sm font-black text-white uppercase tracking-wider border-b border-black-border pb-4 mb-6">
+            {{ 'MATCH_DETAILS.H2H.RECENT_FORM' | translate }}
+        </h3>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 divide-y md:divide-y-0 md:divide-x divide-black-border">
             <!-- Home Team Form -->
@@ -15,7 +16,7 @@
                         <img *ngIf="homeTeam?.logo" [src]="homeTeam.logo" alt="Home Team"
                             class="w-full h-full object-contain" />
                     </div>
-                    <span class="font-bold text-white">{{ homeTeam?.name || 'Home' }}</span>
+                    <span class="font-bold text-white">{{ homeTeam?.name || ('MATCH_DETAILS.INFO.HOME' | translate) }}</span>
                 </div>
 
                 <div class="flex items-center gap-2">
@@ -26,7 +27,7 @@
                         </div>
                     </ng-container>
                     <ng-template #noHomeForm>
-                        <span class="text-xs font-bold text-zinc-500 uppercase tracking-widest">No match data</span>
+                        <span class="text-xs font-bold text-zinc-500 uppercase tracking-widest">{{ 'MATCH_DETAILS.H2H.NO_DATA' | translate }}</span>
                     </ng-template>
                 </div>
             </div>
@@ -39,7 +40,7 @@
                         <img *ngIf="awayTeam?.logo" [src]="awayTeam.logo" alt="Away Team"
                             class="w-full h-full object-contain" />
                     </div>
-                    <span class="font-bold text-white">{{ awayTeam?.name || 'Away' }}</span>
+                    <span class="font-bold text-white">{{ awayTeam?.name || ('MATCH_DETAILS.INFO.AWAY' | translate) }}</span>
                 </div>
 
                 <div class="flex items-center gap-2">
@@ -62,7 +63,7 @@
     @if (mode === 'all' || mode === 'h2h') {
     <div class="bg-black-card border border-black-border rounded-xl overflow-hidden">
         <div class="p-6 md:p-8 border-b border-black-border">
-            <h3 class="text-sm font-black text-white uppercase tracking-wider">Head-To-Head Matches</h3>
+            <h3 class="text-sm font-black text-white uppercase tracking-wider">{{ 'MATCH_DETAILS.H2H.TITLE' | translate }}</h3>
         </div>
 
         <div class="divide-y divide-black-border">
@@ -112,8 +113,8 @@
                                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
-                    <p class="font-bold text-zinc-400">No Previous Encounters Found</p>
-                    <p class="text-xs text-zinc-500 mt-1">These teams haven't played against each other yet.</p>
+                    <p class="font-bold text-zinc-400">{{ 'MATCH_DETAILS.H2H.NO_PREVIOUS' | translate }}</p>
+                    <p class="text-xs text-zinc-500 mt-1">{{ 'MATCH_DETAILS.H2H.NO_PREVIOUS_DESC' | translate }}</p>
                 </div>
             </ng-template>
         </div>
@@ -124,7 +125,7 @@
     @if (mode === 'all' || mode === 'standings') {
     <div *ngIf="groupStandings" class="bg-black-card border border-black-border rounded-xl mt-8 overflow-hidden">
         <div class="px-6 py-4 border-b border-black-border flex justify-between items-center bg-zinc-900/50">
-            <h3 class="text-sm font-black text-white uppercase tracking-wider">Group Standings</h3>
+            <h3 class="text-sm font-black text-white uppercase tracking-wider">{{ 'MATCH_DETAILS.H2H.GROUP_STANDINGS' | translate }}</h3>
             <span
                 class="text-xs font-bold text-zinc-500 bg-black px-3 py-1 rounded-full border border-black-border uppercase tracking-widest">{{
                 groupStandings.groupName }}</span>
@@ -135,14 +136,15 @@
                 <thead
                     class="text-[10px] text-zinc-500 font-black uppercase tracking-wider bg-black border-b border-black-border">
                     <tr>
-                        <th class="px-4 py-3 w-10 text-center">Pos</th>
-                        <th class="px-4 py-3">Team</th>
-                        <th class="px-3 py-3 text-center">MP</th>
-                        <th class="px-3 py-3 text-center">W</th>
-                        <th class="px-3 py-3 text-center">D</th>
-                        <th class="px-3 py-3 text-center">L</th>
-                        <th class="px-3 py-3 text-center hidden sm:table-cell">GD</th>
-                        <th class="px-4 py-3 text-center text-gold-400">Pts</th>
+                        <th class="px-4 py-3 w-10 text-center">{{ 'MATCH_DETAILS.H2H.POS' | translate }}</th>
+                        <th class="px-4 py-3">{{ 'MATCH_DETAILS.H2H.TEAM' | translate }}</th>
+                        <th class="px-3 py-3 text-center">{{ 'MATCH_DETAILS.H2H.MP' | translate }}</th>
+                        <th class="px-3 py-3 text-center">{{ 'MATCH_DETAILS.H2H.W' | translate }}</th>
+                        <th class="px-3 py-3 text-center">{{ 'MATCH_DETAILS.H2H.D' | translate }}</th>
+                        <th class="px-3 py-3 text-center">{{ 'MATCH_DETAILS.H2H.L' | translate }}</th>
+                        <th class="px-3 py-3 text-center hidden sm:table-cell">{{ 'MATCH_DETAILS.H2H.GD' | translate }}</th>
+                        <th class="px-4 py-3 text-center text-gold-400">{{ 'MATCH_DETAILS.H2H.PTS' | translate }}</th>
+                        <th class="px-4 py-3 text-center">{{ 'MATCH_DETAILS.H2H.FORM' | translate }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-black-border text-xs sm:text-sm">
@@ -162,9 +164,9 @@
                             </div>
                             <span class="truncate max-w-[120px] sm:max-w-[200px]">{{ team.teamName }}</span>
                             <span *ngIf="team.teamId === homeTeam?.id"
-                                class="hidden sm:inline-block text-[9px] bg-white/10 text-white px-2 py-0.5 rounded-sm uppercase tracking-widest font-black ml-2">Home</span>
+                                class="hidden sm:inline-block text-[9px] bg-white/10 text-white px-2 py-0.5 rounded-sm uppercase tracking-widest font-black ml-2">{{ 'MATCH_DETAILS.INFO.HOME' | translate }}</span>
                             <span *ngIf="team.teamId === awayTeam?.id"
-                                class="hidden sm:inline-block text-[9px] bg-white/10 text-white px-2 py-0.5 rounded-sm uppercase tracking-widest font-black ml-2">Away</span>
+                                class="hidden sm:inline-block text-[9px] bg-white/10 text-white px-2 py-0.5 rounded-sm uppercase tracking-widest font-black ml-2">{{ 'MATCH_DETAILS.INFO.AWAY' | translate }}</span>
                         </td>
                         <td class="px-3 py-3 text-center text-zinc-400 font-medium">{{ team.played }}</td>
                         <td class="px-3 py-3 text-center text-emerald-500/80">{{ team.wins }}</td>
@@ -175,6 +177,13 @@
                             {{ team.goalDifference > 0 ? '+' : '' }}{{ team.goalDifference }}
                         </td>
                         <td class="px-4 py-3 text-center font-black text-gold-400 bg-gold-400/5">{{ team.points }}</td>
+                        <td class="px-4 py-3 text-center">
+                            <div class="flex items-center gap-1 justify-center">
+                                <div *ngFor="let res of team.form" [ngClass]="getFormColor(res)" class="w-5 h-5 rounded-sm text-[9px] flex items-center justify-center font-black border">
+                                    {{ res }}
+                                </div>
+                            </div>
+                        </td>
                     </tr>
                 </tbody>
             </table>

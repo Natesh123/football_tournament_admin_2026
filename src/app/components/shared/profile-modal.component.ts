@@ -10,97 +10,172 @@ import { SettingsService } from '../../settings/settings.service';
   template: `
     <div *ngIf="show" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <!-- Backdrop -->
-      <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="onClose.emit()"></div>
+      <div class="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300" (click)="onClose.emit()"></div>
       
       <!-- Modal Content -->
-      <div class="relative bg-black-card border border-gold-400/30 rounded-2xl w-full max-w-lg shadow-[0_0_50px_rgba(251,191,36,0.15)] overflow-hidden animate-in zoom-in-95 duration-200">
-        <!-- Header -->
-        <div class="px-6 py-4 border-b border-black-border flex items-center justify-between bg-white/5">
-          <h3 class="text-xl font-bold text-white uppercase tracking-wider italic">User Profile</h3>
-          <button (click)="onClose.emit()" class="text-zinc-500 hover:text-white transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        <div class="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
-          <!-- User Stats/Badge -->
-          <div class="flex items-center gap-4 p-4 bg-gold-400/5 rounded-xl border border-gold-400/10">
-            <div class="w-16 h-16 rounded-full bg-gold-400/20 flex items-center justify-center border-2 border-gold-400/30">
-              <span class="text-2xl font-black text-gold-400">{{ user?.user_name?.charAt(0)?.toUpperCase() }}</span>
+      <div class="relative w-full max-w-xl transform overflow-hidden rounded-2xl border border-gold-400/30 bg-black-card text-left align-middle shadow-[0_0_80px_rgba(0,0,0,0.9),0_0_30px_rgba(251,191,36,0.15)] transition-all animate-in zoom-in-95 duration-300">
+          <!-- Header -->
+          <div class="px-8 py-5 border-b border-black-border flex items-center justify-between bg-gradient-to-r from-black-card to-white/[0.03]">
+            <div class="flex items-center gap-3">
+               <div class="w-2 h-2 rounded-full bg-gold-400 shadow-[0_0_10px_rgba(251,191,36,0.6)]"></div>
+               <h3 class="text-xl font-black text-white uppercase tracking-[0.2em]">User Profile</h3>
             </div>
-            <div>
-              <h4 class="text-lg font-bold text-white">{{ user?.user_name }}</h4>
-              <p class="text-sm text-zinc-500">{{ user?.email }}</p>
-              <div class="mt-1 flex items-center gap-2">
-                <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest bg-gold-400 text-black">
-                  {{ user?.userRole?.name }}
-                </span>
-                <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest border border-green-500/30 text-green-500 bg-green-500/5">
-                  {{ user?.state === 1 ? 'Active' : 'Inactive' }}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Basic Info (Read Only) -->
-          <div class="grid grid-cols-2 gap-4">
-             <div class="space-y-1">
-                <label class="text-[10px] text-zinc-500 uppercase font-black tracking-widest">Phone Number</label>
-                <div class="bg-black-bg border border-black-border rounded-lg px-4 py-2.5 text-white font-mono">
-                  {{ user?.phone_number || 'N/A' }}
-                </div>
-             </div>
-             <div class="space-y-1">
-                <label class="text-[10px] text-zinc-500 uppercase font-black tracking-widest">Role (Disabled)</label>
-                <div class="bg-black-bg border border-black-border rounded-lg px-4 py-2.5 text-zinc-500 italic">
-                  {{ user?.userRole?.name || 'User' }}
-                </div>
-             </div>
-          </div>
-
-          <!-- Password Change Section -->
-          <div class="pt-6 border-t border-black-border">
-            <div class="flex items-center gap-2 mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 00-2 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            <button (click)="onClose.emit()" class="w-10 h-10 rounded-full flex items-center justify-center text-zinc-500 hover:text-white hover:bg-white/5 transition-all">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
-              <h4 class="text-sm font-bold text-white uppercase tracking-wider">Security Settings</h4>
+            </button>
+          </div>
+          
+          <!-- Modal Body -->
+          <div class="p-8 space-y-8 max-h-[75vh] overflow-y-auto custom-scrollbar">
+            <!-- User Stats/Badge -->
+            <div class="relative group">
+              <div class="absolute -inset-0.5 bg-gradient-to-r from-gold-400/50 to-amber-600/50 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
+              <div class="relative flex items-center gap-6 p-5 bg-black-bg/50 rounded-xl border border-gold-400/20">
+                <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-gold-400/20 to-gold-400/5 flex items-center justify-center border border-gold-400/30 shadow-inner">
+                  <span class="text-4xl font-black text-gold-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.3)]">{{ user?.user_name?.charAt(0)?.toUpperCase() }}</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h4 class="text-2xl font-black text-white truncate">{{ user?.user_name }}</h4>
+                  <p class="text-zinc-500 font-medium truncate mb-2">{{ user?.email }}</p>
+                  <div class="flex flex-wrap items-center gap-2">
+                    <span class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-[0.1em] bg-gold-400/10 text-gold-400 border border-gold-400/20">
+                      {{ user?.userRole?.name }}
+                    </span>
+                    <span class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-[0.1em] border border-green-500/20 text-green-500 bg-green-500/10">
+                      {{ user?.state === 1 ? 'Active' : 'Inactive' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="space-y-4">
-              <div class="space-y-1">
-                <label class="text-[10px] text-zinc-500 uppercase font-black tracking-widest px-1">Current Password</label>
-                <input formControlName="oldPassword" type="password" placeholder="Enter current password"
-                  class="w-full bg-black-bg border border-black-border rounded-lg px-4 py-2.5 text-white focus:border-gold-400 focus:outline-none transition-all" />
+            <!-- Basic Info Section -->
+            <div class="space-y-4">
+              <h4 class="text-[11px] text-zinc-500 uppercase font-black tracking-[0.3em] pl-1 border-l-2 border-gold-400/50 ml-1">Identity & Contact</h4>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                 <div class="space-y-1.5">
+                    <label class="text-[9px] text-zinc-600 uppercase font-black tracking-widest px-1">Display Name</label>
+                    <div class="bg-black-bg/40 border border-black-border rounded-xl px-4 py-3 text-white font-bold shadow-inner">
+                      {{ user?.user_name || 'N/A' }}
+                    </div>
+                 </div>
+                 <div class="space-y-1.5">
+                    <label class="text-[9px] text-zinc-600 uppercase font-black tracking-widest px-1">Email Connection</label>
+                    <div class="bg-black-bg/40 border border-black-border rounded-xl px-4 py-3 text-zinc-400 text-sm truncate shadow-inner">
+                      {{ user?.email || 'N/A' }}
+                    </div>
+                 </div>
+                 <div class="space-y-1.5">
+                    <label class="text-[9px] text-zinc-600 uppercase font-black tracking-widest px-1">Secure Mobile</label>
+                    <div class="bg-black-bg/40 border border-black-border rounded-xl px-4 py-3 text-white font-mono text-sm shadow-inner group-hover:border-gold-400/30 transition-colors">
+                      {{ user?.phone_number || 'N/A' }}
+                    </div>
+                 </div>
+                 <div class="space-y-1.5">
+                    <label class="text-[9px] text-zinc-600 uppercase font-black tracking-widest px-1">System Privilege</label>
+                    <div class="bg-black-bg/40 border border-black-border rounded-xl px-4 py-3 text-zinc-500 italic shadow-inner">
+                      {{ user?.userRole?.name || 'User' }}
+                    </div>
+                 </div>
+                 <div class="space-y-1.5 sm:col-span-2">
+                    <label class="text-[9px] text-zinc-600 uppercase font-black tracking-widest px-1">Account Visibility</label>
+                    <div class="bg-black-bg/40 border border-black-border rounded-xl px-4 py-3 flex items-center gap-3 shadow-inner">
+                      <span class="w-3 h-3 rounded-full animate-pulse" [ngClass]="user?.state === 1 ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]' : 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]'"></span>
+                      <span class="text-sm font-black uppercase tracking-widest" [ngClass]="user?.state === 1 ? 'text-green-500' : 'text-red-500'">
+                        {{ user?.state === 1 ? 'Current Status: Active' : 'Current Status: Inactive' }}
+                      </span>
+                      <div class="flex items-center gap-1 ml-auto text-[9px] text-zinc-600 font-bold uppercase tracking-tighter bg-white/5 px-2 py-1 rounded">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 00-2 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        Read-only
+                      </div>
+                    </div>
+                 </div>
               </div>
-              <div class="grid grid-cols-2 gap-4">
-                <div class="space-y-1">
-                  <label class="text-[10px] text-zinc-500 uppercase font-black tracking-widest px-1">New Password</label>
-                  <input formControlName="newPassword" type="password" placeholder="New password"
-                    class="w-full bg-black-bg border border-black-border rounded-lg px-4 py-2.5 text-white focus:border-gold-400 focus:outline-none transition-all" />
-                </div>
-                <div class="space-y-1">
-                  <label class="text-[10px] text-zinc-500 uppercase font-black tracking-widest px-1">Confirm New</label>
-                  <input formControlName="confirmPassword" type="password" placeholder="Confirm new"
-                    class="w-full bg-black-bg border border-black-border rounded-lg px-4 py-2.5 text-white focus:border-gold-400 focus:outline-none transition-all" />
-                </div>
+            </div>
+
+            <!-- Password Change Section -->
+            <div class="pt-8 border-t border-black-border space-y-6">
+              <div class="flex items-center justify-between">
+                 <div class="flex items-center gap-3">
+                   <div class="w-8 h-8 rounded-lg bg-gold-400/10 flex items-center justify-center border border-gold-400/20 text-gold-400">
+                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 00-2 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                     </svg>
+                   </div>
+                   <h4 class="text-sm font-black text-white uppercase tracking-[0.2em]">Security Upgrade</h4>
+                 </div>
+                 <span class="text-[9px] text-zinc-500 font-bold uppercase tracking-widest italic opacity-50">Last updated recently</span>
               </div>
 
-              <div *ngIf="message" [ngClass]="isSuccess ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'" class="p-3 rounded-lg border text-xs font-bold text-center italic">
-                {{ message }}
-              </div>
+              <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="space-y-5">
+                <div class="space-y-2">
+                  <label class="text-[10px] text-zinc-500 uppercase font-black tracking-widest px-1">Current Password</label>
+                  <div class="relative">
+                    <input formControlName="oldPassword" type="password" placeholder="Verify your current identity"
+                      class="w-full bg-black-bg/60 border border-black-border rounded-xl px-4 py-3.5 text-white placeholder-zinc-700 focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/30 transition-all font-medium" />
+                  </div>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div class="space-y-2">
+                    <label class="text-[10px] text-zinc-500 uppercase font-black tracking-widest px-1">New Password</label>
+                    <input formControlName="newPassword" type="password" placeholder="New credentials"
+                      class="w-full bg-black-bg/60 border border-black-border rounded-xl px-4 py-3.5 text-white placeholder-zinc-700 focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/30 transition-all font-medium" />
+                  </div>
+                  <div class="space-y-2">
+                    <label class="text-[10px] text-zinc-500 uppercase font-black tracking-widest px-1">Confirm New</label>
+                    <input formControlName="confirmPassword" type="password" placeholder="Repeat to confirm"
+                      class="w-full bg-black-bg/60 border border-black-border rounded-xl px-4 py-3.5 text-white placeholder-zinc-700 focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/30 transition-all font-medium" />
+                  </div>
+                </div>
 
-              <button type="submit" [disabled]="passwordForm.invalid || isLoading"
-                class="w-full py-3 bg-gold-400 text-black font-black rounded-xl hover:bg-gold-500 transition-all shadow-lg active:scale-95 disabled:opacity-50 uppercase tracking-widest text-xs mt-2">
-                {{ isLoading ? 'Updating Security...' : 'Update Password' }}
-              </button>
-            </form>
+                <div *ngIf="message" [ngClass]="isSuccess ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'" class="p-4 rounded-xl border text-xs font-black text-center uppercase tracking-widest animate-in slide-in-from-top-2">
+                  <div class="flex items-center justify-center gap-2">
+                    <svg *ngIf="isSuccess" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {{ message }}
+                  </div>
+                </div>
+
+                <button type="submit" [disabled]="passwordForm.invalid || isLoading"
+                  class="w-full py-4 bg-gold-400 text-black font-black rounded-xl hover:bg-gold-500 transition-all shadow-[0_10px_20px_-5px_rgba(212,175,55,0.4)] hover:shadow-[0_15px_30px_-5px_rgba(212,175,55,0.6)] active:scale-95 disabled:opacity-30 disabled:grayscale uppercase tracking-[0.2em] text-xs mt-4 flex items-center justify-center gap-2 group">
+                  @if (isLoading) {
+                    <svg class="animate-spin h-4 w-4 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    Processing...
+                  } @else {
+                    Commit Changes
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  }
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+
+    <style>
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(212, 175, 55, 0.2);
+        border-radius: 10px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: rgba(212, 175, 55, 0.4);
+      }
+    </style>
   `
 })
 export class ProfileModalComponent implements OnInit {

@@ -56,13 +56,14 @@
     <div
         class="flex items-center justify-between px-8 py-4 border-b border-black-border bg-black-card/80 backdrop-blur-md sticky top-0 z-20 shrink-0">
         <div class="flex items-center gap-2 text-sm">
-            <button (click)="goBack()" class="text-zinc-500 hover:text-white transition-colors">Tournament
-                Dashboard</button>
+            <button (click)="goBack()" class="text-zinc-500 hover:text-white transition-colors">
+                {{ 'MATCH_DETAILS.HEADER.BACK_TO_DASHBOARD' | translate }}
+            </button>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-zinc-600" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
             </svg>
-            <span class="text-gold-400 font-bold">Match Details</span>
+            <span class="text-gold-400 font-bold">{{ 'MATCH_DETAILS.HEADER.TITLE' | translate }}</span>
         </div>
 
         <button (click)="openEditModal()"
@@ -72,7 +73,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
-            Edit Match
+            {{ 'MATCH_DETAILS.HEADER.EDIT_MATCH' | translate }}
         </button>
     </div>
 
@@ -81,19 +82,47 @@
         <div class="max-w-[1500px] mx-auto">
             <!-- Persistent Header: Always visible at the top -->
             <div class="mb-8">
-                <app-match-header [match]="match()" (editMatch)="openEditModal()" (addLineup)="openLineupModal()"
+                <app-match-header [match]="match()" [isLoading]="ui.isLoadingAction()" (addLineup)="openLineupModal()"
                     (startMatch)="handleStartMatch()" (completeMatch)="handleCompleteMatch()">
                 </app-match-header>
             </div>
 
+            @if (match().status === 'scheduled' && !isLineupValid) {
+            <div class="mb-8 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-xl flex items-start gap-4">
+                <div class="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <div>
+                    <h4 class="text-sm font-bold text-white mb-1">{{ 'MATCH_DETAILS.ALERTS.LINEUPS_REQUIRED' | translate }}</h4>
+                    <p class="text-xs text-zinc-400">{{ 'MATCH_DETAILS.ALERTS.LINEUPS_REQUIRED_DESC' | translate: { playersOnField: getRequiredLineupCounts().playersOnField, subsLimit: getRequiredLineupCounts().subsLimit } }}</p>
+                </div>
+            </div>
+            } @else if (match().status === 'scheduled' && isLineupValid) {
+            <div class="mb-8 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl flex items-start gap-4">
+                <div class="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+                <div>
+                    <h4 class="text-sm font-bold text-white mb-1">{{ 'MATCH_DETAILS.ALERTS.LINEUPS_READY' | translate }}</h4>
+                    <p class="text-xs text-zinc-400">{{ 'MATCH_DETAILS.ALERTS.LINEUPS_READY_DESC' | translate }}</p>
+                </div>
+            </div>
+            }
+
             <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
                 <!-- Left Sidebar: Home Squad -->
                 <div class="lg:col-span-1 space-y-6">
-                    @if (homePlayers()?.length) {
+                    @if (homePlayers().length) {
                     <div class="bg-black-card border border-black-border rounded-xl overflow-hidden sticky top-8">
                         <div class="px-4 py-3 bg-white/5 border-b border-black-border flex items-center gap-2">
                             <div class="w-2 h-2 rounded-full bg-gold-400"></div>
-                            <h3 class="text-[10px] font-black text-white uppercase tracking-widest">{{ match().homeTeam?.shortName || 'Home' }} Squad</h3>
+                            <h3 class="text-[10px] font-black text-white uppercase tracking-widest">
+                                {{ 'MATCH_DETAILS.SIDEBAR.SQUAD' | translate: { team: match().homeTeam?.shortName || 'Home' } }}
+                            </h3>
                         </div>
                         <div class="p-4 space-y-3 max-h-[calc(100vh-250px)] overflow-y-auto custom-scrollbar">
                             @for (player of homePlayers(); track player.id) {
@@ -114,7 +143,7 @@
                                 </div>
                                 <div class="min-w-0">
                                     <p class="text-sm font-bold text-white truncate">{{ player.name }}</p>
-                                    <p class="text-[9px] text-zinc-500 font-bold uppercase">{{ player.position || 'Player' }}</p>
+                                    <p class="text-[9px] text-zinc-500 font-bold uppercase">{{ player.position || ('MATCH_DETAILS.SIDEBAR.PLAYER_FALLBACK' | translate) }}</p>
                                 </div>
                             </div>
                             }
@@ -126,7 +155,7 @@
                 <!-- Center Content: Main Management -->
                 <div class="lg:col-span-3 space-y-8">
                     <div class="mt-4">
-                        <app-match-tabs [activeTab]="activeTab()" (tabChange)="activeTab.set($event)">
+                        <app-match-tabs [activeTab]="activeTab()" [showStandings]="!!h2hData()?.groupStandings" (tabChange)="activeTab.set($event)">
                         </app-match-tabs>
                     </div>
 
@@ -138,13 +167,15 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                                 </svg>
                             </div>
-                            <h3 class="text-xl font-black text-white tracking-tight">Add Match Event</h3>
+                            <h3 class="text-xl font-black text-white tracking-tight">{{ 'MATCH_DETAILS.TIMELINE.MODAL.TITLE_ADD' | translate }}</h3>
                         </div>
 
                         <div class="space-y-6">
                             <!-- Event Type Grid -->
                             <div>
-                                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-3 block">Match Event Type</label>
+                                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-3 block">
+                                    {{ 'MATCH_DETAILS.TIMELINE.MODAL.TYPE' | translate }}
+                                </label>
                                 <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
                                     <!-- Goal -->
                                     <button (click)="eventFormType.set('goal')"
@@ -157,7 +188,7 @@
                                         [class.border-zinc-800]="eventFormType() !== 'goal'"
                                         class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border text-[10px] font-black uppercase tracking-tight transition-all hover:border-gold-400/50 group">
                                         <span class="text-xl group-hover:scale-110 transition-transform">⚽</span>
-                                        <span>Goal</span>
+                                        <span>{{ 'COMMON.GOAL' | translate }}</span>
                                     </button>
 
                                     <!-- Own Goal -->
@@ -171,7 +202,7 @@
                                         [class.border-zinc-800]="eventFormType() !== 'own_goal'"
                                         class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border text-[10px] font-black uppercase tracking-tight transition-all hover:border-gold-400/50 group">
                                         <span class="text-xl group-hover:scale-110 transition-transform">↩️</span>
-                                        <span>Own Goal</span>
+                                        <span>{{ 'COMMON.OWN_GOAL' | translate }}</span>
                                     </button>
 
                                     <!-- Yellow Card -->
@@ -185,7 +216,7 @@
                                         [class.border-zinc-800]="eventFormType() !== 'yellow_card'"
                                         class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border text-[10px] font-black uppercase tracking-tight transition-all hover:border-gold-400/50 group">
                                         <span class="text-xl group-hover:scale-110 transition-transform">🟨</span>
-                                        <span>Yellow</span>
+                                        <span>{{ 'COMMON.YELLOW_CARD' | translate }}</span>
                                     </button>
 
                                     <!-- Red Card -->
@@ -199,7 +230,7 @@
                                         [class.border-zinc-800]="eventFormType() !== 'red_card'"
                                         class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border text-[10px] font-black uppercase tracking-tight transition-all hover:border-gold-400/50 group">
                                         <span class="text-xl group-hover:scale-110 transition-transform">🟥</span>
-                                        <span>Red Card</span>
+                                        <span>{{ 'COMMON.RED_CARD' | translate }}</span>
                                     </button>
 
                                     <!-- Substitution -->
@@ -213,7 +244,7 @@
                                         [class.border-zinc-800]="eventFormType() !== 'substitution'"
                                         class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border text-[10px] font-black uppercase tracking-tight transition-all hover:border-gold-400/50 group">
                                         <span class="text-xl group-hover:scale-110 transition-transform">🔄</span>
-                                        <span>Sub</span>
+                                        <span>{{ 'COMMON.SUBSTITUTION' | translate }}</span>
                                     </button>
 
                                     <!-- Penalty -->
@@ -227,7 +258,7 @@
                                         [class.border-zinc-800]="eventFormType() !== 'penalty'"
                                         class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border text-[10px] font-black uppercase tracking-tight transition-all hover:border-gold-400/50 group">
                                         <span class="text-xl group-hover:scale-110 transition-transform">⚡</span>
-                                        <span>Penalty</span>
+                                        <span>{{ 'COMMON.PENALTY' | translate }}</span>
                                     </button>
                                 </div>
                             </div>
@@ -235,18 +266,20 @@
                             <!-- Minute Selection -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                                 <div>
-                                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Match Minute</label>
+                                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">
+                                        {{ 'MATCH_DETAILS.TIMELINE.MODAL.MINUTE' | translate }} <span class="text-red-500">*</span>
+                                    </label>
                                     <div class="relative">
                                         <input type="number" [ngModel]="eventFormMinute()" (ngModelChange)="eventFormMinute.set($event)"
                                             class="input input-bordered w-full bg-black border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all hover:border-gold-400/50 hover:bg-white/[0.02] pl-10"
-                                            placeholder="e.g. 45" />
+                                            placeholder="{{ 'MATCH_DETAILS.TIMELINE.MODAL.PLACEHOLDER_MINUTE' | translate }}" />
                                         <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-zinc-400 font-black text-xs">'</span>
                                     </div>
                                 </div>
 
                                 <!-- Team Selection -->
                                 <div>
-                                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Select Team</label>
+                                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">{{ 'MATCH_DETAILS.TIMELINE.MODAL.TEAM' | translate }}</label>
                                     <div class="flex gap-3">
                                         <button (click)="onDirectTeamSwitch('home')" 
                                             [class.bg-gold-400]="eventFormTeam() === 'home'"
@@ -256,7 +289,7 @@
                                             [class.border-gold-400]="eventFormTeam() === 'home'"
                                             [class.border-black-border]="eventFormTeam() !== 'home'"
                                             class="btn flex-1 border font-black text-sm transition-all truncate hover:border-gold-400/50 hover:shadow-[0_0_10px_rgba(212,175,55,0.1)]">
-                                            {{ match().homeTeam?.shortName || 'Home' }}
+                                            {{ match().homeTeam?.shortName || ('MATCH_DETAILS.INFO.HOME' | translate) }}
                                         </button>
                                         <button (click)="onDirectTeamSwitch('away')" 
                                             [class.bg-gold-400]="eventFormTeam() === 'away'"
@@ -266,7 +299,7 @@
                                             [class.border-gold-400]="eventFormTeam() === 'away'"
                                             [class.border-black-border]="eventFormTeam() !== 'away'"
                                             class="btn flex-1 border font-black text-sm transition-all truncate hover:border-gold-400/50 hover:shadow-[0_0_10px_rgba(212,175,55,0.1)]">
-                                            {{ match().awayTeam?.shortName || 'Away' }}
+                                            {{ match().awayTeam?.shortName || ('MATCH_DETAILS.INFO.AWAY' | translate) }}
                                         </button>
                                     </div>
                                 </div>
@@ -275,24 +308,31 @@
                             <!-- Player & Details -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Player Name</label>
+                                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">
+                                        {{ (eventFormType() === 'substitution' ? 'MATCH_DETAILS.TIMELINE.SUB_OUT' : 'MATCH_DETAILS.TIMELINE.MODAL.PLAYER') | translate }} <span class="text-red-500">*</span>
+                                    </label>
                                     <select [ngModel]="eventFormPlayerName()" (ngModelChange)="eventFormPlayerName.set($event)"
                                         class="select select-bordered w-full bg-black border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all hover:border-gold-400/50 hover:shadow-[0_0_10px_rgba(212,175,55,0.1)] hover:bg-white/[0.02] cursor-pointer">
-                                        <option value="" disabled selected class="bg-black">Select Player</option>
-                                        @for (p of directEventTeamPlayers; track p.id) {
+                                        <option value="" disabled selected class="bg-black">{{ 'MATCH_DETAILS.DIRECT_FORM.SELECT_PLAYER' | translate }}</option>
+                                        @for (p of (eventFormType() === 'substitution' ? directEventStartingPlayers : directEventTeamPlayers); track p.id) {
                                         <option [value]="p.name" class="bg-black">
                                             {{ p.name }} {{ p.jerseyNumber ? '(#' + p.jerseyNumber + ')' : '' }}
                                         </option>
                                         }
                                     </select>
                                 </div>
-                                @if (eventFormType() === 'goal') {
+                                @if (eventFormType() === 'goal' || eventFormType() === 'substitution') {
                                 <div>
-                                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Assist By (Optional)</label>
+                                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">
+                                        {{ (eventFormType() === 'substitution' ? 'MATCH_DETAILS.TIMELINE.SUB_IN' : 'MATCH_DETAILS.TIMELINE.MODAL.DETAILS') | translate }}
+                                        @if (eventFormType() === 'substitution') {
+                                        <span class="text-red-500">*</span>
+                                        }
+                                    </label>
                                     <select [ngModel]="eventFormAssistPlayerName()" (ngModelChange)="eventFormAssistPlayerName.set($event)"
                                         class="select select-bordered w-full bg-black border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all hover:border-gold-400/50 hover:shadow-[0_0_10px_rgba(212,175,55,0.1)] hover:bg-white/[0.02] cursor-pointer">
-                                        <option value="" class="bg-black">No Assist</option>
-                                        @for (p of directEventTeamPlayers; track p.id) {
+                                        <option value="" class="bg-black">{{ (eventFormType() === 'substitution' ? 'MATCH_DETAILS.DIRECT_FORM.SELECT_SUB_IN' : 'MATCH_DETAILS.TIMELINE.MODAL.DETAILS') | translate }}</option>
+                                        @for (p of (eventFormType() === 'substitution' ? directEventSubPlayers : directEventTeamPlayers); track p.id) {
                                         <option [value]="p.name" [disabled]="p.name === eventFormPlayerName()" class="bg-black">
                                             {{ p.name }}
                                         </option>
@@ -301,22 +341,22 @@
                                 </div>
                                 } @else {
                                 <div>
-                                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Extra Details</label>
+                                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">{{ 'MATCH_DETAILS.TIMELINE.MODAL.DETAILS' | translate }}</label>
                                     <input type="text" [ngModel]="eventFormDetails()" (ngModelChange)="eventFormDetails.set($event)"
                                         class="input input-bordered w-full bg-black border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all hover:border-gold-400/50 hover:shadow-[0_0_10px_rgba(212,175,55,0.1)] hover:bg-white/[0.02]"
-                                        placeholder="e.g. Header, tactical foul" />
+                                        placeholder="{{ 'MATCH_DETAILS.DIRECT_FORM.PLACEHOLDER_DETAILS' | translate }}" />
                                 </div>
                                 }
                             </div>
 
                             <div class="pt-4 flex justify-end">
-                                <button (click)="submitDirectEvent()" [disabled]="isSaving()"
+                                <button (click)="submitDirectEvent()" [disabled]="ui.isLoadingAction()"
                                     class="btn bg-gold-400 hover:bg-gold-400/90 text-black border-none font-black px-12 transition-all shadow-[0_0_20px_rgba(212,175,55,0.4)]">
-                                    @if (isSaving()) {
+                                    @if (ui.isLoadingAction()) {
                                     <span class="loading loading-spinner loading-sm"></span>
-                                    Saving...
+                                    {{ 'MATCH_DETAILS.TIMELINE.MODAL.SUBMITTING' | translate }}
                                     } @else {
-                                    Add Event
+                                    {{ 'MATCH_DETAILS.DIRECT_FORM.ADD_EVENT' | translate }}
                                     }
                                 </button>
                             </div>
@@ -326,19 +366,17 @@
 
                     <div class="mt-4">
                         @if (activeTab() === 'timeline') {
-                        <app-match-timeline [match]="match()" [events]="events()" (addEvent)="openEventModal()"
+                        <app-match-timeline [match]="match()" [events]="events()" [isLoading]="ui.isLoadingAction()" [homeLineup]="homeLineup" [awayLineup]="awayLineup" (addEvent)="openEventModal()"
                             (editEvent)="openEventModal($event)" (deleteEvent)="handleDeleteEvent($event)">
                         </app-match-timeline>
                         } @else if (activeTab() === 'stats') {
-                        <app-match-stats [matchId]="matchId()"></app-match-stats>
+                        <div class="space-y-6">
+                            <app-match-stats [matchId]="matchId()"></app-match-stats>
+                            <app-h2h [homeTeam]="match()?.homeTeam" [awayTeam]="match()?.awayTeam" [h2hData]="h2hData()" mode="form"></app-h2h>
+                            <app-h2h [homeTeam]="match()?.homeTeam" [awayTeam]="match()?.awayTeam" [h2hData]="h2hData()" mode="h2h"></app-h2h>
+                        </div>
                         } @else if (activeTab() === 'info') {
-                        <app-match-info [match]="match()"></app-match-info>
-                        } @else if (activeTab() === 'h2h') {
-                        <app-h2h [homeTeam]="match()?.homeTeam" [awayTeam]="match()?.awayTeam" [h2hData]="h2hData()" mode="h2h">
-                        </app-h2h>
-                        } @else if (activeTab() === 'form') {
-                        <app-h2h [homeTeam]="match()?.homeTeam" [awayTeam]="match()?.awayTeam" [h2hData]="h2hData()" mode="form">
-                        </app-h2h>
+                        <app-match-info [match]="match()" [homeLineup]="homeLineup" [awayLineup]="awayLineup"></app-match-info>
                         } @else if (activeTab() === 'standings') {
                         <app-h2h [homeTeam]="match()?.homeTeam" [awayTeam]="match()?.awayTeam" [h2hData]="h2hData()" mode="standings">
                         </app-h2h>
@@ -348,11 +386,13 @@
 
                 <!-- Right Sidebar: Away Squad -->
                 <div class="lg:col-span-1 space-y-6">
-                    @if (awayPlayers()?.length) {
+                    @if (awayPlayers().length) {
                     <div class="bg-black-card border border-black-border rounded-xl overflow-hidden sticky top-8">
                         <div class="px-4 py-3 bg-white/5 border-b border-black-border flex items-center gap-2">
                             <div class="w-2 h-2 rounded-full bg-gold-400"></div>
-                            <h3 class="text-[10px] font-black text-white uppercase tracking-widest">{{ match().awayTeam?.shortName || 'Away' }} Squad</h3>
+                            <h3 class="text-[10px] font-black text-white uppercase tracking-widest">
+                                {{ 'MATCH_DETAILS.SIDEBAR.SQUAD' | translate: { team: match().awayTeam?.shortName || 'Away' } }}
+                            </h3>
                         </div>
                         <div class="p-4 space-y-3 max-h-[calc(100vh-250px)] overflow-y-auto custom-scrollbar">
                             @for (player of awayPlayers(); track player.id) {
@@ -373,7 +413,7 @@
                                 </div>
                                 <div class="min-w-0">
                                     <p class="text-sm font-bold text-white truncate">{{ player.name }}</p>
-                                    <p class="text-[9px] text-zinc-500 font-bold uppercase">{{ player.position || 'Player' }}</p>
+                                    <p class="text-[9px] text-zinc-500 font-bold uppercase">{{ player.position || ('MATCH_DETAILS.SIDEBAR.PLAYER_FALLBACK' | translate) }}</p>
                                 </div>
                             </div>
                             }
@@ -395,21 +435,17 @@
             <app-lineup-editor [isOpen]="isLineupModalOpen()" [match]="match()" [lineups]="lineups()"
                 (close)="closeLineupModal()" (save)="handleSaveLineups($event)">
             </app-lineup-editor>
+
+            <app-confirm-modal 
+                [show]="isConfirmDeleteOpen()" 
+                [title]="'COMMON.DELETE_CONFIRM' | translate" 
+                [message]="'MATCH_DETAILS.TIMELINE.DELETE_CONFIRM_MSG' | translate"
+                (onConfirm)="confirmDeleteEvent()" 
+                (onCancel)="isConfirmDeleteOpen.set(false)">
+            </app-confirm-modal>
         </div>
     </main>
 </div>
 }
 
-<!-- Toast -->
-@if (toastMessage()) {
-<div
-    class="fixed bottom-6 right-6 z-50 bg-black-card border border-gold-400/30 rounded-xl px-5 py-3 shadow-[0_0_30px_rgba(0,0,0,0.5)] flex items-center gap-3 animate-[slideUp_0.3s_ease-out]">
-    <div class="w-8 h-8 rounded-full bg-gold-400/20 flex items-center justify-center shrink-0">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gold-400" fill="none" viewBox="0 0 24 24"
-            stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-        </svg>
-    </div>
-    <span class="text-sm text-white font-bold">{{ toastMessage() }}</span>
-</div>
-}
+<!-- Toast handled globally by UiService -->
