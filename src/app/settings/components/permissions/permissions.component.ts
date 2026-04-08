@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SettingsService } from '../../settings.service';
 import { ConfirmModalComponent } from '../../../components/shared/confirm-modal.component';
+import { UiService } from '../../../services/ui.service';
 
 @Component({
   selector: 'app-permissions',
@@ -199,7 +200,8 @@ export class PermissionsComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private settingsService: SettingsService
+    private settingsService: SettingsService,
+    private ui: UiService
   ) {
     const permGroup: any = {};
     this.modules.forEach(m => permGroup[m.key] = [false]);
@@ -279,7 +281,7 @@ export class PermissionsComponent implements OnInit {
       error: () => {
         this.isLoading = false;
         this.recordToDelete = null;
-        alert('Failed to delete permission mapping');
+        this.ui.showToast('Failed to delete permission mapping', 'error');
       }
     });
   }
@@ -301,7 +303,7 @@ export class PermissionsComponent implements OnInit {
       },
       error: (err) => {
         this.isLoading = false;
-        alert(err.error?.error || 'Failed to save permissions');
+        this.ui.showToast(err.error?.error || 'Failed to save permissions', 'error');
       }
     });
   }

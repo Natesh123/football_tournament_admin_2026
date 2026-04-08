@@ -10,15 +10,15 @@
                         class="w-full h-full object-contain" />
                 </div>
                 <div>
-                    <h3 class="font-black text-white text-base">{{ homeTeam?.name || 'Home Team' }}</h3>
+                    <h3 class="font-black text-white text-base">{{ homeTeam?.name || ('MATCH_DETAILS.INFO.HOME' | translate) }}</h3>
                     <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-wide">{{ homeLineup?.formation ||
-                        'Formation TBD' }}</p>
+                        ('MATCH_DETAILS.LINEUP.FORMATION_TBD' | translate) }}</p>
                 </div>
             </div>
         </div>
 
         <div class="p-4">
-            <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3">Starting XI</h4>
+            <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3">{{ 'MATCH_DETAILS.LINEUP.STARTING_XI' | translate: { label: '' } }}</h4>
             <div class="space-y-1">
                 <ng-container *ngIf="homeStarting.length > 0; else noHomeStarting">
                     <div *ngFor="let player of homeStarting"
@@ -28,19 +28,19 @@
                             <span class="font-bold text-sm text-white">{{ player.name }}</span>
                             <span *ngIf="player.isCaptain"
                                 class="px-1.5 py-0.5 rounded bg-gold-500/10 text-gold-400 border border-gold-500/20 text-[9px] font-black uppercase"
-                                title="Captain">C</span>
+                                [title]="'MATCH_DETAILS.LINEUP.CAPTAIN' | translate">C</span>
                             <span *ngIf="player.position === 'GK'"
                                 class="px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[9px] font-black uppercase"
-                                title="Goalkeeper">GK</span>
+                                [title]="'MATCH_DETAILS.LINEUP.GK' | translate">{{ 'MATCH_DETAILS.LINEUP.GK' | translate }}</span>
                         </div>
                     </div>
                 </ng-container>
                 <ng-template #noHomeStarting>
-                    <div class="py-4 text-center text-sm font-bold text-zinc-600">Starting XI not announced</div>
+                    <div class="py-4 text-center text-sm font-bold text-zinc-600">{{ 'MATCH_DETAILS.LINEUP.NOT_ANNOUNCED' | translate }}</div>
                 </ng-template>
             </div>
 
-            <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3 mt-6">Substitutes</h4>
+            <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3 mt-6">{{ 'MATCH_DETAILS.LINEUP.SUBSTITUTES' | translate }}</h4>
             <div class="space-y-1">
                 <ng-container *ngIf="homeSubs.length > 0; else noHomeSubs">
                     <div *ngFor="let player of homeSubs"
@@ -50,18 +50,18 @@
                             <span class="font-medium text-sm text-zinc-300">{{ player.name }}</span>
                             <span *ngIf="player.position === 'GK'"
                                 class="px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[9px] font-black uppercase"
-                                title="Goalkeeper">GK</span>
+                                [title]="'MATCH_DETAILS.LINEUP.GK' | translate">{{ 'MATCH_DETAILS.LINEUP.GK' | translate }}</span>
                         </div>
                     </div>
                 </ng-container>
                 <ng-template #noHomeSubs>
-                    <div class="py-2 text-center text-sm font-bold text-zinc-600">Subs not announced</div>
+                    <div class="py-2 text-center text-sm font-bold text-zinc-600">{{ 'MATCH_DETAILS.LINEUP.SUBS_NOT_ANNOUNCED' | translate }}</div>
                 </ng-template>
             </div>
 
             <div class="mt-6 pt-4 border-t border-black-border">
-                <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Coach</p>
-                <p class="font-black text-sm text-white">{{ homeLineup?.coach || 'TBD' }}</p>
+                <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">{{ 'MATCH_DETAILS.LINEUP.COACH' | translate }}</p>
+                <p class="font-black text-sm text-white">{{ homeLineup?.coach || ('COMMON.TBD' | translate) }}</p>
             </div>
         </div>
     </div>
@@ -77,15 +77,15 @@
                         class="w-full h-full object-contain" />
                 </div>
                 <div>
-                    <h3 class="font-black text-white text-base">{{ awayTeam?.name || 'Away Team' }}</h3>
+                    <h3 class="font-black text-white text-base">{{ awayTeam?.name || ('MATCH_DETAILS.INFO.AWAY' | translate) }}</h3>
                     <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-wide">{{ awayLineup?.formation ||
-                        'Formation TBD' }}</p>
+                        ('MATCH_DETAILS.LINEUP.FORMATION_TBD' | translate) }}</p>
                 </div>
             </div>
         </div>
 
         <div class="p-4">
-            <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3 text-right">Starting XI</h4>
+            <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3 text-right">{{ 'MATCH_DETAILS.LINEUP.STARTING_XI' | translate: { label: '' } }}</h4>
             <div class="space-y-1">
                 <ng-container *ngIf="awayStarting.length > 0; else noAwayStarting">
                     <div *ngFor="let player of awayStarting"
@@ -95,19 +95,19 @@
                             <span class="font-bold text-sm text-white">{{ player.name }}</span>
                             <span *ngIf="player.isCaptain"
                                 class="px-1.5 py-0.5 rounded bg-gold-500/10 text-gold-400 border border-gold-500/20 text-[9px] font-black uppercase"
-                                title="Captain">C</span>
+                                [title]="'MATCH_DETAILS.LINEUP.CAPTAIN' | translate">C</span>
                             <span *ngIf="player.position === 'GK'"
                                 class="px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[9px] font-black uppercase"
-                                title="Goalkeeper">GK</span>
+                                [title]="'MATCH_DETAILS.LINEUP.GK' | translate">{{ 'MATCH_DETAILS.LINEUP.GK' | translate }}</span>
                         </div>
                     </div>
                 </ng-container>
                 <ng-template #noAwayStarting>
-                    <div class="py-4 text-center text-sm font-bold text-zinc-600">Starting XI not announced</div>
+                    <div class="py-4 text-center text-sm font-bold text-zinc-600">{{ 'MATCH_DETAILS.LINEUP.NOT_ANNOUNCED' | translate }}</div>
                 </ng-template>
             </div>
 
-            <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3 mt-6 text-right">Substitutes</h4>
+            <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3 mt-6 text-right">{{ 'MATCH_DETAILS.LINEUP.SUBSTITUTES' | translate }}</h4>
             <div class="space-y-1">
                 <ng-container *ngIf="awaySubs.length > 0; else noAwaySubs">
                     <div *ngFor="let player of awaySubs"
@@ -117,17 +117,17 @@
                             <span class="font-medium text-sm text-zinc-300">{{ player.name }}</span>
                             <span *ngIf="player.position === 'GK'"
                                 class="px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[9px] font-black uppercase"
-                                title="Goalkeeper">GK</span>
+                                [title]="'MATCH_DETAILS.LINEUP.GK' | translate">{{ 'MATCH_DETAILS.LINEUP.GK' | translate }}</span>
                         </div>
                     </div>
                 </ng-container>
                 <ng-template #noAwaySubs>
-                    <div class="py-2 text-center text-sm font-bold text-zinc-600">Subs not announced</div>
+                    <div class="py-2 text-center text-sm font-bold text-zinc-600">{{ 'MATCH_DETAILS.LINEUP.SUBS_NOT_ANNOUNCED' | translate }}</div>
                 </ng-template>
             </div>
 
             <div class="mt-6 pt-4 border-t border-black-border text-right">
-                <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Coach</p>
+                <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">{{ 'MATCH_DETAILS.LINEUP.COACH' | translate }}</p>
                 <p class="font-black text-sm text-white">{{ awayLineup?.coach || 'TBD' }}</p>
             </div>
         </div>

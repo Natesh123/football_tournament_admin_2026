@@ -1,16 +1,19 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { TeamMemberService, TeamMember } from '../../../../../teams/team-member.service';
+import { UiService } from '../../../../../services/ui.service';
 
 @Component({
     selector: 'app-match-event-editor-modal',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, TranslateModule],
     templateUrl: './match-event-editor-modal.component.html'
 })
 export class MatchEventEditorModalComponent implements OnInit, OnChanges {
     private teamMemberService = inject(TeamMemberService);
+    public ui = inject(UiService);
 
     @Input() isOpen = false;
     @Input() match: any;
@@ -46,7 +49,10 @@ export class MatchEventEditorModalComponent implements OnInit, OnChanges {
     private resetForm() {
         this.isSubmitting = false;
         if (this.eventData) {
-            this.formData = { ...this.eventData };
+            this.formData = { 
+                ...this.eventData,
+                team: this.eventData.teamSide || (typeof this.eventData.team === 'string' ? this.eventData.team : 'home')
+            };
         } else {
             this.formData = {
                 type: 'goal',
@@ -100,6 +106,64 @@ export class MatchEventEditorModalComponent implements OnInit, OnChanges {
         return this.formData.team === 'home' ? this.homePlayers : this.awayPlayers;
     }
 
+    get homeLineupData() {
+        if (!this.match?.homeLineup) return null;
+        try {
+            return typeof this.match.homeLineup === 'string' ? JSON.parse(this.match.homeLineup) : this.match.homeLineup;
+        } catch (e) { return null; }
+    }
+
+    get awayLineupData() {
+        if (!this.match?.awayLineup) return null;
+        try {
+            return typeof this.match.awayLineup === 'string' ? JSON.parse(this.match.awayLineup) : this.match.awayLineup;
+        } catch (e) { return null; }
+    }
+
+    get currentTeamStartingPlayers(): TeamMember[] {
+        const lineup = this.formData.team === 'home' ? this.homeLineupData : this.awayLineupData;
+        const players = this.currentTeamPlayers;
+        if (lineup && lineup.starting && Array.isArray(lineup.starting)) {
+            const names = lineup.starting.map((obj: any) => {
+                if (typeof obj === 'string' || typeof obj === 'number') {
+                    const foundP = players.find(p => p.id?.toString() === obj.toString());
+                    return foundP ? foundP.name : obj.toString();
+                }
+                return obj?.name;
+            });
+            const filtered = players.filter(p => names.includes(p.name));
+            // Ensure currently selected player is included even if state changed (e.g. they were since subbed out)
+            if (this.formData.playerName && !filtered.find(p => p.name === this.formData.playerName)) {
+                const selectedP = players.find(p => p.name === this.formData.playerName);
+                if (selectedP) filtered.push(selectedP);
+            }
+            return filtered;
+        }
+        return players;
+    }
+
+    get currentTeamSubPlayers(): TeamMember[] {
+        const lineup = this.formData.team === 'home' ? this.homeLineupData : this.awayLineupData;
+        const players = this.currentTeamPlayers;
+        if (lineup && lineup.subs && Array.isArray(lineup.subs)) {
+            const names = lineup.subs.map((obj: any) => {
+                if (typeof obj === 'string' || typeof obj === 'number') {
+                    const foundP = players.find(p => p.id?.toString() === obj.toString());
+                    return foundP ? foundP.name : obj.toString();
+                }
+                return obj?.name;
+            });
+            const filtered = players.filter(p => names.includes(p.name));
+            // Ensure currently selected assist player (incoming sub) is included 
+            if (this.formData.assistPlayerName && !filtered.find(p => p.name === this.formData.assistPlayerName)) {
+                const selectedP = players.find(p => p.name === this.formData.assistPlayerName);
+                if (selectedP) filtered.push(selectedP);
+            }
+            return filtered;
+        }
+        return players;
+    }
+
     onTeamSwitch(team: 'home' | 'away') {
         this.formData.team = team;
         this.formData.playerName = '';
@@ -112,7 +176,11 @@ export class MatchEventEditorModalComponent implements OnInit, OnChanges {
 
     onSubmit() {
         if (!this.formData.playerName || !this.formData.minute) {
-            alert('Please fill in required fields: Player Name and Minute.');
+            this.ui.showToast('Please fill in required fields: Player Name and Minute.', 'error');
+            return;
+        }
+        if (this.formData.type === 'substitution' && !this.formData.assistPlayerName) {
+            this.ui.showToast('Please select a substitute player to come in.', 'error');
             return;
         }
         this.isSubmitting = true;
@@ -123,6 +191,9 @@ export class MatchEventEditorModalComponent implements OnInit, OnChanges {
             // Remove existing assist from details if we're editing
             let cleanDetails = (this.formData.details || '').split(' (Assist:')[0].trim();
             this.formData.details = cleanDetails ? `${cleanDetails} (Assist: ${this.formData.assistPlayerName})` : `Assist: ${this.formData.assistPlayerName}`;
+        } else if (this.formData.type === 'substitution' && this.formData.assistPlayerName) {
+            // Include assistPlayerName in the payload directly
+            this.formData.details = `Sub: ${this.formData.playerName} out, ${this.formData.assistPlayerName} in`;
         }
 
         // The teamId is important so backend knows exactly which team.

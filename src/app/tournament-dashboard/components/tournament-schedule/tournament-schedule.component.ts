@@ -1,19 +1,25 @@
 import { Component, Input, OnInit, signal, inject, HostListener, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TournamentService } from '../../../tournament/tournament.service';
 import { UiService } from '../../../services/ui.service';
 
 @Component({
     selector: 'app-tournament-schedule',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [
+        CommonModule,
+        FormsModule,
+        TranslateModule
+    ],
     templateUrl: './tournament-schedule.component.html'
 })
 export class TournamentScheduleComponent implements OnInit {
     @Input() data!: any;
     @Input() tournamentId!: string;
 
+    private translate = inject(TranslateService);
     private tournamentService = inject(TournamentService);
     public ui = inject(UiService);
     private elRef = inject(ElementRef);
@@ -100,11 +106,11 @@ export class TournamentScheduleComponent implements OnInit {
         if (!this.tournamentId) return;
 
         if (!this.data?.startDate) {
-            this.ui.showToast('Please select a Tournament Start Date.', 'error');
+            this.ui.showToast('TOURNAMENT_DASHBOARD.SCHEDULE.ERR_START_DATE', 'error');
             return;
         }
         if (this.selectedTimeSlots.length === 0) {
-            this.ui.showToast('Please select at least one Allowed Time Slot.', 'error');
+            this.ui.showToast('TOURNAMENT_DASHBOARD.SCHEDULE.ERR_TIME_SLOT', 'error');
             return;
         }
 
@@ -113,11 +119,11 @@ export class TournamentScheduleComponent implements OnInit {
             next: (data: any) => {
                 this.structure.set(data);
                 this.ui.endAction();
-                this.ui.showToast('Schedule generated successfully!', 'success');
+                this.ui.showToast('TOURNAMENT_DASHBOARD.SCHEDULE.SUCCESS_GENERATE', 'success');
             },
             error: (err: any) => {
                 this.ui.endAction();
-                this.ui.showToast(err?.error?.message || 'Failed to generate schedule', 'error');
+                this.ui.showToast(err?.error?.message || 'TOURNAMENT_DASHBOARD.SCHEDULE.ERR_GENERATE', 'error');
             }
         });
     }
@@ -177,7 +183,7 @@ export class TournamentScheduleComponent implements OnInit {
 
         const matchId = this.editingMatch.id;
         if (!matchId) {
-            this.ui.showToast('Cannot save: match ID is missing', 'error');
+            this.ui.showToast('TOURNAMENT_DASHBOARD.SCHEDULE.ERR_MATCH_ID', 'error');
             return;
         }
 
@@ -202,12 +208,12 @@ export class TournamentScheduleComponent implements OnInit {
                     }
                 }
                 this.isSavingMatch.set(false);
-                this.ui.showToast('Schedule saved successfully', 'success');
+                this.ui.showToast('TOURNAMENT_DASHBOARD.SCHEDULE.SUCCESS_SAVE', 'success');
                 this.closeMatchEditor();
             },
             error: (err: any) => {
                 this.isSavingMatch.set(false);
-                this.ui.showToast(err?.error?.message || 'Failed to save schedule', 'error');
+                this.ui.showToast(err?.error?.message || 'TOURNAMENT_DASHBOARD.SCHEDULE.ERR_SAVE', 'error');
             }
         });
     }

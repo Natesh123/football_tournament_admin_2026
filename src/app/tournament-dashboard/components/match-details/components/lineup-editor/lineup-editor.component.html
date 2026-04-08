@@ -8,7 +8,7 @@
 
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b border-zinc-800 shrink-0 bg-black/50">
-            <h3 class="text-lg font-black text-white" id="modal-title">Manage Lineups</h3>
+            <h3 class="text-lg font-black text-white" id="modal-title">{{ 'MATCH_DETAILS.LINEUP.TITLE' | translate }}</h3>
             <button (click)="close.emit()"
                 class="text-zinc-500 hover:text-white transition-colors bg-white/5 p-2 rounded-lg hover:bg-white/10">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -26,23 +26,23 @@
                     [class.btn-warning]="activeTeam === 'home'"
                     [class.btn-ghost]="activeTeam !== 'home'"
                     class="btn btn-sm flex-1 font-bold transition-all">
-                    {{ match?.homeTeam?.name || 'Home' }}
+                    {{ match?.homeTeam?.name || ('MATCH_DETAILS.INFO.HOME' | translate) }}
                 </button>
                 <button (click)="activeTeam = 'away'"
                     [class.btn-warning]="activeTeam === 'away'"
                     [class.btn-ghost]="activeTeam !== 'away'"
                     class="btn btn-sm flex-1 font-bold transition-all">
-                    {{ match?.awayTeam?.name || 'Away' }}
+                    {{ match?.awayTeam?.name || ('MATCH_DETAILS.INFO.AWAY' | translate) }}
                 </button>
             </div>
 
             <!-- General Info -->
             <div class="grid grid-cols-1 gap-4">
                 <div>
-                    <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Coach Name</label>
+                    <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">{{ 'MATCH_DETAILS.LINEUP.COACH' | translate }}</label>
                     <input type="text" [(ngModel)]="currentData.coach"
                         class="input input-bordered w-full bg-black border-zinc-800 text-sm text-white focus:outline-none focus:border-gold-500 transition-colors"
-                        placeholder="Enter coach name">
+                        [placeholder]="'MATCH_DETAILS.LINEUP.PLACEHOLDER_COACH' | translate">
                 </div>
             </div>
 
@@ -50,21 +50,21 @@
             <div>
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-baseline gap-2">
-                        <h4 class="text-sm font-black text-white uppercase tracking-wider">Starting {{ startingLabel }}</h4>
+                        <h4 class="text-sm font-black text-white uppercase tracking-wider">{{ 'MATCH_DETAILS.LINEUP.STARTING_XI' | translate: { label: startingLabel } }}</h4>
                         <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 uppercase">
-                            {{ currentStartingCount }} / {{ playersOnField }} Players
+                            {{ 'MATCH_DETAILS.LINEUP.PLAYERS_COUNT' | translate: { current: currentStartingCount, total: playersOnField } }}
                         </span>
                     </div>
                     <div class="flex gap-2">
                         <button (click)="openPicker('starting')" [disabled]="!canAddMoreStarting"
                             [class.opacity-50]="!canAddMoreStarting"
                             class="btn btn-sm bg-gold-500/10 text-gold-400 border border-gold-500/20 hover:bg-gold-500/20 transition-colors flex items-center gap-1">
-                            Bulk Add
+                            {{ 'MATCH_DETAILS.LINEUP.BULK_ADD' | translate }}
                         </button>
                         <button (click)="addPlayer('starting')" [disabled]="!canAddMoreStarting"
                             [class.opacity-50]="!canAddMoreStarting"
                             class="btn btn-sm btn-ghost border border-white/10 hover:bg-white/10 transition-colors flex items-center gap-1">
-                            + Add Player
+                            {{ 'MATCH_DETAILS.LINEUP.ADD_PLAYER' | translate }}
                         </button>
                     </div>
                 </div>
@@ -73,27 +73,27 @@
                     <div *ngFor="let p of currentData.starting; let i = index"
                         class="flex gap-2 items-center bg-black border border-zinc-800 p-2 rounded-lg">
                         <!-- Starting XI Select -->
-                        <input type="number" [(ngModel)]="p.number" placeholder="#"
+                        <input type="number" [(ngModel)]="p.number" [placeholder]="'MATCH_DETAILS.LINEUP.JERSEY_PLACEHOLDER' | translate"
                             class="input input-bordered w-16 bg-zinc-900 border-zinc-700 p-2 text-sm text-white focus:border-gold-500 text-center">
                         <select [(ngModel)]="p.name" (ngModelChange)="onPlayerSelect($event, 'starting', i)"
                             class="select select-bordered flex-1 bg-zinc-900 border-zinc-700 p-2 text-sm text-white focus:border-gold-500 hover:border-gold-500/50 cursor-pointer">
-                            <option value="" class="bg-black">Select Player</option>
+                            <option value="" class="bg-black">{{ 'MATCH_DETAILS.LINEUP.SELECT_PLAYER' | translate }}</option>
                             <option *ngFor="let player of getAvailablePlayers('starting', i)" [value]="player.name" class="bg-black">
                                 {{ player.name }} ({{ player.jerseyNumber || 'N/A' }})
                             </option>
                         </select>
                         <select [(ngModel)]="p.position"
                             class="select select-bordered w-24 bg-zinc-900 border-zinc-700 p-2 text-sm text-white focus:border-gold-500 hover:border-gold-500/50 cursor-pointer">
-                            <option value="OUTFIELD" class="bg-black">Field</option>
-                            <option value="GK" class="bg-black">GK</option>
-                            <option value="DF" class="bg-black">DF</option>
-                            <option value="MF" class="bg-black">MF</option>
-                            <option value="FW" class="bg-black">FW</option>
+                            <option value="OUTFIELD" class="bg-black">{{ 'MATCH_DETAILS.LINEUP.FIELD' | translate }}</option>
+                            <option value="GK" class="bg-black">{{ 'MATCH_DETAILS.LINEUP.GK' | translate }}</option>
+                            <option value="DF" class="bg-black">{{ 'MATCH_DETAILS.LINEUP.DF' | translate }}</option>
+                            <option value="MF" class="bg-black">{{ 'MATCH_DETAILS.LINEUP.MF' | translate }}</option>
+                            <option value="FW" class="bg-black">{{ 'MATCH_DETAILS.LINEUP.FW' | translate }}</option>
                         </select>
                         <label class="flex items-center gap-2 text-xs text-zinc-400 px-2 cursor-pointer">
                             <input type="checkbox" [(ngModel)]="p.isCaptain"
                                 class="checkbox checkbox-xs checkbox-warning border-zinc-700">
-                            Capt
+                            {{ 'MATCH_DETAILS.LINEUP.CAPTAIN_SHORT' | translate }}
                         </label>
                         <button (click)="removePlayer('starting', i)"
                             class="p-2 text-red-400 hover:bg-red-400/10 rounded transition-colors">
@@ -106,7 +106,7 @@
                     </div>
                     <p *ngIf="currentData.starting.length === 0"
                         class="text-xs text-zinc-500 text-center py-4 bg-black/50 rounded border border-dashed border-zinc-800">
-                        No starting players added.</p>
+                        {{ 'MATCH_DETAILS.LINEUP.NO_STARTING' | translate }}</p>
                 </div>
             </div>
 
@@ -114,9 +114,9 @@
             <div>
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-baseline gap-2">
-                        <h4 class="text-sm font-black text-white uppercase tracking-wider">Substitutes</h4>
+                        <h4 class="text-sm font-black text-white uppercase tracking-wider">{{ 'MATCH_DETAILS.LINEUP.SUBSTITUTES' | translate }}</h4>
                         <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 uppercase">
-                            {{ currentSubsCount }} / {{ subsLimit }} Players
+                            {{ 'MATCH_DETAILS.LINEUP.PLAYERS_COUNT' | translate: { current: currentSubsCount, total: subsLimit } }}
                         </span>
                     </div>
                     <div class="flex gap-2">
@@ -140,18 +140,18 @@
                             class="input input-bordered w-16 bg-zinc-900 border-zinc-700 p-2 text-sm text-white text-center">
                         <select [(ngModel)]="p.name" (ngModelChange)="onPlayerSelect($event, 'subs', i)"
                             class="select select-bordered flex-1 bg-zinc-900 border-zinc-700 p-2 text-sm text-white hover:border-gold-500/50 cursor-pointer">
-                            <option value="" class="bg-black">Select Player</option>
+                            <option value="" class="bg-black">{{ 'MATCH_DETAILS.LINEUP.SELECT_PLAYER' | translate }}</option>
                             <option *ngFor="let player of getAvailablePlayers('subs', i)" [value]="player.name" class="bg-black">
                                 {{ player.name }} ({{ player.jerseyNumber || 'N/A' }})
                             </option>
                         </select>
                         <select [(ngModel)]="p.position"
                             class="select select-bordered w-24 bg-zinc-900 border-zinc-700 p-2 text-sm text-white hover:border-gold-500/50 cursor-pointer">
-                            <option value="OUTFIELD" class="bg-black">Field</option>
-                            <option value="GK" class="bg-black">GK</option>
-                            <option value="DF" class="bg-black">DF</option>
-                            <option value="MF" class="bg-black">MF</option>
-                            <option value="FW" class="bg-black">FW</option>
+                            <option value="OUTFIELD" class="bg-black">{{ 'MATCH_DETAILS.LINEUP.FIELD' | translate }}</option>
+                            <option value="GK" class="bg-black">{{ 'MATCH_DETAILS.LINEUP.GK' | translate }}</option>
+                            <option value="DF" class="bg-black">{{ 'MATCH_DETAILS.LINEUP.DF' | translate }}</option>
+                            <option value="MF" class="bg-black">{{ 'MATCH_DETAILS.LINEUP.MF' | translate }}</option>
+                            <option value="FW" class="bg-black">{{ 'MATCH_DETAILS.LINEUP.FW' | translate }}</option>
                         </select>
                         <button (click)="removePlayer('subs', i)"
                             class="p-2 text-red-400 hover:bg-red-400/10 rounded transition-colors ml-14">
@@ -164,7 +164,7 @@
                     </div>
                     <p *ngIf="currentData.subs.length === 0"
                         class="text-xs text-zinc-500 text-center py-4 bg-black/50 rounded border border-dashed border-zinc-800">
-                        No substitutes added.</p>
+                        {{ 'MATCH_DETAILS.LINEUP.NO_SUBS' | translate }}</p>
                 </div>
             </div>
 
@@ -178,7 +178,7 @@
             </button>
             <button (click)="onSave()"
                 class="btn bg-gold-500 hover:bg-gold-400 text-black border-none font-bold text-sm transition-all shadow-lg hover:shadow-gold-500/20">
-                Save Lineups
+                {{ 'MATCH_DETAILS.LINEUP.SAVE' | translate }}
             </button>
         </div>
 
@@ -191,11 +191,11 @@
     <div class="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
         <div class="p-4 border-b border-zinc-800 flex items-center justify-between bg-black/20">
             <div>
-                <h4 class="text-sm font-black text-white uppercase tracking-wider">Select {{ startingLabel }}</h4>
+                <h4 class="text-sm font-black text-white uppercase tracking-wider">{{ 'MATCH_DETAILS.LINEUP.PICKER_TITLE' | translate: { title: pickerTitle } }}</h4>
                 <p class="text-[10px] text-zinc-500 uppercase font-bold mt-0.5">
-                    {{ pickerType === 'starting' 
-                        ? (currentStartingCount + selectedInPicker.size) + ' / ' + playersOnField + ' Max' 
-                        : (currentSubsCount + selectedInPicker.size) + ' / ' + subsLimit + ' Max' }}
+                    {{ (pickerType === 'starting' 
+                        ? 'MATCH_DETAILS.LINEUP.PICKER_MAX'
+                        : 'MATCH_DETAILS.LINEUP.PICKER_MAX') | translate: (pickerType === 'starting' ? { current: currentStartingCount + selectedInPicker.size, total: playersOnField } : { current: currentSubsCount + selectedInPicker.size, total: subsLimit }) }}
                 </p>
             </div>
             <button (click)="closePicker()" class="text-zinc-500 hover:text-white transition-colors">
@@ -227,7 +227,7 @@
                     </div>
                 </div>
                 <span *ngIf="isPlayerSelected(p.name) && !selectedInPicker.has(p.name)" 
-                      class="text-[9px] font-black uppercase text-zinc-600 bg-zinc-800 px-1.5 py-0.5 rounded">In Lineup</span>
+                      class="text-[9px] font-black uppercase text-zinc-600 bg-zinc-800 px-1.5 py-0.5 rounded">{{ 'MATCH_DETAILS.LINEUP.SELECTED' | translate }}</span>
             </div>
         </div>
 
@@ -235,7 +235,7 @@
             <button (click)="addSelectedPlayers()" 
                 [disabled]="selectedInPicker.size === 0"
                 class="w-full bg-gold-500 disabled:opacity-50 disabled:cursor-not-allowed text-black py-3 rounded-xl font-black uppercase tracking-widest hover:bg-gold-400 transition-all">
-                Confirm Selection ({{ selectedInPicker.size }})
+                {{ 'MATCH_DETAILS.LINEUP.CONFIRM_PICKER' | translate: { count: selectedInPicker.size } }}
             </button>
         </div>
     </div>

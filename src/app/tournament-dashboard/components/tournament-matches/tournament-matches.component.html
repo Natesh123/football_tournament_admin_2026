@@ -1,8 +1,8 @@
 <div class="space-y-8">
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-            <h1 class="text-3xl font-black text-white tracking-tight">Tournament Matches</h1>
-            <p class="text-zinc-500 mt-1.5">View and manage all matches scheduled for this tournament.</p>
+            <h1 class="text-3xl font-black text-white tracking-tight">{{ 'TOURNAMENT_DASHBOARD.MATCHES.TITLE' | translate }}</h1>
+            <p class="text-zinc-500 mt-1.5">{{ 'TOURNAMENT_DASHBOARD.MATCHES.SUBTITLE' | translate }}</p>
         </div>
 
         <!-- Match Status Tabs -->
@@ -15,7 +15,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                Upcoming
+                {{ 'TOURNAMENT_DASHBOARD.MATCHES.TABS.UPCOMING' | translate }}
             </button>
             <button (click)="activeTab.set('live')"
                 [class]="activeTab() === 'live' ? 'bg-gold-500/20 text-gold-400 border-gold-500/30' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5 border-transparent'"
@@ -26,7 +26,7 @@
                     <span class="relative inline-flex rounded-full h-2 w-2"
                         [class]="activeTab() === 'live' ? 'bg-gold-500' : 'bg-zinc-500'"></span>
                 </span>
-                Live
+                {{ 'TOURNAMENT_DASHBOARD.MATCHES.TABS.LIVE' | translate }}
             </button>
             <button (click)="activeTab.set('past')"
                 [class]="activeTab() === 'past' ? 'bg-white/10 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5'"
@@ -36,7 +36,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Past
+                {{ 'TOURNAMENT_DASHBOARD.MATCHES.TABS.PAST' | translate }}
             </button>
         </div>
     </div>
@@ -53,7 +53,7 @@
             <div (click)="openMatchDetails(match.id)" class="p-4 flex items-center justify-between hover:bg-zinc-800/80 transition-colors cursor-pointer group">
                 <div class="flex items-center gap-4 flex-1">
                     <span class="text-xs font-bold text-zinc-500 w-24 text-center">{{match.stage?.name ||
-                        'Match'}}</span>
+                        ('MATCH_DETAILS.INFO.TITLE' | translate)}}</span>
 
                     <div class="flex-1 flex justify-end items-center gap-2">
                         <span class="text-sm font-bold text-white">{{match.homeTeam?.name || 'TBD'}}</span>
@@ -75,7 +75,7 @@
                     <div class="ml-4 flex items-center gap-2">
                         <button (click)="openMatchDetails(match.id); $event.stopPropagation()"
                             class="px-4 py-2 rounded-lg bg-white/5 border border-black-border group-hover:bg-gold-500 group-hover:text-black font-bold text-[10px] uppercase tracking-wider text-zinc-400 transition-all shadow-[0_4px_10px_rgba(0,0,0,0.5)]">
-                            Manage Result
+                            {{ 'TOURNAMENT_DASHBOARD.MATCHES.MANAGE_RESULT' | translate }}
                         </button>
                     </div>
                 </div>
@@ -127,9 +127,8 @@
                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
         </div>
-        <h3 class="text-lg font-bold text-white mb-2">No {{ activeTab() | titlecase }} Matches</h3>
-        <p class="text-sm text-zinc-500 max-w-md">There are no {{ activeTab() }} matches for this tournament at the
-            moment.</p>
+        <h3 class="text-lg font-bold text-white mb-2">{{ 'TOURNAMENT_DASHBOARD.MATCHES.EMPTY_STATE' | translate: { tab: ('TOURNAMENT_DASHBOARD.MATCHES.TABS.' + (activeTab() | uppercase) | translate) } }}</h3>
+        <p class="text-sm text-zinc-500 max-w-md">{{ 'TOURNAMENT_DASHBOARD.MATCHES.EMPTY_STATE_DESC' | translate: { tab: ('TOURNAMENT_DASHBOARD.MATCHES.TABS.' + (activeTab() | uppercase) | translate) } }}</p>
     </div>
 
     } @else {
@@ -142,9 +141,8 @@
                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
         </div>
-        <h3 class="text-lg font-bold text-white mb-2">No Matches Found</h3>
-        <p class="text-sm text-zinc-500 max-w-md">There are no matches scheduled for this tournament yet. Generate a
-            schedule first.</p>
+        <h3 class="text-lg font-bold text-white mb-2">{{ 'TOURNAMENT_DASHBOARD.MATCHES.NO_MATCHES' | translate }}</h3>
+        <p class="text-sm text-zinc-500 max-w-md">{{ 'TOURNAMENT_DASHBOARD.MATCHES.NO_MATCHES_DESC' | translate }}</p>
     </div>
     }
 </div>
@@ -156,9 +154,9 @@
         class="relative w-full max-w-lg bg-black-card border border-black-border rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         <div class="px-6 py-5 border-b border-black-border bg-zinc-900/50 flex items-center justify-between">
             <div>
-                <h3 class="text-lg font-black text-white">Edit Match</h3>
-                <p class="text-sm text-zinc-400 mt-1">{{ editingMatch.homeTeam?.name || 'TBD' }} vs {{
-                    editingMatch.awayTeam?.name || 'TBD' }}</p>
+                <h3 class="text-lg font-black text-white">{{ 'TOURNAMENT_DASHBOARD.MATCHES.MODAL.TITLE' | translate }}</h3>
+                <p class="text-sm text-zinc-400 mt-1">{{ editingMatch.homeTeam?.name || ('MATCH_DETAILS.INFO.TITLE' | translate) }} vs {{
+                    editingMatch.awayTeam?.name || ('MATCH_DETAILS.INFO.TITLE' | translate) }}</p>
             </div>
             <button (click)="closeMatchEditor()" class="text-zinc-500 hover:text-white transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
@@ -170,33 +168,36 @@
 
         <div class="p-6 overflow-y-auto space-y-5">
             <div>
-                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Match Date &
-                    Time</label>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">
+                    {{ 'MATCH_DETAILS.INFO.DATE_TIME' | translate }}
+                </label>
                 <input type="datetime-local" [(ngModel)]="editingMatch.matchTime"
                     class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all [color-scheme:dark]" />
             </div>
             <div>
-                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Venue /
-                    Pitch</label>
-                <input type="text" [(ngModel)]="editingMatch.venue" placeholder="e.g. Main Stadium"
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">
+                    {{ 'MATCH_DETAILS.INFO.VENUE' | translate }}
+                </label>
+                <input type="text" [(ngModel)]="editingMatch.venue" [placeholder]="'MATCH_DETAILS.INFO.PLACEHOLDER_VENUE' | translate"
                     class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all" />
             </div>
             <div>
-                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Match
-                    Referees</label>
-                <input type="text" [(ngModel)]="editingMatch.matchReferees" placeholder="e.g. John Doe"
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">
+                    {{ 'MATCH_DETAILS.INFO.OFFICIALS' | translate }}
+                </label>
+                <input type="text" [(ngModel)]="editingMatch.matchReferees" [placeholder]="'MATCH_DETAILS.INFO.PLACEHOLDER_OFFICIALS' | translate"
                     class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all" />
             </div>
         </div>
 
         <div class="px-6 py-4 border-t border-black-border bg-zinc-900/50 flex justify-end gap-3">
             <button (click)="closeMatchEditor()"
-                class="px-4 py-2 rounded-lg text-sm font-bold text-zinc-400 hover:text-white transition-colors">Cancel</button>
+                class="px-4 py-2 rounded-lg text-sm font-bold text-zinc-400 hover:text-white transition-colors">{{ 'COMMON.CANCEL' | translate }}</button>
             <button (click)="saveMatchSchedule()" [disabled]="ui.isLoadingAction()"
                 class="px-6 py-2 bg-gold-500 hover:bg-gold-400 text-black rounded-lg text-sm font-bold transition-colors flex items-center gap-2">
                 <span *ngIf="ui.isLoadingAction()"
                     class="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin"></span>
-                {{ ui.isLoadingAction() ? 'Saving...' : 'Save' }}
+                {{ (ui.isLoadingAction() ? 'COMMON.SAVING' : 'COMMON.SAVE') | translate }}
             </button>
         </div>
     </div>

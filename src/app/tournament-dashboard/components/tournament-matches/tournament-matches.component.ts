@@ -4,10 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TournamentService } from '../../../tournament/tournament.service';
 import { UiService } from '../../../services/ui.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 @Component({
     selector: 'app-tournament-matches',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, TranslateModule],
     templateUrl: './tournament-matches.component.html'
 })
 export class TournamentMatchesComponent implements OnInit {
@@ -16,6 +17,7 @@ export class TournamentMatchesComponent implements OnInit {
     private router = inject(Router);
     private tournamentService = inject(TournamentService);
     public ui = inject(UiService);
+    private translate = inject(TranslateService);
     structure = signal<any>(null);
     isLoading = signal(true);
 
@@ -127,14 +129,18 @@ export class TournamentMatchesComponent implements OnInit {
                     }
                 }
                 this.ui.endAction();
-                this.ui.showToast('Match schedule updated successfully!', 'success');
+                this.showToast('TOURNAMENT_DASHBOARD.TOAST.MATCH_UPDATE_SUCCESS', 'success');
                 this.closeMatchEditor();
             },
             error: (err: any) => {
                 console.error("Failed to update schedule:", err);
                 this.ui.endAction();
-                this.ui.showToast('Failed to update match schedule.', 'error');
+                this.showToast('TOURNAMENT_DASHBOARD.TOAST.MATCH_UPDATE_ERROR', 'error');
             }
         });
+    }
+
+    showToast(key: string, type: 'success' | 'error' | 'info' = 'success') {
+        this.ui.showToast(key, type);
     }
 }
