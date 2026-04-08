@@ -1,14 +1,16 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, Signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive, RouterOutlet, ActivatedRoute } from '@angular/router';
-import { TeamService } from './team.service';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { TeamService, Team } from './team.service';
 import { TranslateModule } from '@ngx-translate/core';
+import { CreateTeamModalComponent } from './components/create-team-modal/create-team-modal.component';
+import { Subject, switchMap, startWith } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-team-layout',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet, TranslateModule],
+  imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet, TranslateModule, CreateTeamModalComponent],
   template: `
     <div class="space-y-6">
       <!-- Header -->
@@ -29,17 +31,35 @@ import { TranslateModule } from '@ngx-translate/core';
             <p class="text-zinc-400">{{ 'TEAM_LAYOUT.TEAM_MANAGER' | translate }}</p>
           </div>
           <div class="ml-auto flex items-center gap-3">
-             <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border"
-                [ngClass]="{
-                  'bg-green-500/10 text-green-500 border-green-500/20': t.status === 'approved',
-                  'bg-yellow-500/10 text-yellow-500 border-yellow-500/20': t.status === 'pending',
-                  'bg-red-500/10 text-red-500 border-red-500/20': t.status === 'rejected'
-                }">
-                {{ t.status }}
-             </span>
+             @if (t.status) {
+               <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border"
+                  [ngClass]="{
+                    'bg-green-500/10 text-green-500 border-green-500/20': t.status === 'approved',
+                    'bg-yellow-500/10 text-yellow-500 border-yellow-500/20': t.status === 'pending',
+                    'bg-red-500/10 text-red-500 border-red-500/20': t.status === 'rejected'
+                  }">
+                  {{ 'COMMON.STATUS.' + (t.status | uppercase) | translate }}
+               </span>
+             }
+             
+             <button (click)="openEditModal()" 
+                class="flex items-center gap-2 px-4 py-2 bg-black-main border border-black-border hover:border-gold-400/50 text-zinc-300 hover:text-white rounded-xl transition-all font-medium text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                {{ 'COMMON.EDIT' | translate }}
+             </button>
           </div>
         </div>
       }
+
+      <app-create-team-modal 
+        [isOpen]="isEditModalOpen" 
+        [mode]="'edit'" 
+        [teamToEdit]="team()"
+        (closeModal)="closeEditModal()"
+        (teamUpdated)="onTeamUpdated()">
+      </app-create-team-modal>
 
       <div class="flex flex-col md:flex-row gap-6 min-h-[500px]">
         <!-- Sidebar -->
@@ -102,9 +122,29 @@ export class TeamLayoutComponent {
   private route = inject(ActivatedRoute);
   protected teamService = inject(TeamService);
 
-  private teamId = this.route.snapshot.paramMap.get('id');
+  private teamId = this.route.snapshot.paramMap.get('id')!;
+  private refreshSubject = new Subject<void>();
+  
+  team = toSignal<Team | undefined>(
+    this.refreshSubject.pipe(
+      startWith(null),
+      switchMap(() => this.teamService.getById(this.teamId))
+    )
+  );
 
-  team = toSignal(this.teamService.getById(this.teamId!));
+  isEditModalOpen = false;
+
+  openEditModal() {
+    this.isEditModalOpen = true;
+  }
+
+  closeEditModal() {
+    this.isEditModalOpen = false;
+  }
+
+  onTeamUpdated() {
+    this.refreshSubject.next();
+  }
 
   logoError(event: Event) {
     // Hide broken image — the @else block with initials will show instead

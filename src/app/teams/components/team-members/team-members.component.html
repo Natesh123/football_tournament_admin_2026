@@ -70,9 +70,12 @@
     <!-- Captain Highlight Section -->
     @if (captain() && (activeFilter() === 'all' || activeFilter() === 'players')) {
     <div
-        class="bg-gradient-to-r from-gold-500/10 to-black-card border border-gold-500/30 rounded-2xl p-6 relative overflow-hidden group">
-        <div
-            class="absolute -right-20 -top-20 w-64 h-64 bg-gold-500/5 rounded-full blur-3xl group-hover:bg-gold-500/10 transition-colors duration-700 pointer-events-none">
+        class="bg-gradient-to-r from-gold-500/10 to-black-card border border-gold-500/30 rounded-2xl p-6 relative group">
+        <!-- Background Clipping Layer -->
+        <div class="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+            <div
+                class="absolute -right-20 -top-20 w-64 h-64 bg-gold-500/5 rounded-full blur-3xl group-hover:bg-gold-500/10 transition-colors duration-700">
+            </div>
         </div>
 
         <div class="flex flex-col md:flex-row items-center gap-6 relative z-10">
@@ -186,11 +189,11 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         @for (member of filteredMembers(); track member.id) {
         <div *ngIf="member.id !== captain()?.id"
-            class="bg-black-card border border-black-border rounded-xl overflow-hidden group hover:border-gold-500/30 transition-all shadow-sm hover:shadow-[0_4px_20px_rgba(0,0,0,0.5)] flex flex-col relative">
+            class="bg-black-card border border-black-border rounded-xl group hover:border-gold-500/30 transition-all shadow-sm hover:shadow-[0_4px_20px_rgba(0,0,0,0.5)] flex flex-col relative">
 
             <!-- Card Header: Photo & Jersey -->
             <div
-                class="h-24 bg-gradient-to-b from-black-main to-black-card relative px-4 pt-4 flex justify-between items-start">
+                class="h-24 bg-gradient-to-b from-black-main to-black-card relative px-4 pt-4 flex justify-between items-start rounded-t-xl">
                 <!-- Status indicator -->
                 <div class="flex gap-2">
                     <div *ngIf="member.role === 'vice_captain'"
