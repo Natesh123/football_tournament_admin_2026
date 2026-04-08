@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { SettingsService } from '../../settings.service';
 import { ConfirmModalComponent } from '../../../components/shared/confirm-modal.component';
 import { ProfileModalComponent } from '../../../components/shared/profile-modal.component';
+import { UiService } from '../../../services/ui.service';
 
 @Component({
   selector: 'app-users',
@@ -234,7 +235,8 @@ export class UsersComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private settingsService: SettingsService
+    private settingsService: SettingsService,
+    private ui: UiService
   ) {
     this.userForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -328,7 +330,7 @@ export class UsersComponent implements OnInit {
       error: (err) => {
         this.isLoading = false;
         this.userToDelete = null;
-        alert(err.error?.error || 'Failed to delete user');
+        this.ui.showToast(err.error?.error || 'Failed to delete user', 'error');
       }
     });
   }

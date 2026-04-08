@@ -5,6 +5,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { PhysicsBallDirective } from '../physics-ball.directive';
+import { UiService } from '../../services/ui.service';
 
 @Component({
     selector: 'app-otp',
@@ -24,7 +25,8 @@ export class OtpComponent {
     constructor(
         private fb: FormBuilder,
         private auth: AuthService,
-        private router: Router
+        private router: Router,
+        private ui: UiService
     ) {
         this.otpForm = this.fb.group({
             otp: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]]
@@ -79,7 +81,7 @@ export class OtpComponent {
         this.auth.resendOtp({ email: this.email }).subscribe({
             next: (res: any) => {
                 this.isLoading = false;
-                alert(res.message || 'OTP resent successfully');
+                this.ui.showToast(res.message || 'OTP resent successfully', 'success');
             },
             error: (err) => {
                 this.isLoading = false;

@@ -1,13 +1,16 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { inject } from '@angular/core';
 
 @Component({
     selector: 'app-match-header',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, TranslateModule],
     templateUrl: './match-header.component.html'
 })
 export class MatchHeaderComponent implements OnInit, OnDestroy, OnChanges {
+    private translate = inject(TranslateService);
     @Input() match: any;
     @Input() isLoading = false;
 
@@ -65,7 +68,7 @@ export class MatchHeaderComponent implements OnInit, OnDestroy, OnChanges {
         const diff = matchTime - now;
 
         if (diff <= 0) {
-            this.countdown = 'Started';
+            this.countdown = this.translate.instant('MATCH_DETAILS.HEADER.LIVE');
             return;
         }
 

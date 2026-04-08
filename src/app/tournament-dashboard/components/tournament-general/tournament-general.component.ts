@@ -1,16 +1,22 @@
 import { Component, Input, ChangeDetectorRef, inject, HostListener, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { environment } from '../../../../environments/environment';
 
 @Component({
     selector: 'app-tournament-general',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [
+        CommonModule,
+        FormsModule,
+        TranslateModule
+    ],
     templateUrl: './tournament-general.component.html'
 })
 export class TournamentGeneralComponent {
-    @Input() data!: any;
+    private translate = inject(TranslateService);
+    @Input() data: any;
     private cdr = inject(ChangeDetectorRef);
 
     availableSponsors = [

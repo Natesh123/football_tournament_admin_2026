@@ -1,43 +1,39 @@
 <div class="space-y-8">
     <div>
-        <h1 class="text-3xl font-black text-white tracking-tight">Match Rules</h1>
-        <p class="text-zinc-500 mt-1.5">Define exactly how the game is played on the pitch.</p>
+        <h1 class="text-3xl font-black text-white tracking-tight">{{ 'TOURNAMENT_DASHBOARD.RULES.TITLE' | translate }}</h1>
+        <p class="text-zinc-500 mt-1.5">{{ 'TOURNAMENT_DASHBOARD.RULES.SUBTITLE' | translate }}</p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Gameplay Rules -->
         <div class="bg-black-card border border-black-border rounded-xl p-6 space-y-6">
-            <h2 class="text-lg font-bold text-white">General &amp; Gameplay</h2>
+            <h2 class="text-lg font-bold text-white">{{ 'TOURNAMENT_DASHBOARD.RULES.GAMEPLAY_TITLE' | translate }}</h2>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Governing
-                        Body</label>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.RULES.GOVERNING_BODY' | translate }}</label>
                     <input type="text" [(ngModel)]="data.govBody"
                         class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all" />
                 </div>
                 <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Ball
-                        Size</label>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.RULES.BALL_SIZE' | translate }}</label>
                     <select [(ngModel)]="data.ballSize"
                         class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all">
-                        <option [ngValue]="3" class="bg-black-card">Size 3</option>
-                        <option [ngValue]="4" class="bg-black-card">Size 4</option>
-                        <option [ngValue]="5" class="bg-black-card">Size 5</option>
+                        <option [ngValue]="3" class="bg-black-card">{{ 'TOURNAMENT_DASHBOARD.RULES.SIZE' | translate }} 3</option>
+                        <option [ngValue]="4" class="bg-black-card">{{ 'TOURNAMENT_DASHBOARD.RULES.SIZE' | translate }} 4</option>
+                        <option [ngValue]="5" class="bg-black-card">{{ 'TOURNAMENT_DASHBOARD.RULES.SIZE' | translate }} 5</option>
                     </select>
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Players
-                        on Field</label>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.RULES.PLAYERS_ON_FIELD' | translate }}</label>
                     <input type="number" [(ngModel)]="data.playersOnField"
                         class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all" />
                 </div>
                 <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Minimum
-                        Players</label>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.RULES.MIN_PLAYERS' | translate }}</label>
                     <input type="number" [(ngModel)]="data.minPlayers"
                         class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all" />
                 </div>
@@ -46,29 +42,29 @@
             <!-- Substitution Rules with tooltip -->
             <div class="relative group">
                 <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                    Substitution Rules
+                    {{ 'TOURNAMENT_DASHBOARD.RULES.SUBSTITUTION_RULES' | translate }}
                     <span class="text-gold-400 cursor-help text-xs leading-none">&#9432;</span>
                 </label>
                 <!-- Tooltip -->
                 <div class="absolute z-20 left-0 bottom-full mb-2 hidden group-hover:block w-72
                             bg-zinc-900 border border-gold-400/40 text-zinc-300 text-xs rounded-lg px-4 py-3 shadow-xl pointer-events-none">
-                    <p class="font-semibold text-gold-400 mb-1">Substitution Rules</p>
-                    <p><strong class="text-white">3 Substitutions</strong> — Standard FIFA rule for competitive matches.</p>
-                    <p class="mt-1"><strong class="text-white">5 Substitutions</strong> — Allowed in certain competitions &amp; friendly matches.</p>
-                    <p class="mt-1"><strong class="text-white">Rolling / Unlimited</strong> — Common in recreational or 5-a-side formats.</p>
+                    <p class="font-semibold text-gold-400 mb-1">{{ 'TOURNAMENT_DASHBOARD.RULES.SUBSTITUTION_RULES' | translate }}</p>
+                    <p><strong class="text-white">3 {{ 'TOURNAMENT_DASHBOARD.RULES.SUBSTITUTIONS' | translate }}</strong> — {{ 'TOURNAMENT_DASHBOARD.RULES.SUBS_DESC_3' | translate }}</p>
+                    <p class="mt-1"><strong class="text-white">5 {{ 'TOURNAMENT_DASHBOARD.RULES.SUBSTITUTIONS' | translate }}</strong> — {{ 'TOURNAMENT_DASHBOARD.RULES.SUBS_DESC_5' | translate }}</p>
+                    <p class="mt-1"><strong class="text-white">{{ 'TOURNAMENT_DASHBOARD.RULES.ROLLING_UNLIMITED' | translate }}</strong> — {{ 'TOURNAMENT_DASHBOARD.RULES.SUBS_DESC_ROLLING' | translate }}</p>
                 </div>
                 <select [(ngModel)]="data.subsAllowed"
                     class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all">
-                    <option [ngValue]="3" class="bg-black-card">3 Substitutions</option>
-                    <option [ngValue]="5" class="bg-black-card">5 Substitutions</option>
-                    <option [ngValue]="99" class="bg-black-card">Rolling / Unlimited</option>
+                    <option [ngValue]="3" class="bg-black-card">3 {{ 'TOURNAMENT_DASHBOARD.RULES.SUBSTITUTIONS' | translate }}</option>
+                    <option [ngValue]="5" class="bg-black-card">5 {{ 'TOURNAMENT_DASHBOARD.RULES.SUBSTITUTIONS' | translate }}</option>
+                    <option [ngValue]="99" class="bg-black-card">{{ 'TOURNAMENT_DASHBOARD.RULES.ROLLING_UNLIMITED' | translate }}</option>
                 </select>
             </div>
 
             <div class="pt-2 flex flex-col gap-3">
                 <label
                     class="cursor-pointer label flex items-center justify-between bg-white/5 border border-black-border rounded-lg px-4 py-3 hover:border-gold-400/50 transition-all">
-                    <div><span class="label-text text-white font-bold block">Apply Offside Rule</span></div>
+                    <div><span class="label-text text-white font-bold block">{{ 'TOURNAMENT_DASHBOARD.RULES.OFFSIDE_RULE' | translate }}</span></div>
                     <input type="checkbox" [(ngModel)]="data.offsideRule" class="toggle toggle-warning" />
                 </label>
             </div>
@@ -76,22 +72,21 @@
 
         <!-- Tie & Discipline -->
         <div class="bg-black-card border border-black-border rounded-xl p-6 space-y-6">
-            <h2 class="text-lg font-bold text-white">Discipline &amp; Tie Resolutions</h2>
+            <h2 class="text-lg font-bold text-white">{{ 'TOURNAMENT_DASHBOARD.RULES.DISCIPLINE_TIE_TITLE' | translate }}</h2>
 
             <div class="grid grid-cols-2 gap-4 border-b border-black-border pb-6">
                 <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">Extra
-                        Time Rules</label>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.RULES.EXTRA_TIME_RULES' | translate }}</label>
                     <select [(ngModel)]="data.extraTimeRule" (ngModelChange)="onExtraTimeChange()"
                         class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all">
-                        <option value="None" class="bg-black-card">No Extra Time</option>
-                        <option value="2x15" class="bg-black-card">2 x 15 mins</option>
-                        <option value="Golden Goal" class="bg-black-card">Golden Goal</option>
+                        <option value="None" class="bg-black-card">{{ 'TOURNAMENT_DASHBOARD.RULES.NO_EXTRA_TIME' | translate }}</option>
+                        <option value="2x15" class="bg-black-card">{{ 'TOURNAMENT_DASHBOARD.RULES.MIN_2X15' | translate }}</option>
+                        <option value="Golden Goal" class="bg-black-card">{{ 'TOURNAMENT_DASHBOARD.RULES.GOLDEN_GOAL' | translate }}</option>
                     </select>
                 </div>
                 <div class="flex items-end pb-2">
                     <label class="cursor-pointer label flex items-center gap-3"
-                        [title]="isNoExtraTime ? 'Enable Extra Time first to use Penalties Shootout' : ''"
+                        [title]="isNoExtraTime ? ('TOURNAMENT_DASHBOARD.RULES.ENABLE_EXTRA_TIME_HINT' | translate) : ''"
                         [class.opacity-40]="isNoExtraTime"
                         [class.cursor-not-allowed]="isNoExtraTime">
                         <input type="checkbox" [(ngModel)]="data.penaltiesRule"
@@ -99,8 +94,8 @@
                             class="checkbox checkbox-warning border-gold-400"
                             [class.cursor-not-allowed]="isNoExtraTime" />
                         <div>
-                            <span class="label-text text-white font-bold block">Penalties Shootout</span>
-                            <span *ngIf="isNoExtraTime" class="text-[10px] text-zinc-500">Requires Extra Time</span>
+                            <span class="label-text text-white font-bold block">{{ 'TOURNAMENT_DASHBOARD.RULES.PENALTIES_SHOOTOUT' | translate }}</span>
+                            <span *ngIf="isNoExtraTime" class="text-[10px] text-zinc-500">{{ 'TOURNAMENT_DASHBOARD.RULES.REQUIRES_EXTRA_TIME' | translate }}</span>
                         </div>
                     </label>
                 </div>
@@ -110,15 +105,15 @@
                 <!-- Yellow Card Suspension with tooltip & stepper -->
                 <div class="relative group">
                     <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                        Yellow Card Suspension
+                        {{ 'TOURNAMENT_DASHBOARD.RULES.YELLOW_CARD_SUSPENSION' | translate }}
                         <span class="text-gold-400 cursor-help text-xs leading-none">&#9432;</span>
                     </label>
                     <!-- Tooltip -->
                     <div class="absolute z-20 left-0 bottom-full mb-2 hidden group-hover:block w-72
                                 bg-zinc-900 border border-gold-400/40 text-zinc-300 text-xs rounded-lg px-4 py-3 shadow-xl pointer-events-none">
-                        <p class="font-semibold text-gold-400 mb-1">Yellow Card Suspension</p>
-                        <p>Set how many accumulated yellow cards trigger a <strong class="text-white">1-match ban</strong>.</p>
-                        <p class="mt-1">E.g. setting <strong class="text-white">3</strong> means a player is suspended after their 3rd yellow card in the tournament.</p>
+                        <p class="font-semibold text-gold-400 mb-1">{{ 'TOURNAMENT_DASHBOARD.RULES.YELLOW_CARD_SUSPENSION' | translate }}</p>
+                        <p>{{ 'TOURNAMENT_DASHBOARD.RULES.YELLOW_SUSPENSION_DESC' | translate }}</p>
+                        <p class="mt-1">{{ 'TOURNAMENT_DASHBOARD.RULES.YELLOW_SUSPENSION_EXAMPLE' | translate }}</p>
                     </div>
                     <div class="flex items-center gap-3">
                         <!-- +/- Stepper -->
@@ -137,22 +132,22 @@
                                 +
                             </button>
                         </div>
-                        <span class="text-sm text-zinc-400">accumulated yellows = 1 match ban</span>
+                        <span class="text-sm text-zinc-400">{{ 'TOURNAMENT_DASHBOARD.RULES.YELLOW_SUSPENSION_BAN_HINT' | translate }}</span>
                     </div>
                 </div>
 
                 <!-- Red Card Penalty with tooltip & stepper -->
                 <div class="relative group">
                     <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                        Red Card Penalty
+                        {{ 'TOURNAMENT_DASHBOARD.RULES.RED_CARD_PENALTY' | translate }}
                         <span class="text-gold-400 cursor-help text-xs leading-none">&#9432;</span>
                     </label>
                     <!-- Tooltip -->
                     <div class="absolute z-20 left-0 bottom-full mb-2 hidden group-hover:block w-72
                                 bg-zinc-900 border border-gold-400/40 text-zinc-300 text-xs rounded-lg px-4 py-3 shadow-xl pointer-events-none">
-                        <p class="font-semibold text-gold-400 mb-1">Red Card Penalty</p>
-                        <p>Number of <strong class="text-white">matches banned</strong> for a straight red card.</p>
-                        <p class="mt-1">E.g. setting <strong class="text-white">2</strong> means a red-carded player misses the next <strong class="text-white">2 matches</strong> automatically.</p>
+                        <p class="font-semibold text-gold-400 mb-1">{{ 'TOURNAMENT_DASHBOARD.RULES.RED_CARD_PENALTY' | translate }}</p>
+                        <p>{{ 'TOURNAMENT_DASHBOARD.RULES.RED_SUSPENSION_DESC' | translate }}</p>
+                        <p class="mt-1">{{ 'TOURNAMENT_DASHBOARD.RULES.RED_SUSPENSION_EXAMPLE' | translate }}</p>
                     </div>
                     <div class="flex items-center gap-3">
                         <!-- +/- Stepper -->
@@ -171,29 +166,29 @@
                                 +
                             </button>
                         </div>
-                        <span class="text-sm text-zinc-400">match ban automatically</span>
+                        <span class="text-sm text-zinc-400">{{ 'TOURNAMENT_DASHBOARD.RULES.RED_SUSPENSION_BAN_HINT' | translate }}</span>
                     </div>
                 </div>
 
                 <!-- Goalkeeper Rules with tooltip -->
                 <div class="relative group">
                     <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                        Goalkeeper Rules
+                        {{ 'TOURNAMENT_DASHBOARD.RULES.GOALKEEPER_RULES' | translate }}
                         <span class="text-gold-400 cursor-help text-xs leading-none">&#9432;</span>
                     </label>
                     <!-- Tooltip -->
                     <div class="absolute z-20 left-0 bottom-full mb-2 hidden group-hover:block w-72
                                 bg-zinc-900 border border-gold-400/40 text-zinc-300 text-xs rounded-lg px-4 py-3 shadow-xl pointer-events-none">
-                        <p class="font-semibold text-gold-400 mb-1">Goalkeeper Rules</p>
-                        <p><strong class="text-white">Standard (FIFA)</strong> — Goalkeeper can handle back-passes from headers and throw-ins.</p>
-                        <p class="mt-1"><strong class="text-white">Strict No Pass Back</strong> — Keeper cannot touch the ball with hands from any deliberate kick by a teammate.</p>
-                        <p class="mt-1"><strong class="text-white">Futsal (Hand throw)</strong> — Goalkeeper must throw the ball back into play; no kicking from hands.</p>
+                        <p class="font-semibold text-gold-400 mb-1">{{ 'TOURNAMENT_DASHBOARD.RULES.GOALKEEPER_RULES' | translate }}</p>
+                        <p><strong class="text-white">{{ 'TOURNAMENT_DASHBOARD.RULES.GK_STANDARD' | translate }}</strong> — {{ 'TOURNAMENT_DASHBOARD.RULES.GK_STANDARD_DESC' | translate }}</p>
+                        <p class="mt-1"><strong class="text-white">{{ 'TOURNAMENT_DASHBOARD.RULES.GK_NO_PASS_BACK' | translate }}</strong> — {{ 'TOURNAMENT_DASHBOARD.RULES.GK_NO_PASS_BACK_DESC' | translate }}</p>
+                        <p class="mt-1"><strong class="text-white">{{ 'TOURNAMENT_DASHBOARD.RULES.GK_FUTSAL' | translate }}</strong> — {{ 'TOURNAMENT_DASHBOARD.RULES.GK_FUTSAL_DESC' | translate }}</p>
                     </div>
                     <select [(ngModel)]="data.gkRules"
                         class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all">
-                        <option value="Standard" class="bg-black-card">Standard (FIFA)</option>
-                        <option value="No Pass Back" class="bg-black-card">Strict No Pass Back</option>
-                        <option value="Futsal Throw" class="bg-black-card">Futsal Rules (Hand throw only)
+                        <option value="Standard" class="bg-black-card">{{ 'TOURNAMENT_DASHBOARD.RULES.GK_STANDARD' | translate }}</option>
+                        <option value="No Pass Back" class="bg-black-card">{{ 'TOURNAMENT_DASHBOARD.RULES.GK_NO_PASS_BACK' | translate }}</option>
+                        <option value="Futsal Throw" class="bg-black-card">{{ 'TOURNAMENT_DASHBOARD.RULES.GK_FUTSAL' | translate }}
                         </option>
                     </select>
                 </div>

@@ -6,7 +6,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
         </div>
-        <h3 class="text-lg font-black text-white">Match Statistics</h3>
+        <h3 class="text-lg font-black text-white">{{ 'MATCH_DETAILS.STATS.TITLE' | translate }}</h3>
     </div>
 
     @if (isLoading()) {
@@ -17,7 +17,7 @@
     <!-- Team Headers -->
     <div class="grid grid-cols-3 items-center mb-4 px-2">
         <span class="text-sm font-black text-white text-left truncate">{{ homeTeamName }}</span>
-        <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest text-center">Stat</span>
+        <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest text-center">{{ 'MATCH_DETAILS.STATS.STAT_LABEL' | translate }}</span>
         <span class="text-sm font-black text-white text-right truncate">{{ awayTeamName }}</span>
     </div>
 
@@ -28,7 +28,7 @@
             <!-- Numbers row -->
             <div class="grid grid-cols-3 items-center mb-1.5 px-2">
                 <span class="text-base font-black text-white">{{ row.home }}</span>
-                <span class="text-[10px] font-bold text-zinc-500 text-center truncate px-1">{{ row.label }}</span>
+                <span class="text-[10px] font-bold text-zinc-500 text-center truncate px-1">{{ row.label | translate }}</span>
                 <span class="text-base font-black text-white text-right">{{ row.away }}</span>
             </div>
             <!-- Bar row -->

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TournamentService, TournamentDTO } from '../tournament/tournament.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { TournamentGeneralComponent } from './components/tournament-general/tournament-general.component';
 import { TournamentParticipantsComponent } from './components/tournament-participants/tournament-participants.component';
@@ -131,7 +132,9 @@ export interface TournamentSettings {
         TournamentResultsComponent,
         TournamentTeamsComponent,
         TournamentMatchesComponent,
-        LoaderComponent
+        TournamentMatchesComponent,
+        LoaderComponent,
+        TranslateModule
     ],
     templateUrl: './tournament-dashboard.component.html',
 })
@@ -140,6 +143,7 @@ export class TournamentDashboardComponent implements OnInit {
     private router = inject(Router);
     private tournamentService = inject(TournamentService);
     public ui = inject(UiService);
+    private translate = inject(TranslateService);
 
     tournament = signal<TournamentDTO | null>(null);
     isLoading = signal(true);
@@ -149,17 +153,17 @@ export class TournamentDashboardComponent implements OnInit {
     settings: TournamentSettings = this.getDefaultSettings();
 
     sidebarItems = [
-        { id: 'general', label: 'General', icon: 'settings' },
-        { id: 'participants', label: 'Participants', icon: 'users' },
-        { id: 'teams', label: 'Teams', icon: 'shield' },
-        { id: 'matches', label: 'Matches', icon: 'list' },
-        { id: 'format', label: 'Format', icon: 'grid' },
-        { id: 'schedule', label: 'Schedule', icon: 'calendar' },
-        { id: 'rules', label: 'Rules', icon: 'scale-balanced' },
-        { id: 'venues', label: 'Venues', icon: 'map-pin' },
-        { id: 'finance', label: 'Finance', icon: 'coins' },
-        { id: 'presentation', label: 'Presentation', icon: 'monitor' },
-        { id: 'results', label: 'Results', icon: 'bar-chart' }
+        { id: 'general', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.GENERAL', icon: 'settings' },
+        { id: 'participants', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.PARTICIPANTS', icon: 'users' },
+        { id: 'teams', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.TEAMS', icon: 'shield' },
+        { id: 'matches', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.MATCHES', icon: 'list' },
+        { id: 'format', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.FORMAT', icon: 'grid' },
+        { id: 'schedule', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.SCHEDULE', icon: 'calendar' },
+        { id: 'rules', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.RULES', icon: 'scale-balanced' },
+        { id: 'venues', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.VENUES', icon: 'map-pin' },
+        { id: 'finance', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.FINANCE', icon: 'coins' },
+        { id: 'presentation', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.PRESENTATION', icon: 'monitor' },
+        { id: 'results', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.RESULTS', icon: 'bar-chart' }
     ];
 
     ngOnInit() {
@@ -458,30 +462,30 @@ export class TournamentDashboardComponent implements OnInit {
         }).subscribe({
             next: (updated) => {
                 this.tournament.set(updated);
-
+                
                 // If format changed, also let's generate the structure
                 if (this.formatChanged && t.id) {
                     this.tournamentService.generateStructure(t.id).subscribe({
                         next: () => {
                             this.formatChanged = false;
                             this.ui.endAction();
-                            this.showToast('Changes saved & structure generated!', 'success');
+                            this.showToast('TOURNAMENT_DASHBOARD.TOAST.STRUCTURE_SUCCESS', 'success');
                         },
                         error: (err) => {
                             console.error('Failed to generate structure:', err);
                             this.ui.endAction();
-                            this.showToast('Saved changes, but structure generation failed.', 'error');
+                            this.showToast('TOURNAMENT_DASHBOARD.TOAST.STRUCTURE_ERROR', 'error');
                         }
                     });
                 } else {
                     this.ui.endAction();
-                    this.showToast('Changes saved successfully!', 'success');
+                    this.showToast('TOURNAMENT_DASHBOARD.TOAST.SAVE_SUCCESS', 'success');
                 }
             },
             error: (err) => {
                 console.error('Failed to save:', err);
                 this.ui.endAction();
-                this.showToast('Failed to save changes.', 'error');
+                this.showToast('TOURNAMENT_DASHBOARD.TOAST.SAVE_ERROR', 'error');
             }
         });
     }
@@ -490,23 +494,23 @@ export class TournamentDashboardComponent implements OnInit {
         const t = this.tournament();
         if (!t) return;
         this.mergeTournamentToSettings(t);
-        this.showToast('Changes discarded.', 'info');
+        this.showToast('TOURNAMENT_DASHBOARD.TOAST.DISCARD_SUCCESS', 'info');
     }
 
     goBack() {
         this.router.navigate(['/tournaments']);
     }
 
-    showToast(text: string, type: 'success' | 'error' | 'info' = 'success') {
-        this.ui.showToast(text, type);
+    showToast(key: string, type: 'success' | 'error' | 'info' = 'success') {
+        this.ui.showToast(key, type);
     }
 
     getStatusLabel(status: string): string {
         const map: Record<string, string> = {
-            draft: 'Draft',
-            registration_open: 'Registration Open',
-            in_progress: 'In Progress',
-            completed: 'Completed',
+            draft: 'TOURNAMENT_DASHBOARD.STATUS.DRAFT',
+            registration_open: 'TOURNAMENT_DASHBOARD.STATUS.REGISTRATION_OPEN',
+            in_progress: 'TOURNAMENT_DASHBOARD.STATUS.IN_PROGRESS',
+            completed: 'TOURNAMENT_DASHBOARD.STATUS.COMPLETED',
         };
         return map[status] || status;
     }

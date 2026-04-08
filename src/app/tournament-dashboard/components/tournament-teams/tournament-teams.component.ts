@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { UiService } from '../../../services/ui.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 interface Team {
     id: string;
@@ -24,7 +25,7 @@ interface TournamentTeam {
 @Component({
     selector: 'app-tournament-teams',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, TranslateModule],
     templateUrl: './tournament-teams.component.html',
     styleUrls: []
 })
@@ -33,6 +34,7 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
 
     private http = inject(HttpClient);
     public ui = inject(UiService);
+    private translate = inject(TranslateService);
 
     teams = signal<TournamentTeam[]>([]);
     availableTeams = signal<Team[]>([]); // Teams not in this tournament
@@ -52,12 +54,12 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
     // Data Table State
     searchQuery = signal('');
     columns = signal([
-        { key: 'team', label: 'Team', visible: true },
-        { key: 'type', label: 'Type', visible: true },
-        { key: 'location', label: 'Location', visible: true },
-        { key: 'status', label: 'Status', visible: true },
-        { key: 'payment', label: 'Payment', visible: true },
-        { key: 'actions', label: 'Actions', visible: true }
+        { key: 'team', label: 'TOURNAMENT_DASHBOARD.TEAMS.TABLE.TEAM', visible: true },
+        { key: 'type', label: 'TOURNAMENT_DASHBOARD.TEAMS.TABLE.TYPE', visible: true },
+        { key: 'location', label: 'TOURNAMENT_DASHBOARD.TEAMS.TABLE.LOCATION', visible: true },
+        { key: 'status', label: 'TOURNAMENT_DASHBOARD.TEAMS.TABLE.STATUS', visible: true },
+        { key: 'payment', label: 'TOURNAMENT_DASHBOARD.TEAMS.TABLE.PAYMENT', visible: true },
+        { key: 'actions', label: 'TOURNAMENT_DASHBOARD.TEAMS.TABLE.ACTIONS', visible: true }
     ]);
 
     // Computed filtered list
@@ -165,13 +167,13 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
                         this.availableTeams.update(av => av.filter(a => !addedSet.has(a.id)));
 
                         this.ui.endAction();
-                        this.ui.showToast('Existing teams successfully added to tournament', 'success');
+                        this.showToast('TOURNAMENT_DASHBOARD.TOAST.ADD_TEAMS_SUCCESS', 'success');
                         this.closeModal();
                     },
                     error: (err) => {
                         console.error('Error assigning teams:', err);
                         this.ui.endAction();
-                        this.ui.showToast('Failed to add existing teams.', 'error');
+                        this.showToast('TOURNAMENT_DASHBOARD.TOAST.ADD_TEAMS_ERROR', 'error');
                     }
                 });
         } else {
@@ -187,42 +189,44 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
                             next: (res) => {
                                 this.teams.update(t => [res.data, ...t]);
                                 this.ui.endAction();
-                                this.ui.showToast('New team created and added successfully', 'success');
+                                this.showToast('TOURNAMENT_DASHBOARD.TOAST.CREATE_TEAM_SUCCESS', 'success');
                                 this.closeModal();
                             },
                             error: (err) => {
                                 console.error('Error mapping new team to tournament:', err);
                                 this.ui.endAction();
-                                this.ui.showToast('Created team but failed to add to tournament.', 'error');
+                                this.showToast('TOURNAMENT_DASHBOARD.TOAST.MAPPING_ERROR', 'error');
                             }
                         });
                 },
                 error: (err) => {
                     console.error('Error saving team:', err);
                     this.ui.endAction();
-                    this.ui.showToast('Failed to create new team.', 'error');
+                    this.showToast('TOURNAMENT_DASHBOARD.TOAST.CREATE_TEAM_ERROR', 'error');
                 }
             });
         }
     }
 
     deleteTeam(regId: string, teamId: string) {
-        if (confirm('Are you sure you want to remove this team from the tournament?')) {
-            this.ui.startAction();
-            // Delete the registration link
-            this.http.delete(`${environment.apiBaseUrl}/api/tournaments/${this.tournamentId}/teams/${teamId}`).subscribe({
-                next: () => {
-                    this.ui.showToast('Team removed from tournament successfully.', 'success');
-                    this.fetchTeams(); // Refetch to update both lists
-                    this.ui.endAction();
-                },
-                error: (err) => {
-                    console.error('Error unassigning team:', err);
-                    this.ui.showToast('Failed to remove team.', 'error');
-                    this.ui.endAction();
-                }
-            });
-        }
+        this.translate.get('TOURNAMENT_DASHBOARD.TEAMS.CONFIRM_REMOVE').subscribe(confirmMsg => {
+            if (confirm(confirmMsg)) {
+                this.ui.startAction();
+                // Delete the registration link
+                this.http.delete(`${environment.apiBaseUrl}/api/tournaments/${this.tournamentId}/teams/${teamId}`).subscribe({
+                    next: () => {
+                        this.showToast('TOURNAMENT_DASHBOARD.TOAST.REMOVE_TEAM_SUCCESS', 'success');
+                        this.fetchTeams(); // Refetch to update both lists
+                        this.ui.endAction();
+                    },
+                    error: (err) => {
+                        console.error('Error unassigning team:', err);
+                        this.showToast('TOURNAMENT_DASHBOARD.TOAST.REMOVE_TEAM_ERROR', 'error');
+                        this.ui.endAction();
+                    }
+                });
+            }
+        });
     }
 
     toggleApprovalStatus(reg: TournamentTeam) {
@@ -235,13 +239,15 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
         this.http.put(`${environment.apiBaseUrl}/api/tournaments/${this.tournamentId}/teams/${reg.team.id}/status`, { status: newStatus }).subscribe({
             next: () => {
                 this.ui.endAction();
-                this.ui.showToast(`Team approval status updated to ${newStatus}.`, 'success');
+                this.translate.get('TOURNAMENT_DASHBOARD.TEAMS.STATUS_UPDATED', { status: newStatus }).subscribe(msg => {
+                    this.ui.showToast(msg, 'success');
+                });
             },
             error: (err) => {
                 console.error('Error updating approval status:', err);
                 reg.status = oldStatus; // Revert on error
                 this.ui.endAction();
-                this.ui.showToast('Failed to update approval status.', 'error');
+                this.showToast('TOURNAMENT_DASHBOARD.TOAST.SAVE_ERROR', 'error');
             }
         });
     }
@@ -256,13 +262,15 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
         this.http.put(`${environment.apiBaseUrl}/api/tournaments/${this.tournamentId}/teams/${reg.team.id}/status`, { paymentStatus: newPaymentStatus }).subscribe({
             next: () => {
                 this.ui.endAction();
-                this.ui.showToast(`Team payment status updated to ${newPaymentStatus}.`, 'success');
+                this.translate.get('TOURNAMENT_DASHBOARD.TEAMS.PAYMENT_UPDATED', { status: newPaymentStatus }).subscribe(msg => {
+                    this.ui.showToast(msg, 'success');
+                });
             },
             error: (err) => {
                 console.error('Error updating payment status:', err);
                 reg.paymentStatus = oldPaymentStatus; // Revert on error
                 this.ui.endAction();
-                this.ui.showToast('Failed to update payment status.', 'error');
+                this.showToast('TOURNAMENT_DASHBOARD.TOAST.SAVE_ERROR', 'error');
             }
         });
     }
@@ -279,5 +287,9 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
         this.columns.update(cols =>
             cols.map(c => c.key === key ? { ...c, visible: !c.visible } : c)
         );
+    }
+
+    showToast(key: string, type: 'success' | 'error' | 'info' = 'success') {
+        this.ui.showToast(key, type);
     }
 }

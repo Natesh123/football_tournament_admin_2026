@@ -1,14 +1,17 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
+import { UiService } from '../../../../../services/ui.service';
 
 @Component({
     selector: 'app-match-edit-modal',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, TranslateModule],
     templateUrl: './match-edit-modal.component.html'
 })
 export class MatchEditModalComponent implements OnInit {
+    private ui = inject(UiService);
     @Input() isOpen = false;
     @Input() match: any;
 
@@ -50,7 +53,7 @@ export class MatchEditModalComponent implements OnInit {
 
     onSubmit() {
         if (!this.formData.startTime) {
-            alert('Please select a start time for the match.');
+            this.ui.showToast('Please select a start time for the match.', 'error');
             return;
         }
 

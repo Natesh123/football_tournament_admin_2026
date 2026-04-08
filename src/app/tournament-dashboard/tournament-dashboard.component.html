@@ -25,10 +25,10 @@
                     </svg>
                 </div>
                 <div class="min-w-0">
-                    <h3 class="text-sm font-bold text-white truncate">{{ settings.general.name || 'Tournament' }}</h3>
+                    <h3 class="text-sm font-bold text-white truncate">{{ settings.general.name || ('TOURNAMENT_DASHBOARD.HEADER.TOURNAMENT' | translate) }}</h3>
                     <span class="text-[10px] px-2 py-0.5 rounded-full border font-bold"
                         [ngClass]="getStatusClass(settings.general.status)">
-                        {{ getStatusLabel(settings.general.status) }}
+                        {{ getStatusLabel(settings.general.status) | translate }}
                     </span>
                 </div>
             </div>
@@ -132,7 +132,7 @@
                 }
 
                 }
-                {{ item.label }}
+                {{ item.label | translate }}
             </button>
             }
             }
@@ -149,14 +149,13 @@
             class="flex items-center justify-between px-8 py-4 border-b border-black-border bg-black-card/80 backdrop-blur-md sticky top-0 z-10">
             <!-- Breadcrumb -->
             <div class="flex items-center gap-2 text-sm">
-                <button (click)="goBack()" class="text-zinc-500 hover:text-white transition-colors">Tournament
-                    Manager</button>
+                <button (click)="goBack()" class="text-zinc-500 hover:text-white transition-colors">{{ 'TOURNAMENT_DASHBOARD.HEADER.MANAGER' | translate }}</button>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-zinc-600" fill="none"
                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
                 <span class="text-gold-400 font-bold">
-                    @if (isLoading()) { Loading... } @else { {{ settings.general.name || 'Settings' }} }
+                    @if (isLoading()) { {{ 'TOURNAMENT_DASHBOARD.HEADER.LOADING' | translate }} } @else { {{ settings.general.name || ('TOURNAMENT_DASHBOARD.HEADER.SETTINGS' | translate) }} }
                 </span>
             </div>
 
@@ -164,7 +163,7 @@
             <div class="flex items-center gap-3">
                 <button (click)="discardChanges()" [disabled]="isLoading()"
                     class="px-5 py-2 rounded-lg border border-black-border text-zinc-400 hover:text-white hover:border-zinc-500 font-bold text-sm transition-all disabled:opacity-30">
-                    Discard
+                    {{ 'TOURNAMENT_DASHBOARD.HEADER.DISCARD' | translate }}
                 </button>
                 <button (click)="saveChanges()" [disabled]="ui.isLoadingAction() || isLoading()"
                     class="px-5 py-2 rounded-lg bg-gold-400 hover:bg-gold-400/90 text-black font-bold text-sm transition-all hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] disabled:opacity-40 flex items-center gap-2">
@@ -176,9 +175,9 @@
                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                         </path>
                     </svg>
-                    Saving...
+                    {{ 'TOURNAMENT_DASHBOARD.HEADER.SAVING' | translate }}
                     } @else {
-                    Save Changes
+                    {{ 'TOURNAMENT_DASHBOARD.HEADER.SAVE_CHANGES' | translate }}
                     }
                 </button>
             </div>
@@ -302,6 +301,6 @@
             </svg>
         }
     </div>
-    <span class="text-sm text-white font-bold">{{ ui.toastMessage()?.text }}</span>
+    <span class="text-sm text-white font-bold">{{ ui.toastMessage()?.text | translate }}</span>
 </div>
 }

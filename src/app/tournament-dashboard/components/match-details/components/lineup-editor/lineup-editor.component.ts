@@ -1,12 +1,13 @@
 import { Component, Input, Output, EventEmitter, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { TeamMemberService, TeamMember } from '../../../../../teams/team-member.service';
 
 @Component({
     selector: 'app-lineup-editor',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, TranslateModule],
     templateUrl: './lineup-editor.component.html'
 })
 export class LineupEditorComponent implements OnInit {
@@ -74,8 +75,11 @@ export class LineupEditorComponent implements OnInit {
     }
 
     get startingLabel(): string {
-        if (this.pickerType === 'subs') return 'Substitutes';
         return this.playersOnField === 11 ? 'XI' : this.playersOnField.toString();
+    }
+
+    get pickerTitle(): string {
+        return this.pickerType === 'subs' ? 'Substitutes' : (this.playersOnField === 11 ? 'Starting XI' : `Starting ${this.playersOnField}`);
     }
 
     get currentStartingCount(): number {
@@ -246,23 +250,9 @@ export class LineupEditorComponent implements OnInit {
     }
 
     onSave() {
-        if (this.homeData.starting.length !== this.playersOnField) {
-            alert(`Home Team Starting ${this.startingLabel} must have exactly ${this.playersOnField} players.`);
-            return;
-        }
-        if (this.awayData.starting.length !== this.playersOnField) {
-            alert(`Away Team Starting ${this.startingLabel} must have exactly ${this.playersOnField} players.`);
-            return;
-        }
-        
-        const homeSubsLimit = (this.match as any)?.tournament?.squadSize - this.playersOnField || 0;
-        const awaySubsLimit = (this.match as any)?.tournament?.squadSize - this.playersOnField || 0;
-        
-        if (this.homeData.subs.length > homeSubsLimit || this.awayData.subs.length > awaySubsLimit) {
-            alert(`Substitutes cannot exceed ${homeSubsLimit} players.`);
-            return;
-        }
-
+        // We no longer strictly validate complete lineups on save, 
+        // as teams might submit lineups at different times.
+        // Strict validation is enforced when starting the match instead.
         this.save.emit({
             homeLineup: this.homeData,
             awayLineup: this.awayData

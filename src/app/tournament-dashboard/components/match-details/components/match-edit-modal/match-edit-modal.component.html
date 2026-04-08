@@ -18,7 +18,7 @@
                             d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                 </div>
-                <h2 class="text-xl font-black text-white tracking-tight">Edit Match Details</h2>
+                <h2 class="text-xl font-black text-white tracking-tight">{{ 'MATCH_DETAILS.HEADER.EDIT_MATCH' | translate }}</h2>
             </div>
             <button (click)="onClose()"
                 class="text-zinc-500 hover:text-white transition-colors p-2 hover:bg-white/5 rounded-lg">
@@ -33,7 +33,7 @@
         <div class="p-6 md:p-8 space-y-6">
             <!-- Date & Time -->
             <div>
-                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Match Date & Time
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">{{ 'MATCH_DETAILS.INFO.DATE_TIME' | translate }}
                     <span class="text-red-500">*</span></label>
                 <input type="datetime-local" [(ngModel)]="formData.startTime"
                     class="input input-bordered w-full bg-black-card border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all [color-scheme:dark]" />
@@ -41,32 +41,29 @@
 
             <!-- Status -->
             <div>
-                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Match
-                    Status</label>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">{{ 'MATCH_DETAILS.INFO.STATUS' | translate }}</label>
                 <select [(ngModel)]="formData.status"
                     class="select select-bordered w-full bg-black-card border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all hover:border-gold-400/50 cursor-pointer">
-                    <option value="scheduled" class="bg-black text-white">Scheduled</option>
-                    <option value="live" class="bg-black text-white">Live / In Progress</option>
-                    <option value="completed" class="bg-black text-white">Completed / Full Time</option>
+                    <option value="scheduled" class="bg-black text-white">{{ 'MATCH_DETAILS.HEADER.SCHEDULED' | translate }}</option>
+                    <option value="live" class="bg-black text-white">{{ 'MATCH_DETAILS.HEADER.LIVE' | translate }}</option>
+                    <option value="completed" class="bg-black text-white">{{ 'MATCH_DETAILS.HEADER.COMPLETED' | translate }}</option>
                 </select>
             </div>
 
             <!-- Venue -->
             <div>
-                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Venue /
-                    Pitch</label>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">{{ 'MATCH_DETAILS.INFO.VENUE' | translate }}</label>
                 <input type="text" [(ngModel)]="formData.venue"
                     class="input input-bordered w-full bg-black-card border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all"
-                    placeholder="e.g. Main Stadium" />
+                    [placeholder]="'MATCH_DETAILS.INFO.PLACEHOLDER_VENUE' | translate" />
             </div>
 
             <!-- Referees -->
             <div>
-                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">Match Officials /
-                    Referees</label>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2 block">{{ 'MATCH_DETAILS.INFO.OFFICIALS' | translate }}</label>
                 <input type="text" [(ngModel)]="formData.matchReferees"
                     class="input input-bordered w-full bg-black-card border-black-border text-sm font-bold text-white focus:border-gold-400 focus:outline-none transition-all"
-                    placeholder="e.g. John Doe, Jane Smith" />
+                    [placeholder]="'MATCH_DETAILS.INFO.PLACEHOLDER_OFFICIALS' | translate" />
             </div>
         </div>
 
@@ -74,15 +71,15 @@
         <div class="p-6 border-t border-black-border bg-black-card/50 flex justify-end gap-3">
             <button (click)="onClose()"
                 class="btn btn-ghost text-zinc-400 hover:text-white font-bold text-sm">
-                Cancel
+                {{ 'COMMON.CANCEL' | translate }}
             </button>
             <button (click)="onSubmit()" [disabled]="isSubmitting"
                 class="btn bg-gold-400 hover:bg-gold-400/90 text-black border-none font-bold text-sm transition-all shadow-[0_0_15px_rgba(212,175,55,0.4)] flex items-center gap-2">
                 @if (isSubmitting) {
                 <span class="loading loading-spinner loading-xs"></span>
-                Saving...
+                {{ 'MATCH_DETAILS.TIMELINE.MODAL.SUBMITTING' | translate }}
                 } @else {
-                Save Changes
+                {{ 'MATCH_DETAILS.TIMELINE.MODAL.SUBMIT_EDIT' | translate }}
                 }
             </button>
         </div>

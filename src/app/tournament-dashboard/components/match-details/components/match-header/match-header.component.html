@@ -8,11 +8,11 @@
         <!-- Top Row: Tournament info & Actions -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
             <div>
-                <h2 class="text-xl font-bold text-white">{{ match?.tournament?.name || 'Tournament' }}</h2>
+                <h2 class="text-xl font-bold text-white">{{ match?.tournament?.name || ('MATCH_FEED.HEADER.TITLE' | translate) }}</h2>
                 <div class="flex items-center gap-2 mt-1">
                     <span
                         class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-gold-500/10 text-gold-400 border border-gold-500/20">
-                        {{ match?.stage?.name || 'Match' }}
+                        {{ match?.stage?.name || ('MATCH_FEED.TABS.LIVE' | translate) }}
                     </span>
                     <span *ngIf="match?.tournament?.format?.format_type"
                         class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-white/5 text-zinc-400 border border-white/10">
@@ -23,44 +23,38 @@
                     </span>
                     <span *ngIf="match?.status === 'scheduled'"
                         class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-zinc-800 text-zinc-400 border border-zinc-700">
-                        SCHEDULED
+                        {{ 'MATCH_DETAILS.HEADER.SCHEDULED' | translate }}
                     </span>
                     <span *ngIf="match?.status === 'live'"
                         class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-red-500/10 text-red-500 border border-red-500/20 animate-pulse">
-                        LIVE
+                        {{ 'MATCH_DETAILS.HEADER.LIVE' | translate }}
                     </span>
                     <span *ngIf="match?.status === 'completed'"
                         class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-green-500/10 text-green-500 border border-green-500/20">
-                        COMPLETED
+                        {{ 'MATCH_DETAILS.HEADER.COMPLETED' | translate }}
                     </span>
                 </div>
             </div>
 
             <div class="flex flex-wrap items-center gap-2">
-                <button (click)="editMatch.emit()"
-                    class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-white hover:bg-white/10 transition-colors flex items-center gap-1.5">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                    Edit Match
-                </button>
+
                 <button (click)="addLineup.emit()"
                     class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-white hover:bg-white/10 transition-colors flex items-center gap-1.5">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
-                    Manage Lineups
+                    {{ 'MATCH_DETAILS.HEADER.MANAGE_LINEUPS' | translate }}
                 </button>
-                <button *ngIf="match?.status === 'scheduled'" (click)="startMatch.emit()"
-                    class="px-4 py-1.5 rounded-lg bg-gold-500 text-black text-xs font-black uppercase tracking-wider hover:bg-gold-400 transition-colors shadow-[0_0_15px_rgba(212,175,55,0.3)]">
-                    Start Match
+                <button *ngIf="match?.status === 'scheduled'" (click)="startMatch.emit()" [disabled]="isLoading"
+                    class="px-4 py-1.5 rounded-lg bg-gold-500 text-black text-xs font-black uppercase tracking-wider hover:bg-gold-400 transition-colors shadow-[0_0_15px_rgba(212,175,55,0.3)] flex items-center gap-2">
+                    <span *ngIf="isLoading" class="loading loading-spinner loading-xs"></span>
+                    {{ 'MATCH_DETAILS.HEADER.START_MATCH' | translate }}
                 </button>
-                <button *ngIf="match?.status === 'live'" (click)="completeMatch.emit()"
-                    class="px-4 py-1.5 rounded-lg bg-red-600/90 text-white text-xs font-black uppercase tracking-wider hover:bg-red-600 transition-all shadow-[0_0_15px_rgba(220,38,38,0.3)]">
-                    Complete Match
+                <button *ngIf="match?.status === 'live'" (click)="completeMatch.emit()" [disabled]="isLoading"
+                    class="px-4 py-1.5 rounded-lg bg-red-600/90 text-white text-xs font-black uppercase tracking-wider hover:bg-red-600 transition-all shadow-[0_0_15px_rgba(220,38,38,0.3)] flex items-center gap-2">
+                    <span *ngIf="isLoading" class="loading loading-spinner loading-xs"></span>
+                    {{ 'MATCH_DETAILS.HEADER.COMPLETE_MATCH' | translate }}
                 </button>
             </div>
         </div>
@@ -79,7 +73,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
                     </svg>
                 </div>
-                <h3 class="text-xl md:text-2xl font-black text-white text-center">{{ match?.homeTeam?.name || 'TBD' }}
+                <h3 class="text-xl md:text-2xl font-black text-white text-center">{{ match?.homeTeam?.name || ('COMMON.TBD' | translate) }}
                 </h3>
             </div>
 
@@ -91,10 +85,10 @@
                     </span>
                 </div>
                 <span class="text-xs font-bold text-zinc-500 uppercase tracking-widest" *ngIf="match?.status === 'scheduled'">
-                    Starts in: <span class="text-gold-400">{{ countdown }}</span>
+                    {{ 'MATCH_DETAILS.HEADER.STARTS_IN' | translate }} <span class="text-gold-400">{{ countdown }}</span>
                 </span>
                 <span class="text-xs font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2" *ngIf="match?.status === 'live'">
-                    Match Time: <span class="text-gold-400 tabular-nums font-black">{{ liveMinute }}'</span>
+                    {{ 'MATCH_DETAILS.HEADER.MATCH_TIME' | translate }} <span class="text-gold-400 tabular-nums font-black">{{ liveMinute }}'</span>
                 </span>
             </div>
 
@@ -109,7 +103,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
                     </svg>
                 </div>
-                <h3 class="text-xl md:text-2xl font-black text-white text-center">{{ match?.awayTeam?.name || 'TBD' }}
+                <h3 class="text-xl md:text-2xl font-black text-white text-center">{{ match?.awayTeam?.name || ('COMMON.TBD' | translate) }}
                 </h3>
             </div>
         </div>
@@ -126,7 +120,7 @@
                     </svg>
                 </div>
                 <div>
-                    <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Date & Time</p>
+                    <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">{{ 'MATCH_DETAILS.HEADER.DATE_TIME' | translate }}</p>
                     <p class="text-sm font-bold text-white">{{ match?.startTime ? (match.startTime | date:'medium') :
                         'TBD' }}</p>
                 </div>
@@ -143,8 +137,8 @@
                     </svg>
                 </div>
                 <div>
-                    <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Venue</p>
-                    <p class="text-sm font-bold text-white">{{ match?.venue || 'TBD' }}</p>
+                    <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">{{ 'MATCH_DETAILS.HEADER.VENUE' | translate }}</p>
+                    <p class="text-sm font-bold text-white">{{ match?.venue || ('COMMON.TBD' | translate) }}</p>
                 </div>
             </div>
 
@@ -157,8 +151,8 @@
                     </svg>
                 </div>
                 <div>
-                    <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Referee</p>
-                    <p class="text-sm font-bold text-white">{{ match?.referees?.main || match?.matchReferees || 'TBD' }}
+                    <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">{{ 'MATCH_DETAILS.HEADER.REFEREE' | translate }}</p>
+                    <p class="text-sm font-bold text-white">{{ match?.referees?.main || match?.matchReferees || ('COMMON.TBD' | translate) }}
                     </p>
                 </div>
             </div>

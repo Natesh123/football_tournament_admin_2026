@@ -1,5 +1,6 @@
 import { Component, Input, OnInit, OnChanges, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../../environments/environment';
 
@@ -12,7 +13,7 @@ interface StatRow {
 @Component({
     selector: 'app-match-stats',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, TranslateModule],
     templateUrl: './match-stats.component.html'
 })
 export class MatchStatsComponent implements OnChanges {
@@ -26,15 +27,15 @@ export class MatchStatsComponent implements OnChanges {
     statsRows = signal<StatRow[]>([]);
 
     private labelMap: Record<string, string> = {
-        goals:        '⚽ Goals',
-        yellowCards:  '🟨 Yellow Cards',
-        redCards:     '🟥 Red Cards',
-        corners:      '🚩 Corners',
-        offsides:     '🚫 Offsides',
-        fouls:        '🤜 Fouls',
-        freeKicks:    '🎯 Free Kicks',
-        substitutions:'🔄 Substitutions',
-        penalties:    '⚡ Penalties',
+        goals:        'MATCH_DETAILS.STATS.GOALS',
+        yellowCards:  'MATCH_DETAILS.STATS.YELLOW_CARDS',
+        redCards:     'MATCH_DETAILS.STATS.RED_CARDS',
+        corners:      'MATCH_DETAILS.STATS.CORNERS',
+        offsides:     'MATCH_DETAILS.STATS.OFFSIDE',
+        fouls:        'MATCH_DETAILS.STATS.FOUL',
+        freeKicks:    'MATCH_DETAILS.STATS.FREE_KICK',
+        substitutions:'MATCH_DETAILS.STATS.SUBSTITUTIONS',
+        penalties:    'MATCH_DETAILS.STATS.PENALTIES',
     };
 
     ngOnChanges() {
@@ -55,9 +56,7 @@ export class MatchStatsComponent implements OnChanges {
                                 home: val.home ?? 0,
                                 away: val.away ?? 0,
                             }))
-                            .filter(r => r.home > 0 || r.away > 0 || ['goals'].includes(
-                                Object.keys(this.labelMap).find(k => this.labelMap[k] === r.label) ?? ''
-                            ));
+                            .filter(r => r.home > 0 || r.away > 0 || r.label === 'MATCH_DETAILS.STATS.GOALS');
                         this.statsRows.set(rows.length ? rows : this.emptyStats());
                     } else {
                         this.statsRows.set(this.emptyStats());
