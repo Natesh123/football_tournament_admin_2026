@@ -218,7 +218,9 @@ export class PermissionsComponent implements OnInit {
 
   loadData() {
     this.settingsService.getPermissions().subscribe(data => this.permissions.set(data));
-    this.settingsService.getRoles().subscribe(data => this.roles.set(data));
+    this.settingsService.getRoles().subscribe(data => {
+      this.roles.set(data.filter((r: any) => r.id !== 1));
+    });
   }
 
   toggleRoleDropdown(event: Event) {

@@ -1,8 +1,7 @@
 import { Component, Input, ChangeDetectorRef, inject, HostListener, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { environment } from '../../../../environments/environment';
+import { API_URL } from '../../../core/config/app.config';
 
 @Component({
     selector: 'app-tournament-general',
@@ -80,6 +79,6 @@ export class TournamentGeneralComponent {
     getImageUrl(path?: string): string {
         if (!path) return '';
         if (path.startsWith('http') || path.startsWith('data:')) return path;
-        return `${environment.apiBaseUrl}${path.startsWith('/') ? '' : '/'}${path}`;
+        return `${API_URL}${path.startsWith('/') ? '' : '/'}${path}`;
     }
 }

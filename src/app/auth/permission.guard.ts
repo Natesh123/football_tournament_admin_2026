@@ -34,12 +34,17 @@ export class PermissionGuard implements CanActivate {
 
     private findFirstAvailableModule(): string | null {
         const user = this.auth.user;
-        if (!user || !user.permissions?.module_access) return null;
+        if (!user) return null;
+
+        // Admin has all modules
+        if (user.roleId === 1) return '/dashboard';
+
+        if (!user.permissions?.module_access) return null;
         const access = user.permissions.module_access;
 
         if (access.can_dashboard) return '/dashboard';
         if (access.can_tournaments) return '/tournaments';
-        if (access.can_teams) return '/tournaments';
+        if (access.can_teams) return '/teams';
         if (access.can_settings) return '/settings';
 
         return null;

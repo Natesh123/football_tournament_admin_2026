@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { API_URL } from '../core/config/app.config';
 
 export interface TournamentDTO {
     id?: string;
@@ -41,7 +41,7 @@ interface ApiResponse<T> {
 @Injectable({ providedIn: 'root' })
 export class TournamentService {
     private http = inject(HttpClient);
-    private baseUrl = `${environment.apiBaseUrl}/api/tournaments`;
+    private baseUrl = `${API_URL}/api/tournaments`;
 
     getAll(): Observable<TournamentDTO[]> {
         return this.http.get<ApiResponse<TournamentDTO[]>>(this.baseUrl).pipe(

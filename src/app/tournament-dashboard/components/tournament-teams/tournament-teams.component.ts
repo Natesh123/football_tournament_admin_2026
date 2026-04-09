@@ -2,9 +2,7 @@ import { Component, OnInit, inject, signal, computed, Input, OnChanges, SimpleCh
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../environments/environment';
-import { UiService } from '../../../services/ui.service';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { API_URL } from '../../../core/config/app.config';
 
 interface Team {
     id: string;
@@ -92,10 +90,10 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
         this.isLoading.set(true);
 
         // Fetch all teams
-        this.http.get<Team[]>(`${environment.apiBaseUrl}/api/teams`).subscribe({
+        this.http.get<Team[]>(`${API_URL}/api/teams`).subscribe({
             next: (allTeams) => {
                 // Fetch tournament registrations
-                this.http.get<{ success: boolean, data: TournamentTeam[] }>(`${environment.apiBaseUrl}/api/tournaments/${this.tournamentId}/teams`).subscribe({
+                this.http.get<{ success: boolean, data: TournamentTeam[] }>(`${API_URL}/api/tournaments/${this.tournamentId}/teams`).subscribe({
                     next: (res) => {
                         const mappedTeams = res.data || [];
                         this.teams.set(mappedTeams);
@@ -180,8 +178,8 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
             const teamData = { ...this.newTeam(), tournamentId: this.tournamentId };
             if (!teamData.name || !teamData.teamType) return;
 
-            this.ui.startAction();
-            this.http.post<Team>(`${environment.apiBaseUrl}/api/teams`, teamData).subscribe({
+            this.isSaving.set(true);
+            this.http.post<Team>(`${API_URL}/api/teams`, teamData).subscribe({
                 next: (newTeam) => {
                     // Step 2: Now map it to the tournament
                     this.http.post<{ success: boolean, data: TournamentTeam }>(`${environment.apiBaseUrl}/api/tournaments/${this.tournamentId}/teams/${newTeam.id}`, {})
@@ -279,17 +277,6 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
         if (!path) return '';
         if (path.startsWith('http')) return path;
         // Prefix with backend URL since Angular runs on 4200
-        return `${environment.apiBaseUrl}${path.startsWith('/') ? '' : '/'}${path}`;
-    }
-
-    // Data Table Logic
-    toggleColumn(key: string) {
-        this.columns.update(cols =>
-            cols.map(c => c.key === key ? { ...c, visible: !c.visible } : c)
-        );
-    }
-
-    showToast(key: string, type: 'success' | 'error' | 'info' = 'success') {
-        this.ui.showToast(key, type);
+        return `${API_URL}${path.startsWith('/') ? '' : '/'}${path}`;
     }
 }

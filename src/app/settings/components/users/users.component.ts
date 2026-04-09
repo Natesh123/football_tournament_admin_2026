@@ -253,7 +253,9 @@ export class UsersComponent implements OnInit {
 
   loadData() {
     this.settingsService.getUsers().subscribe(data => this.users.set(data));
-    this.settingsService.getRoles().subscribe(data => this.roles.set(data));
+    this.settingsService.getRoles().subscribe(data => {
+      this.roles.set(data.filter((r: any) => r.id !== 1));
+    });
   }
 
   resetForm() {
