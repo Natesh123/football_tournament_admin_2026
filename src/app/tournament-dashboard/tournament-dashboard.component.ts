@@ -16,6 +16,7 @@ import { TournamentPresentationComponent } from './components/tournament-present
 import { TournamentResultsComponent } from './components/tournament-results/tournament-results.component';
 import { TournamentTeamsComponent } from './components/tournament-teams/tournament-teams.component';
 import { TournamentMatchesComponent } from './components/tournament-matches/tournament-matches.component';
+import { TournamentSponsorsComponent } from './components/tournament-sponsors/tournament-sponsors.component';
 import { LoaderComponent } from '../components/loader/loader.component';
 
 import { UiService } from '../services/ui.service';
@@ -133,6 +134,7 @@ export interface TournamentSettings {
         TournamentTeamsComponent,
         TournamentMatchesComponent,
         TournamentMatchesComponent,
+        TournamentSponsorsComponent,
         LoaderComponent,
         TranslateModule
     ],
@@ -163,6 +165,7 @@ export class TournamentDashboardComponent implements OnInit {
         { id: 'venues', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.VENUES', icon: 'map-pin' },
         { id: 'finance', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.FINANCE', icon: 'coins' },
         { id: 'presentation', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.PRESENTATION', icon: 'monitor' },
+        { id: 'sponsors', label: 'Sponsors', icon: 'list' },
         { id: 'results', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.RESULTS', icon: 'bar-chart' }
     ];
 
@@ -356,17 +359,17 @@ export class TournamentDashboardComponent implements OnInit {
 
             let incomingFormatData = tournament.format.format_data;
             if (typeof incomingFormatData === 'string') {
-              try {
-                incomingFormatData = JSON.parse(incomingFormatData);
-              } catch (e) {
-                console.error('[TournamentDashboard] Failed to parse format_data:', e);
-              }
+                try {
+                    incomingFormatData = JSON.parse(incomingFormatData);
+                } catch (e) {
+                    console.error('[TournamentDashboard] Failed to parse format_data:', e);
+                }
             }
 
             // If incoming format_data is valid, use it. Otherwise keep what we have if it exists.
             const finalFormatData = (incomingFormatData && Array.isArray(incomingFormatData) && incomingFormatData.length > 0)
-              ? incomingFormatData
-              : (this.settings.format.format_data || []);
+                ? incomingFormatData
+                : (this.settings.format.format_data || []);
 
             this.settings.format = {
                 ...this.settings.format,
@@ -390,7 +393,7 @@ export class TournamentDashboardComponent implements OnInit {
 
     handleSettingsUpdate(key: keyof TournamentSettings, data: any) {
         this.settings[key] = { ...this.settings[key], ...data };
-        
+
         // If tournament type changed, update playersOnField and other relevant rules
         if (key === 'general' && data.type) {
             const type = data.type;
@@ -411,7 +414,7 @@ export class TournamentDashboardComponent implements OnInit {
                 this.settings.participants.squadSize = 25;
             }
         }
-        
+
         this.formatChanged = true;
     }
 
@@ -450,9 +453,9 @@ export class TournamentDashboardComponent implements OnInit {
             squadSize: this.settings.participants.squadSize,
             settings: this.settings,
             format: {
-                format_type: this.settings.format.type === 'group' ? 'groups' : 
-                             this.settings.format.type === 'group_knockout' ? 'groups_knockout' : 
-                             this.settings.format.type,
+                format_type: this.settings.format.type === 'group' ? 'groups' :
+                    this.settings.format.type === 'group_knockout' ? 'groups_knockout' :
+                        this.settings.format.type,
                 format_data: (this.settings.format as any).format_data,
                 home_away_enabled: this.settings.format.homeAway,
                 win_points: this.settings.format.winPoints,
@@ -462,7 +465,7 @@ export class TournamentDashboardComponent implements OnInit {
         }).subscribe({
             next: (updated) => {
                 this.tournament.set(updated);
-                
+
                 // If format changed, also let's generate the structure
                 if (this.formatChanged && t.id) {
                     this.tournamentService.generateStructure(t.id).subscribe({
@@ -498,7 +501,7 @@ export class TournamentDashboardComponent implements OnInit {
     }
 
     goBack() {
-        this.router.navigate(['/tournaments']);
+        this.router.navigate(['/admin/tournaments']);
     }
 
     showToast(key: string, type: 'success' | 'error' | 'info' = 'success') {

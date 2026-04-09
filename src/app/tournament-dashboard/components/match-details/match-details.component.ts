@@ -73,7 +73,7 @@ export class MatchDetailsComponent implements OnInit {
     // Live Match Modals
     isLineupModalOpen = signal(false);
     isEditModalOpen = signal(false);
-    
+
     // Deletion confirmation state
     isConfirmDeleteOpen = signal(false);
     eventToDeleteId = signal<string | null>(null);
@@ -151,10 +151,10 @@ export class MatchDetailsComponent implements OnInit {
         const now = new Date().getTime();
         const diffMs = now - start;
         const diffMins = Math.floor(diffMs / 60000);
-        
+
         // Base minute (e.g. 45 for second half) plus elapsed time in current period
         const currentMinute = (m.live_minute || 0) + diffMins + 1;
-        
+
         return currentMinute;
     }
 
@@ -398,7 +398,7 @@ export class MatchDetailsComponent implements OnInit {
                 this.ui.endAction();
                 this.showToast(this.translate.instant('MATCH_DETAILS.TOAST.EVENT_ADD_SUCCESS'), 'success');
                 // Reset form fields but keep team
-                this.eventFormMinute.set(null); 
+                this.eventFormMinute.set(null);
                 this.eventFormPlayerName.set('');
                 this.eventFormAssistPlayerName.set('');
                 this.eventFormDetails.set('');
@@ -439,7 +439,7 @@ export class MatchDetailsComponent implements OnInit {
 
     getRequiredLineupCounts() {
         const tournament = this.match()?.tournament;
-        
+
         let playersOnField = 11;
         let squadSize = 25;
         if (tournament) {
@@ -470,7 +470,7 @@ export class MatchDetailsComponent implements OnInit {
 
         if (!homeData || !awayData || !homeData.starting || !awayData.starting) return false;
         if (homeData.starting.length !== playersOnField || awayData.starting.length !== playersOnField) return false;
-        
+
         const homeSubsCount = homeData.subs ? homeData.subs.length : 0;
         const awaySubsCount = awayData.subs ? awayData.subs.length : 0;
         if (homeSubsCount > subsLimit || awaySubsCount > subsLimit) return false;
@@ -504,7 +504,7 @@ export class MatchDetailsComponent implements OnInit {
 
     handleCompleteMatch() {
         if (!confirm(this.translate.instant('MATCH_DETAILS.TIMELINE.COMPLETE_CONFIRM_MSG'))) return;
-        
+
         this.ui.startAction();
         this.http.put<{ success: boolean, data: any }>(`${environment.apiBaseUrl}/api/matches/${this.matchId()}`, {
             status: 'completed'
@@ -549,7 +549,7 @@ export class MatchDetailsComponent implements OnInit {
 
     goBack() {
         // Go back to tournament dashboard, matches tab
-        this.router.navigate(['/tournaments', this.tournamentId()], { queryParams: { tab: 'matches' } });
+        this.router.navigate(['/admin/tournaments', this.tournamentId()], { queryParams: { tab: 'matches' } });
     }
 
     showToast(message: string, type: 'success' | 'error' | 'info' = 'success') {

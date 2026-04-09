@@ -122,11 +122,11 @@ export class TeamsComponent {
 
   onTeamCreated(newTeamId: string) {
     this.closeCreateModal();
-    this.router.navigate(['/teams', newTeamId]);
+    this.router.navigate(['/admin/teams', newTeamId]);
   }
 
   openTeamDashboard(id: string) {
-    this.router.navigate(['/teams', id]);
+    this.router.navigate(['/admin/teams', id]);
   }
 
   getImageUrl(path?: string): string {

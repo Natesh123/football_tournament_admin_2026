@@ -50,6 +50,10 @@ export class TeamService {
         return this.http.post<Team>(this.apiUrl, formData);
     }
 
+    updateWithFormData(id: string, formData: FormData): Observable<Team> {
+        return this.http.put<Team>(`${this.apiUrl}/${id}`, formData);
+    }
+
     /** Returns array of fully-qualified photo URLs for this team's gallery */
     getGallery(teamId: string): Observable<{ teamId: string; photos: string[] }> {
         return this.http.get<{ teamId: string; photos: string[] }>(`${this.apiUrl}/${teamId}/gallery`);

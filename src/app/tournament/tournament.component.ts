@@ -86,13 +86,13 @@ export class TournamentComponent implements OnInit {
 
     manageTournament(id: string | undefined) {
         if (id) {
-            this.router.navigate(['/tournaments', id]);
+            this.router.navigate(['/admin/tournaments', id]);
         }
     }
 
     viewMatchCenter(id: string | undefined) {
         if (id) {
-            this.router.navigate(['/tournaments', id, 'match-center']);
+            this.router.navigate(['/admin/tournaments', id, 'match-center']);
         }
     }
 

@@ -112,7 +112,7 @@ export class DashboardComponent implements OnInit {
                 this.isCreating.set(false);
                 this.closeCreateModal();
                 this.loadDashboardStats(); // refresh counts after creating
-                this.router.navigate(['/tournaments', created.id]);
+                this.router.navigate(['/admin/tournaments', created.id]);
             },
             error: (err) => {
                 console.error('Failed to create tournament:', err);

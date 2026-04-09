@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, signal, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TeamService } from '../../team.service';
@@ -19,8 +19,8 @@ import { TeamService } from '../../team.service';
           <!-- Header -->
           <div class="flex items-center justify-between px-6 py-5 border-b border-black-border shrink-0">
             <div>
-              <h2 class="text-xl font-bold text-white">Register New Team</h2>
-              <p class="text-zinc-500 text-xs mt-0.5">Fill in the details to create a team profile</p>
+              <h2 class="text-xl font-bold text-white">{{ mode === 'create' ? 'Register New Team' : 'Edit Team' }}</h2>
+              <p class="text-zinc-500 text-xs mt-0.5">{{ mode === 'create' ? 'Fill in the details to create a team profile' : 'Update the team information below' }}</p>
             </div>
             <button (click)="close()" class="text-zinc-400 hover:text-white transition-colors p-1">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -140,7 +140,7 @@ import { TeamService } from '../../team.service';
                 @if (isSubmitting()) {
                   <span class="loading loading-spinner loading-sm"></span>
                 }
-                Create Team
+                {{ mode === 'create' ? 'Create Team' : 'Save Changes' }}
               </button>
             </div>
           </div>
@@ -150,10 +150,13 @@ import { TeamService } from '../../team.service';
     }
   `
 })
-export class CreateTeamModalComponent {
+export class CreateTeamModalComponent implements OnChanges {
   @Input() isOpen = false;
+  @Input() mode: 'create' | 'edit' = 'create';
+  @Input() teamToEdit: any = null;
   @Output() closeModal = new EventEmitter<void>();
   @Output() teamCreated = new EventEmitter<string>();
+  @Output() teamUpdated = new EventEmitter<void>();
 
   private teamService = inject(TeamService);
   isSubmitting = signal(false);
@@ -174,6 +177,34 @@ export class CreateTeamModalComponent {
     homeGround: string;
     description: string;
   } = this.emptyForm();
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['isOpen']?.currentValue && this.mode === 'edit' && this.teamToEdit) {
+      this.populateForm(this.teamToEdit);
+    } else if (changes['isOpen']?.currentValue && this.mode === 'create') {
+      this.resetForm();
+    }
+  }
+
+  populateForm(data: any) {
+    this.team = {
+      name: data.name || '',
+      shortName: data.shortName || '',
+      logoUrl: data.logoUrl || '',
+      teamType: data.teamType || '',
+      city: data.city || '',
+      state: data.state || '',
+      country: data.country || '',
+      foundedYear: data.foundedYear || null,
+      homeGround: data.homeGround || '',
+      description: data.description || '',
+    };
+    if (data.logoUrl) {
+      this.logoPreview.set(this.teamService.fullUrl(data.logoUrl));
+    } else {
+      this.logoPreview.set(null);
+    }
+  }
 
   emptyForm() {
     return {
@@ -238,16 +269,31 @@ export class CreateTeamModalComponent {
     }
 
     this.isSubmitting.set(true);
-    this.teamService.createWithFormData(formData).subscribe({
-      next: (createdTeam: any) => {
-        this.isSubmitting.set(false);
-        this.teamCreated.emit(createdTeam.id);
-        this.resetForm();
-      },
-      error: (err: any) => {
-        console.error('Failed to create team', err);
-        this.isSubmitting.set(false);
-      }
-    });
+    
+    if (this.mode === 'create') {
+      this.teamService.createWithFormData(formData).subscribe({
+        next: (createdTeam: any) => {
+          this.isSubmitting.set(false);
+          this.teamCreated.emit(createdTeam.id);
+          this.resetForm();
+        },
+        error: (err: any) => {
+          console.error('Failed to create team', err);
+          this.isSubmitting.set(false);
+        }
+      });
+    } else {
+      this.teamService.updateWithFormData(this.teamToEdit.id, formData).subscribe({
+        next: () => {
+          this.isSubmitting.set(false);
+          this.teamUpdated.emit();
+          this.close();
+        },
+        error: (err: any) => {
+          console.error('Failed to update team', err);
+          this.isSubmitting.set(false);
+        }
+      });
+    }
   }
 }

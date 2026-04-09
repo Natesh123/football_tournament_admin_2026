@@ -416,7 +416,8 @@
         "NAV": {
             "ROLES": "Roles",
             "USERS": "Users",
-            "PERMISSIONS": "Permissions"
+            "PERMISSIONS": "Permissions",
+            "SPONSORS": "Sponsors"
         },
         "ROLES": {
             "TITLE": "Roles",
@@ -435,6 +436,32 @@
             "TITLE": "Permissions",
             "SUBTITLE": "Configure role permissions.",
             "EMPTY": "No permissions configured."
+        },
+        "SPONSORS": {
+            "TITLE": "Sponsors",
+            "SUBTITLE": "Manage tournament sponsors and partners.",
+            "CREATE": "Add Sponsor",
+            "SEARCH": "Search sponsors...",
+            "EMPTY": "No sponsors found.",
+            "FIELDS": {
+                "NAME": "Sponsor Name",
+                "LOGO": "Logo",
+                "EMAIL": "Email",
+                "PHONE": "Phone",
+                "WEBSITE": "Website",
+                "TYPE": "Sponsor Type",
+                "ORDER": "Display Order",
+                "STATUS": "Status",
+                "TOURNAMENTS": "Tournaments Sponsored"
+            },
+            "DELETE_TITLE": "Delete Sponsor",
+            "DELETE_CONFIRM": "Are you sure you want to delete this sponsor? All associated tournament mappings will also be removed.",
+            "TYPES": {
+                "GOLD": "Gold",
+                "SILVER": "Silver",
+                "PLATINUM": "Platinum",
+                "PARTNER": "Partner"
+            }
         }
     },
     "WIDGETS": {

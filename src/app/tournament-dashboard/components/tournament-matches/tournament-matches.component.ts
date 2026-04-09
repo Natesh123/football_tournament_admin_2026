@@ -92,7 +92,7 @@ export class TournamentMatchesComponent implements OnInit {
 
     openMatchDetails(matchId: string) {
         if (!this.tournamentId) return;
-        this.router.navigate(['/tournaments', this.tournamentId, 'matches', matchId]);
+        this.router.navigate(['/admin/tournaments', this.tournamentId, 'matches', matchId]);
     }
 
     openMatchEditor(match: any) {

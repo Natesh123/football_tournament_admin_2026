@@ -17,6 +17,10 @@ export const routes: Routes = [
     },
     {
         path: '',
+        loadComponent: () => import('./public/landing/landing-page.component').then(m => m.LandingPageComponent)
+    },
+    {
+        path: 'admin',
         component: MainLayoutComponent,
         canActivate: [AuthGuard],
         children: [
@@ -66,5 +70,5 @@ export const routes: Routes = [
 
     // { path: 'auth', loadChildren: () => import('./auth/auth-module').then(m => m.AuthModule) },
     // { path: 'dashboard', loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent) },
-    { path: '', redirectTo: 'auth/login', pathMatch: 'full' }
+    { path: '**', redirectTo: '' }
 ];

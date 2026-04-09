@@ -20,15 +20,16 @@ export class AuthService {
     }
 
     get userRole(): string {
-        return this.userSignal()?.role || 'user';
+        const u = this.userSignal();
+        return u?.role || u?.userRole?.name || 'user';
     }
 
     get isAdmin(): boolean {
-        return this.userRole === 'admin';
+        return this.userSignal()?.roleId === 1;
     }
 
     get isOrganizer(): boolean {
-        return this.userRole === 'organizer';
+        return this.userRole?.toLowerCase() === 'organizer';
     }
 
     register(data: any) {
@@ -71,10 +72,10 @@ export class AuthService {
     hasPermission(permission: string): boolean {
         const user = this.user;
         if (!user) return false;
-        
+
         // Super Admin (role_id = 1) has all permissions
         if (user.roleId === 1) return true;
-        
+
         if (!user.permissions) return false;
         const access = user.permissions.module_access || {};
         return !!access[permission];

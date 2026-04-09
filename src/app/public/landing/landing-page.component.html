@@ -1,0 +1,299 @@
+<div class="landing-container bg-black text-white min-h-screen">
+    
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-50 bg-black/80 backdrop-blur-md border-b border-gold/20 px-4 md:px-8 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3 cursor-pointer" (click)="scrollToSection('hero')">
+            <div class="gold-glow p-1 rounded-full bg-gold/10 border border-gold/30">
+                <img [src]="getImageUrl(tournament()?.logo)" class="w-10 h-10 object-contain rounded-full" alt="Logo">
+            </div>
+            <span class="text-xl font-black uppercase tracking-tighter text-gold">{{ tournament()?.name || 'Tournament' }}</span>
+        </div>
+        
+        <div class="hidden md:flex items-center gap-8 text-sm font-bold uppercase tracking-widest text-zinc-400">
+            <a (click)="scrollToSection('about')" class="hover:text-gold transition-colors cursor-pointer">About</a>
+            <a (click)="scrollToSection('teams')" class="hover:text-gold transition-colors cursor-pointer">Teams</a>
+            <a (click)="scrollToSection('schedule')" class="hover:text-gold transition-colors cursor-pointer">Schedule</a>
+            <a (click)="scrollToSection('register')" class="px-5 py-2 bg-gold text-black rounded-full hover:bg-white transition-all transform hover:scale-105 cursor-pointer">Register Now</a>
+        </div>
+
+        <button class="md:hidden text-gold" (click)="ui.showToast('Menu feature coming soon', 'info')">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+        </button>
+    </nav>
+
+    <!-- Error State -->
+    <div *ngIf="error()" class="flex flex-col items-center justify-center py-20 text-center">
+        <div class="text-red-500 text-5xl mb-4">⚠️</div>
+        <h2 class="text-2xl font-bold">{{ error() }}</h2>
+        <button (click)="ngOnInit()" class="mt-6 px-6 py-2 bg-zinc-800 rounded-lg">Retry</button>
+    </div>
+
+    <!-- Main Content -->
+    <ng-container *ngIf="!error()">
+        
+        <!-- Hero Section -->
+        <section id="hero" class="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
+            <!-- Background effects -->
+            <div class="absolute inset-0 z-0">
+                <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-gold/10 rounded-full blur-[120px] animate-pulse"></div>
+                <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-white/5 rounded-full blur-[120px]"></div>
+                <div class="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black"></div>
+            </div>
+
+            <div class="relative z-10 text-center px-4 max-w-5xl mx-auto" *ngIf="tournament() as t">
+                <div class="inline-block px-4 py-1.5 rounded-full bg-gold/10 border border-gold/30 text-gold text-xs font-black tracking-widest uppercase mb-8 animate-bounce">
+                    Official Tournament Landing Page
+                </div>
+                
+                <h1 class="text-5xl md:text-8xl font-black uppercase tracking-tighter mb-6 bg-gradient-to-b from-white to-gold bg-clip-text text-transparent italic">
+                    {{ t.name }}
+                </h1>
+                
+                <p class="text-lg md:text-2xl text-zinc-400 mb-10 max-w-3xl mx-auto font-light leading-relaxed">
+                    {{ t.description || 'Experience the most prestigious football event of the season. Join the elite and showcase your talent on the big stage.' }}
+                </p>
+
+                <div class="flex flex-wrap items-center justify-center gap-6">
+                    <div class="flex flex-col items-center p-6 bg-zinc-900/50 backdrop-blur-sm border border-white/5 rounded-2xl min-w-[150px]">
+                        <span class="text-gold text-sm font-bold uppercase mb-2">Starts On</span>
+                        <span class="text-2xl font-black">{{ t.startDate | date:'MMM d, y' }}</span>
+                    </div>
+                    <div class="flex flex-col items-center p-6 bg-zinc-900/50 backdrop-blur-sm border border-white/5 rounded-2xl min-w-[150px]">
+                        <span class="text-gold text-sm font-bold uppercase mb-2">Location</span>
+                        <span class="text-2xl font-black">{{ t.shortName || 'Main Arena' }}</span>
+                    </div>
+                </div>
+
+                <div class="mt-12">
+                    <button (click)="scrollToSection('register')" class="group relative px-10 py-4 bg-gold text-black text-xl font-black uppercase tracking-widest rounded-full overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(255,215,0,0.3)]">
+                        <span class="relative z-10">Register My Team</span>
+                        <div class="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Scroll indicator -->
+            <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce cursor-pointer" (click)="scrollToSection('about')">
+                <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="py-24 px-4 md:px-8 bg-zinc-950">
+            <div class="max-w-6xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+                    <div>
+                        <h2 class="text-gold text-xs font-black uppercase tracking-widest mb-4">About the tournament</h2>
+                        <h3 class="text-4xl md:text-5xl font-black mb-8 leading-tight">Elevate Your Game. <br>Define Your Legacy.</h3>
+                        <div class="space-y-6 text-zinc-400 text-lg leading-relaxed">
+                            <p>This tournament brings together the finest football talent in one place. Whether you are a professional club or a passionate academy team, this is your platform to shine.</p>
+                            <p>With state-of-the-art facilities, certified referees, and massive scouting opportunities, we ensure a world-class experience for every participant.</p>
+                        </div>
+                        <div class="mt-10 grid grid-cols-2 gap-8">
+                            <div>
+                                <div class="text-3xl font-black text-white mb-2">{{ tournament()?.maxTeams }}+</div>
+                                <div class="text-zinc-500 text-sm uppercase font-bold">Total Slots</div>
+                            </div>
+                            <div>
+                                <div class="text-3xl font-black text-white mb-2">{{ tournament()?.regFee | currency:'INR' }}</div>
+                                <div class="text-zinc-500 text-sm uppercase font-bold">Reg. Fee</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <div class="absolute -inset-4 bg-gold/20 blur-2xl rounded-3xl"></div>
+                        <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=800" class="relative rounded-3xl shadow-2xl border border-white/10" alt="Football action">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Teams Section -->
+        <section id="teams" class="py-24 px-4 md:px-8 border-t border-white/5">
+            <div class="max-w-7xl mx-auto text-center mb-16">
+                <h2 class="text-gold text-xs font-black uppercase tracking-widest mb-4">Competitive Field</h2>
+                <h3 class="text-4xl md:text-5xl font-black mb-4">Participating Teams</h3>
+                <p class="text-zinc-500 max-w-2xl mx-auto">Meet the champions who have already secured their spot in this edition's tournament.</p>
+            </div>
+
+            <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6" *ngIf="teams().length > 0; else noTeams">
+                <div *ngFor="let entry of teams()" class="group p-6 bg-zinc-900/50 border border-white/5 rounded-3xl hover:border-gold/50 hover:bg-zinc-800 transition-all text-center">
+                    <div class="w-20 h-20 mx-auto mb-4 p-2 bg-black rounded-full border border-white/5 group-hover:border-gold/30 transition-colors">
+                        <img [src]="getImageUrl(entry.team.logoUrl)" alt="Team" class="w-full h-full object-contain rounded-full opacity-80 group-hover:opacity-100 transition-opacity">
+                    </div>
+                    <div class="font-black text-sm uppercase tracking-tight group-hover:text-gold transition-colors">{{ entry.team.name }}</div>
+                    <div class="text-[10px] text-zinc-500 mt-1 uppercase">{{ entry.team.city || 'Club' }}</div>
+                </div>
+            </div>
+            <ng-template #noTeams>
+                <div class="text-center py-20 text-zinc-500 italic">No teams registered yet. Be the first one!</div>
+            </ng-template>
+        </section>
+
+        <!-- Schedule Section -->
+        <section id="schedule" class="py-24 px-4 md:px-8 bg-zinc-950 border-y border-white/5">
+            <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-end justify-between mb-16 gap-8">
+                <div class="text-left">
+                    <h2 class="text-gold text-xs font-black uppercase tracking-widest mb-4">Match Day</h2>
+                    <h3 class="text-4xl md:text-5xl font-black">Tournament Schedule</h3>
+                </div>
+                <div class="flex gap-4">
+                    <button class="px-6 py-2 bg-zinc-900 border border-gold/20 text-gold rounded-full text-sm font-bold">Upcoming</button>
+                    <button class="px-6 py-2 bg-transparent text-zinc-500 rounded-full text-sm font-bold hover:text-white transition-colors">Completed</button>
+                </div>
+            </div>
+
+            <div class="max-w-4xl mx-auto space-y-6" *ngIf="matches().length > 0; else noMatches">
+                <div *ngFor="let m of matches()" class="group flex items-center justify-between p-6 bg-black border border-white/5 rounded-3xl hover:border-gold/30 transition-all">
+                    <div class="flex-1 flex items-center justify-end gap-4">
+                        <span class="font-black text-sm md:text-lg uppercase text-right">{{ m.homeTeamName || 'TBD' }}</span>
+                        <div class="w-12 h-12 bg-zinc-900 rounded-full p-2 border border-white/10 shrink-0">
+                            <img [src]="getImageUrl(m.homeTeamLogo)" class="w-full h-full object-contain">
+                        </div>
+                    </div>
+
+                    <div class="px-8 text-center flex flex-col items-center">
+                        <div class="text-xs text-gold font-bold uppercase mb-1">{{ m.startTime | date:'MMM d' }}</div>
+                        <div class="px-4 py-1.5 bg-gold text-black font-black text-xl rounded-lg">{{ m.homeScore }} - {{ m.awayScore }}</div>
+                        <div class="text-[10px] text-zinc-500 font-bold mt-2 uppercase">{{ m.startTime | date:'HH:mm' }}</div>
+                    </div>
+
+                    <div class="flex-1 flex items-center justify-start gap-4">
+                        <div class="w-12 h-12 bg-zinc-900 rounded-full p-2 border border-white/10 shrink-0">
+                            <img [src]="getImageUrl(m.awayTeamLogo)" class="w-full h-full object-contain">
+                        </div>
+                        <span class="font-black text-sm md:text-lg uppercase">{{ m.awayTeamName || 'TBD' }}</span>
+                    </div>
+                </div>
+            </div>
+            <ng-template #noMatches>
+                <div class="text-center py-20 text-zinc-500 italic">Schedule will be released after team registrations are finalized.</div>
+            </ng-template>
+        </section>
+
+        <!-- Registration Section -->
+        <section id="register" class="py-32 px-4 md:px-8 relative overflow-hidden">
+            <div class="absolute -top-1/2 -right-1/4 w-[800px] h-[800px] bg-gold/5 rounded-full blur-[150px]"></div>
+            
+            <div class="max-w-5xl mx-auto bg-zinc-900/40 backdrop-blur-xl border border-white/10 rounded-[40px] p-8 md:p-16 relative z-10">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                    <div>
+                        <h2 class="text-gold text-xs font-black uppercase tracking-widest mb-4">Join now</h2>
+                        <h3 class="text-4xl md:text-5xl font-black mb-8">Register Your Team</h3>
+                        <p class="text-zinc-400 text-lg mb-8">Ready to compete? Fill out the form and our team will get in touch with you for the next steps in the enrollment process.</p>
+                        
+                        <div class="space-y-6">
+                            <div class="flex items-start gap-4">
+                                <div class="w-10 h-10 rounded-full bg-gold/20 flex items-center justify-center text-gold shrink-0">1</div>
+                                <div>
+                                    <div class="font-bold">Register Online</div>
+                                    <p class="text-zinc-500 text-sm">Submit your basic details via this form.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <div class="w-10 h-10 rounded-full bg-gold/20 flex items-center justify-center text-gold shrink-0">2</div>
+                                <div>
+                                    <div class="font-bold">Verification</div>
+                                    <p class="text-zinc-500 text-sm">Our admin will review and approve your slot.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <div class="w-10 h-10 rounded-full bg-gold/20 flex items-center justify-center text-gold shrink-0">3</div>
+                                <div>
+                                    <div class="font-bold">Confirmation</div>
+                                    <p class="text-zinc-500 text-sm">Make payment and confirm your participation.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form (submit)="handleRegistration()" class="space-y-6" #regForm="ngForm">
+                        <div class="space-y-4">
+                            <div class="group">
+                                <label class="block text-xs font-black uppercase tracking-widest text-zinc-500 mb-2 group-focus-within:text-gold transition-colors">Captain Name *</label>
+                                <input type="text" [(ngModel)]="regData.name" name="name" required
+                                       class="w-full bg-black border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-gold transition-all text-white"
+                                       placeholder="Full name">
+                            </div>
+                            <div class="group">
+                                <label class="block text-xs font-black uppercase tracking-widest text-zinc-500 mb-2 group-focus-within:text-gold transition-colors">Team Name *</label>
+                                <input type="text" [(ngModel)]="regData.teamName" name="teamName" required
+                                       class="w-full bg-black border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-gold transition-all text-white"
+                                       placeholder="Official team name">
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="group">
+                                    <label class="block text-xs font-black uppercase tracking-widest text-zinc-500 mb-2 group-focus-within:text-gold transition-colors">Phone Number *</label>
+                                    <input type="tel" [(ngModel)]="regData.phone" name="phone" required
+                                           class="w-full bg-black border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-gold transition-all text-white"
+                                           placeholder="+91">
+                                </div>
+                                <div class="group">
+                                    <label class="block text-xs font-black uppercase tracking-widest text-zinc-500 mb-2 group-focus-within:text-gold transition-colors">Email Address</label>
+                                    <input type="email" [(ngModel)]="regData.email" name="email"
+                                           class="w-full bg-black border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-gold transition-all text-white"
+                                           placeholder="email@example.com">
+                                </div>
+                            </div>
+                            <div class="group">
+                                <label class="block text-xs font-black uppercase tracking-widest text-zinc-500 mb-2 group-focus-within:text-gold transition-colors">City</label>
+                                <input type="text" [(ngModel)]="regData.city" name="city"
+                                       class="w-full bg-black border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-gold transition-all text-white"
+                                       placeholder="Enter city">
+                            </div>
+                        </div>
+
+                        <button type="submit" [disabled]="isSubmitting()"
+                                class="w-full py-5 bg-gold text-black font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-white transition-all shadow-[0_10px_30px_rgba(255,215,0,0.15)] flex items-center justify-center gap-3">
+                            <span *ngIf="!isSubmitting()">Submit Registration</span>
+                            <span *ngIf="isSubmitting()" class="flex items-center gap-2">
+                                <svg class="animate-spin h-5 w-5 text-black" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                Please wait...
+                            </span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="py-20 bg-zinc-950 border-t border-white/5">
+            <div class="max-w-7xl mx-auto px-4 md:px-8 grid grid-cols-1 md:grid-cols-3 gap-12">
+                <div>
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="p-1 rounded-full bg-gold/10 border border-gold/30">
+                            <img [src]="getImageUrl(tournament()?.logo)" class="w-8 h-8 object-contain rounded-full" alt="Logo">
+                        </div>
+                        <span class="text-xl font-black uppercase tracking-tighter text-gold">{{ tournament()?.name }}</span>
+                    </div>
+                    <p class="text-zinc-500">The premier platform for football excellence and competitive sportsmanship. Build your squad, showcase your skills, and conquer the field.</p>
+                </div>
+                
+                <div>
+                    <h4 class="font-black uppercase tracking-widest text-xs mb-6 text-white">Quick Links</h4>
+                    <ul class="space-y-4 text-zinc-500 font-bold uppercase text-[10px] tracking-widest">
+                        <li><a (click)="scrollToSection('hero')" class="hover:text-gold transition-colors cursor-pointer">Home</a></li>
+                        <li><a (click)="scrollToSection('about')" class="hover:text-gold transition-colors cursor-pointer">About</a></li>
+                        <li><a (click)="scrollToSection('teams')" class="hover:text-gold transition-colors cursor-pointer">Teams</a></li>
+                        <li><a (click)="scrollToSection('schedule')" class="hover:text-gold transition-colors cursor-pointer">Schedule</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-black uppercase tracking-widest text-xs mb-6 text-white">Contact Us</h4>
+                    <p class="text-zinc-500 mb-2">Technical Support: support@tournament.com</p>
+                    <p class="text-zinc-500">Main Office: Stadium Road, Sports City, IN 560001</p>
+                </div>
+            </div>
+            
+            <div class="max-w-7xl mx-auto px-4 md:px-8 mt-20 pt-8 border-t border-white/5 flex flex-col md:row items-center justify-between gap-4">
+                <p class="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">© 2026 {{ tournament()?.name }}. All rights reserved.</p>
+                <div class="flex gap-6 text-zinc-600 text-[10px] font-bold uppercase tracking-widest">
+                    <a href="#" class="hover:text-gold transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-gold transition-colors">Terms of Service</a>
+                </div>
+            </div>
+        </footer>
+
+    </ng-container>
+</div>
