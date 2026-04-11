@@ -12,12 +12,16 @@ export const routes: Routes = [
         loadComponent: () => import('./public/match-scoreboard/match-scoreboard.component').then(m => m.MatchScoreboardComponent)
     },
     {
-        path: 'auth',
-        loadChildren: () => import('./auth/auth-module').then(m => m.AuthModule)
-    },
-    {
         path: '',
         loadComponent: () => import('./public/landing/landing-page.component').then(m => m.LandingPageComponent)
+    },
+    {
+        path: 'login',
+        loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent)
+    },
+    {
+        path: 'register',
+        loadComponent: () => import('./auth/register/register.component').then(m => m.RegisterComponent)
     },
     {
         path: 'admin',

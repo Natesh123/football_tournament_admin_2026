@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { API_URL } from '../core/config/app.config';
 
 export interface Team {
     id: string;
@@ -26,7 +26,7 @@ export interface Team {
 })
 export class TeamService {
     private http = inject(HttpClient);
-    readonly BASE_URL = environment.apiBaseUrl;
+    readonly BASE_URL = API_URL;
     private apiUrl = `${this.BASE_URL}/api/teams`;
 
     getAll(search?: string): Observable<Team[]> {
@@ -48,6 +48,10 @@ export class TeamService {
     createWithFormData(formData: FormData): Observable<Team> {
         // Do NOT set Content-Type header — browser sets it automatically with multipart boundary
         return this.http.post<Team>(this.apiUrl, formData);
+    }
+
+    updateWithFormData(id: string, formData: FormData): Observable<Team> {
+        return this.http.put<Team>(`${this.apiUrl}/${id}`, formData);
     }
 
     /** Returns array of fully-qualified photo URLs for this team's gallery */

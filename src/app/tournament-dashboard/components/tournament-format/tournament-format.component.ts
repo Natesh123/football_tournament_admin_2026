@@ -183,7 +183,7 @@ export class TournamentFormatComponent implements OnInit, OnChanges {
             return;
         }
         this.http.get<{ success: boolean; data: TournamentTeam[] }>(
-            `${environment.apiBaseUrl}/api/tournaments/${this.tournamentId}/teams`
+            `${environment.apiUrl}/api/tournaments/${this.tournamentId}/teams`
         ).subscribe({
             next: (res) => {
                 // Only show approved teams in the dropdown

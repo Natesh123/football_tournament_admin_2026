@@ -151,7 +151,7 @@ export class SponsorsComponent implements OnInit {
   public ui = inject(UiService);
   
   sponsors: Sponsor[] = [];
-  apiUrl = environment.apiBaseUrl.replace('/api', '');
+  apiUrl = environment.apiUrl.replace('/api', '');
   showModal = false;
   selectedSponsor: Sponsor | null = null;
   
@@ -169,7 +169,10 @@ export class SponsorsComponent implements OnInit {
 
   loadSponsors() {
     this.sponsorService.getAll(this.filters).subscribe({
-      next: (data) => this.sponsors = data,
+      next: (data: any) => {
+        console.log('Sponsors data received:', data);
+        this.sponsors = data.data || data;
+      },
       error: (err) => console.error('Error loading sponsors:', err)
     });
   }

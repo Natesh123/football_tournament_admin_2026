@@ -1,8 +1,8 @@
 import { Component, Input, ChangeDetectorRef, inject, HostListener, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { API_URL } from '../../../core/config/app.config';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { environment } from '../../../../environments/environment';
 
 @Component({
     selector: 'app-tournament-general',
@@ -20,8 +20,8 @@ export class TournamentGeneralComponent {
     private cdr = inject(ChangeDetectorRef);
 
     availableSponsors = [
-        'Nike', 'Adidas', 'Puma', 'Under Armour', 'Red Bull', 
-        'Qatar Airways', 'Emirates', 'Heineken', 'Coca-Cola', 
+        'Nike', 'Adidas', 'Puma', 'Under Armour', 'Red Bull',
+        'Qatar Airways', 'Emirates', 'Heineken', 'Coca-Cola',
         'Pepsi', 'Visa', 'Mastercard', 'Local Partner'
     ];
 
@@ -80,6 +80,6 @@ export class TournamentGeneralComponent {
     getImageUrl(path?: string): string {
         if (!path) return '';
         if (path.startsWith('http') || path.startsWith('data:')) return path;
-        return `${environment.apiBaseUrl}${path.startsWith('/') ? '' : '/'}${path}`;
+        return `${API_URL}${path.startsWith('/') ? '' : '/'}${path}`;
     }
 }

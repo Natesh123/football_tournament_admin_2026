@@ -1,31 +1,8 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
-
-export interface PortalData {
-    tournament: {
-        id: number;
-        name: string;
-        logo?: string;
-        status: string;
-        visibility: string;
-    };
-    presentation: {
-        brandColor: string;
-        welcomeMessage: string;
-        showStandings: boolean;
-        showTopScorers: boolean;
-        showLiveMatches: boolean;
-        showRecentResults: boolean;
-        liveStreamLink?: string;
-    };
-    standings: any[];
-    liveMatches: any[];
-    completedMatches: any[];
-    topScorers: any[];
-}
+import { PublicDataService } from '../../services/public-data.service';
+import { PortalData } from '../../models/portal.model';
 
 @Component({
     selector: 'app-tournament-portal',
@@ -35,8 +12,8 @@ export interface PortalData {
 })
 export class TournamentPortalComponent implements OnInit {
     private route = inject(ActivatedRoute);
-    private http = inject(HttpClient);
-    
+    private dataService = inject(PublicDataService);
+
     data = signal<PortalData | null>(null);
     isLoading = signal(true);
     error = signal('');
@@ -45,25 +22,21 @@ export class TournamentPortalComponent implements OnInit {
         this.route.paramMap.subscribe(params => {
             const id = params.get('id');
             if (id) {
-                this.loadPortalData(id);
+                this.loadPortalData(parseInt(id, 10));
             }
         });
     }
 
-    loadPortalData(id: string) {
+    loadPortalData(id: number) {
         this.isLoading.set(true);
-        this.http.get<{success: boolean, data: PortalData, message?: string}>(`${environment.apiBaseUrl}/api/public/tournament/${id}/portal`).subscribe({
-            next: (res) => {
-                if (res.success) {
-                    this.data.set(res.data);
-                } else {
-                    this.error.set(res.message || 'Failed to load tournament data');
-                }
+        this.dataService.getPortalData(id).subscribe({
+            next: (portalData) => {
+                this.data.set(portalData);
                 this.isLoading.set(false);
             },
             error: (err) => {
                 console.error("Portal load error", err);
-                this.error.set('Failed to connect to the server');
+                this.error.set('Failed to load tournament data');
                 this.isLoading.set(false);
             }
         });

@@ -28,7 +28,7 @@ export class TournamentSponsorsComponent implements OnInit, OnChanges {
   showRemoveConfirm = false;
   mappingToRemove: TournamentSponsor | null = null;
 
-  apiUrl = environment.apiBaseUrl.replace('/api', '');
+  apiUrl = environment.apiUrl.replace('/api', '');
 
   ngOnInit() {
     if (this.tournamentId) {

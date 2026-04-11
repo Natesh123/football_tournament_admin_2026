@@ -37,7 +37,7 @@ export class LoginComponent implements OnInit {
             this.auth.validateToken(token).subscribe({
                 next: (res: any) => {
                     if (res.valid) {
-                        this.router.navigate(['/dashboard']);
+                        this.router.navigate(['/admin/dashboard']);
                     }
                 },
                 error: () => {
@@ -45,7 +45,7 @@ export class LoginComponent implements OnInit {
                     // "If the token validation returns false, a message should be displayed asking 
                     // the user to create an account, and the user should be redirected to the registration page."
                     this.errorMessage = 'Session expired or account not found. Please register.';
-                    setTimeout(() => this.router.navigate(['/auth/register']), 2000);
+                    setTimeout(() => this.router.navigate(['/register']), 2000);
                 }
             });
         }
@@ -77,7 +77,7 @@ export class LoginComponent implements OnInit {
                     if (res.token) {
                         this.auth.setAuthenticatedUser(res.user, res.token);
                         this.successMessage = 'Login successful! Redirecting...';
-                        setTimeout(() => this.router.navigate(['/dashboard']), 1000);
+                        setTimeout(() => this.router.navigate(['/admin/dashboard']), 1000);
                     }
                 },
                 error: (err) => {
@@ -86,7 +86,7 @@ export class LoginComponent implements OnInit {
 
                     if (err.error?.error === "User not found") {
                         this.errorMessage = 'Account not found. Please create an account.';
-                        setTimeout(() => this.router.navigate(['/auth/register']), 2000);
+                        setTimeout(() => this.router.navigate(['/register']), 2000);
                     } else {
                         this.errorMessage = err.error?.error || 'Login failed. Please try again.';
                     }

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { API_URL } from '../core/config/app.config';
 
 export interface TeamMember {
     id: string;
@@ -28,7 +28,7 @@ export interface TeamMember {
 })
 export class TeamMemberService {
     private http = inject(HttpClient);
-    private apiUrl = `${environment.apiBaseUrl}/api/teams`;
+    private apiUrl = `${API_URL}/api/teams`;
 
     getByTeamId(teamId: string): Observable<TeamMember[]> {
         return this.http.get<TeamMember[]>(`${this.apiUrl}/${teamId}/members`);
@@ -39,6 +39,6 @@ export class TeamMemberService {
     }
 
     delete(id: string): Observable<void> {
-        return this.http.delete<void>(`${environment.apiBaseUrl}/api/teams/members/${id}`);
+        return this.http.delete<void>(`${API_URL}/api/teams/members/${id}`);
     }
 }
