@@ -84,12 +84,12 @@ export class TournamentService {
     }
 
     updateMatchSchedule(matchId: number | string, payload: any): Observable<any> {
-        return this.http.patch<ApiResponse<any>>(`${environment.apiBaseUrl}/api/matches/${matchId}/schedule`, payload);
+        return this.http.patch<ApiResponse<any>>(`${API_URL}/api/matches/${matchId}/schedule`, payload);
     }
 
     // Match Center & Event Management
     getMatchesByStatus(status: string, tournamentId?: string): Observable<any[]> {
-        let url = `${environment.apiBaseUrl}/api/matches?status=${status}`;
+        let url = `${API_URL}/api/matches?status=${status}`;
         if (tournamentId) url += `&tournamentId=${tournamentId}`;
         return this.http.get<ApiResponse<any[]>>(url).pipe(
             map(res => res.data)
@@ -97,25 +97,25 @@ export class TournamentService {
     }
 
     getMatchEvents(matchId: number | string): Observable<any[]> {
-        return this.http.get<ApiResponse<any[]>>(`${environment.apiBaseUrl}/api/matches/${matchId}/events`).pipe(
+        return this.http.get<ApiResponse<any[]>>(`${API_URL}/api/matches/${matchId}/events`).pipe(
             map(res => res.data)
         );
     }
 
     addMatchEvent(matchId: number | string, eventData: any): Observable<any> {
-        return this.http.post<ApiResponse<any>>(`${environment.apiBaseUrl}/api/matches/${matchId}/events`, eventData).pipe(
+        return this.http.post<ApiResponse<any>>(`${API_URL}/api/matches/${matchId}/events`, eventData).pipe(
             map(res => res.data)
         );
     }
 
     updateMatchEvent(matchId: number | string, eventId: string, eventData: any): Observable<any> {
-        return this.http.put<ApiResponse<any>>(`${environment.apiBaseUrl}/api/matches/${matchId}/events/${eventId}`, eventData).pipe(
+        return this.http.put<ApiResponse<any>>(`${API_URL}/api/matches/${matchId}/events/${eventId}`, eventData).pipe(
             map(res => res.data)
         );
     }
 
     deleteMatchEvent(matchId: number | string, eventId: string): Observable<any> {
-        return this.http.delete<ApiResponse<any>>(`${environment.apiBaseUrl}/api/matches/${matchId}/events/${eventId}`).pipe(
+        return this.http.delete<ApiResponse<any>>(`${API_URL}/api/matches/${matchId}/events/${eventId}`).pipe(
             map(res => res.data)
         );
     }

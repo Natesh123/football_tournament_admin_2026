@@ -2,6 +2,7 @@ import { Component, Input, ChangeDetectorRef, inject, HostListener, ElementRef, 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { API_URL } from '../../../core/config/app.config';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-tournament-general',
@@ -19,8 +20,8 @@ export class TournamentGeneralComponent {
     private cdr = inject(ChangeDetectorRef);
 
     availableSponsors = [
-        'Nike', 'Adidas', 'Puma', 'Under Armour', 'Red Bull', 
-        'Qatar Airways', 'Emirates', 'Heineken', 'Coca-Cola', 
+        'Nike', 'Adidas', 'Puma', 'Under Armour', 'Red Bull',
+        'Qatar Airways', 'Emirates', 'Heineken', 'Coca-Cola',
         'Pepsi', 'Visa', 'Mastercard', 'Local Partner'
     ];
 

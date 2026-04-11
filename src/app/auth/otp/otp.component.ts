@@ -34,7 +34,7 @@ export class OtpComponent {
 
         // Redirect if no email in storage
         if (!this.email) {
-            this.router.navigate(['/auth/login']);
+            this.router.navigate(['/login']);
         }
     }
 
@@ -59,7 +59,7 @@ export class OtpComponent {
                 // Clear temporary email from storage
                 localStorage.removeItem('email');
                 // Navigate to dashboard
-                this.router.navigate(['/dashboard']);
+                this.router.navigate(['/admin/dashboard']);
             },
             error: (err) => {
                 this.isLoading = false;

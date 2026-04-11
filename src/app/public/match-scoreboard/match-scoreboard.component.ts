@@ -1,8 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
+import { PublicDataService } from '../../services/public-data.service';
 import { SocketService } from '../../core/services/socket.service';
 
 export interface PublicMatchData {
@@ -34,9 +33,9 @@ export interface PublicMatchData {
 })
 export class MatchScoreboardComponent implements OnInit {
     private route = inject(ActivatedRoute);
-    private http = inject(HttpClient);
+    private dataService = inject(PublicDataService);
     private socketService = inject(SocketService);
-    
+
     data = signal<PublicMatchData | null>(null);
     isLoading = signal(true);
     error = signal('');
@@ -47,7 +46,7 @@ export class MatchScoreboardComponent implements OnInit {
         this.route.paramMap.subscribe(params => {
             const id = params.get('id');
             const tid = params.get('tournamentId');
-            
+
             if (tid) this.tournamentId.set(tid);
 
             if (id) {
@@ -55,7 +54,7 @@ export class MatchScoreboardComponent implements OnInit {
                 // Listen for real-time updates
                 this.socketService.on(`match_update_${id}`, (updatedData: any) => {
                     console.log('Real-time update received:', updatedData);
-                    
+
                     // Handle specific event types for alerts
                     if (updatedData.type === 'event_added') {
                         this.showEventAlert(updatedData.event);
@@ -63,8 +62,6 @@ export class MatchScoreboardComponent implements OnInit {
                     } else if (updatedData.status) {
                         // Full match object update (score, status, etc.)
                         this.data.update(curr => curr ? { ...curr, match: updatedData } : null);
-                        
-                        // If score changed, maybe show an alert too (if it wasn't an event_added)
                     }
                 });
             }
@@ -78,29 +75,23 @@ export class MatchScoreboardComponent implements OnInit {
 
     loadMatchData(id: string) {
         this.isLoading.set(true);
-        this.http.get<{success: boolean, data: PublicMatchData, message?: string}>(`${environment.apiBaseUrl}/api/public/match/${id}`).subscribe({
-            next: (res) => {
-                if (res.success) {
-                    this.data.set(res.data);
-                } else {
-                    this.error.set(res.message || 'Failed to load match data');
-                }
+        this.dataService.getMatchData(id).subscribe({
+            next: (matchData) => {
+                this.data.set(matchData);
                 this.isLoading.set(false);
             },
             error: (err) => {
                 console.error("Match load error", err);
-                this.error.set('Failed to connect to the server');
+                this.error.set('Failed to load match data');
                 this.isLoading.set(false);
             }
         });
     }
 
     silentReload(id: string) {
-        this.http.get<{success: boolean, data: PublicMatchData}>(`${environment.apiBaseUrl}/api/public/match/${id}`).subscribe({
-            next: (res) => {
-                if (res.success) {
-                    this.data.set(res.data);
-                }
+        this.dataService.getMatchData(id).subscribe({
+            next: (matchData) => {
+                this.data.set(matchData);
             }
         });
     }
