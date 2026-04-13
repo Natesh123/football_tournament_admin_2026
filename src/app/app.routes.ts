@@ -12,8 +12,13 @@ export const routes: Routes = [
         loadComponent: () => import('./public/match-scoreboard/match-scoreboard.component').then(m => m.MatchScoreboardComponent)
     },
     {
-        path: '',
+        path: 'landing',
         loadComponent: () => import('./public/landing/landing-page.component').then(m => m.LandingPageComponent)
+    },
+    {
+        path: '',
+        redirectTo: 'landing',
+        pathMatch: 'full'
     },
     {
         path: 'login',

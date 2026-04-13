@@ -1,6 +1,8 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { Tournament } from '../../../../models/portal.model';
+import { AuthService } from '../../../../auth/auth.service';
 
 @Component({
   selector: 'app-hero',
@@ -26,17 +28,17 @@ import { Tournament } from '../../../../models/portal.model';
             </div>
             
             <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight text-white">
-              Ultimate <span class="text-gold-gradient italic">Champions</span> League 2026
+              {{ $any(tournamentData)?.name || 'Ultimate Champions League 2026' }}
             </h1>
             
             <p class="text-gray-400 text-lg md:text-xl max-w-xl leading-relaxed">
-              Join the most prestigious regional football tournament. Experience the thrill, the passion, and the glory. Your journey to the top starts here.
+              {{ $any(tournamentData)?.description || 'Join the most prestigious regional football tournament. Experience the thrill, the passion, and the glory. Your journey to the top starts here.' }}
             </p>
             
             <div class="flex flex-col sm:flex-row gap-4 pt-4">
-              <a href="#register" class="btn btn-primary btn-lg border-none text-navy font-bold px-8 py-3 rounded-xl shadow-lg hover:scale-105 transition-all duration-300">
-                Register Your Team
-              </a>
+              <button (click)="handleRegisterClick()" class="btn btn-primary btn-lg border-none text-navy font-bold px-8 py-3 rounded-xl shadow-lg hover:scale-105 transition-all duration-300">
+                Register login
+              </button>
               <a href="#schedule" class="btn btn-outline border-gold text-gold hover:bg-gold/10 hover:text-gold px-8 py-3 rounded-xl transition-all duration-300">
                 View Schedule
               </a>
@@ -86,5 +88,20 @@ import { Tournament } from '../../../../models/portal.model';
   `]
 })
 export class HeroComponent {
-  @Input() tournament?: Tournament;
+  @Input() tournamentData?: Tournament;
+
+  private auth = inject(AuthService);
+  private router = inject(Router);
+
+  handleRegisterClick() {
+    if (this.auth.isAuthenticated()) {
+      // Scroll to registration section
+      document.getElementById('register')?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      // Redirect to login with returnUrl
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: '/landing#register' }
+      });
+    }
+  }
 }

@@ -15,7 +15,6 @@ import { Component } from '@angular/core';
               <div class="ml-10 flex items-baseline space-x-8">
                 <a href="#hero" class="text-white hover:text-gold px-3 py-2 rounded-md font-medium transition-colors">Home</a>
                 <a href="#about" class="text-white hover:text-gold px-3 py-2 rounded-md font-medium transition-colors">About</a>
-                <a href="#teams" class="text-white hover:text-gold px-3 py-2 rounded-md font-medium transition-colors">Teams</a>
                 <a href="#schedule" class="text-white hover:text-gold px-3 py-2 rounded-md font-medium transition-colors">Schedule</a>
               </div>
             </div>

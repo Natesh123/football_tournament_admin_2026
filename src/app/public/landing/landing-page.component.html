@@ -1,15 +1,15 @@
 <main class="min-h-screen bg-navy selection:bg-gold/30 selection:text-white">
     <app-navbar></app-navbar>
 
-    <app-hero [tournament]="portalData()?.tournament"></app-hero>
+    <app-hero [tournamentData]="portalData()?.tournament"></app-hero>
 
     <app-about [tournament]="portalData()?.tournament" [presentation]="portalData()?.presentation"></app-about>
-
-    <app-teams-list [teams]="portalData()?.standings || []"></app-teams-list>
 
     <app-match-schedule [liveMatches]="portalData()?.liveMatches || []"
         [completedMatches]="portalData()?.completedMatches || []">
     </app-match-schedule>
+
+    <app-sponsor-banners></app-sponsor-banners>
 
     <app-registration-form [isSubmitting]="isSubmitting()" [successMessage]="showSuccess()"
         (formSubmit)="handleRegistration($event)">

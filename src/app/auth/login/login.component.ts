@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../auth.service';
 
 @Component({
@@ -22,7 +22,8 @@ export class LoginComponent implements OnInit {
     constructor(
         private fb: FormBuilder,
         private auth: AuthService,
-        private router: Router
+        private router: Router,
+        private route: ActivatedRoute
     ) {
         this.loginForm = this.fb.group({
             email: ['', [Validators.required, Validators.email]],
@@ -37,7 +38,13 @@ export class LoginComponent implements OnInit {
             this.auth.validateToken(token).subscribe({
                 next: (res: any) => {
                     if (res.valid) {
-                        this.router.navigate(['/admin/dashboard']);
+                        const returnUrl = this.route.snapshot.queryParams['returnUrl'];
+                        if (returnUrl) {
+                            const [path, fragment] = returnUrl.split('#');
+                            this.router.navigate([path], { fragment });
+                        } else {
+                            this.router.navigate(['/admin/dashboard']);
+                        }
                     }
                 },
                 error: () => {
@@ -77,7 +84,16 @@ export class LoginComponent implements OnInit {
                     if (res.token) {
                         this.auth.setAuthenticatedUser(res.user, res.token);
                         this.successMessage = 'Login successful! Redirecting...';
-                        setTimeout(() => this.router.navigate(['/admin/dashboard']), 1000);
+
+                        const returnUrl = this.route.snapshot.queryParams['returnUrl'];
+                        setTimeout(() => {
+                            if (returnUrl) {
+                                const [path, fragment] = returnUrl.split('#');
+                                this.router.navigate([path], { fragment });
+                            } else {
+                                this.router.navigate(['/admin/dashboard']);
+                            }
+                        }, 1000);
                     }
                 },
                 error: (err) => {

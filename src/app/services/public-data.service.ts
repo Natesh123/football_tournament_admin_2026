@@ -17,6 +17,11 @@ export class PublicDataService {
       .pipe(map(response => response.data));
   }
 
+  getLatestTournamentId(): Observable<number> {
+    return this.http.get<{ success: boolean; id: number }>(`${this.apiUrl}/public/tournament/latest/id`)
+      .pipe(map(response => response.id));
+  }
+
   registerTeam(tournamentId: number, teamData: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/teams`, teamData);
   }

@@ -19,7 +19,6 @@ import { Component } from '@angular/core';
             <ul class="space-y-3 text-gray-500 text-sm">
               <li><a href="#hero" class="hover:text-gold transition-colors">Home</a></li>
               <li><a href="#about" class="hover:text-gold transition-colors">About</a></li>
-              <li><a href="#teams" class="hover:text-gold transition-colors">Teams</a></li>
               <li><a href="#schedule" class="hover:text-gold transition-colors">Schedule</a></li>
             </ul>
           </div>
@@ -63,4 +62,4 @@ import { Component } from '@angular/core';
   `,
   styles: []
 })
-export class FooterComponent {}
+export class FooterComponent { }

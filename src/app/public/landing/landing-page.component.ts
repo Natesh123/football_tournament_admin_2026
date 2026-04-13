@@ -4,9 +4,9 @@ import { ActivatedRoute } from '@angular/router';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { HeroComponent } from './components/hero/hero.component';
 import { AboutTournamentComponent } from './components/about/about.component';
-import { TeamsListComponent } from './components/teams-list/teams-list.component';
 import { MatchScheduleComponent } from './components/match-schedule/match-schedule.component';
 import { RegistrationFormComponent } from './components/registration-form/registration-form.component';
+import { SponsorBannersComponent } from './components/sponsor-banners/sponsor-banners.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { PublicDataService } from '../../services/public-data.service';
 import { PortalData } from '../../models/portal.model';
@@ -20,9 +20,9 @@ import { UiService } from '../../services/ui.service';
         NavbarComponent,
         HeroComponent,
         AboutTournamentComponent,
-        TeamsListComponent,
         MatchScheduleComponent,
         RegistrationFormComponent,
+        SponsorBannersComponent,
         FooterComponent
     ],
     templateUrl: './landing-page.component.html',
@@ -41,8 +41,19 @@ export class LandingPageComponent implements OnInit {
     ngOnInit() {
         this.route.paramMap.subscribe(params => {
             const id = params.get('id');
-            const tournamentId = id ? parseInt(id, 10) : this.defaultTournamentId;
-            this.fetchPortalData(tournamentId);
+            if (id) {
+                this.fetchPortalData(parseInt(id, 10));
+            } else {
+                this.dataService.getLatestTournamentId().subscribe({
+                    next: (latestId) => {
+                        this.fetchPortalData(latestId);
+                    },
+                    error: (err) => {
+                        console.error('Error fetching latest tournament:', err);
+                        this.fetchPortalData(this.defaultTournamentId);
+                    }
+                });
+            }
         });
     }
 
