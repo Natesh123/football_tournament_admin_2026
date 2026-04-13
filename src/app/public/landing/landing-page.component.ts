@@ -1,180 +1,91 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
-import { environment } from '../../../environments/environment';
-import { TournamentService, TournamentDTO } from '../../tournament/tournament.service';
-import { TeamService } from '../../teams/team.service';
+import { ActivatedRoute } from '@angular/router';
+import { NavbarComponent } from './components/navbar/navbar.component';
+import { HeroComponent } from './components/hero/hero.component';
+import { AboutTournamentComponent } from './components/about/about.component';
+import { TeamsListComponent } from './components/teams-list/teams-list.component';
+import { MatchScheduleComponent } from './components/match-schedule/match-schedule.component';
+import { RegistrationFormComponent } from './components/registration-form/registration-form.component';
+import { FooterComponent } from './components/footer/footer.component';
+import { PublicDataService } from '../../services/public-data.service';
+import { PortalData } from '../../models/portal.model';
 import { UiService } from '../../services/ui.service';
-
-export interface LandingData {
-    tournament: TournamentDTO;
-    teams: any[];
-    matches: any[];
-}
 
 @Component({
     selector: 'app-landing-page',
     standalone: true,
-    imports: [CommonModule, RouterLink, FormsModule],
+    imports: [
+        CommonModule,
+        NavbarComponent,
+        HeroComponent,
+        AboutTournamentComponent,
+        TeamsListComponent,
+        MatchScheduleComponent,
+        RegistrationFormComponent,
+        FooterComponent
+    ],
     templateUrl: './landing-page.component.html',
     styleUrls: ['./landing-page.component.css']
 })
 export class LandingPageComponent implements OnInit {
     private route = inject(ActivatedRoute);
-    private http = inject(HttpClient);
-    private tournamentService = inject(TournamentService);
-    private teamService = inject(TeamService);
+    private dataService = inject(PublicDataService);
     public ui = inject(UiService);
 
-    tournament = signal<TournamentDTO | null>(null);
-    teams = signal<any[]>([]);
-    matches = signal<any[]>([]);
-    isLoading = signal(true);
-    error = signal('');
-
-    // Registration Form
-    regData = {
-        name: '',
-        teamName: '',
-        phone: '',
-        email: '',
-        city: ''
-    };
+    portalData = signal<PortalData | undefined>(undefined);
     isSubmitting = signal(false);
+    showSuccess = signal(false);
+    defaultTournamentId = 1;
 
     ngOnInit() {
         this.route.paramMap.subscribe(params => {
             const id = params.get('id');
-            if (id) {
-                this.loadLandingData(id);
-            } else {
-                this.loadDefaultTournament();
-            }
+            const tournamentId = id ? parseInt(id, 10) : this.defaultTournamentId;
+            this.fetchPortalData(tournamentId);
         });
     }
 
-    loadDefaultTournament() {
-        this.tournamentService.getAll().subscribe({
-            next: (tournaments) => {
-                if (tournaments && tournaments.length > 0) {
-                    // Sort by date to get the latest or current
-                    const sorted = tournaments.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
-                    this.loadLandingData(sorted[0].id!);
-                } else {
-                    this.error.set('No tournaments found.');
-                    this.isLoading.set(false);
-                }
-            },
-            error: (err) => {
-                this.error.set('Failed to load tournaments.');
-                this.isLoading.set(false);
-            }
-        });
-    }
-
-    loadLandingData(id: string) {
-        this.isLoading.set(true);
-        
-        // Fetch Tournament Details
-        this.tournamentService.getById(id).subscribe({
+    fetchPortalData(tournamentId: number) {
+        this.dataService.getPortalData(tournamentId).subscribe({
             next: (data) => {
-                this.tournament.set(data);
-                this.fetchTeamsAndMatches(id);
+                this.portalData.set(data);
             },
             error: (err) => {
-                this.error.set('Failed to load tournament details.');
-                this.isLoading.set(false);
+                console.error('Error fetching portal data:', err);
+                this.ui.showToast('Failed to load tournament data.', 'error');
             }
         });
     }
 
-    fetchTeamsAndMatches(id: string) {
-        // Fetch Teams
-        this.http.get<{ success: boolean, data: any[] }>(`${environment.apiBaseUrl}/api/tournaments/${id}/teams`).subscribe({
-            next: (res) => {
-                this.teams.set(res.data || []);
-            }
-        });
-
-        // Fetch Matches (using getMatchesByStatus 'all')
-        this.tournamentService.getMatchesByStatus('all', id).subscribe({
-            next: (data) => {
-                this.matches.set(data || []);
-                this.isLoading.set(false);
-            },
-            error: (err) => {
-                console.error("Match fetch error", err);
-                this.isLoading.set(false);
-            }
-        });
-    }
-
-    handleRegistration() {
-        if (!this.regData.name || !this.regData.teamName || !this.regData.phone) {
-            this.ui.showToast('Please fill in all required fields.', 'error');
-            return;
-        }
-
-        const tId = this.tournament()?.id;
-        if (!tId) return;
-
+    handleRegistration(formData: any) {
+        const tournamentId = this.portalData()?.tournament?.id || this.defaultTournamentId;
         this.isSubmitting.set(true);
-        
-        // 1. Create Team
-        const teamPayload = {
-            name: this.regData.teamName,
-            city: this.regData.city,
-            contactEmail: this.regData.email,
-            captainName: this.regData.name,
-            status: 'pending'
-        };
 
-        this.http.post<any>(`${environment.apiBaseUrl}/api/teams`, teamPayload).subscribe({
-            next: (newTeam) => {
-                // 2. Map team to tournament
-                this.http.post(`${environment.apiBaseUrl}/api/tournaments/${tId}/teams/${newTeam.id}`, {}).subscribe({
+        // Step 1: Register Team
+        this.dataService.registerTeam(tournamentId, formData).subscribe({
+            next: (team) => {
+                // Step 2: Add Team to Tournament
+                this.dataService.addTeamToTournament(tournamentId, team.id).subscribe({
                     next: () => {
-                        this.ui.showToast('Registration submitted successfully! We will contact you soon.', 'success');
-                        this.resetForm();
                         this.isSubmitting.set(false);
+                        this.showSuccess.set(true);
+                        this.ui.showToast('Registration successful!', 'success');
+                        this.fetchPortalData(tournamentId); // Refresh data
+                        setTimeout(() => this.showSuccess.set(false), 5000);
                     },
                     error: (err) => {
-                        console.error("Mapping error", err);
-                        this.ui.showToast('Team created but failed to register for tournament.', 'info');
+                        console.error('Error linking team to tournament:', err);
+                        this.ui.showToast('Team registered but failed to join tournament.', 'info');
                         this.isSubmitting.set(false);
                     }
                 });
             },
             error: (err) => {
-                console.error("Team creation error", err);
-                this.ui.showToast('Failed to register. Please try again.', 'error');
+                console.error('Error registering team:', err);
+                this.ui.showToast('Failed to register team.', 'error');
                 this.isSubmitting.set(false);
             }
         });
-    }
-
-    resetForm() {
-        this.regData = {
-            name: '',
-            teamName: '',
-            phone: '',
-            email: '',
-            city: ''
-        };
-    }
-
-    getImageUrl(path?: string): string {
-        if (!path) return 'assets/placeholder-logo.png';
-        if (path.startsWith('http')) return path;
-        return `${environment.apiBaseUrl}${path.startsWith('/') ? '' : '/'}${path}`;
-    }
-
-    scrollToSection(sectionId: string) {
-        const element = document.getElementById(sectionId);
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth' });
-        }
     }
 }

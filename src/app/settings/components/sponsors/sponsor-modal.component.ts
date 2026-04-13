@@ -163,7 +163,7 @@ export class SponsorModalComponent {
     if (this.sponsor) {
       this.form.patchValue(this.sponsor);
       if (this.sponsor.logo) {
-        this.previewUrl = environment.apiBaseUrl.replace('/api', '') + this.sponsor.logo;
+        this.previewUrl = environment.apiUrl.replace('/api', '') + this.sponsor.logo;
       }
     }
   }

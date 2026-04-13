@@ -70,7 +70,7 @@ export interface TopScorer {
 @Injectable({ providedIn: 'root' })
 export class DashboardService {
     private http = inject(HttpClient);
-    private base = `${environment.apiBaseUrl}/api/dashboard`;
+    private base = `${environment.apiUrl}/api/dashboard`;
 
     private get headers(): HttpHeaders {
         const token = localStorage.getItem('token') ?? '';

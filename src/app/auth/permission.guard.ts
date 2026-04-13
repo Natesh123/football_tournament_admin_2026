@@ -18,7 +18,7 @@ export class PermissionGuard implements CanActivate {
 
         // If no permission, redirect to dashboard or access denied
         // Prevent loop if they are already trying to access /dashboard but don't have permission
-        if (state.url === '/dashboard' || state.url === '/') {
+        if (state.url === '/admin/dashboard' || state.url === '/') {
             const firstModule = this.findFirstAvailableModule();
             if (firstModule) {
                 this.router.navigate([firstModule]);
@@ -28,7 +28,7 @@ export class PermissionGuard implements CanActivate {
             return false;
         }
 
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/admin/dashboard']);
         return false;
     }
 
@@ -37,12 +37,12 @@ export class PermissionGuard implements CanActivate {
         if (!user) return null;
 
         // Admin has all modules
-        if (user.roleId === 1) return '/dashboard';
+        if (user.roleId === 1) return '/admin/dashboard';
 
         if (!user.permissions?.module_access) return null;
         const access = user.permissions.module_access;
 
-        if (access.can_dashboard) return '/dashboard';
+        if (access.can_dashboard) return '/admin/dashboard';
         if (access.can_tournaments) return '/tournaments';
         if (access.can_teams) return '/teams';
         if (access.can_settings) return '/settings';

@@ -64,7 +64,7 @@ export class AuthService {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         this.userSignal.set(null);
-        this.router.navigate(['/auth/login']);
+        this.router.navigate(['/login']);
     }
 
     isAuthenticated(): boolean {

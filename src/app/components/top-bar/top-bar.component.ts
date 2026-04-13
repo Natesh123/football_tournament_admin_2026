@@ -115,7 +115,7 @@ export class TopBarComponent {
     }
 
     openProfileModal() {
-        this.showProfileModal.set(true);
+        this.showProfilePopup.set(true);
         this.showProfile.set(false);
     }
 

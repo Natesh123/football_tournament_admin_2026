@@ -151,7 +151,7 @@ export class SponsorsComponent implements OnInit {
   public ui = inject(UiService);
   
   sponsors: Sponsor[] = [];
-  apiUrl = environment.apiBaseUrl.replace('/api', '');
+  apiUrl = environment.apiUrl.replace('/api', '');
   showModal = false;
   selectedSponsor: Sponsor | null = null;
   

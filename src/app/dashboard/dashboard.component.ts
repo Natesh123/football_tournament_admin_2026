@@ -54,7 +54,7 @@ export class DashboardComponent implements OnInit {
 
     constructor(private router: Router, public auth: AuthService) {
         if (!this.auth.isAuthenticated()) {
-            this.router.navigate(['/auth/login']);
+            this.router.navigate(['/login']);
         }
     }
 

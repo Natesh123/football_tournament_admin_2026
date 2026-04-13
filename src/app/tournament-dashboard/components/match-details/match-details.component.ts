@@ -109,7 +109,7 @@ export class MatchDetailsComponent implements OnInit {
 
     loadMatchDetails() {
         this.isLoading.set(true);
-        this.http.get<{ success: boolean, data: any }>(`${environment.apiBaseUrl}/api/matches/${this.matchId()}`).subscribe({
+        this.http.get<{ success: boolean, data: any }>(`${environment.apiUrl}/api/matches/${this.matchId()}`).subscribe({
             next: (res) => {
                 this.match.set(res.data);
                 this.homeScore.set(res.data.homeScore !== undefined ? res.data.homeScore : null);
@@ -198,7 +198,7 @@ export class MatchDetailsComponent implements OnInit {
     }
 
     private fetchPreMatchData() {
-        this.http.get<{ success: boolean, data: any }>(`${environment.apiBaseUrl}/api/matches/${this.matchId()}/lineups`).subscribe({
+        this.http.get<{ success: boolean, data: any }>(`${environment.apiUrl}/api/matches/${this.matchId()}/lineups`).subscribe({
             next: (res) => {
                 if (res.success) {
                     this.lineups.set(res.data);
@@ -207,7 +207,7 @@ export class MatchDetailsComponent implements OnInit {
             error: (err) => console.error("Error fetching lineups", err)
         });
 
-        this.http.get<{ success: boolean, data: any }>(`${environment.apiBaseUrl}/api/matches/${this.matchId()}/h2h`).subscribe({
+        this.http.get<{ success: boolean, data: any }>(`${environment.apiUrl}/api/matches/${this.matchId()}/h2h`).subscribe({
             next: (res) => {
                 if (res.success) {
                     this.h2hData.set(res.data);
@@ -247,7 +247,7 @@ export class MatchDetailsComponent implements OnInit {
     // Handlers
     handleSaveMatchMetadata(data: any) {
         this.ui.startAction();
-        this.http.put<{ success: boolean, data: any }>(`${environment.apiBaseUrl}/api/matches/${this.matchId()}`, data).subscribe({
+        this.http.put<{ success: boolean, data: any }>(`${environment.apiUrl}/api/matches/${this.matchId()}`, data).subscribe({
             next: (res) => {
                 this.match.set(res.data);
                 this.closeEditModal();
@@ -264,7 +264,7 @@ export class MatchDetailsComponent implements OnInit {
 
     handleSaveLineups(lineupsData: { homeLineup: any, awayLineup: any }) {
         this.ui.startAction();
-        this.http.put<{ success: boolean, data: any }>(`${environment.apiBaseUrl}/api/matches/${this.matchId()}`, lineupsData).subscribe({
+        this.http.put<{ success: boolean, data: any }>(`${environment.apiUrl}/api/matches/${this.matchId()}`, lineupsData).subscribe({
             next: (res) => {
                 this.match.set(res.data);
                 this.lineups.set({ homeLineup: lineupsData.homeLineup, awayLineup: lineupsData.awayLineup });
@@ -486,7 +486,7 @@ export class MatchDetailsComponent implements OnInit {
         }
 
         this.ui.startAction();
-        this.http.put<{ success: boolean, data: any }>(`${environment.apiBaseUrl}/api/matches/${this.matchId()}`, {
+        this.http.put<{ success: boolean, data: any }>(`${environment.apiUrl}/api/matches/${this.matchId()}`, {
             status: 'live'
         }).subscribe({
             next: (res) => {
@@ -506,7 +506,7 @@ export class MatchDetailsComponent implements OnInit {
         if (!confirm(this.translate.instant('MATCH_DETAILS.TIMELINE.COMPLETE_CONFIRM_MSG'))) return;
 
         this.ui.startAction();
-        this.http.put<{ success: boolean, data: any }>(`${environment.apiBaseUrl}/api/matches/${this.matchId()}`, {
+        this.http.put<{ success: boolean, data: any }>(`${environment.apiUrl}/api/matches/${this.matchId()}`, {
             status: 'completed'
         }).subscribe({
             next: (res) => {
@@ -530,7 +530,7 @@ export class MatchDetailsComponent implements OnInit {
         }
 
         this.ui.startAction();
-        this.http.post<{ success: boolean, data: any }>(`${environment.apiBaseUrl}/api/matches/${this.matchId()}/result`, {
+        this.http.post<{ success: boolean, data: any }>(`${environment.apiUrl}/api/matches/${this.matchId()}/result`, {
             homeScore: this.homeScore(),
             awayScore: this.awayScore()
         }).subscribe({

@@ -46,7 +46,7 @@ export class MatchStatsComponent implements OnChanges {
 
     loadStats() {
         this.isLoading.set(true);
-        this.http.get<{ success: boolean; data: any }>(`${environment.apiBaseUrl}/api/matches/${this.matchId}/stats`)
+        this.http.get<{ success: boolean; data: any }>(`${environment.apiUrl}/api/matches/${this.matchId}/stats`)
             .subscribe({
                 next: (res) => {
                     if (res.success && res.data?.stats) {
