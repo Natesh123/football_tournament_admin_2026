@@ -5,8 +5,7 @@
         <div class="flex items-center justify-between h-28">
             <!-- Logo -->
             <a routerLink="/admin/dashboard" class="flex items-center gap-4 cursor-pointer">
-                <img src="/images/logo-gold.png" alt="Gold Manager Logo"
-                    class="h-24 w-auto object-contain mix-blend-screen">
+                <img src="/images/logo-gold.png" alt="Gold Manager Logo" class="h-16 w-auto object-contain drop-shadow-md">
                 <span class="text-2xl font-bold tracking-tight text-gold-400 ml-2">ATB SPORTS</span>
             </a>
 
@@ -54,93 +53,6 @@
                     </svg>
                 </label>
 
-                <!-- Notification Bell -->
-                <div class="relative notification-bell">
-                    <button (click)="toggleNotifications()"
-                        class="relative w-10 h-10 rounded-full bg-white/5 border border-gold-400/30 flex items-center justify-center text-gold-400 hover:bg-gold-400/10 hover:border-gold-400 transition-all duration-300">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                        </svg>
-                        <!-- Badge -->
-                        @if (unreadCount > 0) {
-                        <span
-                            class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-[10px] font-bold text-white flex items-center justify-center animate-pulse">
-                            {{ unreadCount }}
-                        </span>
-                        }
-                    </button>
-
-                    <!-- Notification Dropdown -->
-                    @if (showNotifications()) {
-                    <div
-                        class="notification-panel absolute right-0 top-14 w-96 bg-black-card border border-black-border rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.6)] overflow-hidden z-50">
-
-                        <!-- Panel Header -->
-                        <div
-                            class="px-5 py-4 border-b border-black-border bg-gradient-to-r from-black-card to-white/[0.02]">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <h3 class="font-bold text-white text-sm">{{ 'TOPBAR.NOTIFICATIONS' | translate }}
-                                    </h3>
-                                    @if (unreadCount > 0) {
-                                    <span
-                                        class="bg-gold-400/20 text-gold-400 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                                        {{ unreadCount }} {{ 'TOPBAR.NEW' | translate }}
-                                    </span>
-                                    }
-                                </div>
-                                @if (unreadCount > 0) {
-                                <button (click)="markAllAsRead()"
-                                    class="text-[10px] font-bold text-gold-400 uppercase tracking-wider hover:underline">
-                                    {{ 'TOPBAR.MARK_ALL_READ' | translate }}
-                                </button>
-                                }
-                            </div>
-                        </div>
-
-                        <!-- Notification List -->
-                        <div class="max-h-80 overflow-y-auto">
-                            @for (notif of notifications; track notif.id) {
-                            <div (click)="markAsRead(notif.id)"
-                                class="px-5 py-3 flex items-start gap-3 hover:bg-white/[0.03] transition-colors cursor-pointer border-b border-zinc-800/50 last:border-b-0"
-                                [ngClass]="{'bg-gold-400/[0.03]': !notif.read}">
-
-                                <!-- Icon -->
-                                <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 text-sm mt-0.5"
-                                    [ngClass]="getTypeClass(notif.type)">
-                                    {{ notif.icon }}
-                                </div>
-
-                                <!-- Content -->
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-start justify-between gap-2">
-                                        <p class="text-sm font-bold truncate"
-                                            [ngClass]="{'text-white': !notif.read, 'text-zinc-400': notif.read}">
-                                            {{ notif.title }}
-                                        </p>
-                                        @if (!notif.read) {
-                                        <span class="w-2 h-2 rounded-full bg-gold-400 shrink-0 mt-1.5"></span>
-                                        }
-                                    </div>
-                                    <p class="text-xs text-zinc-500 truncate">{{ notif.message }}</p>
-                                    <p class="text-[10px] text-zinc-600 mt-1">{{ notif.time }}</p>
-                                </div>
-                            </div>
-                            }
-                        </div>
-
-                        <!-- Panel Footer -->
-                        <div class="px-5 py-3 border-t border-black-border text-center">
-                            <a href="#"
-                                class="text-xs font-bold text-gold-400 uppercase tracking-wider hover:underline">
-                                {{ 'TOPBAR.VIEW_ALL_NOTIFICATIONS' | translate }}
-                            </a>
-                        </div>
-                    </div>
-                    }
-                </div>
 
                 <!-- DaisyUI Language Select -->
                 <div class="relative group">

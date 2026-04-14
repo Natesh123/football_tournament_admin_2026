@@ -1,19 +1,33 @@
-<main class="min-h-screen bg-navy selection:bg-gold/30 selection:text-white">
+<main class="min-h-screen bg-navy selection:bg-gold/30 selection:text-white overflow-hidden">
+    <div class="scroll-progress" [style.width.%]="scrollProgress()"></div>
+    
     <app-navbar></app-navbar>
 
-    <app-hero [tournamentData]="portalData()?.tournament"></app-hero>
+    <app-hero [tournamentData]="portalData()?.tournament" appScrollReveal [revealDelay]="100"></app-hero>
 
-    <app-about [tournament]="portalData()?.tournament" [presentation]="portalData()?.presentation"></app-about>
+    <div appScrollReveal [revealDelay]="200">
+        <app-about [tournament]="portalData()?.tournament" [presentation]="portalData()?.presentation"></app-about>
+    </div>
 
-    <app-match-schedule [liveMatches]="portalData()?.liveMatches || []"
-        [completedMatches]="portalData()?.completedMatches || []">
-    </app-match-schedule>
+    <div appScrollReveal [revealDelay]="200" [revealThreshold]="0.1">
+        <app-match-schedule [liveMatches]="portalData()?.liveMatches || []"
+            [completedMatches]="portalData()?.completedMatches || []">
+        </app-match-schedule>
+    </div>
 
-    <app-sponsor-banners></app-sponsor-banners>
+    <div appScrollReveal [revealDelay]="100">
+        <app-sponsor-banners></app-sponsor-banners>
+    </div>
 
-    <app-registration-form [isSubmitting]="isSubmitting()" [successMessage]="showSuccess()"
-        (formSubmit)="handleRegistration($event)">
-    </app-registration-form>
+    <div appScrollReveal [revealDelay]="100" class="reveal-scale">
+        <app-mobile-promo></app-mobile-promo>
+    </div>
+
+    <div appScrollReveal [revealDelay]="200" class="reveal-scale" id="register">
+        <app-registration-form [isSubmitting]="isSubmitting()" [successMessage]="showSuccess()"
+            (formSubmit)="handleRegistration($event)">
+        </app-registration-form>
+    </div>
 
     <app-footer></app-footer>
 </main>

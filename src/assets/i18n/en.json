@@ -106,6 +106,7 @@
         "MATCH_LOWER": "match",
         "MATCHES_LOWER": "matches",
         "TEAMS": "Teams",
+        "TOURNAMENTS": "Tournaments",
         "TEAMS_MINIMUM": "Teams Minimum",
         "FORMAT": "Format",
         "CREATE_MODULE": "Create Module",
@@ -135,6 +136,20 @@
             "DETAILS": "Details",
             "STATUS_FT": "FT"
         }
+    },
+    "FOOTER": {
+        "DESCRIPTION": "The ultimate tournament management platform for elite football competitions worldwide.",
+        "QUICK_LINKS": "Quick Links",
+        "DASHBOARD": "Dashboard",
+        "TOURNAMENTS": "Tournaments",
+        "TEAMS": "Teams",
+        "SETTINGS": "Settings",
+        "PRIVACY_POLICY": "Privacy Policy",
+        "SUPPORT": "Support",
+        "CONNECT_WITH_US": "Connect With Us",
+        "ALL_RIGHTS_RESERVED": "All rights reserved.",
+        "TERMS_OF_SERVICE": "Terms of Service",
+        "COOKIE_POLICY": "Cookie Policy"
     },
     "HERO": {
         "TITLE": "Tournament",
@@ -491,6 +506,12 @@
             "VIEW_ALL": "View All Tournaments",
             "EMPTY_TITLE": "No goals scored yet",
             "EMPTY_DESC": "The race starts once matches are played"
+        },
+        "TOP_ORGANIZERS": {
+            "TITLE": "Top Organizers",
+            "SUBTITLE": "By Tournament Count",
+            "EMPTY_TITLE": "No Organizers Found",
+            "EMPTY_DESC": "There are no tournament organizers set up yet."
         },
         "ADMIN_PANEL": {
             "TITLE": "Admin Quick Actions",

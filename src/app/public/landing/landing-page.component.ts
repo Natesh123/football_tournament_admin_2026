@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { NavbarComponent } from './components/navbar/navbar.component';
@@ -8,6 +8,8 @@ import { MatchScheduleComponent } from './components/match-schedule/match-schedu
 import { RegistrationFormComponent } from './components/registration-form/registration-form.component';
 import { SponsorBannersComponent } from './components/sponsor-banners/sponsor-banners.component';
 import { FooterComponent } from './components/footer/footer.component';
+import { MobilePromoComponent } from './components/mobile-promo/mobile-promo.component';
+import { ScrollRevealDirective } from './directives/scroll-reveal.directive';
 import { PublicDataService } from '../../services/public-data.service';
 import { PortalData } from '../../models/portal.model';
 import { UiService } from '../../services/ui.service';
@@ -23,12 +25,14 @@ import { UiService } from '../../services/ui.service';
         MatchScheduleComponent,
         RegistrationFormComponent,
         SponsorBannersComponent,
-        FooterComponent
+        FooterComponent,
+        MobilePromoComponent,
+        ScrollRevealDirective
     ],
     templateUrl: './landing-page.component.html',
     styleUrls: ['./landing-page.component.css']
 })
-export class LandingPageComponent implements OnInit {
+export class LandingPageComponent implements OnInit, OnDestroy {
     private route = inject(ActivatedRoute);
     private dataService = inject(PublicDataService);
     public ui = inject(UiService);
@@ -37,6 +41,9 @@ export class LandingPageComponent implements OnInit {
     isSubmitting = signal(false);
     showSuccess = signal(false);
     defaultTournamentId = 1;
+    
+    scrollProgress = signal(0);
+    private scrollHandler: (() => void) | null = null;
 
     ngOnInit() {
         this.route.paramMap.subscribe(params => {
@@ -54,6 +61,35 @@ export class LandingPageComponent implements OnInit {
                     }
                 });
             }
+        });
+        
+        this.initScrollProgress();
+        this.initSmoothScroll();
+    }
+    
+    private initScrollProgress() {
+        this.scrollHandler = () => {
+            const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            this.scrollProgress.set(scrolled);
+        };
+        
+        window.addEventListener('scroll', this.scrollHandler, { passive: true });
+    }
+    
+    private initSmoothScroll() {
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', (e: Event) => {
+                e.preventDefault();
+                const targetId = (anchor as HTMLAnchorElement).getAttribute('href')?.substring(1);
+                if (targetId) {
+                    const element = document.getElementById(targetId);
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+            });
         });
     }
 
@@ -73,16 +109,14 @@ export class LandingPageComponent implements OnInit {
         const tournamentId = this.portalData()?.tournament?.id || this.defaultTournamentId;
         this.isSubmitting.set(true);
 
-        // Step 1: Register Team
         this.dataService.registerTeam(tournamentId, formData).subscribe({
             next: (team) => {
-                // Step 2: Add Team to Tournament
                 this.dataService.addTeamToTournament(tournamentId, team.id).subscribe({
                     next: () => {
                         this.isSubmitting.set(false);
                         this.showSuccess.set(true);
                         this.ui.showToast('Registration successful!', 'success');
-                        this.fetchPortalData(tournamentId); // Refresh data
+                        this.fetchPortalData(tournamentId);
                         setTimeout(() => this.showSuccess.set(false), 5000);
                     },
                     error: (err) => {
@@ -98,5 +132,11 @@ export class LandingPageComponent implements OnInit {
                 this.isSubmitting.set(false);
             }
         });
+    }
+    
+    ngOnDestroy() {
+        if (this.scrollHandler) {
+            window.removeEventListener('scroll', this.scrollHandler);
+        }
     }
 }

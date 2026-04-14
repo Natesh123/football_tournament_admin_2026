@@ -63,7 +63,7 @@ import { TranslateModule } from '@ngx-translate/core';
               </div>
               <div class="space-y-1">
                 <label class="text-[10px] text-zinc-500 uppercase font-black tracking-widest">Phone Number</label>
-                <div class="w-full bg-black-bg border border-black-border rounded-lg px-4 py-2.5 text-zinc-300 font-medium">{{ user?.phone_number }}</div>
+                <div class="w-full bg-black-bg border border-black-border rounded-lg px-4 py-2.5 text-zinc-300 font-medium opacity-80">{{ user?.phone_number || user?.phone || 'Not Provided' }}</div>
               </div>
               <div class="space-y-1 opacity-60">
                 <label class="text-[10px] text-zinc-500 uppercase font-black tracking-widest">Role</label>

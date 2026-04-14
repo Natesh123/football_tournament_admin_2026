@@ -28,16 +28,37 @@ export class WidgetsComponent implements OnInit {
     }
 
 
+    topOrganizers = signal<{ rank: number; name: string; email: string; tournamentsCount: number }[]>([]);
+    isLoadingOrganizers = signal(true);
+
     ngOnInit() {
-        this.dashboardService.getTopScorers().subscribe({
-            next: (data) => {
-                this.topScorers.set(data);
-                this.isLoadingScorers.set(false);
-            },
-            error: () => {
-                this.isLoadingScorers.set(false);
-            }
-        });
+        if (this.isOrganizer()) {
+            this.dashboardService.getTopScorers().subscribe({
+                next: (data) => {
+                    this.topScorers.set(data);
+                    this.isLoadingScorers.set(false);
+                },
+                error: () => {
+                    this.isLoadingScorers.set(false);
+                }
+            });
+        } else {
+            this.isLoadingScorers.set(false);
+        }
+
+        if (this.isAdmin()) {
+            this.dashboardService.getTopOrganizers().subscribe({
+                next: (data) => {
+                    this.topOrganizers.set(data);
+                    this.isLoadingOrganizers.set(false);
+                },
+                error: () => {
+                    this.isLoadingOrganizers.set(false);
+                }
+            });
+        } else {
+            this.isLoadingOrganizers.set(false);
+        }
     }
 
     getFormClass(result: string): string {

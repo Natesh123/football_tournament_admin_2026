@@ -124,7 +124,7 @@
                                         <img *ngIf="match.homeTeamLogo" [src]="match.homeTeamLogo"
                                             class="w-full h-full object-contain">
                                         <span *ngIf="!match.homeTeamLogo" class="text-lg text-zinc-600 font-black">{{
-                                            match.homeTeamName?.substring(0,3) || 'TBD' }}</span>
+                                            match.homeTeamName ? match.homeTeamName.substring(0,3) : 'TBD' }}</span>
                                     </div>
                                     <span
                                         class="font-black text-xl md:text-2xl truncate max-w-[120px] md:max-w-[160px]">{{
@@ -142,7 +142,7 @@
                                         <img *ngIf="match.awayTeamLogo" [src]="match.awayTeamLogo"
                                             class="w-full h-full object-contain">
                                         <span *ngIf="!match.awayTeamLogo" class="text-lg text-zinc-600 font-black">{{
-                                            match.awayTeamName?.substring(0,3) || 'TBD' }}</span>
+                                            match.awayTeamName ? match.awayTeamName.substring(0,3) : 'TBD' }}</span>
                                     </div>
                                     <span
                                         class="font-black text-xl md:text-2xl truncate max-w-[120px] md:max-w-[160px]">{{
@@ -206,7 +206,7 @@
                                             <img *ngIf="team.teamLogo" [src]="team.teamLogo"
                                                 class="w-full h-full object-cover" />
                                             <span *ngIf="!team.teamLogo" class="text-xs text-zinc-600 font-black">{{
-                                                team.teamName?.substring(0,2) }}</span>
+                                                team.teamName ? team.teamName.substring(0,2) : '' }}</span>
                                         </div>
                                         {{ team.teamName }}
                                     </td>

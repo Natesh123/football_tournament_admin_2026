@@ -5,11 +5,12 @@ import { SponsorService, Sponsor, TournamentSponsor } from '../../../settings/se
 import { UiService } from '../../../services/ui.service';
 import { environment } from '../../../../environments/environment';
 import { ConfirmModalComponent } from '../../../components/shared/confirm-modal.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-tournament-sponsors',
   standalone: true,
-  imports: [CommonModule, FormsModule, ConfirmModalComponent],
+  imports: [CommonModule, FormsModule, ConfirmModalComponent, TranslateModule],
   templateUrl: './tournament-sponsors.component.html'
 })
 export class TournamentSponsorsComponent implements OnInit, OnChanges {

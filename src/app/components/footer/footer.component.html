@@ -12,35 +12,34 @@
                     <span class="text-lg font-bold tracking-tight text-gold-400">ATB SPORT</span>
                 </div>
                 <p class="text-sm text-zinc-500 leading-relaxed max-w-xs">
-                    The ultimate tournament management platform for elite football competitions worldwide.
+                    {{ 'FOOTER.DESCRIPTION' | translate }}
                 </p>
             </div>
 
             <!-- Quick Links -->
             <div>
-                <h4 class="text-[11px] font-bold text-gold-400 uppercase tracking-widest mb-4">Quick Links</h4>
+                <h4 class="text-[11px] font-bold text-gold-400 uppercase tracking-widest mb-4">{{ 'FOOTER.QUICK_LINKS' | translate }}</h4>
                 <div class="grid grid-cols-2 gap-2">
-                    <a href="#"
-                        class="text-sm text-zinc-500 hover:text-gold-400 transition-colors duration-200">Dashboard</a>
-                    <a href="#"
-                        class="text-sm text-zinc-500 hover:text-gold-400 transition-colors duration-200">Tournaments</a>
-                    <a href="#"
-                        class="text-sm text-zinc-500 hover:text-gold-400 transition-colors duration-200">Teams</a>
-                    <a href="#"
-                        class="text-sm text-zinc-500 hover:text-gold-400 transition-colors duration-200">Settings</a>
-                    <a href="#" class="text-sm text-zinc-500 hover:text-gold-400 transition-colors duration-200">Privacy
-                        Policy</a>
-                    <a href="#"
-                        class="text-sm text-zinc-500 hover:text-gold-400 transition-colors duration-200">Support</a>
+                    <a routerLink="/admin/dashboard"
+                        class="text-sm text-zinc-500 hover:text-gold-400 transition-colors duration-200 cursor-pointer">{{ 'FOOTER.DASHBOARD' | translate }}</a>
+                    <a routerLink="/admin/tournaments"
+                        class="text-sm text-zinc-500 hover:text-gold-400 transition-colors duration-200 cursor-pointer">{{ 'FOOTER.TOURNAMENTS' | translate }}</a>
+                    <a routerLink="/admin/teams"
+                        class="text-sm text-zinc-500 hover:text-gold-400 transition-colors duration-200 cursor-pointer">{{ 'FOOTER.TEAMS' | translate }}</a>
+                    <a routerLink="/admin/settings"
+                        class="text-sm text-zinc-500 hover:text-gold-400 transition-colors duration-200 cursor-pointer">{{ 'FOOTER.SETTINGS' | translate }}</a>
+                    <a routerLink="/privacy" class="text-sm text-zinc-500 hover:text-gold-400 transition-colors duration-200 cursor-pointer">{{ 'FOOTER.PRIVACY_POLICY' | translate }}</a>
+                    <a routerLink="/support"
+                        class="text-sm text-zinc-500 hover:text-gold-400 transition-colors duration-200 cursor-pointer">{{ 'FOOTER.SUPPORT' | translate }}</a>
                 </div>
             </div>
 
             <!-- Social & Contact -->
             <div>
-                <h4 class="text-[11px] font-bold text-gold-400 uppercase tracking-widest mb-4">Connect With Us</h4>
+                <h4 class="text-[11px] font-bold text-gold-400 uppercase tracking-widest mb-4">{{ 'FOOTER.CONNECT_WITH_US' | translate }}</h4>
                 <div class="flex gap-3 mb-4">
                     <!-- Instagram -->
-                    <a href="#"
+                    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"
                         class="h-9 w-9 bg-white/5 border border-black-border rounded-lg flex items-center justify-center text-zinc-500 hover:bg-gold-400/10 hover:text-gold-400 hover:border-gold-400/30 transition-all duration-300 group">
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                             <path
@@ -48,7 +47,7 @@
                         </svg>
                     </a>
                     <!-- X / Twitter -->
-                    <a href="#"
+                    <a href="https://x.com" target="_blank" rel="noopener noreferrer"
                         class="h-9 w-9 bg-white/5 border border-black-border rounded-lg flex items-center justify-center text-zinc-500 hover:bg-gold-400/10 hover:text-gold-400 hover:border-gold-400/30 transition-all duration-300 group">
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                             <path
@@ -56,7 +55,7 @@
                         </svg>
                     </a>
                     <!-- YouTube -->
-                    <a href="#"
+                    <a href="https://youtube.com" target="_blank" rel="noopener noreferrer"
                         class="h-9 w-9 bg-white/5 border border-black-border rounded-lg flex items-center justify-center text-zinc-500 hover:bg-gold-400/10 hover:text-gold-400 hover:border-gold-400/30 transition-all duration-300 group">
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                             <path
@@ -64,7 +63,7 @@
                         </svg>
                     </a>
                     <!-- LinkedIn -->
-                    <a href="#"
+                    <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer"
                         class="h-9 w-9 bg-white/5 border border-black-border rounded-lg flex items-center justify-center text-zinc-500 hover:bg-gold-400/10 hover:text-gold-400 hover:border-gold-400/30 transition-all duration-300 group">
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                             <path
@@ -79,14 +78,14 @@
         <!-- Bottom Bar -->
         <div class="border-t border-zinc-800/50 py-5 flex flex-col md:flex-row items-center justify-between gap-3">
             <p class="text-xs text-zinc-600">
-                &copy; 2026 ATB Sport. All rights reserved.
+                &copy; 2026 ATB Sport. {{ 'FOOTER.ALL_RIGHTS_RESERVED' | translate }}
             </p>
             <div class="flex items-center gap-4 text-[10px] text-zinc-600">
-                <a href="#" class="hover:text-gold-400 transition-colors">Terms of Service</a>
+                <a routerLink="/terms" class="hover:text-gold-400 transition-colors cursor-pointer">{{ 'FOOTER.TERMS_OF_SERVICE' | translate }}</a>
                 <span class="w-1 h-1 rounded-full bg-zinc-700"></span>
-                <a href="#" class="hover:text-gold-400 transition-colors">Privacy Policy</a>
+                <a routerLink="/privacy" class="hover:text-gold-400 transition-colors cursor-pointer">{{ 'FOOTER.PRIVACY_POLICY' | translate }}</a>
                 <span class="w-1 h-1 rounded-full bg-zinc-700"></span>
-                <a href="#" class="hover:text-gold-400 transition-colors">Cookie Policy</a>
+                <a routerLink="/cookie" class="hover:text-gold-400 transition-colors cursor-pointer">{{ 'FOOTER.COOKIE_POLICY' | translate }}</a>
             </div>
         </div>
     </div>

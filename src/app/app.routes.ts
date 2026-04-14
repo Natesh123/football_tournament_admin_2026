@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { AuthGuard } from './auth/auth.guard';
+import { NoAuthGuard } from './auth/no-auth.guard';
 import { MainLayoutComponent } from './components/main-layout/main-layout.component';
 
 export const routes: Routes = [
@@ -13,19 +14,22 @@ export const routes: Routes = [
     },
     {
         path: 'landing',
-        loadComponent: () => import('./public/landing/landing-page.component').then(m => m.LandingPageComponent)
+        canActivate: [NoAuthGuard],
+        loadComponent: () => import('./public/landing/components/premium-landing/premium-landing.component').then(m => m.PremiumLandingComponent)
     },
     {
         path: '',
-        redirectTo: 'landing',
-        pathMatch: 'full'
+        canActivate: [NoAuthGuard],
+        loadComponent: () => import('./public/landing/components/premium-landing/premium-landing.component').then(m => m.PremiumLandingComponent)
     },
     {
         path: 'login',
+        canActivate: [NoAuthGuard],
         loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent)
     },
     {
         path: 'register',
+        canActivate: [NoAuthGuard],
         loadComponent: () => import('./auth/register/register.component').then(m => m.RegisterComponent)
     },
     {
@@ -79,5 +83,14 @@ export const routes: Routes = [
 
     // { path: 'auth', loadChildren: () => import('./auth/auth-module').then(m => m.AuthModule) },
     // { path: 'dashboard', loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent) },
-    { path: '**', redirectTo: '' }
+
+    // Error Pages
+    {
+        path: '500',
+        loadComponent: () => import('./public/errors/server-error/server-error.component').then(m => m.ServerErrorComponent)
+    },
+    {
+        path: '**',
+        loadComponent: () => import('./public/errors/not-found/not-found.component').then(m => m.NotFoundComponent)
+    }
 ];

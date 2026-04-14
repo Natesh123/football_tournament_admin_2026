@@ -101,4 +101,9 @@ export class DashboardService {
         return this.http.get<{ success: boolean; data: TopScorer[] }>(`${this.base}/scorers`, { headers: this.headers })
             .pipe(map(r => r.data));
     }
+
+    getTopOrganizers(): Observable<{ rank: number; name: string; email: string; tournamentsCount: number }[]> {
+        return this.http.get<{ success: boolean; data: any[] }>(`${this.base}/top-organizers`, { headers: this.headers })
+            .pipe(map(r => r.data));
+    }
 }
