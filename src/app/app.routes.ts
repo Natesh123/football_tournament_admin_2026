@@ -33,6 +33,11 @@ export const routes: Routes = [
         loadComponent: () => import('./auth/register/register.component').then(m => m.RegisterComponent)
     },
     {
+        path: 'otp',
+        canActivate: [NoAuthGuard],
+        loadComponent: () => import('./auth/otp/otp.component').then(m => m.OtpComponent)
+    },
+    {
         path: 'admin',
         component: MainLayoutComponent,
         canActivate: [AuthGuard],

@@ -79,7 +79,7 @@ export class RegisterComponent {
                     this.successMessage = res.message || 'OTP sent to your email';
                     // Navigate to OTP page after a brief delay
                     setTimeout(() => {
-                        this.router.navigate(['/auth/otp']);
+                        this.router.navigate(['/otp']);
                     }, 1500);
                 },
                 error: (err) => {
