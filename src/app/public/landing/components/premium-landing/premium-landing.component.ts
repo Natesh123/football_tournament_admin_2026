@@ -203,20 +203,18 @@ gsap.registerPlugin(ScrollTrigger);
           </div>
           
           <!-- Main Headline -->
-          <h1 class="hero-title text-7xl md:text-8xl lg:text-[120px] font-black leading-none tracking-tighter mb-8">
+          <!-- Main Headline -->
+          <h1 class="hero-title text-5xl md:text-6xl lg:text-[85px] font-black leading-[1.1] tracking-tighter mb-10">
             <span class="block text-white mb-2">ORGANIZE.</span>
-            <span class="block bg-gradient-to-r from-[#D4AF37] via-[#F4D03F] to-[#D4AF37] bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">COMPETE.</span>
+            <span class="block bg-gradient-to-r from-[#D4AF37] via-[#F4D03F] to-[#D4AF37] bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient mb-2">COMPETE.</span>
             <span class="block text-white/80 mt-2">CONQUER.</span>
           </h1>
           
-          <!-- Subtitle -->
-          <p class="hero-subtitle text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed">
-            The world's most advanced football tournament platform. 
-            Create epic competitions, manage teams, and deliver unforgettable experiences.
-          </p>
+      
           
           <!-- CTA Buttons -->
-          <div class="hero-buttons flex flex-col sm:flex-row items-center justify-center gap-5 mb-20">
+          <!-- CTA Buttons -->
+          <div class="hero-buttons flex flex-col sm:flex-row items-center justify-start gap-6 mb-20 sm:ml-10 lg:ml-[15%]">
             <a href="/register" class="group relative px-10 py-5 bg-gradient-to-r from-[#D4AF37] to-[#F4D03F] text-black font-bold text-lg rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-[0_0_50px_rgba(212,175,55,0.5)] hover:scale-105">
               <span class="relative z-10 flex items-center">
                 Start Free Trial
