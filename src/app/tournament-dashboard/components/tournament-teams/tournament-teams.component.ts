@@ -31,6 +31,7 @@ interface TournamentTeam {
 })
 export class TournamentTeamsComponent implements OnInit, OnChanges {
     @Input() tournamentId!: string;
+    @Input() maxTeams: number = 16;
 
     private http = inject(HttpClient);
     public ui = inject(UiService);
@@ -75,6 +76,9 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
                 (team.city && team.city.toLowerCase().includes(query));
         });
     });
+
+    remainingSlots = computed(() => this.maxTeams - this.teams().length);
+    isTeamLimitReached = computed(() => this.teams().length >= this.maxTeams);
 
     ngOnInit() {
         if (this.tournamentId) {
@@ -121,6 +125,10 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
     }
 
     openModal() {
+        if (this.isTeamLimitReached()) {
+            this.ui.showToast('TOURNAMENT_DASHBOARD.TOAST.MAX_TEAMS_REACHED', 'error');
+            return;
+        }
         this.newTeam.set({
             name: '',
             shortName: '',
@@ -154,6 +162,12 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
         if (this.modalMode() === 'existing') {
             const teamIds = this.selectedExistingTeamIds();
             if (!teamIds || teamIds.length === 0) return;
+
+            // Check max teams limit
+            if (this.teams().length + teamIds.length > this.maxTeams) {
+                this.ui.showToast('TOURNAMENT_DASHBOARD.TOAST.MAX_TEAMS_EXCEEDED', 'error');
+                return;
+            }
 
             this.ui.startAction();
             this.http.post<{ success: boolean, data: TournamentTeam[] }>(`${API_URL}/api/tournaments/${this.tournamentId}/teams/bulk`, { teamIds })

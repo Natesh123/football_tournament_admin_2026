@@ -164,9 +164,9 @@
 
             <!-- Actions -->
             <div class="flex items-center gap-3">
-                <button (click)="discardChanges()" [disabled]="isLoading()"
+                <button (click)="closeDashboard()" [disabled]="isLoading()"
                     class="px-5 py-2 rounded-lg border border-black-border text-zinc-400 hover:text-white hover:border-zinc-500 font-bold text-sm transition-all disabled:opacity-30">
-                    {{ 'TOURNAMENT_DASHBOARD.HEADER.DISCARD' | translate }}
+                    {{ 'COMMON.CLOSE' | translate }}
                 </button>
                 <button (click)="saveChanges()" [disabled]="ui.isLoadingAction() || isLoading()"
                     class="px-5 py-2 rounded-lg bg-gold-400 hover:bg-gold-400/90 text-black font-bold text-sm transition-all hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] disabled:opacity-40 flex items-center gap-2">
@@ -188,26 +188,8 @@
 
         <!-- Skeleton Content (shown while loading) -->
         @if (isLoading()) {
-        <div class="p-8 space-y-8">
-            <div class="space-y-3">
-                <div class="h-8 w-64 skeleton"></div>
-                <div class="h-4 w-96 skeleton opacity-50"></div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="h-48 rounded-2xl skeleton opacity-30"></div>
-                <div class="h-48 rounded-2xl skeleton opacity-30"></div>
-            </div>
-
-            <div class="space-y-4">
-                <div class="h-10 w-48 skeleton"></div>
-                <div class="h-64 rounded-2xl skeleton opacity-20"></div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="h-40 rounded-2xl skeleton opacity-20"></div>
-                <div class="h-40 rounded-2xl skeleton opacity-20"></div>
-            </div>
+        <div class="h-[calc(100vh-64px)] flex items-center justify-center">
+            <app-loader></app-loader>
         </div>
         }
 
@@ -215,7 +197,8 @@
         @if (!isLoading() && tournament()) {
         <div class="p-8">
             @if (activeTab() === 'general') {
-            <app-tournament-general [data]="settings.general"></app-tournament-general>
+            <app-tournament-general [data]="settings.general"
+                [showValidationErrors]="showValidationErrors()"></app-tournament-general>
             }
 
             @if (activeTab() === 'participants') {
@@ -223,7 +206,7 @@
             }
 
             @if (activeTab() === 'teams') {
-            <app-tournament-teams [tournamentId]="tournament()?.id || ''"></app-tournament-teams>
+            <app-tournament-teams [tournamentId]="tournament()?.id || ''" [maxTeams]="settings.participants.maxTeams"></app-tournament-teams>
             }
 
             @if (activeTab() === 'matches') {
@@ -237,8 +220,8 @@
             }
 
             @if (activeTab() === 'schedule') {
-            <app-tournament-schedule [data]="settings.schedule"
-                [tournamentId]="tournament()?.id || ''"></app-tournament-schedule>
+            <app-tournament-schedule [data]="settings.schedule" [tournamentId]="tournament()?.id || ''"
+                [showValidationErrors]="showValidationErrors()"></app-tournament-schedule>
             }
 
             @if (activeTab() === 'rules') {

@@ -2,11 +2,12 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SettingsService } from '../../settings.service';
+import { LoaderComponent } from '../../../components/loader/loader.component';
 
 @Component({
   selector: 'app-roles',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoaderComponent],
   template: `
     <div class="space-y-6">
       <div class="flex items-center justify-between">
@@ -39,7 +40,12 @@ import { SettingsService } from '../../settings.service';
         <div class="p-4 border-b border-black-border bg-white/5">
           <h3 class="font-semibold text-white">Existing Roles</h3>
         </div>
-        <div class="p-0">
+        <div class="p-0 relative min-h-[200px]">
+          @if (isFetchingData()) {
+            <div class="absolute inset-0 flex items-center justify-center">
+              <app-loader></app-loader>
+            </div>
+          } @else {
           <table class="w-full text-left">
             <thead>
               <tr class="text-zinc-400 text-sm border-b border-black-border">
@@ -61,6 +67,7 @@ import { SettingsService } from '../../settings.service';
               </tr>
             </tbody>
           </table>
+          }
         </div>
       </div>
     </div>
@@ -70,6 +77,7 @@ export class RolesComponent implements OnInit {
   roles = signal<any[]>([]);
   newRoleName = '';
   isLoading = false;
+  isFetchingData = signal(true);
   errorMessage = '';
 
   constructor(private settingsService: SettingsService) { }
@@ -79,9 +87,16 @@ export class RolesComponent implements OnInit {
   }
 
   loadRoles() {
+    this.isFetchingData.set(true);
     this.settingsService.getRoles().subscribe({
-      next: (data) => this.roles.set(data),
-      error: (err) => console.error('Error loading roles:', err)
+      next: (data) => {
+        this.roles.set(data);
+        this.isFetchingData.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading roles:', err);
+        this.isFetchingData.set(false);
+      }
     });
   }
 

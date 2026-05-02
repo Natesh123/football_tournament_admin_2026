@@ -581,6 +581,7 @@
                 "NAME": "Tournament Name",
                 "SHORT_NAME": "Short Name (Acronym)",
                 "TYPE": "Tournament Type",
+                "SELECT_TYPE": "Select Tournament Type",
                 "DESCRIPTION": "Public Description",
                 "ORGANIZER_DETAILS": "Organizer Details",
                 "ORG_NAME": "Name",
@@ -990,6 +991,8 @@
             "MAPPING_ERROR": "Created team but failed to add to tournament.",
             "REMOVE_TEAM_SUCCESS": "Team removed from tournament successfully.",
             "REMOVE_TEAM_ERROR": "Failed to remove team.",
+            "MAX_TEAMS_REACHED": "Maximum team limit reached. Cannot add more teams.",
+            "MAX_TEAMS_EXCEEDED": "Adding these teams would exceed the maximum team limit.",
             "MATCH_UPDATE_SUCCESS": "Match schedule updated successfully!",
             "MATCH_UPDATE_ERROR": "Failed to update match schedule."
         },

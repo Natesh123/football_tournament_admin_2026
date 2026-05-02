@@ -1,4 +1,4 @@
-import { Component, Input, ChangeDetectorRef, inject, HostListener, ElementRef, ViewChild } from '@angular/core';
+import { Component, Input, ChangeDetectorRef, inject, HostListener, ElementRef, ViewChild, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { API_URL } from '../../../core/config/app.config';
@@ -14,10 +14,40 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     ],
     templateUrl: './tournament-general.component.html'
 })
-export class TournamentGeneralComponent {
+export class TournamentGeneralComponent implements OnInit, OnChanges {
     private translate = inject(TranslateService);
     @Input() data: any;
+    @Input() showValidationErrors = false;
     private cdr = inject(ChangeDetectorRef);
+
+    ngOnInit() {
+        this.applyDefaults();
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes['data']) {
+            this.applyDefaults();
+        }
+    }
+
+    private validTypes = ['futsal', '7aside', '11aside', 'custom'];
+
+    private applyDefaults() {
+        if (this.data && !this.validTypes.includes(this.data.type)) {
+            this.data.type = '11aside';
+            this.cdr.markForCheck();
+        }
+    }
+
+    get selectedType(): string {
+        return this.validTypes.includes(this.data?.type) ? this.data.type : '11aside';
+    }
+
+    set selectedType(value: string) {
+        if (this.data) {
+            this.data.type = value;
+        }
+    }
 
     availableSponsors = [
         'Nike', 'Adidas', 'Puma', 'Under Armour', 'Red Bull',

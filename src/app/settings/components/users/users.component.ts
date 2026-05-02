@@ -5,11 +5,12 @@ import { SettingsService } from '../../settings.service';
 import { ConfirmModalComponent } from '../../../components/shared/confirm-modal.component';
 import { ProfileModalComponent } from '../../../components/shared/profile-modal.component';
 import { UiService } from '../../../services/ui.service';
+import { LoaderComponent } from '../../../components/loader/loader.component';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, ConfirmModalComponent, ProfileModalComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, ConfirmModalComponent, ProfileModalComponent, LoaderComponent],
   template: `
     <div class="space-y-6">
       <div class="flex items-center justify-between">
@@ -127,7 +128,12 @@ import { UiService } from '../../../services/ui.service';
           <span class="font-bold text-lg text-white">System Users</span>
           <span class="text-xs text-zinc-500 uppercase font-bold tracking-widest">{{ users().length }} total users</span>
         </div>
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto min-h-[300px] relative">
+          @if (isFetchingData()) {
+            <div class="absolute inset-0 flex items-center justify-center">
+              <app-loader></app-loader>
+            </div>
+          } @else {
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="text-zinc-500 text-[10px] uppercase font-bold tracking-[0.2em] border-b border-black-border bg-black/20">
@@ -185,6 +191,7 @@ import { UiService } from '../../../services/ui.service';
               </tr>
             </tbody>
           </table>
+          }
         </div>
       </div>
       <app-confirm-modal
@@ -233,6 +240,8 @@ export class UsersComponent implements OnInit {
     }
   }
 
+  isFetchingData = signal(true);
+
   constructor(
     private fb: FormBuilder,
     private settingsService: SettingsService,
@@ -252,9 +261,19 @@ export class UsersComponent implements OnInit {
   }
 
   loadData() {
-    this.settingsService.getUsers().subscribe(data => this.users.set(data));
-    this.settingsService.getRoles().subscribe(data => {
-      this.roles.set(data.filter((r: any) => r.id !== 1));
+    this.isFetchingData.set(true);
+    this.settingsService.getUsers().subscribe({
+      next: (data) => {
+        this.users.set(data);
+        this.settingsService.getRoles().subscribe({
+          next: (rolesData) => {
+            this.roles.set(rolesData.filter((r: any) => r.id !== 1));
+            this.isFetchingData.set(false);
+          },
+          error: () => this.isFetchingData.set(false)
+        });
+      },
+      error: () => this.isFetchingData.set(false)
     });
   }
 

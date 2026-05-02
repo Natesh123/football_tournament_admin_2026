@@ -6,11 +6,12 @@ import { TeamService, Team } from './team.service';
 import { CreateTeamModalComponent } from './components/create-team-modal/create-team-modal.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { API_URL } from '../core/config/app.config';
+import { LoaderComponent } from '../components/loader/loader.component';
 
 @Component({
   selector: 'app-teams',
   standalone: true,
-  imports: [CommonModule, FormsModule, CreateTeamModalComponent, TranslateModule],
+  imports: [CommonModule, FormsModule, CreateTeamModalComponent, TranslateModule, LoaderComponent],
   template: `
     <div class="space-y-6">
       <!-- Header -->
@@ -41,8 +42,13 @@ import { API_URL } from '../core/config/app.config';
       </div>
 
       <!-- Teams Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        @for (team of teams(); track team.id) {
+      @if (isLoading()) {
+        <div class="h-64 flex items-center justify-center">
+          <app-loader></app-loader>
+        </div>
+      } @else {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          @for (team of teams(); track team.id) {
           <div (click)="openTeamDashboard(team.id)" class="group bg-black-card border border-black-border hover:border-gold-400/50 rounded-2xl p-5 transition-all duration-300 hover:shadow-xl hover:shadow-gold-400/5 hover:-translate-y-1 cursor-pointer">
             <div class="flex items-start justify-between mb-4">
               <div class="w-16 h-16 rounded-xl bg-black-main border border-black-border flex items-center justify-center overflow-hidden shrink-0 group-hover:border-gold-400/30 transition-colors">
@@ -78,6 +84,7 @@ import { API_URL } from '../core/config/app.config';
           </div>
         }
       </div>
+      }
     </div>
 
     <!-- Create Modal -->
@@ -93,6 +100,7 @@ export class TeamsComponent {
   private router = inject(Router);
 
   teams = signal<Team[]>([]);
+  isLoading = signal(true);
   searchQuery = '';
   isCreateModalOpen = signal(false);
 
@@ -101,9 +109,16 @@ export class TeamsComponent {
   }
 
   loadTeams() {
+    this.isLoading.set(true);
     this.teamService.getAll(this.searchQuery).subscribe({
-      next: (data) => this.teams.set(data),
-      error: (err) => console.error('Failed to load teams', err)
+      next: (data) => {
+        this.teams.set(data);
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Failed to load teams', err);
+        this.isLoading.set(false);
+      }
     });
   }
 

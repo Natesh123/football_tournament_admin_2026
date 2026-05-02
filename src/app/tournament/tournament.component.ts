@@ -240,7 +240,7 @@ export class TournamentComponent implements OnInit {
                 this.closeCreateModal();
                 this.showToast('Tournament created successfully!', 'success');
                 // Navigate to the tournament dashboard
-                this.router.navigate(['/tournaments', created.id]);
+                this.router.navigate(['/admin/tournaments', created.id]);
             },
             error: (err) => {
                 console.error('Failed to create tournament:', err);

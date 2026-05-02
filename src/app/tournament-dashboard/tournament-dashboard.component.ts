@@ -151,18 +151,19 @@ export class TournamentDashboardComponent implements OnInit {
     isLoading = signal(true);
     activeTab = signal<string>('general');
     formatChanged = false;
+    showValidationErrors = signal(false);
 
     settings: TournamentSettings = this.getDefaultSettings();
 
     sidebarItems = [
         { id: 'general', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.GENERAL', icon: 'settings' },
         { id: 'participants', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.PARTICIPANTS', icon: 'users' },
-        { id: 'teams', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.TEAMS', icon: 'shield' },
-        { id: 'matches', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.MATCHES', icon: 'list' },
         { id: 'format', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.FORMAT', icon: 'grid' },
-        { id: 'schedule', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.SCHEDULE', icon: 'calendar' },
+        { id: 'teams', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.TEAMS', icon: 'shield' },
         { id: 'rules', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.RULES', icon: 'scale-balanced' },
         { id: 'venues', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.VENUES', icon: 'map-pin' },
+        { id: 'schedule', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.SCHEDULE', icon: 'calendar' },
+        { id: 'matches', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.MATCHES', icon: 'list' },
         { id: 'finance', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.FINANCE', icon: 'coins' },
         { id: 'presentation', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.PRESENTATION', icon: 'monitor' },
         { id: 'sponsors', label: 'Sponsors', icon: 'list' },
@@ -178,8 +179,33 @@ export class TournamentDashboardComponent implements OnInit {
         });
     }
 
-    setActiveTab(tabId: string) {
+    setActiveTab(tabId: string, skipSave = false) {
+        if (skipSave) {
+            this.setTab(tabId);
+            return;
+        }
+
+        // Enforce validation before allowing tab switch
+        if (!this.settings.general.name || !this.settings.general.type || !this.settings.schedule.startDate || !this.settings.schedule.endDate) {
+            this.showValidationErrors.set(true);
+            this.ui.showToast('Please fill all mandatory fields before proceeding.', 'error');
+
+            // Stay on or navigate to the tab with missing fields
+            if (!this.settings.general.name || !this.settings.general.type) {
+                if (this.activeTab() !== 'general') this.setTab('general');
+            } else if (!this.settings.schedule.startDate || !this.settings.schedule.endDate) {
+                if (this.activeTab() !== 'schedule') this.setTab('schedule');
+            }
+            return; // Prevent navigating to the requested tab
+        }
+
+        this.showValidationErrors.set(false);
         this.syncRegFee();
+
+        // Auto-save changes silently in the background
+        this.saveChanges(true);
+
+        // Switch immediately for a smooth UX
         this.setTab(tabId);
     }
 
@@ -193,9 +219,10 @@ export class TournamentDashboardComponent implements OnInit {
     }
 
     getDefaultSettings(): TournamentSettings {
+        const today = new Date().toISOString().split('T')[0];
         return {
             general: {
-                name: '',
+                name: 'New Tournament',
                 shortName: '',
                 description: '',
                 status: 'draft',
@@ -234,8 +261,8 @@ export class TournamentDashboardComponent implements OnInit {
                 qualRules: 'Top 2 Advance'
             },
             schedule: {
-                startDate: '',
-                endDate: '',
+                startDate: today,
+                endDate: today,
                 matchDuration: 90,
                 halfDuration: 45,
                 breakTime: 15,
@@ -292,8 +319,12 @@ export class TournamentDashboardComponent implements OnInit {
         this.tournamentService.getById(id).subscribe({
             next: (tournament) => {
                 this.tournament.set(tournament);
-                this.mergeTournamentToSettings(tournament);
+                const hadMissingDefaults = this.mergeTournamentToSettings(tournament);
                 this.isLoading.set(false);
+                // Auto-save if we had to inject default values so the DB is consistent
+                if (hadMissingDefaults) {
+                    this.saveChanges(true);
+                }
             },
             error: (err) => {
                 console.error('Failed to load tournament:', err);
@@ -302,15 +333,48 @@ export class TournamentDashboardComponent implements OnInit {
         });
     }
 
-    mergeTournamentToSettings(tournament: TournamentDTO) {
-        this.settings.general.name = tournament.name;
+    mergeTournamentToSettings(tournament: TournamentDTO): boolean {
+        const today = new Date().toISOString().split('T')[0];
+        let injectedDefaults = false;
+
+        // ── Mandatory fields: inject smart defaults if missing ──────────────
+        const rawName = tournament.name?.trim();
+        if (!rawName || rawName === 'null' || rawName === 'undefined') {
+            this.settings.general.name = 'New Tournament';
+            injectedDefaults = true;
+        } else {
+            this.settings.general.name = rawName;
+        }
+
+        const rawType = tournament.type?.trim();
+        if (!rawType || rawType === 'null' || rawType === 'undefined') {
+            this.settings.general.type = '11aside';
+            injectedDefaults = true;
+        } else {
+            this.settings.general.type = rawType;
+        }
+
+        const rawStart = tournament.startDate?.split('T')[0];
+        if (!rawStart || rawStart === 'null') {
+            this.settings.schedule.startDate = today;
+            injectedDefaults = true;
+        } else {
+            this.settings.schedule.startDate = rawStart;
+        }
+
+        const rawEnd = tournament.endDate?.split('T')[0];
+        if (!rawEnd || rawEnd === 'null') {
+            this.settings.schedule.endDate = today;
+            injectedDefaults = true;
+        } else {
+            this.settings.schedule.endDate = rawEnd;
+        }
+        // ────────────────────────────────────────────────────────────────────
+
         this.settings.general.description = tournament.description || '';
-        this.settings.schedule.startDate = tournament.startDate?.split('T')[0] || '';
-        this.settings.schedule.endDate = tournament.endDate?.split('T')[0] || '';
         this.settings.participants.maxTeams = tournament.maxTeams || 16;
         this.settings.general.status = tournament.status || 'draft';
         this.settings.general.shortName = tournament.shortName || '';
-        this.settings.general.type = tournament.type || '11aside';
         this.settings.general.visibility = tournament.visibility || 'public';
         this.settings.general.logo = tournament.logo || '';
         this.settings.general.coverImage = tournament.coverImage || '';
@@ -343,6 +407,16 @@ export class TournamentDashboardComponent implements OnInit {
             this.settings.venues = { ...this.settings.venues, ...(tournament.settings.venues || {}) };
             this.settings.finance = { ...this.settings.finance, ...(tournament.settings.finance || {}) };
             this.settings.presentation = { ...this.settings.presentation, ...(tournament.settings.presentation || {}) };
+
+            // Re-assert mandatory date defaults — deep merge from stored settings can overwrite with nulls
+            if (!this.settings.schedule.startDate || this.settings.schedule.startDate === 'null') {
+                this.settings.schedule.startDate = today;
+                injectedDefaults = true;
+            }
+            if (!this.settings.schedule.endDate || this.settings.schedule.endDate === 'null') {
+                this.settings.schedule.endDate = today;
+                injectedDefaults = true;
+            }
         }
 
         // Force sync regFee from top-level to all sub-settings
@@ -381,6 +455,8 @@ export class TournamentDashboardComponent implements OnInit {
                 lossPoints: tournament.format.loss_points ?? (tournament.format as any).lossPoints ?? this.settings.format.lossPoints
             };
         }
+
+        return injectedDefaults;
     }
 
     setTab(tab: string) {
@@ -423,11 +499,28 @@ export class TournamentDashboardComponent implements OnInit {
         this.formatChanged = true;
     }
 
-    saveChanges() {
+    saveChanges(silent: boolean = false) {
         const t = this.tournament();
         if (!t || !t.id) return;
+
+        if (!this.settings.general.name || !this.settings.general.type || !this.settings.schedule.startDate || !this.settings.schedule.endDate) {
+            this.showValidationErrors.set(true);
+            if (!silent) this.ui.showToast('Please fill all mandatory fields.', 'error');
+
+            if (!this.settings.general.name || !this.settings.general.type) {
+                this.setActiveTab('general', true);
+            } else if (!this.settings.schedule.startDate || !this.settings.schedule.endDate) {
+                this.setActiveTab('schedule', true);
+            }
+            return;
+        }
+
+        this.showValidationErrors.set(false);
         this.syncRegFee();
-        this.ui.startAction();
+
+        if (!silent) {
+            this.ui.startAction();
+        }
 
         this.tournamentService.update(t.id, {
             name: this.settings.general.name,
@@ -471,33 +564,38 @@ export class TournamentDashboardComponent implements OnInit {
                     this.tournamentService.generateStructure(t.id).subscribe({
                         next: () => {
                             this.formatChanged = false;
-                            this.ui.endAction();
-                            this.showToast('TOURNAMENT_DASHBOARD.TOAST.STRUCTURE_SUCCESS', 'success');
+                            if (!silent) {
+                                this.ui.endAction();
+                                this.showToast('TOURNAMENT_DASHBOARD.TOAST.STRUCTURE_SUCCESS', 'success');
+                            }
                         },
                         error: (err) => {
                             console.error('Failed to generate structure:', err);
-                            this.ui.endAction();
-                            this.showToast('TOURNAMENT_DASHBOARD.TOAST.STRUCTURE_ERROR', 'error');
+                            if (!silent) {
+                                this.ui.endAction();
+                                this.showToast(err?.error?.message || 'TOURNAMENT_DASHBOARD.TOAST.STRUCTURE_ERROR', 'error');
+                            }
                         }
                     });
                 } else {
-                    this.ui.endAction();
-                    this.showToast('TOURNAMENT_DASHBOARD.TOAST.SAVE_SUCCESS', 'success');
+                    if (!silent) {
+                        this.ui.endAction();
+                        this.showToast('TOURNAMENT_DASHBOARD.TOAST.SAVE_SUCCESS', 'success');
+                    }
                 }
             },
             error: (err) => {
                 console.error('Failed to save:', err);
-                this.ui.endAction();
-                this.showToast('TOURNAMENT_DASHBOARD.TOAST.SAVE_ERROR', 'error');
+                if (!silent) {
+                    this.ui.endAction();
+                    this.showToast('TOURNAMENT_DASHBOARD.TOAST.SAVE_ERROR', 'error');
+                }
             }
         });
     }
 
-    discardChanges() {
-        const t = this.tournament();
-        if (!t) return;
-        this.mergeTournamentToSettings(t);
-        this.showToast('TOURNAMENT_DASHBOARD.TOAST.DISCARD_SUCCESS', 'info');
+    closeDashboard() {
+        this.router.navigate(['/admin/tournaments']);
     }
 
     goBack() {

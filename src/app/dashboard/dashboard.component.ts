@@ -10,13 +10,14 @@ import { StatsBoard } from '../components/stats-board/stats-board';
 import { TournamentService } from '../tournament/tournament.service';
 import { DashboardService } from './dashboard.service';
 import { TranslateModule } from '@ngx-translate/core';
+import { LoaderComponent } from '../components/loader/loader.component';
 
 @Component({
     selector: 'app-dashboard',
     templateUrl: './dashboard.html',
     styleUrl: './dashboard.css',
     standalone: true,
-    imports: [CommonModule, HeroComponent, MatchFeedComponent, WidgetsComponent, StatsBoard, FormsModule, TranslateModule]
+    imports: [CommonModule, HeroComponent, MatchFeedComponent, WidgetsComponent, StatsBoard, FormsModule, TranslateModule, LoaderComponent]
 })
 export class DashboardComponent implements OnInit {
     private tournamentService = inject(TournamentService);
@@ -107,6 +108,7 @@ export class DashboardComponent implements OnInit {
             endDate: this.newTournament.endDate || this.newTournament.startDate,
             maxTeams: this.newTournament.maxTeams,
             status: this.newTournament.status,
+            type: '11aside',
         }).subscribe({
             next: (created) => {
                 this.isCreating.set(false);

@@ -18,6 +18,7 @@ import { UiService } from '../../../services/ui.service';
 export class TournamentScheduleComponent implements OnInit {
     @Input() data!: any;
     @Input() tournamentId!: string;
+    @Input() showValidationErrors = false;
 
     private translate = inject(TranslateService);
     private tournamentService = inject(TournamentService);

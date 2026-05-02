@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
@@ -7,11 +7,12 @@ import { SponsorModalComponent } from './sponsor-modal.component';
 import { environment } from '../../../../environments/environment';
 import { UiService } from '../../../services/ui.service';
 import { ConfirmModalComponent } from '../../../components/shared/confirm-modal.component';
+import { LoaderComponent } from '../../../components/loader/loader.component';
 
 @Component({
   selector: 'app-sponsors',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule, SponsorModalComponent, ConfirmModalComponent],
+  imports: [CommonModule, FormsModule, TranslateModule, SponsorModalComponent, ConfirmModalComponent, LoaderComponent],
   template: `
     <div class="space-y-6">
       <!-- Header -->
@@ -53,7 +54,12 @@ import { ConfirmModalComponent } from '../../../components/shared/confirm-modal.
 
       <!-- Table -->
       <div class="bg-black-card border border-black-border rounded-xl overflow-hidden shadow-lg border-separate">
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto relative min-h-[300px]">
+          @if (isFetchingData()) {
+            <div class="absolute inset-0 flex items-center justify-center">
+              <app-loader></app-loader>
+            </div>
+          } @else {
           <table class="w-full text-left">
             <thead>
               <tr class="bg-white/5 text-zinc-400 text-xs uppercase tracking-wider">
@@ -126,6 +132,7 @@ import { ConfirmModalComponent } from '../../../components/shared/confirm-modal.
               </tr>
             </tbody>
           </table>
+          }
         </div>
       </div>
     </div>
@@ -154,6 +161,7 @@ export class SponsorsComponent implements OnInit {
   apiUrl = environment.apiUrl.replace('/api', '');
   showModal = false;
   selectedSponsor: Sponsor | null = null;
+  isFetchingData = signal(true);
   
   // Delete confirmation
   showDeleteConfirm = false;
@@ -168,12 +176,17 @@ export class SponsorsComponent implements OnInit {
   }
 
   loadSponsors() {
+    this.isFetchingData.set(true);
     this.sponsorService.getAll(this.filters).subscribe({
       next: (data: any) => {
         console.log('Sponsors data received:', data);
         this.sponsors = data.data || data;
+        this.isFetchingData.set(false);
       },
-      error: (err) => console.error('Error loading sponsors:', err)
+      error: (err) => {
+        console.error('Error loading sponsors:', err);
+        this.isFetchingData.set(false);
+      }
     });
   }
 

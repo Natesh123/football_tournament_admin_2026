@@ -1,8 +1,10 @@
+@if (isLoadingStats()) {
+<div class="h-[calc(100vh-64px)] flex items-center justify-center">
+    <app-loader></app-loader>
+</div>
+} @else {
 <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <app-hero (createTournament)="openCreateModal()"></app-hero>
-
-    <!-- <h1>Welcome, <span style="color: #667eea;">{{ auth.userEmail }}</span></h1>
-    <button (click)="logout()" class="logout-btn">Logout</button> -->
 
     <!-- System Overview & Live Activity -->
     <app-stats-board [platformStats]="platformStats()" [activityStats]="activityStats()"
@@ -18,31 +20,30 @@
         </div>
     </div>
 </div>
+}
 
 <!-- Create Tournament Modal -->
 @if (showCreateModal()) {
-<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+<div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <!-- Backdrop -->
-    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" (click)="closeCreateModal()"></div>
+    <div class="absolute inset-0" (click)="closeCreateModal()"></div>
 
     <!-- Modal -->
     <div
-        class="relative bg-black-card border border-black-border rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-[0_0_60px_rgba(250,204,21,0.15)]">
+        class="relative bg-black-card border border-gold-400/30 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-[0_0_50px_rgba(255,215,0,0.1)]">
 
         <!-- Modal Header -->
-        <div class="flex items-center justify-between p-6 border-b border-black-border">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-gold-400/20 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gold-400" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                    </svg>
-                </div>
-                <h2 class="text-xl font-bold text-white">{{ 'DASHBOARD.MODAL.TITLE' | translate }}</h2>
-            </div>
-            <button (click)="closeCreateModal()"
-                class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition-colors">
+        <div
+            class="px-6 py-4 border-b border-black-border flex justify-between items-center bg-gradient-to-r from-black-card to-white/[0.02] shrink-0">
+            <h3 class="text-lg font-black text-white uppercase tracking-wider flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gold-400" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+                {{ 'DASHBOARD.MODAL.TITLE' | translate }}
+            </h3>
+            <button (click)="closeCreateModal()" class="text-zinc-500 hover:text-white transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -51,49 +52,49 @@
         </div>
 
         <!-- Modal Body -->
-        <div class="p-6 space-y-5">
+        <div class="p-6 space-y-5 overflow-y-auto flex-1">
             <!-- Tournament Name -->
             <div>
-                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{
+                <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1.5 block">{{
                     'DASHBOARD.MODAL.NAME' | translate }} *</label>
                 <input type="text" [(ngModel)]="newTournament.name"
                     [placeholder]="'DASHBOARD.MODAL.NAME_PLACEHOLDER' | translate"
-                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all" />
+                    class="w-full bg-black-main border border-black-border rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all" />
             </div>
 
             <!-- Description -->
             <div>
-                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{
+                <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1.5 block">{{
                     'DASHBOARD.MODAL.DESCRIPTION' | translate }}</label>
                 <textarea [(ngModel)]="newTournament.description"
                     [placeholder]="'DASHBOARD.MODAL.DESCRIPTION_PLACEHOLDER' | translate" rows="3"
-                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all resize-none"></textarea>
+                    class="w-full bg-black-main border border-black-border rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all resize-none"></textarea>
             </div>
 
             <!-- Dates Row -->
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{
+                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1.5 block">{{
                         'DASHBOARD.MODAL.START_DATE' | translate }}
                         *</label>
                     <input type="date" [(ngModel)]="newTournament.startDate"
-                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all [color-scheme:dark]" />
+                        class="w-full bg-black-main border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all [color-scheme:dark]" />
                 </div>
                 <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{
+                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1.5 block">{{
                         'DASHBOARD.MODAL.END_DATE' | translate }}</label>
                     <input type="date" [(ngModel)]="newTournament.endDate"
-                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all [color-scheme:dark]" />
+                        class="w-full bg-black-main border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all [color-scheme:dark]" />
                 </div>
             </div>
 
             <!-- Max Teams & Prize Pool Row -->
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{
+                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1.5 block">{{
                         'DASHBOARD.MODAL.MAX_TEAMS' | translate }}</label>
                     <select [(ngModel)]="newTournament.maxTeams"
-                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all">
+                        class="w-full bg-black-main border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all">
                         <option value="8" class="bg-black-card">8 Teams</option>
                         <option value="16" class="bg-black-card">16 Teams</option>
                         <option value="24" class="bg-black-card">24 Teams</option>
@@ -103,20 +104,20 @@
                     </select>
                 </div>
                 <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{
+                    <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1.5 block">{{
                         'DASHBOARD.MODAL.PRIZE_POOL' | translate }}</label>
                     <input type="text" [(ngModel)]="newTournament.prizePool"
                         [placeholder]="'DASHBOARD.MODAL.PRIZE_POOL_PLACEHOLDER' | translate"
-                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all" />
+                        class="w-full bg-black-main border border-black-border rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all" />
                 </div>
             </div>
 
             <!-- Status -->
             <div>
-                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{
+                <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1.5 block">{{
                     'DASHBOARD.MODAL.STATUS' | translate }}</label>
                 <select [(ngModel)]="newTournament.status"
-                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all">
+                    class="w-full bg-black-main border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all">
                     <option value="draft" class="bg-black-card">{{ 'DASHBOARD.MODAL.STATUS_DRAFT' | translate }}
                     </option>
                     <option value="registration_open" class="bg-black-card">{{
@@ -126,22 +127,16 @@
         </div>
 
         <!-- Modal Footer -->
-        <div class="flex items-center justify-end gap-3 p-6 border-t border-black-border">
+        <div class="px-6 py-4 border-t border-black-border flex justify-end gap-3 bg-black-main/50 shrink-0">
             <button (click)="closeCreateModal()" [disabled]="isCreating()"
-                class="px-6 py-2.5 rounded-lg border border-black-border text-zinc-400 hover:text-white hover:border-zinc-500 font-bold transition-all duration-300 disabled:opacity-40">
+                class="px-5 py-2 rounded-lg font-bold text-zinc-400 hover:text-white hover:bg-white/5 transition-colors uppercase text-xs disabled:opacity-40">
                 {{ 'COMMON.CANCEL' | translate }}
             </button>
             <button (click)="createTournament()"
                 [disabled]="!newTournament.name || !newTournament.startDate || isCreating()"
-                class="px-6 py-2.5 rounded-lg bg-gold-400 hover:bg-gold-400/90 text-black font-bold transition-all duration-300 hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none flex items-center gap-2">
+                class="px-5 py-2 rounded-lg font-bold text-black-main bg-gold-400 hover:bg-gold-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 uppercase text-xs shadow-[0_0_15px_rgba(255,215,0,0.2)]">
                 @if (isCreating()) {
-                <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
-                    </circle>
-                    <path class="opacity-75" fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                    </path>
-                </svg>
+                <span class="loading loading-spinner w-3 h-3"></span>
                 {{ 'DASHBOARD.MODAL.CREATING' | translate }}
                 } @else {
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"

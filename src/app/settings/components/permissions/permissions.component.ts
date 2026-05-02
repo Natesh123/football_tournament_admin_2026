@@ -4,11 +4,12 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { SettingsService } from '../../settings.service';
 import { ConfirmModalComponent } from '../../../components/shared/confirm-modal.component';
 import { UiService } from '../../../services/ui.service';
+import { LoaderComponent } from '../../../components/loader/loader.component';
 
 @Component({
   selector: 'app-permissions',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, ConfirmModalComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, ConfirmModalComponent, LoaderComponent],
   template: `
     <div class="space-y-6">
       <div class="flex items-center justify-between">
@@ -111,7 +112,12 @@ import { UiService } from '../../../services/ui.service';
         <div class="p-6 border-b border-black-border bg-black/40 flex items-center justify-between">
             <h3 class="text-xl font-bold text-white tracking-widest uppercase">Permissions List</h3>
         </div>
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto relative min-h-[300px]">
+          @if (isFetchingData()) {
+            <div class="absolute inset-0 flex items-center justify-center">
+              <app-loader></app-loader>
+            </div>
+          } @else {
           <table class="w-full text-left">
             <thead>
               <tr class="text-gold-400 text-[10px] uppercase font-black tracking-[0.2em] border-b border-black-border bg-black/20">
@@ -156,6 +162,7 @@ import { UiService } from '../../../services/ui.service';
               </tr>
             </tbody>
           </table>
+          }
         </div>
       </div>
 
@@ -173,6 +180,7 @@ export class PermissionsComponent implements OnInit {
   permissions = signal<any[]>([]);
   roles = signal<any[]>([]);
   isLoading = false;
+  isFetchingData = signal(true);
   editingId: number | null = null;
   permissionForm: FormGroup;
 
@@ -217,9 +225,19 @@ export class PermissionsComponent implements OnInit {
   }
 
   loadData() {
-    this.settingsService.getPermissions().subscribe(data => this.permissions.set(data));
-    this.settingsService.getRoles().subscribe(data => {
-      this.roles.set(data.filter((r: any) => r.id !== 1));
+    this.isFetchingData.set(true);
+    this.settingsService.getPermissions().subscribe({
+      next: (data) => {
+        this.permissions.set(data);
+        this.settingsService.getRoles().subscribe({
+          next: (rolesData) => {
+            this.roles.set(rolesData.filter((r: any) => r.id !== 1));
+            this.isFetchingData.set(false);
+          },
+          error: () => this.isFetchingData.set(false)
+        });
+      },
+      error: () => this.isFetchingData.set(false)
     });
   }
 

@@ -11,14 +11,22 @@
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.START_DATE' | translate }}</label>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.START_DATE' | translate }} *</label>
                     <input type="date" [(ngModel)]="data.startDate"
-                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all [color-scheme:dark]" />
+                        class="w-full bg-white/5 border rounded-lg px-4 py-3 text-sm text-white focus:outline-none transition-all [color-scheme:dark]"
+                        [ngClass]="showValidationErrors && !data.startDate ? 'border-red-500 ring-1 ring-red-500/50 focus:border-red-500 focus:ring-red-500/50' : 'border-black-border focus:border-gold-400 focus:ring-1 focus:ring-gold-400/50'" />
+                    @if (showValidationErrors && !data.startDate) {
+                    <p class="text-xs text-red-500 mt-1.5 font-bold">{{ 'COMMON.REQUIRED_FIELD' | translate }}</p>
+                    }
                 </div>
                 <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.END_DATE' | translate }}</label>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.END_DATE' | translate }} *</label>
                     <input type="date" [(ngModel)]="data.endDate"
-                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all [color-scheme:dark]" />
+                        class="w-full bg-white/5 border rounded-lg px-4 py-3 text-sm text-white focus:outline-none transition-all [color-scheme:dark]"
+                        [ngClass]="showValidationErrors && !data.endDate ? 'border-red-500 ring-1 ring-red-500/50 focus:border-red-500 focus:ring-red-500/50' : 'border-black-border focus:border-gold-400 focus:ring-1 focus:ring-gold-400/50'" />
+                    @if (showValidationErrors && !data.endDate) {
+                    <p class="text-xs text-red-500 mt-1.5 font-bold">{{ 'COMMON.REQUIRED_FIELD' | translate }}</p>
+                    }
                 </div>
             </div>
 

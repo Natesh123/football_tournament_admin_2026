@@ -1,4 +1,5 @@
 export const environment = {
     production: false,
-    apiBaseUrl: 'https://footballapi.frischfuersie.de'
+    apiUrl: 'http://localhost:3000'
+    //apiUrl: 'https://api.footballtournament.in'
 };

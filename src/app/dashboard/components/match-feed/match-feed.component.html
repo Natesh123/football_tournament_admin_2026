@@ -26,7 +26,7 @@
             {{ 'MATCH_FEED.TABS.PAST' | translate }}
         </button>
         <div class="ml-auto">
-            <a [routerLink]="['/matches']"
+            <a [routerLink]="['/admin/tournaments']"
                 class="text-xs font-bold text-text-muted hover:text-white hover:underline flex items-center gap-1 transition-colors">
                 {{ 'MATCH_FEED.VIEW_ALL' | translate }}
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24"
@@ -52,7 +52,7 @@
     } @else {
     <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6 mt-6">
         @for (match of liveMatches(); track match.id) {
-        <a [routerLink]="['/tournaments', match.tournamentId, 'matches', match.id]"
+        <a [routerLink]="['/admin/tournaments', match.tournamentId, 'matches', match.id]"
             class="bg-black-card border border-black-border rounded-xl p-6 relative group transition-all duration-300 transform hover:border-gold-400 hover:border-2 hover:-translate-y-2 hover:shadow-[0_0_30px_rgba(250,204,21,0.3)] block cursor-pointer">
             <!-- Live badge -->
             <div
@@ -109,7 +109,7 @@
             <h3 class="text-gold-400 font-bold uppercase tracking-wider text-sm mb-3 pl-1">{{ group.date }}</h3>
             <div class="divide-y divide-black-border">
                 @for (match of group.matches; track match.id) {
-                <a [routerLink]="['/tournaments', match.tournamentId, 'matches', match.id]" class="group p-4 flex flex-col transition-all duration-500 relative first:rounded-t-xl last:rounded-b-xl hover:z-10 bg-black-card border border-transparent hover:border-gold-400 hover:border-2 hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(250,204,21,0.2)] block cursor-pointer">
+                <a [routerLink]="['/admin/tournaments', match.tournamentId, 'matches', match.id]" class="group p-4 flex flex-col transition-all duration-500 relative first:rounded-t-xl last:rounded-b-xl hover:z-10 bg-black-card border border-transparent hover:border-gold-400 hover:border-2 hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(250,204,21,0.2)] block cursor-pointer">
                     <div class="flex items-center justify-between w-full">
                         <div class="flex items-center gap-4 text-xs font-mono text-text-muted w-24">
                             <span class="font-bold text-text-main">{{ match.time }}</span>
@@ -160,7 +160,7 @@
             <h3 class="text-text-muted font-bold uppercase tracking-wider text-sm mb-3 pl-1">{{ group.date }}</h3>
             <div class="divide-y divide-black-border">
                 @for (match of group.matches; track match.id) {
-                <a [routerLink]="['/tournaments', match.tournamentId, 'matches', match.id]" class="group p-4 flex flex-col transition-all duration-500 relative first:rounded-t-xl last:rounded-b-xl hover:z-10 bg-black-card border border-transparent hover:border-gold-400 hover:border-2 hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(250,204,21,0.2)] block cursor-pointer">
+                <a [routerLink]="['/admin/tournaments', match.tournamentId, 'matches', match.id]" class="group p-4 flex flex-col transition-all duration-500 relative first:rounded-t-xl last:rounded-b-xl hover:z-10 bg-black-card border border-transparent hover:border-gold-400 hover:border-2 hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(250,204,21,0.2)] block cursor-pointer">
                     <div class="flex items-center justify-between w-full">
                         <div class="flex items-center gap-4 text-xs font-mono text-text-muted w-24">
                             <span class="px-2 py-0.5 rounded bg-zinc-800 text-[10px]">{{ match.status }}</span>
