@@ -83,6 +83,12 @@ export class TournamentService {
         );
     }
 
+    seedResults(id: string): Observable<any> {
+        return this.http.post<ApiResponse<any>>(`${this.baseUrl}/${id}/seed-results`, {}).pipe(
+            map(res => res)
+        );
+    }
+
     updateMatchSchedule(matchId: number | string, payload: any): Observable<any> {
         return this.http.patch<ApiResponse<any>>(`${API_URL}/api/matches/${matchId}/schedule`, payload);
     }
@@ -116,6 +122,18 @@ export class TournamentService {
 
     deleteMatchEvent(matchId: number | string, eventId: string): Observable<any> {
         return this.http.delete<ApiResponse<any>>(`${API_URL}/api/matches/${matchId}/events/${eventId}`).pipe(
+            map(res => res.data)
+        );
+    }
+
+    getTournamentResults(tournamentId: string): Observable<any[]> {
+        return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/${tournamentId}/results`).pipe(
+            map(res => res.data)
+        );
+    }
+
+    getTournamentTopPerformance(tournamentId: string): Observable<any> {
+        return this.http.get<ApiResponse<any>>(`${this.baseUrl}/${tournamentId}/results/top-performance`).pipe(
             map(res => res.data)
         );
     }

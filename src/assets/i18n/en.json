@@ -662,6 +662,7 @@
             "SUN": "SUN",
             "MANUAL_EDITOR_BTN": "Manual Match Editor",
             "GENERATED_MATCHES": "Generated Matches",
+            "MATCH": "Match",
             "EDIT_MATCH_TITLE": "Edit Match Schedule",
             "MATCH_TIME_LABEL": "Match Start Time",
             "VENUE_LABEL": "Match Venue",
@@ -1176,6 +1177,14 @@
             "GD": "GD",
             "PTS": "Pts",
             "FORM": "Form"
+        },
+        "ROUNDS": {
+            "FINAL": "Final",
+            "SEMI_FINAL": "Semi-Final",
+            "QUARTER_FINAL": "Quarter-Final",
+            "R16": "Round of 16",
+            "R32": "Round of 32",
+            "R64": "Round of 64"
         },
         "DIRECT_FORM": {
             "ADD_EVENT": "Add Match Event",

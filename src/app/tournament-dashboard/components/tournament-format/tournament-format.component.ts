@@ -61,6 +61,7 @@ export class TournamentFormatComponent implements OnInit, OnChanges {
 
     private cdr = inject(ChangeDetectorRef);
     private http = inject(HttpClient);
+    private translate = inject(TranslateService);
 
     selectedFormat: 'group' | 'group_knockout' | 'knockout' | 'custom' | null = null;
     customStages: TournamentStage[] = [];
@@ -216,6 +217,19 @@ export class TournamentFormatComponent implements OnInit, OnChanges {
         }
 
         if (incomingData && Array.isArray(incomingData) && incomingData.length > 0) {
+            // Fix previously saved raw translation keys
+            for (const phase of incomingData) {
+                if (phase.name && phase.name.startsWith('MATCH_DETAILS.')) {
+                    phase.name = this.translate.instant(phase.name);
+                }
+                if (phase.rounds) {
+                    for (const round of phase.rounds) {
+                        if (round.name && round.name.startsWith('MATCH_DETAILS.')) {
+                            round.name = this.translate.instant(round.name);
+                        }
+                    }
+                }
+            }
             this.boardPhases = incomingData;
             this.showBoard = true;
             this.selectedFormat = this.data.type || this.data.format?.type || 'group';
@@ -397,7 +411,9 @@ export class TournamentFormatComponent implements OnInit, OnChanges {
         let matchNum = matchIdOffset;
         const allRounds: { name: string; matchCount: number }[] = [];
         while (teams >= 2) {
-            allRounds.push({ name: roundNames[teams] ?? `Round of ${teams}`, matchCount: teams / 2 });
+            const translationKey = roundNames[teams];
+            const translatedName = translationKey ? this.translate.instant(translationKey) : `Round of ${teams}`;
+            allRounds.push({ name: translatedName, matchCount: teams / 2 });
             teams = Math.floor(teams / 2);
         }
         for (const r of allRounds) {
@@ -478,7 +494,12 @@ export class TournamentFormatComponent implements OnInit, OnChanges {
             2: 'MATCH_DETAILS.ROUNDS.FINAL', 4: 'MATCH_DETAILS.ROUNDS.SEMI_FINAL', 8: 'MATCH_DETAILS.ROUNDS.QUARTER_FINAL',
             16: 'MATCH_DETAILS.ROUNDS.R16', 32: 'MATCH_DETAILS.ROUNDS.R32', 64: 'MATCH_DETAILS.ROUNDS.R64'
         };
-        while (teams >= 2) { rounds.push(names[teams] ?? `Round of ${teams}`); teams = Math.floor(teams / 2); }
+        while (teams >= 2) { 
+            const translationKey = names[teams];
+            const translatedName = translationKey ? this.translate.instant(translationKey) : `Round of ${teams}`;
+            rounds.push(translatedName); 
+            teams = Math.floor(teams / 2); 
+        }
         return rounds;
     }
 
@@ -652,7 +673,12 @@ export class TournamentFormatComponent implements OnInit, OnChanges {
             2: 'MATCH_DETAILS.ROUNDS.FINAL', 4: 'MATCH_DETAILS.ROUNDS.SEMI_FINAL', 8: 'MATCH_DETAILS.ROUNDS.QUARTER_FINAL',
             16: 'MATCH_DETAILS.ROUNDS.R16', 32: 'MATCH_DETAILS.ROUNDS.R32', 64: 'MATCH_DETAILS.ROUNDS.R64'
         };
-        while (teams >= 2) { rounds.push(names[teams] ?? `Round of ${teams}`); teams = Math.floor(teams / 2); }
+        while (teams >= 2) { 
+            const translationKey = names[teams];
+            const translatedName = translationKey ? this.translate.instant(translationKey) : `Round of ${teams}`;
+            rounds.push(translatedName); 
+            teams = Math.floor(teams / 2); 
+        }
         return rounds;
     }
 

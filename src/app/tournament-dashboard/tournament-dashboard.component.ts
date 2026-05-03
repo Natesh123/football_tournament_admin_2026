@@ -133,7 +133,6 @@ export interface TournamentSettings {
         TournamentResultsComponent,
         TournamentTeamsComponent,
         TournamentMatchesComponent,
-        TournamentMatchesComponent,
         TournamentSponsorsComponent,
         LoaderComponent,
         TranslateModule

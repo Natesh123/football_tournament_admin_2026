@@ -36,31 +36,11 @@ export class TournamentMatchesComponent implements OnInit {
             if (status === 'completed' || status === 'finished' || status === 'past') {
                 category = 'past';
             } else if (status === 'live' || status === 'in_progress') {
-                // Primary is status, secondary is time validation for stuck matches
-                if (startTime) {
-                    const maxEndTime = new Date(startTime.getTime() + 300 * 60000); // 5 hours max for live
-                    if (now > maxEndTime) {
-                        category = 'past';
-                    } else {
-                        category = 'live';
-                    }
-                } else {
-                    category = 'live';
-                }
+                category = 'live';
             } else {
-                // Not started (scheduled)
-                if (!startTime) {
-                    category = 'upcoming';
-                } else {
-                    const endTime = new Date(startTime.getTime() + 150 * 60000); // 2.5 hours assumed duration
-                    if (now > endTime) {
-                        category = 'past';
-                    } else if (now >= startTime && now <= endTime) {
-                        category = 'live';
-                    } else {
-                        category = 'upcoming';
-                    }
-                }
+                // Not started (scheduled) - prioritize status over time bounds 
+                // so newly generated matches don't immediately drop into "live" or "past"
+                category = 'upcoming';
             }
 
             return category === tab;

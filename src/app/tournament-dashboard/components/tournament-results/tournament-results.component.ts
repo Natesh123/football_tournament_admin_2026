@@ -19,11 +19,14 @@ export class TournamentResultsComponent implements OnInit {
     isLoadingStructure = signal(false);
     matches = signal<any[]>([]);
     isLoadingMatches = signal(false);
+    topPerformance = signal<any>(null);
+    isLoadingPerformance = signal(false);
 
     ngOnInit() {
         if (this.tournamentId) {
             this.loadStructure();
             this.loadMatches();
+            this.loadTopPerformance();
         }
     }
 
@@ -43,14 +46,28 @@ export class TournamentResultsComponent implements OnInit {
 
     loadMatches() {
         this.isLoadingMatches.set(true);
-        this.tournamentService.getMatchesByStatus('completed', this.tournamentId).subscribe({
+        this.tournamentService.getTournamentResults(this.tournamentId).subscribe({
             next: (data: any[]) => {
                 this.matches.set(data);
                 this.isLoadingMatches.set(false);
             },
             error: (err: any) => {
-                console.error("Failed to load completed matches", err);
+                console.error("Failed to load match results", err);
                 this.isLoadingMatches.set(false);
+            }
+        });
+    }
+
+    loadTopPerformance() {
+        this.isLoadingPerformance.set(true);
+        this.tournamentService.getTournamentTopPerformance(this.tournamentId).subscribe({
+            next: (data: any) => {
+                this.topPerformance.set(data);
+                this.isLoadingPerformance.set(false);
+            },
+            error: (err: any) => {
+                console.error("Failed to load top performance stats", err);
+                this.isLoadingPerformance.set(false);
             }
         });
     }
