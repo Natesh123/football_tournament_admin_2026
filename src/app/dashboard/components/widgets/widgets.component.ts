@@ -23,9 +23,6 @@ export class WidgetsComponent implements OnInit {
     isAdmin = computed(() => this.auth.isAdmin);
     isOrganizer = computed(() => this.auth.isOrganizer);
 
-    createTournamentAction() {
-        this.openCreateModal.emit();
-    }
 
 
     topOrganizers = signal<{ rank: number; name: string; email: string; tournamentsCount: number }[]>([]);

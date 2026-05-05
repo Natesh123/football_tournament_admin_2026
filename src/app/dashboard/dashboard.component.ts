@@ -11,32 +11,32 @@ import { TournamentService } from '../tournament/tournament.service';
 import { DashboardService } from './dashboard.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { LoaderComponent } from '../components/loader/loader.component';
+import { TournamentCreateModalComponent } from '../components/shared/tournament-create-modal/tournament-create-modal.component';
 
 @Component({
     selector: 'app-dashboard',
     templateUrl: './dashboard.html',
     styleUrl: './dashboard.css',
     standalone: true,
-    imports: [CommonModule, HeroComponent, MatchFeedComponent, WidgetsComponent, StatsBoard, FormsModule, TranslateModule, LoaderComponent]
+    imports: [
+        CommonModule, 
+        HeroComponent, 
+        MatchFeedComponent, 
+        WidgetsComponent, 
+        StatsBoard, 
+        FormsModule, 
+        TranslateModule, 
+        LoaderComponent,
+        TournamentCreateModalComponent
+    ]
 })
 export class DashboardComponent implements OnInit {
     private tournamentService = inject(TournamentService);
     private dashboardService = inject(DashboardService);
 
     showCreateModal = signal(false);
-    isCreating = signal(false);
-    toastMessage = signal('');
+    toastMessage = signal<{text: string, type: 'success' | 'error' | 'info'} | null>(null);
     isLoadingStats = signal(true);
-
-    newTournament = {
-        name: '',
-        description: '',
-        startDate: '',
-        endDate: '',
-        status: 'draft',
-        maxTeams: 16,
-        prizePool: ''
-    };
 
     platformStats = signal<any[]>([
         { label: 'DASHBOARD.STATS.TOTAL_TOURNAMENTS', labelKey: true, value: '—', icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10' },
@@ -94,51 +94,16 @@ export class DashboardComponent implements OnInit {
 
     closeCreateModal() {
         this.showCreateModal.set(false);
-        this.resetForm();
     }
 
-    createTournament() {
-        if (!this.newTournament.name || !this.newTournament.startDate) return;
-        this.isCreating.set(true);
-
-        this.tournamentService.create({
-            name: this.newTournament.name,
-            description: this.newTournament.description,
-            startDate: this.newTournament.startDate,
-            endDate: this.newTournament.endDate || this.newTournament.startDate,
-            maxTeams: this.newTournament.maxTeams,
-            status: this.newTournament.status,
-            type: '11aside',
-        }).subscribe({
-            next: (created) => {
-                this.isCreating.set(false);
-                this.closeCreateModal();
-                this.loadDashboardStats(); // refresh counts after creating
-                this.router.navigate(['/admin/tournaments', created.id]);
-            },
-            error: (err) => {
-                console.error('Failed to create tournament:', err);
-                this.isCreating.set(false);
-                this.showToast('Failed to create tournament. Please try again.');
-            }
-        });
+    onTournamentCreated(created: any) {
+        this.showToast('Tournament created successfully!', 'success');
+        this.loadDashboardStats(); // refresh counts after creating
     }
 
-    showToast(message: string) {
-        this.toastMessage.set(message);
-        setTimeout(() => this.toastMessage.set(''), 3000);
-    }
-
-    resetForm() {
-        this.newTournament = {
-            name: '',
-            description: '',
-            startDate: '',
-            endDate: '',
-            status: 'draft',
-            maxTeams: 16,
-            prizePool: ''
-        };
+    showToast(text: string, type: 'success' | 'error' | 'info' = 'success') {
+        this.toastMessage.set({ text, type } as any);
+        setTimeout(() => this.toastMessage.set(null), 3000);
     }
 
     logout() {
