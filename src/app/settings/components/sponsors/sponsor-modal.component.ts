@@ -137,7 +137,7 @@ import { environment } from '../../../../environments/environment';
 export class SponsorModalComponent {
   @Input() sponsor: Sponsor | null = null;
   @Output() close = new EventEmitter<void>();
-  @Output() saved = new EventEmitter<void>();
+  @Output() saved = new EventEmitter<Sponsor>();
 
   private fb = inject(FormBuilder);
   private sponsorService = inject(SponsorService);
@@ -209,8 +209,8 @@ export class SponsorModalComponent {
       this.sponsorService.create(formData);
 
     request.subscribe({
-      next: () => {
-        this.saved.emit();
+      next: (res) => {
+        this.saved.emit(res);
         this.close.emit();
       },
       error: (err) => {
