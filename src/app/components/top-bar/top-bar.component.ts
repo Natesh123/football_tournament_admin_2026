@@ -16,7 +16,7 @@ export class TopBarComponent {
     private router = inject(Router);
     auth = inject(AuthService);
 
-    currentLang = signal('en');
+    currentLang = signal(localStorage.getItem('lang') || 'en');
     isDropdownOpen = signal(false);
     showNotifications = signal(false);
     showProfile = signal(false);
@@ -69,13 +69,15 @@ export class TopBarComponent {
     }
 
     constructor() {
-        this.translate.use('en');
+        const savedLang = localStorage.getItem('lang') || 'en';
+        this.translate.use(savedLang);
     }
 
     setLang(event: Event) {
         const lang = (event.target as HTMLSelectElement).value;
         this.currentLang.set(lang);
         this.translate.use(lang);
+        localStorage.setItem('lang', lang);
     }
 
     toggleDropdown() {

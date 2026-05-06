@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, inject, signal, OnChanges, Simp
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TeamService } from '../../team.service';
+import { UiService } from '../../../services/ui.service';
 
 @Component({
   selector: 'app-create-team-modal',
@@ -159,6 +160,7 @@ export class CreateTeamModalComponent implements OnChanges {
   @Output() teamUpdated = new EventEmitter<void>();
 
   private teamService = inject(TeamService);
+  private ui = inject(UiService);
   isSubmitting = signal(false);
   logoPreview = signal<string | null>(null);
   private selectedLogoFile: File | null = null;
@@ -274,6 +276,7 @@ export class CreateTeamModalComponent implements OnChanges {
       this.teamService.createWithFormData(formData).subscribe({
         next: (createdTeam: any) => {
           this.isSubmitting.set(false);
+          this.ui.showToast('Team created successfully', 'success');
           this.teamCreated.emit(createdTeam.id);
           this.resetForm();
         },
@@ -286,6 +289,7 @@ export class CreateTeamModalComponent implements OnChanges {
       this.teamService.updateWithFormData(this.teamToEdit.id, formData).subscribe({
         next: () => {
           this.isSubmitting.set(false);
+          this.ui.showToast('Team updated successfully', 'success');
           this.teamUpdated.emit();
           this.close();
         },

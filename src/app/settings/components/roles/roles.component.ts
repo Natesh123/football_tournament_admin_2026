@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SettingsService } from '../../settings.service';
 import { LoaderComponent } from '../../../components/loader/loader.component';
+import { UiService } from '../../../services/ui.service';
 
 @Component({
   selector: 'app-roles',
@@ -80,7 +81,10 @@ export class RolesComponent implements OnInit {
   isFetchingData = signal(true);
   errorMessage = '';
 
-  constructor(private settingsService: SettingsService) { }
+  constructor(
+    private settingsService: SettingsService,
+    private ui: UiService
+  ) { }
 
   ngOnInit() {
     this.loadRoles();
@@ -109,6 +113,7 @@ export class RolesComponent implements OnInit {
       next: () => {
         this.newRoleName = '';
         this.isLoading = false;
+        this.ui.showToast('Role added successfully', 'success');
         this.loadRoles();
       },
       error: (err) => {

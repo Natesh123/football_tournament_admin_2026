@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -18,6 +18,7 @@ export class LoginComponent implements OnInit {
     errorMessage: string = '';
     successMessage: string = '';
     isLoading: boolean = false;
+    showPassword = signal(false);
 
     constructor(
         private fb: FormBuilder,

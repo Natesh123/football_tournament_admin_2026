@@ -296,6 +296,7 @@ export class PermissionsComponent implements OnInit {
       next: () => {
         this.isLoading = false;
         this.recordToDelete = null;
+        this.ui.showToast('Permission mapping removed', 'success');
         this.loadData();
       },
       error: () => {
@@ -318,6 +319,7 @@ export class PermissionsComponent implements OnInit {
     this.settingsService.savePermissions(formData).subscribe({
       next: () => {
         this.isLoading = false;
+        this.ui.showToast('Permissions saved successfully', 'success');
         this.resetForm();
         this.loadData();
       },
