@@ -6,11 +6,12 @@ import { UiService } from '../../../services/ui.service';
 import { environment } from '../../../../environments/environment';
 import { ConfirmModalComponent } from '../../../components/shared/confirm-modal.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { SponsorModalComponent } from '../../../settings/components/sponsors/sponsor-modal.component';
 
 @Component({
   selector: 'app-tournament-sponsors',
   standalone: true,
-  imports: [CommonModule, FormsModule, ConfirmModalComponent, TranslateModule],
+  imports: [CommonModule, FormsModule, ConfirmModalComponent, TranslateModule, SponsorModalComponent],
   templateUrl: './tournament-sponsors.component.html'
 })
 export class TournamentSponsorsComponent implements OnInit, OnChanges {
@@ -23,6 +24,7 @@ export class TournamentSponsorsComponent implements OnInit, OnChanges {
   availableSponsors = signal<Sponsor[]>([]);
   isLoading = signal(true);
   isAssignModalOpen = signal(false);
+  isCreateModalOpen = signal(false);
   selectedSponsorId = signal<number | null>(null);
   
   // Delete confirmation
@@ -73,6 +75,31 @@ export class TournamentSponsorsComponent implements OnInit, OnChanges {
   openAssignModal() {
     this.selectedSponsorId.set(null);
     this.isAssignModalOpen.set(true);
+  }
+
+  openCreateModal() {
+    this.isCreateModalOpen.set(true);
+  }
+
+  onSponsorCreated(sponsor: Sponsor) {
+    if (sponsor.id && this.tournamentId) {
+      this.ui.startAction();
+      this.sponsorService.assignSponsor(parseInt(this.tournamentId), sponsor.id).subscribe({
+        next: () => {
+          this.loadData();
+          this.ui.endAction();
+          this.ui.showToast('Sponsor created and assigned successfully', 'success');
+        },
+        error: (err) => {
+          console.error('Error assigning created sponsor:', err);
+          this.loadData(); // Still refresh even if assignment fails
+          this.ui.endAction();
+          this.ui.showToast('Sponsor created but failed to assign', 'error');
+        }
+      });
+    } else {
+      this.loadData();
+    }
   }
 
   assignSponsor() {

@@ -147,22 +147,47 @@
                             </div>
                         </div>
 
-                        <!-- Row 3: Passwords -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2 group">
                                 <label class="text-xs font-bold text-neutral-400 uppercase tracking-widest">{{
                                     'AUTH.REGISTER.PASSWORD' | translate }}</label>
-                                <input type="password" formControlName="password"
-                                    class="w-full bg-[#1e1e20] border-b-2 border-[#333] px-4 py-3 text-white placeholder-neutral-600 focus:outline-none focus:border-gold-500 focus:bg-[#252528] transition-all duration-300 rounded-t-lg text-sm font-medium"
-                                    placeholder="••••••••">
+                                <div class="relative">
+                                    <input [type]="showPassword() ? 'text' : 'password'" formControlName="password"
+                                        class="w-full bg-[#1e1e20] border-b-2 border-[#333] px-4 py-3 pr-10 text-white placeholder-neutral-600 focus:outline-none focus:border-gold-500 focus:bg-[#252528] transition-all duration-300 rounded-t-lg text-sm font-medium"
+                                        placeholder="••••••••">
+                                    <button type="button" (click)="showPassword.set(!showPassword())"
+                                        class="absolute right-3 top-3 text-neutral-600 hover:text-gold-500 transition-colors focus:outline-none">
+                                        <svg *ngIf="!showPassword()" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                        <svg *ngIf="showPassword()" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064-7 9.542-7 1.153 0 2.253.197 3.275.558M16.516 16.516l3.484 3.484M4.221 4.221l15.558 15.558" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                             <div class="space-y-2 group">
                                 <label class="text-xs font-bold text-neutral-400 uppercase tracking-widest">{{
                                     'AUTH.REGISTER.CONFIRM_PASSWORD' | translate }}</label>
-                                <input type="password" formControlName="confirmPassword"
-                                    class="w-full bg-[#1e1e20] border-b-2 border-[#333] px-4 py-3 text-white placeholder-neutral-600 focus:outline-none focus:border-gold-500 focus:bg-[#252528] transition-all duration-300 rounded-t-lg text-sm font-medium"
-                                    [class.border-red-500]="registerForm.get('confirmPassword')?.touched && registerForm.hasError('mismatch', 'confirmPassword')"
-                                    placeholder="••••••••">
+                                <div class="relative">
+                                    <input [type]="showConfirmPassword() ? 'text' : 'password'" formControlName="confirmPassword"
+                                        class="w-full bg-[#1e1e20] border-b-2 border-[#333] px-4 py-3 pr-10 text-white placeholder-neutral-600 focus:outline-none focus:border-gold-500 focus:bg-[#252528] transition-all duration-300 rounded-t-lg text-sm font-medium"
+                                        [class.border-red-500]="registerForm.get('confirmPassword')?.touched && registerForm.hasError('mismatch', 'confirmPassword')"
+                                        placeholder="••••••••">
+                                    <button type="button" (click)="showConfirmPassword.set(!showConfirmPassword())"
+                                        class="absolute right-3 top-3 text-neutral-600 hover:text-gold-500 transition-colors focus:outline-none">
+                                        <svg *ngIf="!showConfirmPassword()" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                        <svg *ngIf="showConfirmPassword()" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064-7 9.542-7 1.153 0 2.253.197 3.275.558M16.516 16.516l3.484 3.484M4.221 4.221l15.558 15.558" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 

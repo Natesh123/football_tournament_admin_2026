@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -19,6 +19,8 @@ export class RegisterComponent {
     errorMessage: string = '';
     successMessage: string = '';
     isLoading: boolean = false;
+    showPassword = signal(false);
+    showConfirmPassword = signal(false);
 
     constructor(
         private fb: FormBuilder,

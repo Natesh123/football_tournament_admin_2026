@@ -346,6 +346,7 @@ export class UsersComponent implements OnInit {
       next: () => {
         this.isLoading = false;
         this.userToDelete = null;
+        this.ui.showToast('User deleted successfully', 'success');
         this.loadData();
       },
       error: (err) => {
@@ -370,6 +371,7 @@ export class UsersComponent implements OnInit {
       next: () => {
         this.isLoading = false;
         this.showForm = false;
+        this.ui.showToast(this.editingUserId ? 'User updated successfully' : 'User created successfully', 'success');
         this.resetForm();
         this.loadData();
       },

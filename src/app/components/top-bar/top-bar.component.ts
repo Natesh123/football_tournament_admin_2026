@@ -47,13 +47,15 @@ export class TopBarComponent {
     ];
 
     constructor() {
-        this.translate.use('en');
+        const savedLang = localStorage.getItem('lang') || 'en';
+        this.translate.use(savedLang);
     }
 
     setLang(event: Event) {
         const lang = (event.target as HTMLSelectElement).value;
         this.currentLang.set(lang);
         this.translate.use(lang);
+        localStorage.setItem('lang', lang);
     }
 
     toggleProfile() {

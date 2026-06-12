@@ -115,21 +115,40 @@ import { SettingsService } from '../../settings/settings.service';
                 <div class="space-y-2">
                   <label class="text-[10px] text-zinc-500 uppercase font-black tracking-widest px-1">Current Password</label>
                   <div class="relative">
-                    <input formControlName="oldPassword" type="password" placeholder="Verify your current identity"
-                      class="w-full bg-black-bg/60 border border-black-border rounded-xl px-4 py-3.5 text-white placeholder-zinc-700 focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/30 transition-all font-medium" />
+                    <input formControlName="oldPassword" [type]="showOldPassword ? 'text' : 'password'" placeholder="Verify your current identity"
+                      class="w-full bg-black-bg/60 border border-black-border rounded-xl px-4 py-3.5 pr-12 text-white placeholder-zinc-700 focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/30 transition-all font-medium" />
+                    <button type="button" (click)="showOldPassword = !showOldPassword" class="absolute right-4 top-4 text-zinc-600 hover:text-gold-400 transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="showOldPassword ? 'M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064-7 9.542-7 1.153 0 2.253.197 3.275.558M16.516 16.516l3.484 3.484M4.221 4.221l15.558 15.558' : 'M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z'" />
+                      </svg>
+                    </button>
                   </div>
                 </div>
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div class="space-y-2">
                     <label class="text-[10px] text-zinc-500 uppercase font-black tracking-widest px-1">New Password</label>
-                    <input formControlName="newPassword" type="password" placeholder="New credentials"
-                      class="w-full bg-black-bg/60 border border-black-border rounded-xl px-4 py-3.5 text-white placeholder-zinc-700 focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/30 transition-all font-medium" />
+                    <div class="relative">
+                      <input formControlName="newPassword" [type]="showNewPassword ? 'text' : 'password'" placeholder="New credentials"
+                        class="w-full bg-black-bg/60 border border-black-border rounded-xl px-4 py-3.5 pr-12 text-white placeholder-zinc-700 focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/30 transition-all font-medium" />
+                      <button type="button" (click)="showNewPassword = !showNewPassword" class="absolute right-4 top-4 text-zinc-600 hover:text-gold-400 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="showNewPassword ? 'M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064-7 9.542-7 1.153 0 2.253.197 3.275.558M16.516 16.516l3.484 3.484M4.221 4.221l15.558 15.558' : 'M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z'" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                   <div class="space-y-2">
                     <label class="text-[10px] text-zinc-500 uppercase font-black tracking-widest px-1">Confirm New</label>
-                    <input formControlName="confirmPassword" type="password" placeholder="Repeat to confirm"
-                      class="w-full bg-black-bg/60 border border-black-border rounded-xl px-4 py-3.5 text-white placeholder-zinc-700 focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/30 transition-all font-medium" />
+                    <div class="relative">
+                      <input formControlName="confirmPassword" [type]="showConfirmPassword ? 'text' : 'password'" placeholder="Repeat to confirm"
+                        class="w-full bg-black-bg/60 border border-black-border rounded-xl px-4 py-3.5 pr-12 text-white placeholder-zinc-700 focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/30 transition-all font-medium" />
+                      <button type="button" (click)="showConfirmPassword = !showConfirmPassword" class="absolute right-4 top-4 text-zinc-600 hover:text-gold-400 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="showConfirmPassword ? 'M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064-7 9.542-7 1.153 0 2.253.197 3.275.558M16.516 16.516l3.484 3.484M4.221 4.221l15.558 15.558' : 'M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z'" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -187,6 +206,9 @@ export class ProfileModalComponent implements OnInit {
   isLoading = false;
   message = '';
   isSuccess = false;
+  showOldPassword = false;
+  showNewPassword = false;
+  showConfirmPassword = false;
 
   constructor(
     private fb: FormBuilder,
