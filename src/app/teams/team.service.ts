@@ -17,8 +17,31 @@ export interface Team {
     description?: string;
     captainName?: string;
     contactEmail?: string;
-    status: 'pending' | 'approved' | 'rejected';
     createdAt: string;
+}
+
+export interface TeamMatchSummary {
+    id: number;
+    opponent: string;
+    score?: string;
+    result?: 'W' | 'D' | 'L';
+    date: string;
+    venue?: string;
+    status?: string;
+    tournament: string;
+}
+
+export interface TeamStats {
+    totalMatches: number;
+    wins: number;
+    draws: number;
+    losses: number;
+    goalsScored: number;
+    goalsConceded: number;
+    cleanSheets: number;
+    winPercentage: number;
+    recentMatches: TeamMatchSummary[];
+    upcomingMatches: TeamMatchSummary[];
 }
 
 @Injectable({
@@ -39,6 +62,14 @@ export class TeamService {
 
     getById(id: string): Observable<Team> {
         return this.http.get<Team>(`${this.apiUrl}/${id}`);
+    }
+
+    getStats(id: string): Observable<TeamStats> {
+        return this.http.get<TeamStats>(`${this.apiUrl}/${id}/stats`);
+    }
+
+    delete(id: string): Observable<{ message: string }> {
+        return this.http.delete<{ message: string }>(`${this.apiUrl}/${id}`);
     }
 
     create(data: Partial<Team>): Observable<Team> {

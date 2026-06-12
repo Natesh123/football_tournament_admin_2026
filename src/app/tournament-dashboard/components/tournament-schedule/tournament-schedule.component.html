@@ -4,6 +4,25 @@
         <p class="text-zinc-500 mt-1.5">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.SUBTITLE' | translate }}</p>
     </div>
 
+    <!-- Venue details are required before matches can be scheduled -->
+    @if (!hasVenueDetails) {
+    <div class="flex items-center gap-4 bg-amber-400/10 border border-amber-400/30 rounded-xl p-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <div class="flex-1">
+            <h3 class="text-sm font-bold text-amber-400">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.VENUE_REQUIRED_TITLE' | translate }}</h3>
+            <p class="text-sm text-zinc-400 mt-0.5">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.VENUE_REQUIRED_DESC' | translate }}</p>
+        </div>
+        <button (click)="requireVenue.emit()"
+            class="px-4 py-2 bg-amber-400/20 hover:bg-amber-400/30 text-amber-400 rounded-lg text-sm font-bold transition-colors whitespace-nowrap">
+            {{ 'TOURNAMENT_DASHBOARD.SCHEDULE.GO_TO_VENUES' | translate }}
+        </button>
+    </div>
+    }
+
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Tournament Dates & Play Days -->
         <div class="bg-black-card border border-black-border rounded-xl p-6 space-y-6">
@@ -273,11 +292,26 @@
                     class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all [color-scheme:dark]" />
             </div>
 
-            <!-- Venue -->
+            <!-- Venue: matches are played at the tournament venue(s) -->
             <div>
-                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.VENUE_LABEL' | translate }}</label>
-                <input type="text" [(ngModel)]="editingMatch.venue" placeholder="{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.VENUE_LABEL' | translate }}"
-                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all" />
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.VENUE_LABEL' | translate }} <span class="text-red-500">*</span></label>
+                @if (venueOptions.length > 0) {
+                <select [(ngModel)]="editingMatch.venue"
+                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all">
+                    <option value="" disabled class="bg-black-card">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.SELECT_VENUE' | translate }}</option>
+                    @for (option of venueOptions; track option) {
+                    <option [value]="option" class="bg-black-card">{{ option }}</option>
+                    }
+                </select>
+                } @else {
+                <div class="bg-amber-400/10 border border-amber-400/30 rounded-lg px-4 py-3 flex items-center justify-between gap-3">
+                    <p class="text-sm text-amber-400">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.VENUE_REQUIRED_DESC' | translate }}</p>
+                    <button (click)="closeMatchEditor(); requireVenue.emit()"
+                        class="text-sm font-bold text-amber-400 hover:text-white transition-colors whitespace-nowrap">
+                        {{ 'TOURNAMENT_DASHBOARD.SCHEDULE.GO_TO_VENUES' | translate }}
+                    </button>
+                </div>
+                }
             </div>
 
             <!-- Break Duration -->

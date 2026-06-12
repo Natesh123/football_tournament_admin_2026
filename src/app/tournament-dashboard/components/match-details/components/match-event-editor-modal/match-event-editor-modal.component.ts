@@ -91,13 +91,13 @@ export class MatchEventEditorModalComponent implements OnInit, OnChanges {
         if (homeTeamId) {
             this.teamMemberService.getByTeamId(homeTeamId).subscribe({
                 next: (players) => this.homePlayers = players.sort((a, b) => a.name.localeCompare(b.name)),
-                error: (err) => console.error('Failed to fetch home players', err)
+                error: () => {}
             });
         }
         if (awayTeamId) {
             this.teamMemberService.getByTeamId(awayTeamId).subscribe({
                 next: (players) => this.awayPlayers = players.sort((a, b) => a.name.localeCompare(b.name)),
-                error: (err) => console.error('Failed to fetch away players', err)
+                error: () => {}
             });
         }
     }

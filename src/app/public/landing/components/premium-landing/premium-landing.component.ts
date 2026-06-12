@@ -1,1429 +1,1189 @@
-import { Component, OnInit, OnDestroy, ElementRef, AfterViewInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, inject, signal, computed, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { Meta, Title } from '@angular/platform-browser';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { API_URL } from '../../../../core/config/app.config';
+import { EpIconComponent } from '../ep-icon.component';
 
-gsap.registerPlugin(ScrollTrigger);
+/*
+  ELITE PITCH — landing page recreated from the Claude Design handoff bundle.
+  Deep warm black + metallic gold, faint pitch-green glow.
+  Display: Oswald (condensed, uppercase). Body: Manrope.
+  Reveal-on-scroll via IntersectionObserver (content stays visible if JS fails);
+  GSAP drives the on-load hero entrance plus scrub-linked parallax
+  (transform-only, desktop + no-reduced-motion only — see initParallax).
+*/
+
+interface Team { name: string; score: number | string; win?: boolean; grad: string; }
 
 @Component({
   selector: 'app-premium-landing',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule, EpIconComponent],
+  host: { '[class.io-ready]': 'ioReady()' },
   template: `
-    <main class="relative bg-[#0B0B0B] text-white overflow-x-hidden font-sans">
-      
-      <!-- ========================================
-          FLOATING ELEMENTS (Background)
-          ======================================== -->
-      <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div class="parallax-layer absolute w-64 h-64 border border-[#D4AF37]/10 rounded-full" 
-             style="top: 20%; left: 5%; transform: translateZ(-100px);"
-             data-speed="0.3"></div>
-        <div class="parallax-layer absolute w-96 h-96 border border-[#D4AF37]/5 rounded-full" 
-             style="top: 60%; right: -10%; transform: translateZ(-200px);"
-             data-speed="0.5"></div>
-        <div class="parallax-layer absolute w-32 h-32 bg-[#D4AF37]/5 rounded-full blur-3xl" 
-             style="top: 40%; left: 70%;"
-             data-speed="0.2"></div>
-        <div class="parallax-layer absolute w-48 h-48 bg-[#D4AF37]/3 rounded-full blur-3xl" 
-             style="top: 80%; left: 20%;"
-             data-speed="0.4"></div>
-        
-        <!-- Grid Pattern -->
-        <div class="absolute inset-0 opacity-[0.02]" 
-             style="background-image: linear-gradient(rgba(212,175,55,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(212,175,55,0.8) 1px, transparent 1px); background-size: 100px 100px;"></div>
+    <!-- page background: warm vignette + faint pitch lines -->
+    <div class="bg-vignette"></div>
+    <div class="bg-lines"></div>
+
+    <!-- ===================== NAV ===================== -->
+    <nav class="nav" [class.scrolled]="navScrolled()">
+      <div class="nav-inner">
+        <a href="#" class="brand">
+          <img class="brand-logo" src="images/logo-gold.png" alt="ATB Sports" />
+          <span class="name">ATB Sports<small>Admin Hub</small></span>
+        </a>
+        <div class="nav-links">
+          @for (l of navLinks(); track l.href) {
+            <a [href]="l.href">{{ l.label }}</a>
+          }
+        </div>
+        <div class="lang-switch" role="group" aria-label="Language">
+          @for (l of langs; track l.id) {
+            <button type="button" [class.on]="lang() === l.id" (click)="setLang(l.id)">{{ l.label }}</button>
+          }
+        </div>
+        <a href="/login" class="btn btn-gold nav-cta"><ep-icon name="log-in"></ep-icon> {{ t().login }}</a>
+        <button class="nav-burger" aria-label="Menu"><ep-icon name="menu"></ep-icon></button>
       </div>
+    </nav>
 
-      <!-- ========================================
-          NAVIGATION
-          ======================================== -->
-      <nav class="fixed top-4 left-0 right-0 mx-auto w-[92%] max-w-7xl z-50 transition-all duration-500 rounded-3xl" [class]="navClasses">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="flex items-center justify-between h-20">
-            <!-- Logo -->
-            <a href="#" class="flex items-center space-x-3 group">
-              <div class="w-12 h-12 flex items-center justify-center -ml-2">
-                <img src="/images/logo-gold.png" alt="ATB Sports" class="h-16 w-auto object-contain mix-blend-screen drop-shadow-[#D4AF37]">
-              </div>
-              <span class="text-2xl font-black tracking-widest text-[#D4AF37]">ATB SPORTS</span>
-            </a>
-            
-            <!-- Desktop Nav -->
-            <div class="hidden lg:flex items-center space-x-10">
-              <a *ngFor="let link of navLinks" [href]="link.href" 
-                 class="relative text-sm font-medium text-gray-300 hover:text-[#D4AF37] transition-colors group">
-                {{ link.label }}
-                <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#D4AF37] group-hover:w-full transition-all duration-300"></span>
-              </a>
-            </div>
-            
-            <!-- CTA Buttons -->
-            <div class="hidden lg:flex items-center space-x-4">
-              <a href="/login" class="text-sm font-semibold text-gray-300 hover:text-[#D4AF37] transition-colors">Login</a>
-              <a href="#pricing" class="px-6 py-3 bg-gradient-to-r from-[#D4AF37] to-[#F4D03F] text-black font-bold text-sm rounded-xl hover:shadow-lg hover:shadow-[#D4AF37]/30 hover:scale-105 transition-all">
-                Get Started
-              </a>
-            </div>
-            
-            <!-- Mobile Menu Button -->
-            <button class="lg:hidden p-2 text-white" (click)="toggleMobileMenu()">
-              <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path *ngIf="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                <path *ngIf="mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
+    <!-- ===================== HERO ===================== -->
+    <header class="hero">
+      <div class="hero-pitch"></div>
+      <div class="hero-ball"><img src="assets/images/landing-ball.webp" alt="Gold football" /></div>
+      <div class="hero-whistle"><img src="assets/images/landing-whistle.webp" alt="Gold referee whistle" /></div>
+      <div class="hero-inner">
+        <h1 [class.lang-de]="lang() === 'de'">{{ t().heroTitle1 }}<br /><span class="gold-text">{{ t().heroTitle2 }}</span></h1>
+        <p class="hero-sub">{{ t().heroSub }}</p>
+        <div class="hero-cta">
+          <a href="/login" class="btn btn-gold">{{ t().signIn }}</a>
         </div>
-        
-        <!-- Mobile Menu -->
-        <div *ngIf="mobileMenuOpen" class="lg:hidden bg-black/40 backdrop-blur-xl border-t border-[#D4AF37]/20 rounded-b-3xl">
-          <div class="px-6 py-6 space-y-4">
-            <a *ngFor="let link of navLinks" [href]="link.href" (click)="closeMobileMenu()"
-               class="block py-3 text-lg font-medium text-gray-300 hover:text-[#D4AF37] border-b border-white/5">
-              {{ link.label }}
-            </a>
-            <div class="pt-4 space-y-3">
-              <a href="/login" class="block text-center py-3 text-gray-300">Login</a>
-              <a href="#pricing" (click)="closeMobileMenu()" class="block text-center py-3 bg-[#D4AF37] text-black font-bold rounded-xl">Get Started</a>
-            </div>
-          </div>
+      </div>
+    </header>
+
+    <!-- ===================== FEATURES ===================== -->
+    <section id="features">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="eyebrow">{{ t().featEyebrow }}</span>
+          <h2>{{ t().featH2 }}</h2>
+          <p>{{ t().featP }}</p>
         </div>
-      </nav>
-
-      <!-- ========================================
-          HERO SECTION
-          ======================================== -->
-      <section id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden pt-36 pb-20">
-        <!-- Hero Background -->
-        <div class="absolute inset-0">
-          <!-- Radial Gradient -->
-          <div class="absolute inset-0 bg-gradient-radial from-[#1a1a1a] via-[#0B0B0B] to-[#0B0B0B]"></div>
-          
-          <!-- Glowing Orbs -->
-          <div class="hero-orb absolute top-1/4 left-1/4 w-[700px] h-[700px] bg-[#D4AF37]/10 rounded-full blur-[150px]" data-parallax="0.2"></div>
-          <div class="hero-orb absolute bottom-1/4 right-1/4 w-[900px] h-[900px] bg-[#D4AF37]/5 rounded-full blur-[200px]" data-parallax="0.3"></div>
-          <div class="hero-orb absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#D4AF37]/8 rounded-full blur-[120px]" data-parallax="0.1"></div>
-          
-          <!-- Floating Particles -->
-          <div class="absolute inset-0 overflow-hidden pointer-events-none">
-            <div *ngFor="let p of particles; let i = index"
-                 class="absolute w-1.5 h-1.5 bg-[#D4AF37]/40 rounded-full floating-dot"
-                 [style.left.%]="p.x"
-                 [style.top.%]="p.y"
-                 [style.animation-delay.s]="p.delay"
-                 [style.animation-duration.s]="p.duration">
+        <div class="feat-grid">
+          @for (f of features; track f.title) {
+            <div class="feat-card reveal">
+              <div class="feat-ico"><ep-icon [name]="f.icon"></ep-icon></div>
+              <h3>{{ f.title }}</h3>
+              <p>{{ f.desc }}</p>
+              <span class="more">Learn more <ep-icon name="arrow-right"></ep-icon></span>
             </div>
-          </div>
-
-          <!-- Football Animated Elements -->
-          <div class="absolute inset-0 overflow-hidden pointer-events-none z-0">
-            <div *ngFor="let icon of footballIcons" 
-                 class="football-element absolute opacity-[0.07] blur-[1px] text-[#D4AF37] hover:opacity-30 transition-opacity duration-700"
-                 [style.left.%]="icon.x"
-                 [style.top.%]="icon.y"
-                 [style.width.px]="icon.size"
-                 [style.height.px]="icon.size"
-                 [style.transform]="'rotate(' + icon.rotation + 'deg)'">
-               <div [innerHTML]="getIconSvg(icon.type)" class="w-full h-full"></div>
-            </div>
-
-            <!-- Tactical Sketches -->
-            <div class="absolute left-[3%] bottom-[15%] w-[350px] h-[250px] opacity-[0.04] rotate-[-8deg] border-2 border-dashed border-[#D4AF37] rounded-3xl p-6 hidden lg:block">
-              <div class="relative w-full h-full">
-                <!-- Half Field Line -->
-                <div class="absolute left-0 right-0 top-1/2 h-0.5 bg-[#D4AF37]"></div>
-                <!-- Penalty Area -->
-                <div class="absolute left-1/4 right-1/4 top-0 h-1/4 border-2 border-[#D4AF37] rounded-b-xl border-t-0"></div>
-                <!-- Play Arrow -->
-                <svg class="absolute top-1/3 left-1/4 w-32 h-32 text-[#D4AF37]" viewBox="0 0 100 100">
-                  <path d="M10 80 C 10 30, 80 30, 80 80" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="8 6"></path>
-                  <polygon points="80 80, 72 75, 76 84" fill="currentColor"></polygon>
-                </svg>
-                <!-- X and O marks -->
-                <div class="absolute top-1/4 left-1/3 text-2xl font-black text-[#D4AF37]">X</div>
-                <div class="absolute top-1/2 left-2/3 text-2xl font-black text-[#D4AF37]">O</div>
-              </div>
-            </div>
-
-            <div class="absolute right-[3%] top-[20%] w-[300px] h-[200px] opacity-[0.04] rotate-[12deg] border-2 border-dashed border-[#D4AF37] rounded-3xl p-6 hidden lg:block">
-               <div class="relative w-full h-full">
-                <div class="absolute top-1/4 left-1/4 w-4 h-4 rounded-full border-2 border-[#D4AF37]"></div>
-                <div class="absolute top-1/2 right-1/4 w-4 h-4 rounded-full border-2 border-[#D4AF37]"></div>
-                <svg class="absolute top-1/4 right-1/4 w-32 h-32 text-[#D4AF37]" viewBox="0 0 100 100">
-                  <path d="M80 20 C 10 20, 10 80, 80 80" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="8 6"></path>
-                  <polygon points="80 80, 72 75, 76 84" fill="currentColor"></polygon>
-                </svg>
-              </div>
-            </div>
-
-            <div class="action-player-left absolute -left-[6%] top-[8%] w-[680px] h-[680px] pointer-events-none z-0 hidden xl:block mix-blend-screen transition-transform duration-100 ease-out" id="parallax-left" style="-webkit-mask-image: radial-gradient(circle at 45% 50%, black 50%, transparent 100%);">
-              <img src="assets/images/hero-striker-pro.png" alt="" class="w-full h-full object-contain filter contrast-125 brightness-110 drop-shadow-[0_0_100px_rgba(212,175,55,0.4)]">
-            </div>
-            <div class="action-player-right absolute -right-[8%] top-[2%] w-[780px] h-[780px] pointer-events-none z-0 hidden xl:block mix-blend-screen transition-transform duration-100 ease-out" id="parallax-right" style="-webkit-mask-image: radial-gradient(circle at 55% 50%, black 50%, transparent 100%);">
-              <img src="assets/images/hero-goal-pro.png" alt="" class="w-full h-full object-contain filter contrast-125 brightness-110 drop-shadow-[0_0_120px_rgba(212,175,55,0.5)]">
-            </div>
-
-            <!-- Cinematic Atmospheric Fog -->
-            <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#0B0B0B] via-transparent to-transparent pointer-events-none z-10"></div>
-            
-            <!-- Lens Flare Effect -->
-            <div class="absolute top-[20%] left-[30%] w-[400px] h-[400px] bg-[#D4AF37]/5 rounded-full blur-[150px] pointer-events-none animate-pulse"></div>
-
-            <!-- Custom Gold Embers -->
-            <div class="absolute inset-0 overflow-hidden pointer-events-none z-10">
-              <div *ngFor="let i of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" 
-                   class="absolute w-1 h-1 bg-[#D4AF37] rounded-full gold-ember"
-                   [style.left.%]="(i * 7) % 100"
-                   [style.top.%]="(i * 13) % 100"
-                   [style.animation-delay.s]="i * 0.4"
-                   [style.opacity]="0.4">
-              </div>
-            </div>
-
-            <!-- Enhanced Glow Beams -->
-            <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.08)_0%,transparent_70%)] pointer-events-none"></div>
-
-            <!-- Mockup Sparkles -->
-            <div class="absolute bottom-[20%] right-[8%] w-16 h-16 text-[#D4AF37] opacity-40 animate-pulse pointer-events-none hidden lg:block">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.5 7.5L22 10l-7.5 2.5L12 20l-2.5-7.5L2 10l7.5-2.5L12 0z"/></svg>
-            </div>
-          </div>
+          }
         </div>
-        
-          <!-- Hero Content -->
-          <div class="relative z-20 max-w-7xl mx-auto px-6 text-center">
-            <!-- Badge -->
-            <div class="hero-badge inline-flex items-center space-x-3 px-6 py-3 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 mb-10">
-            <span class="relative flex h-2.5 w-2.5">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4AF37] opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#D4AF37]"></span>
-            </span>
-            <span class="text-[#D4AF37] font-semibold tracking-wide">Season 2026 Now Live</span>
-          </div>
-          
-          <!-- Main Headline -->
-          <!-- Main Headline -->
-          <h1 class="hero-title text-5xl md:text-6xl lg:text-[85px] font-black leading-[1.1] tracking-tighter mb-10">
-            <span class="block text-white mb-2">ORGANIZE.</span>
-            <span class="block bg-gradient-to-r from-[#D4AF37] via-[#F4D03F] to-[#D4AF37] bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient mb-2">COMPETE.</span>
-            <span class="block text-white/80 mt-2">CONQUER.</span>
-          </h1>
-          
-      
-          
-          <!-- CTA Buttons -->
-          <!-- CTA Buttons -->
-          <div class="hero-buttons flex flex-col sm:flex-row items-center justify-start gap-6 mb-20 sm:ml-10 lg:ml-[15%]">
-            <a href="/register" class="group relative px-10 py-5 bg-gradient-to-r from-[#D4AF37] to-[#F4D03F] text-black font-bold text-lg rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-[0_0_50px_rgba(212,175,55,0.5)] hover:scale-105">
-              <span class="relative z-10 flex items-center">
-                Start Free Trial
-                <svg class="w-6 h-6 ml-3 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </span>
-            </a>
-            <a href="#tournaments" class="group px-10 py-5 border-2 border-[#D4AF37]/50 text-[#D4AF37] font-bold text-lg rounded-2xl hover:bg-[#D4AF37]/10 hover:border-[#D4AF37] transition-all duration-300 flex items-center">
-              View Tournaments
-              <svg class="w-6 h-6 ml-3 group-hover:translate-y-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-              </svg>
-            </a>
-          </div>
-          
-          <!-- Stats Grid -->
-          <div class="hero-stats grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-            <div *ngFor="let stat of heroStats; let i = index" 
-                 class="stat-card group p-6 md:p-8 rounded-3xl bg-white/[0.03] backdrop-blur-sm border border-white/10 hover:border-[#D4AF37]/50 hover:bg-[#D4AF37]/5 transition-all duration-500 cursor-pointer">
-              <div class="text-4xl md:text-5xl font-black text-[#D4AF37] mb-3 group-hover:scale-110 transition-transform">{{ stat.value }}</div>
-              <div class="text-gray-400 text-sm uppercase tracking-wider font-medium">{{ stat.label }}</div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Scroll Indicator -->
-        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center space-y-3">
-          <span class="text-gray-600 text-xs uppercase tracking-[0.3em]">Scroll</span>
-          <div class="w-7 h-12 border-2 border-[#D4AF37]/40 rounded-full flex justify-center pt-2">
-            <div class="w-1.5 h-3 bg-[#D4AF37] rounded-full animate-bounce"></div>
-          </div>
-        </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- ========================================
-          TOURNAMENTS SECTION
-          ======================================== -->
-      <section id="tournaments" class="relative py-32 overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-b from-[#0B0B0B] via-[#0a0a0a] to-[#0B0B0B]"></div>
-        <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D4AF37]/40 to-transparent"></div>
-        
-        <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
-          <!-- Section Header -->
-          <div class="text-center mb-20">
-            <span class="section-label inline-block text-[#D4AF37] text-sm font-bold uppercase tracking-[0.3em] mb-6">Championships</span>
-            <h2 class="section-title text-5xl md:text-6xl lg:text-7xl font-black text-white mb-6">Featured Tournaments</h2>
-            <p class="text-gray-400 text-lg max-w-2xl mx-auto">Join the most prestigious football competitions from around the globe</p>
-          </div>
-          
-          <!-- Tournament Cards -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div *ngFor="let t of tournaments; let i = index" 
-                 class="tournament-card group relative rounded-3xl overflow-hidden bg-gradient-to-br from-white/[0.05] to-white/[0.02] border border-white/10 hover:border-[#D4AF37]/60 transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_30px_80px_rgba(212,175,55,0.2)]">
-              
-              <!-- Image Area -->
-              <div class="aspect-[16/10] relative overflow-hidden">
-                <img [src]="t.image" [alt]="t.name" 
-                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                     onerror="this.src='https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600'">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
-                
-                <!-- Type Badge -->
-                <div class="absolute top-4 right-4 px-4 py-1.5 bg-[#D4AF37] text-black text-xs font-bold rounded-full shadow-lg">
-                  {{ t.type }}
+    <!-- ===== DASHBOARD + BRACKET share the pitch backdrop ===== -->
+    <div class="pitch-band">
+    <div class="pitch-band-bg" aria-hidden="true"></div>
+    <!-- ===================== DASHBOARD ===================== -->
+    <section id="dashboard">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="eyebrow">{{ t().dashEyebrow }}</span>
+          <h2>{{ t().dashH2 }}</h2>
+          <p>{{ t().dashP }}</p>
+        </div>
+        <div class="dash-shell reveal">
+          <div class="dash">
+            <div class="dash-top">
+              <div class="dash-dots"><span></span><span></span><span></span></div>
+              <div class="dash-title"><b>ATB Sports</b> &nbsp;·&nbsp; Admin Control Panel</div>
+            </div>
+            <div class="dash-body">
+              <aside class="dash-side">
+                <div class="brand-sm"><img class="brand-logo sm" src="images/logo-gold.png" alt="ATB Sports" /> ATB Sports</div>
+                <nav class="dnav">
+                  @for (n of dashNav; track n.label) {
+                    <a [class.active]="n.active"><ep-icon [name]="n.icon"></ep-icon> {{ n.label }}</a>
+                  }
+                </nav>
+              </aside>
+              <div class="dash-main">
+                <div class="dh">
+                  <h4>Season Overview</h4>
+                  <span class="pill">2025–26 · Active</span>
                 </div>
-                
-                <!-- Prize Badge -->
-                <div class="absolute bottom-4 left-4 px-4 py-2 bg-black/60 backdrop-blur-md rounded-xl border border-[#D4AF37]/30">
-                  <span class="text-[#D4AF37] font-black text-lg">{{ t.prize }}</span>
+                <div class="metrics">
+                  @for (m of metrics; track m.k) {
+                    <div class="metric"><div class="k">{{ m.k }}</div><div class="v">{{ m.v }}</div><div class="d" [class.dn]="m.down">{{ m.d }}</div></div>
+                  }
                 </div>
-              </div>
-              
-              <!-- Content -->
-              <div class="p-7">
-                <h3 class="text-xl font-bold text-white mb-3 group-hover:text-[#D4AF37] transition-colors">{{ t.name }}</h3>
-                <p class="text-gray-400 text-sm mb-5 leading-relaxed">{{ t.description }}</p>
-                <div class="flex items-center justify-between">
-                  <span class="text-gray-500 text-sm flex items-center">
-                    <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    {{ t.date }}
-                  </span>
-                  <button class="text-[#D4AF37] font-semibold text-sm flex items-center hover:underline">
-                    Details
-                    <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ========================================
-          FEATURES SECTION
-          ======================================== -->
-      <section id="features" class="relative py-32 overflow-hidden">
-        <div class="absolute inset-0 bg-[#0B0B0B]"></div>
-        <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D4AF37]/40 to-transparent"></div>
-        <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D4AF37]/40 to-transparent"></div>
-        
-        <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
-          <!-- Section Header -->
-          <div class="text-center mb-20">
-            <span class="section-label inline-block text-[#D4AF37] text-sm font-bold uppercase tracking-[0.3em] mb-6">Capabilities</span>
-            <h2 class="section-title text-5xl md:text-6xl lg:text-7xl font-black text-white mb-6">Powerful Features</h2>
-            <p class="text-gray-400 text-lg max-w-2xl mx-auto">Everything you need to run world-class tournaments</p>
-          </div>
-          
-          <!-- Features Grid -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div *ngFor="let f of features; let i = index" 
-                 class="feature-card group p-8 md:p-10 rounded-3xl bg-gradient-to-br from-white/[0.05] to-white/[0.02] border border-white/10 hover:border-[#D4AF37]/50 hover:bg-[#D4AF37]/5 transition-all duration-500 cursor-pointer"
-                 [style.transition-delay.ms]="i * 100">
-              
-              <!-- Icon -->
-              <div class="w-16 h-16 mb-8 rounded-2xl bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 flex items-center justify-center group-hover:scale-110 group-hover:from-[#D4AF37]/30 group-hover:to-[#D4AF37]/10 transition-all duration-300">
-                <div [innerHTML]="f.icon" class="w-8 h-8 text-[#D4AF37]"></div>
-              </div>
-              
-              <h3 class="text-xl font-bold text-white mb-4 group-hover:text-[#D4AF37] transition-colors">{{ f.title }}</h3>
-              <p class="text-gray-400 leading-relaxed">{{ f.description }}</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ========================================
-          ABOUT / SPLIT SECTION
-          ======================================== -->
-      <section id="about" class="relative py-32 overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-b from-[#0B0B0B] to-[#080808]"></div>
-        
-        <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
-            
-            <!-- Left: Content -->
-            <div class="order-2 lg:order-1">
-              <span class="section-label inline-block text-[#D4AF37] text-sm font-bold uppercase tracking-[0.3em] mb-6">About Us</span>
-              <h2 class="section-title text-4xl md:text-5xl lg:text-6xl font-black text-white mb-8 leading-tight">
-                Revolutionizing<br>
-                <span class="bg-gradient-to-r from-[#D4AF37] to-[#F4D03F] bg-clip-text text-transparent">Football</span> Management
-              </h2>
-              <p class="text-gray-400 text-lg leading-relaxed mb-10">
-                We're building the future of football tournament management. Our platform brings together organizers, teams, and fans in one powerful ecosystem, delivering unmatched experiences.
-              </p>
-              
-              <!-- Benefits List -->
-              <div class="space-y-5 mb-10">
-                <div *ngFor="let point of aboutPoints" class="flex items-start space-x-4">
-                  <div class="w-8 h-8 mt-0.5 rounded-lg bg-[#D4AF37]/20 flex items-center justify-center flex-shrink-0">
-                    <svg class="w-4 h-4 text-[#D4AF37]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                    </svg>
+                <div class="dash-tables">
+                  <div class="dbox">
+                    <div class="bh"><span>Recent Results</span><span>FT</span></div>
+                    @for (r of recentResults; track r.av) {
+                      <div class="drow"><span class="av" [style.background]="r.grad">{{ r.av }}</span><span class="nm">{{ r.home }} <span class="sub">vs {{ r.away }}</span></span><span class="sc">{{ r.score }}</span></div>
+                    }
                   </div>
-                  <span class="text-gray-300 text-lg">{{ point }}</span>
-                </div>
-              </div>
-              
-              <a href="#cta" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-[#D4AF37] to-[#F4D03F] text-black font-bold rounded-xl hover:shadow-lg hover:shadow-[#D4AF37]/30 hover:scale-105 transition-all">
-                Learn More
-                <svg class="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </a>
-            </div>
-            
-            <!-- Right: Dashboard Visual Stack -->
-            <div class="about-visual order-1 lg:order-2 relative">
-              <div class="relative min-h-[450px] flex items-center justify-center">
-                <!-- Background Graph (Subtle) -->
-                <div class="about-bg-graph absolute inset-0 opacity-[0.03] pointer-events-none z-0 overflow-hidden">
-                  <div class="flex items-end gap-2 h-full w-[150%] -ml-[25%]">
-                    <div *ngFor="let b of [80, 45, 90, 65, 85, 50, 95, 70, 40, 60, 100, 75, 45, 80, 55, 90]" 
-                         class="flex-1 bg-white rounded-t-lg" [style.height.%]="b"></div>
+                  <div class="dbox">
+                    <div class="bh"><span>Top Scorers</span><span>Goals</span></div>
+                    @for (s of topScorers; track s.name) {
+                      <div class="bar-row"><span class="bl">{{ s.name }}</span><span class="bar"><i [style.width.%]="s.pct"></i></span><span class="bv">{{ s.goals }}</span></div>
+                    }
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-                <!-- Glow Effect -->
-                <div class="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/15 via-transparent to-[#D4AF37]/15 rounded-[3rem] blur-3xl"></div>
-
-                <!-- Card 1 (back) - Small Analytics Graph -->
-                <div class="about-card-1 absolute -bottom-6 -left-8 w-60 rounded-2xl bg-[#0b0b0b] border border-white/5 p-5 shadow-2xl z-10">
-                  <p class="text-[9px] text-[#D4AF37] font-bold uppercase tracking-widest mb-3">Analytics</p>
-                  <div class="relative h-16 mb-2">
-                    <div class="relative h-full flex items-end gap-1 z-10">
-                      <div *ngFor="let b of [40, 70, 50, 90, 60, 80, 75]" 
-                           class="about-graph-bar flex-1 rounded-t-sm bg-gradient-to-t from-[#D4AF37]/10 to-[#D4AF37]/40" 
-                           [style.height.%]="b"></div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Card 2 (middle) - Match Score Card -->
-                <div class="about-card-2 absolute -top-8 -right-8 w-52 rounded-2xl bg-[#0f0f0f] border border-[#D4AF37]/10 p-4 shadow-xl z-20">
-                  <div class="flex items-center gap-2 mb-2">
-                    <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span>
-                    <span class="text-[8px] font-bold text-red-400 uppercase tracking-widest">Live</span>
-                  </div>
-                  <div class="flex items-center justify-between text-white">
-                    <span class="font-bold text-[10px]">RMA</span>
-                    <span class="text-lg font-black text-[#D4AF37]">2 - 1</span>
-                    <span class="font-bold text-[10px]">BAY</span>
-                  </div>
-                </div>
-
-                <!-- Card 3 (front) - Main Standings Card -->
-                <div class="about-card-3 relative w-72 rounded-[1.5rem] overflow-hidden border border-[#D4AF37]/30 shadow-2xl z-30">
-                  <div class="bg-gradient-to-br from-[#111] to-[#0B0B0B] p-6">
-                    <div class="flex items-center justify-between mb-5">
-                      <div class="flex items-center gap-2">
-                        <img src="/images/logo-gold.png" alt="ATB" class="h-4 w-auto object-contain mix-blend-screen">
-                        <span class="text-[10px] font-black text-[#D4AF37] tracking-widest uppercase">Live Standings</span>
-                      </div>
-                      <div class="px-2 py-0.5 rounded-full bg-gold/10 border border-gold/20">
-                        <span class="text-[8px] font-bold text-gold">PRO</span>
+    <!-- ===================== BRACKET ===================== -->
+    <section id="bracket">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="eyebrow">{{ t().brackEyebrow }}</span>
+          <h2>{{ t().brackH2 }}</h2>
+          <p>{{ t().brackP }}</p>
+        </div>
+        <div class="bracket-wrap reveal">
+          <div class="bracket">
+            @for (round of bracket; track round.label) {
+              <div class="round">
+                <div class="round-label">{{ round.label }}</div>
+                <div class="matches">
+                  @for (match of round.matches; track $index) {
+                    <div class="match">
+                      <div class="match-card">
+                        @for (t of match; track $index) {
+                          <div class="team-row" [class.win]="t.win">
+                            <span class="badge" [style.background]="t.grad"><ep-icon name="shield"></ep-icon></span>
+                            <span class="tn">{{ t.name }}</span>
+                            <span class="ts">{{ t.score }}</span>
+                            @if (t.win) { <ep-icon class="adv" name="check"></ep-icon> }
+                          </div>
+                        }
                       </div>
                     </div>
-                    
-                    <div class="space-y-3">
-                      <div *ngFor="let s of mockStandings" class="flex items-center gap-3 py-2 border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors px-1 rounded-lg">
-                        <span class="w-4 text-[10px] text-zinc-500 font-mono">{{s.pos}}</span>
-                        <span class="flex-1 text-xs text-white font-medium truncate">{{s.team}}</span>
-                        <div class="flex items-center gap-2">
-                          <span class="text-[10px] text-zinc-500">Pts</span>
-                          <span class="text-xs text-[#D4AF37] font-black">{{s.pts}}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  }
                 </div>
-
-                <!-- Floating Badge -->
-                <div class="absolute bottom-12 -right-4 z-30 px-3 py-2 bg-[#D4AF37] rounded-xl shadow-lg shadow-[#D4AF37]/30">
-                  <p class="text-black text-[10px] font-black uppercase tracking-widest">🏆 500+ Tournaments</p>
+              </div>
+            }
+            <div class="round champ-col">
+              <div class="round-label">Champion</div>
+              <div class="matches">
+                <div class="match">
+                  <div class="champ">
+                    <div class="cup"><ep-icon name="trophy"></ep-icon></div>
+                    <div class="ct">Champions</div>
+                    <div class="cn gold-text">Falcons United</div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
+    </div>
 
-      <!-- ========================================
-          PRICING SECTION
-          ======================================== -->
-      <section id="pricing" class="relative py-32 overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-b from-[#080808] to-[#0B0B0B]"></div>
-        <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D4AF37]/40 to-transparent"></div>
-        
-        <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
-          <!-- Section Header -->
-          <div class="text-center mb-20">
-            <span class="section-label inline-block text-[#D4AF37] text-sm font-bold uppercase tracking-[0.3em] mb-6">Pricing</span>
-            <h2 class="section-title text-5xl md:text-6xl lg:text-7xl font-black text-white mb-6">Choose Your Plan</h2>
-            <p class="text-gray-400 text-lg max-w-2xl mx-auto">Select the perfect plan for your tournament needs</p>
-          </div>
-          
-          <!-- Pricing Cards -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
-            <div *ngFor="let plan of pricingPlans; let i = index" 
-                 class="pricing-card relative rounded-3xl p-8 lg:p-10 transition-all duration-500 hover:-translate-y-2"
-                 [class.bg-gradient-to-br]="plan.featured"
-                 [class.from-[#D4AF37]/15]="plan.featured"
-                 [class.to-black]="plan.featured"
-                 [class.border-2]="plan.featured"
-                 [class.border-[#D4AF37]/50]="plan.featured"
-                 [class.-mt-8]="plan.featured"
-                 [class.md:-mt-8]="plan.featured"
-                 [class.shadow-2xl]="plan.featured"
-                 [class.shadow-[#D4AF37]/10]="plan.featured"
-                 [class]="!plan.featured ? 'bg-gradient-to-br from-white/[0.05] to-white/[0.02] border border-white/10' : ''">
-              
-              <!-- Popular Badge -->
-              <div *ngIf="plan.featured" class="absolute -top-4 left-1/2 -translate-x-1/2 px-6 py-2 bg-gradient-to-r from-[#D4AF37] to-[#F4D03F] text-black text-xs font-bold rounded-full shadow-lg">
-                MOST POPULAR
-              </div>
-              
-              <h3 class="text-2xl font-bold text-white mb-2">{{ plan.name }}</h3>
-              <p class="text-gray-400 text-sm mb-6">{{ plan.description }}</p>
-              
-              <div class="mb-8">
-                <span class="text-6xl font-black text-white">{{ plan.price }}</span>
-                <span class="text-gray-500 text-lg">/{{ plan.period }}</span>
-              </div>
-              
-              <ul class="space-y-4 mb-10">
-                <li *ngFor="let feature of plan.features" class="flex items-center space-x-3">
-                  <svg class="w-5 h-5 text-[#D4AF37] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span class="text-gray-300 text-sm">{{ feature }}</span>
-                </li>
+    <!-- ===================== PRICING ===================== -->
+    <section id="pricing">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="eyebrow">{{ t().priceEyebrow }}</span>
+          <h2>{{ t().priceH2 }}</h2>
+          <p>{{ t().priceP }}</p>
+        </div>
+        <div class="price-grid">
+          @for (p of pricing; track p.tier) {
+            <div class="price-card reveal" [class.featured]="p.featured">
+              <div class="tier">{{ p.tier }}</div>
+              <div class="desc">{{ p.desc }}</div>
+              <div class="amt">{{ p.amt }}@if (p.per) {<small> {{ p.per }}</small>}</div>
+              <div class="per">{{ p.note }}</div>
+              <ul class="price-feats">
+                @for (feat of p.feats; track feat.label) {
+                  <li [class.off]="feat.off"><ep-icon [name]="feat.off ? 'minus' : 'check'"></ep-icon> {{ feat.label }}</li>
+                }
               </ul>
-              
-              <a [href]="plan.ctaLink" 
-                 class="block text-center py-4 rounded-xl font-bold transition-all duration-300"
-                 [class.bg-[#D4AF37]]="plan.featured"
-                 [class.text-black]="plan.featured"
-                 [class.hover:bg-[#F4D03F]]="plan.featured"
-                 [class.shadow-lg]="plan.featured"
-                 [class.shadow-[#D4AF37]/30]="plan.featured"
-                 [class.border]="!plan.featured"
-                 [class.border-[#D4AF37]/50]="!plan.featured"
-                 [class.text-[#D4AF37]]="!plan.featured"
-                 [class.hover.bg-[#D4AF37]/10]="!plan.featured">
-                {{ plan.cta }}
-              </a>
+              <a href="/register" class="btn" [class.btn-gold]="p.featured" [class.btn-ghost]="!p.featured">{{ p.cta }}</a>
             </div>
-          </div>
+          }
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- ========================================
-          TESTIMONIALS SECTION
-          ======================================== -->
-      <section id="testimonials" class="relative py-32 overflow-hidden">
-        <div class="absolute inset-0 bg-[#0B0B0B]"></div>
-        <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D4AF37]/40 to-transparent"></div>
-        
-        <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
-          <!-- Section Header -->
-          <div class="text-center mb-20">
-            <span class="section-label inline-block text-[#D4AF37] text-sm font-bold uppercase tracking-[0.3em] mb-6">Testimonials</span>
-            <h2 class="section-title text-5xl md:text-6xl lg:text-7xl font-black text-white mb-6">What They Say</h2>
-          </div>
-          
-          <!-- Testimonial Cards -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div *ngFor="let t of testimonials; let i = index" 
-                 class="testimonial-card p-8 md:p-10 rounded-3xl bg-gradient-to-br from-white/[0.05] to-white/[0.02] border border-white/10 hover:border-[#D4AF37]/30 transition-all duration-500 hover:-translate-y-2">
-              
-              <!-- Stars -->
-              <div class="flex space-x-1 mb-6">
-                <svg *ngFor="let s of [1,2,3,4,5]" class="w-5 h-5 text-[#D4AF37]" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-                </svg>
-              </div>
-              
-              <!-- Quote -->
-              <p class="text-gray-300 leading-relaxed mb-8 text-lg">"{{ t.text }}"</p>
-              
-              <!-- Author -->
-              <div class="flex items-center space-x-4">
-                <img [src]="t.avatar" [alt]="t.name"
-                     class="w-14 h-14 rounded-2xl object-cover border-2 border-[#D4AF37]/30 shadow-lg shadow-[#D4AF37]/10"
-                     onerror="this.style.display='none'">
-                <div>
-                  <div class="text-white font-bold text-lg">{{ t.name }}</div>
-                  <div class="text-gray-500 text-sm">{{ t.role }}</div>
+    <!-- ===================== FIXTURES ===================== -->
+    <section id="fixtures">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="eyebrow">{{ t().fixEyebrow }}</span>
+          <h2>{{ t().fixH2 }}</h2>
+          <p>{{ t().fixP }}</p>
+        </div>
+        <div class="fixtures reveal">
+          <div class="fix-card">
+            <div class="fix-head">
+              <h3>Today's Matches</h3>
+              <span class="live"><span class="dot"></span> Live Now</span>
+            </div>
+            <div class="fix-colhead"><span>Match</span><span>Venue</span><span>Kickoff</span><span></span></div>
+            @for (fx of fixtures; track $index) {
+              <div class="fix-row">
+                <div class="matchup">
+                  <span class="badge" [style.background]="fx.home.grad"><ep-icon name="shield"></ep-icon></span>
+                  <span class="tt">{{ fx.home.name }}</span>
+                  <span class="vs">vs</span>
+                  <span class="badge" [style.background]="fx.away.grad"><ep-icon name="shield"></ep-icon></span>
+                  <span class="tt">{{ fx.away.name }}</span>
                 </div>
+                <div class="venue">{{ fx.venue }}</div>
+                <div class="time">{{ fx.time }}<small>{{ fx.day }}</small></div>
+                <a href="#" class="watch"><ep-icon name="play"></ep-icon> Watch Live</a>
               </div>
-            </div>
+            }
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- ========================================
-          SPONSORS SECTION
-          ======================================== -->
-      <section id="sponsors" class="relative py-24 overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-b from-[#0B0B0B] to-[#0a0a0a]"></div>
-        <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D4AF37]/40 to-transparent"></div>
-        
-        <div class="relative z-10">
-          <!-- Section Header -->
-          <div class="text-center mb-16">
-            <span class="section-label inline-block text-[#D4AF37] text-sm font-bold uppercase tracking-[0.3em] mb-6">Partners</span>
-            <h2 class="section-title text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6">Our Sponsors</h2>
-            <p class="text-gray-400 text-lg max-w-2xl mx-auto">Trusted by world-class brands and organizations</p>
-          </div>
-          
-          <!-- Marquee Container -->
-          <div class="relative overflow-hidden">
-            <!-- Gradient Fades -->
-            <div class="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-[#0B0B0B] to-transparent z-10 pointer-events-none"></div>
-            <div class="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-[#0B0B0B] to-transparent z-10 pointer-events-none"></div>
-            
-            <!-- Marquee Track -->
-            <div class="flex animate-marquee hover:pause">
-              <div *ngFor="let sponsor of sponsors; let i = index" 
-                   class="flex-shrink-0 mx-8 group cursor-pointer">
-                <div class="sponsor-card w-56 h-32 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-[#D4AF37]/50 flex items-center justify-center p-6 transition-all duration-500 hover:bg-[#D4AF37]/5 hover:shadow-[0_0_40px_rgba(212,175,55,0.15)] hover:scale-105">
-                  <img [src]="sponsor.logo" [alt]="sponsor.name" 
-                       class="h-12 object-contain grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:opacity-100 opacity-60"
-                       onerror="this.style.display='none'">
-                  <span *ngIf="!sponsor.logo" class="text-gray-500 font-bold text-lg group-hover:text-[#D4AF37] transition-colors">{{ sponsor.name }}</span>
-                </div>
-              </div>
-              <!-- Duplicate for seamless loop -->
-              <div *ngFor="let sponsor of sponsors; let i = index" 
-                   class="flex-shrink-0 mx-8 group cursor-pointer">
-                <div class="sponsor-card w-56 h-32 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-[#D4AF37]/50 flex items-center justify-center p-6 transition-all duration-500 hover:bg-[#D4AF37]/5 hover:shadow-[0_0_40px_rgba(212,175,55,0.15)] hover:scale-105">
-                  <img [src]="sponsor.logo" [alt]="sponsor.name" 
-                       class="h-12 object-contain grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:opacity-100 opacity-60"
-                       onerror="this.style.display='none'">
-                  <span *ngIf="!sponsor.logo" class="text-gray-500 font-bold text-lg group-hover:text-[#D4AF37] transition-colors">{{ sponsor.name }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Stats Row -->
-          <div class="max-w-5xl mx-auto px-6 lg:px-8 mt-20">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-              <div *ngFor="let stat of sponsorStats" class="text-center group">
-                <div class="text-4xl md:text-5xl font-black text-[#D4AF37] mb-2 group-hover:scale-110 transition-transform">{{ stat.value }}</div>
-                <div class="text-gray-500 text-sm uppercase tracking-wider">{{ stat.label }}</div>
-              </div>
-            </div>
+    <!-- ===================== TESTIMONIALS ===================== -->
+    <section id="testimonials">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="eyebrow">{{ t().testiEyebrow }}</span>
+          <h2>{{ t().testiH2 }}</h2>
+          <p>{{ t().testiP }}</p>
+        </div>
+        <div class="testi-grid" (mouseenter)="pauseTesti()" (mouseleave)="resumeTesti()">
+          @for (t of testimonials; track t.name; let i = $index) {
+            <article class="testi-card reveal" [class.active]="i === testiIdx()">
+              <span class="qmark">&ldquo;</span>
+              <p class="testi-quote">{{ t.text }}</p>
+              <div class="testi-name">— {{ t.name }}</div>
+              <span class="avatar" [style.background]="t.grad">{{ t.initials }}</span>
+            </article>
+          }
+        </div>
+        <div class="testi-dots">
+          @for (t of testimonials; track t.name; let i = $index) {
+            <button class="dot" [class.on]="i === testiIdx()" (click)="selectTesti(i)" [attr.aria-label]="'Show testimonial ' + (i + 1)"></button>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== CTA BANNER ===================== -->
+    <section class="cta-band">
+      <div class="cta-inner reveal">
+        <div class="cta-player">
+          <div class="cta-player-art"></div>
+        </div>
+        <div class="wrap cta-wrap">
+          <div class="cta-copy">
+            <span class="eyebrow">{{ t().ctaEyebrow }}</span>
+            <h2 style="margin-top:16px">{{ t().ctaH2 }}</h2>
+            <p>{{ t().ctaP }}</p>
+            <a href="/register" class="btn btn-gold">{{ t().ctaBtn }} <ep-icon name="arrow-right"></ep-icon></a>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- ========================================
-          CONTACT SECTION
-          ======================================== -->
-      <section id="contact" class="relative py-32 overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-b from-[#0B0B0B] to-[#080808]"></div>
-        <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D4AF37]/40 to-transparent"></div>
-        
-        <div class="relative z-10 max-w-4xl mx-auto px-6 lg:px-8">
-          <!-- Section Header -->
-          <div class="text-center mb-16">
-            <span class="section-label inline-block text-[#D4AF37] text-sm font-bold uppercase tracking-[0.3em] mb-6">Contact</span>
-            <h2 class="section-title text-5xl md:text-6xl lg:text-7xl font-black text-white mb-6">Get In Touch</h2>
-            <p class="text-gray-400 text-lg">Have questions? We'd love to hear from you.</p>
-          </div>
-          
-          <!-- Contact Form -->
-          <form (ngSubmit)="onSubmit()" class="space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <input type="text" [(ngModel)]="contactForm.name" name="name" placeholder="Your Name"
-                       class="w-full px-6 py-5 bg-white/[0.05] border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37]/50 focus:bg-[#D4AF37]/5 transition-all">
-              </div>
-              <div>
-                <input type="email" [(ngModel)]="contactForm.email" name="email" placeholder="Your Email"
-                       class="w-full px-6 py-5 bg-white/[0.05] border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37]/50 focus:bg-[#D4AF37]/5 transition-all">
-              </div>
-            </div>
-            <div>
-              <input type="text" [(ngModel)]="contactForm.subject" name="subject" placeholder="Subject"
-                     class="w-full px-6 py-5 bg-white/[0.05] border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37]/50 focus:bg-[#D4AF37]/5 transition-all">
-            </div>
-            <div>
-              <textarea [(ngModel)]="contactForm.message" name="message" rows="5" placeholder="Your Message"
-                        class="w-full px-6 py-5 bg-white/[0.05] border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37]/50 focus:bg-[#D4AF37]/5 transition-all resize-none"></textarea>
-            </div>
-            <button type="submit" 
-                    class="w-full py-5 bg-gradient-to-r from-[#D4AF37] to-[#F4D03F] text-black font-bold text-lg rounded-2xl hover:shadow-lg hover:shadow-[#D4AF37]/40 hover:scale-[1.02] transition-all">
-              Send Message
-            </button>
-          </form>
-        </div>
-      </section>
-
-      <!-- ========================================
-          CTA SECTION
-          ======================================== -->
-      <section id="cta" class="relative py-40 overflow-hidden">
-        <img src="https://images.unsplash.com/photo-1551958219-acbc608c6377?auto=format&fit=crop&w=2000&q=80" 
-             onerror="this.style.display='none'"
-             class="absolute inset-0 w-full h-full object-cover object-center z-0" 
-             alt="Professional Football Stadium" />
-        <div class="absolute inset-0 bg-black/60"></div>
-        <div class="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/20 via-transparent to-[#D4AF37]/10"></div>
-        <div class="absolute inset-0" style="background-image: radial-gradient(circle at 2px 2px, rgba(212,175,55,0.08) 1px, transparent 0); background-size: 50px 50px;"></div>
-        
-        <div class="relative z-10 max-w-5xl mx-auto px-6 lg:px-8 text-center">
-          <h2 class="cta-title text-5xl md:text-6xl lg:text-8xl font-black text-white mb-8 leading-tight">
-            Ready to<br>
-            <span class="bg-gradient-to-r from-[#D4AF37] to-[#F4D03F] bg-clip-text text-transparent">Dominate?</span>
-          </h2>
-          <p class="text-gray-400 text-xl md:text-2xl mb-12 max-w-3xl mx-auto">
-            Join thousands of tournament organizers who trust ATB SPORTS to deliver world-class experiences.
-          </p>
-          <div class="flex flex-col sm:flex-row items-center justify-center gap-5">
-            <a href="/register" class="cta-btn-primary magnetic px-12 py-5 bg-gradient-to-r from-[#D4AF37] to-[#F4D03F] text-black font-bold text-xl rounded-2xl hover:shadow-[0_0_60px_rgba(212,175,55,0.5)] hover:scale-105 transition-all">
-              Start Free Trial
+    <!-- ===================== FOOTER ===================== -->
+    <footer class="footer">
+      <div class="wrap">
+        <div class="foot-grid">
+          <div class="foot-brand">
+            <a href="#" class="brand">
+              <img class="brand-logo" src="images/logo-gold.png" alt="ATB Sports" />
+              <span class="name">ATB Sports<small>Admin Hub</small></span>
             </a>
-            <a href="/login" class="cta-btn-secondary px-12 py-5 border-2 border-white/20 text-white font-bold text-xl rounded-2xl hover:bg-white/10 hover:border-[#D4AF37]/50 transition-all">
-              Login to Dashboard
-            </a>
+            <p>The ultimate platform for running football tournaments, leagues and federations — from kickoff to final whistle.</p>
+            <div class="socials">
+              @for (s of socials; track s.icon) {
+                <a href="#" [attr.aria-label]="s.label"><ep-icon [name]="s.icon"></ep-icon></a>
+              }
+            </div>
+          </div>
+          @for (col of footerCols; track col.title) {
+            <div class="foot-col">
+              <h5>{{ col.title }}</h5>
+              @for (l of col.links; track l.label) {
+                <a [href]="l.href">{{ l.label }}</a>
+              }
+            </div>
+          }
+          <div class="news">
+            <h5>Newsletter</h5>
+            <p>Match-day tips, product news and tournament insights — straight to your inbox.</p>
+            <form (ngSubmit)="onSubmit()">
+              <input type="email" [(ngModel)]="contactForm.email" name="email" placeholder="Your email address" />
+              <button class="btn btn-gold" type="submit" [disabled]="contactSubmitting()">
+                {{ contactSubmitting() ? '...' : (contactSuccess() ? 'Done' : 'Join') }}
+              </button>
+            </form>
           </div>
         </div>
-      </section>
-
-      <!-- ========================================
-          FOOTER
-          ======================================== -->
-      <footer class="relative pt-24 pb-10 bg-[#080808]">
-        <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D4AF37]/40 to-transparent"></div>
-        
-        <div class="max-w-7xl mx-auto px-6 lg:px-8">
-          <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-16">
-            
-            <!-- Brand -->
-            <div class="col-span-2 lg:col-span-1">
-              <a href="#" class="flex items-center space-x-3 mb-6">
-                <div class="w-12 h-12 flex items-center justify-center -ml-2">
-                   <img src="/images/logo-gold.png" alt="ATB Sports" class="h-16 w-auto object-contain mix-blend-screen drop-shadow-[#D4AF37]">
-                </div>
-                <span class="text-2xl font-black tracking-widest text-[#D4AF37]">ATB SPORTS</span>
-              </a>
-              <p class="text-gray-500 text-sm leading-relaxed mb-6">
-                The world's most advanced football tournament platform.
-              </p>
-              <!-- Social Links -->
-              <div class="flex space-x-4">
-                <a *ngFor="let social of socials" [href]="social.url" 
-                   class="w-11 h-11 rounded-xl bg-white/5 flex items-center justify-center text-gray-400 hover:bg-[#D4AF37] hover:text-black transition-all hover:-translate-y-1">
-                  <div [innerHTML]="social.icon" class="w-5 h-5"></div>
-                </a>
-              </div>
-            </div>
-            
-            <!-- Links -->
-            <div *ngFor="let col of footerLinks">
-              <h5 class="text-white font-bold uppercase tracking-widest text-sm mb-6">{{ col.title }}</h5>
-              <ul class="space-y-4">
-                <li *ngFor="let link of col.links">
-                  <a [href]="link.href" class="text-gray-500 hover:text-[#D4AF37] transition-colors text-sm">{{ link.label }}</a>
-                </li>
-              </ul>
-            </div>
-            
-            <!-- Newsletter -->
-            <div class="col-span-2 lg:col-span-1">
-              <h5 class="text-white font-bold uppercase tracking-widest text-sm mb-6">Newsletter</h5>
-              <p class="text-gray-500 text-sm mb-4">Get updates on new features.</p>
-              <div class="flex">
-                <input type="email" placeholder="Email" 
-                       class="flex-1 px-5 py-3.5 bg-white/5 border border-white/10 rounded-l-xl text-white text-sm focus:outline-none focus:border-[#D4AF37]/50">
-                <button class="px-5 py-3.5 bg-[#D4AF37] text-black rounded-r-xl font-bold hover:bg-[#F4D03F] transition-colors">
-                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Bottom Bar -->
-          <div class="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p class="text-gray-600 text-xs tracking-widest font-medium">© 2026 ATB SPORTS. ALL RIGHTS RESERVED.</p>
-            <p class="text-gray-600 text-xs">Premium Tournament Platform</p>
+        <div class="foot-bottom">
+          <span>© 2026 ATB Sports. All rights reserved.</span>
+          <div class="links">
+            <a href="#">Privacy</a>
+            <a href="#">Terms</a>
+            <a href="#">Security</a>
+            <a href="#">Status</a>
           </div>
         </div>
-      </footer>
-      
-    </main>
+      </div>
+    </footer>
   `,
   styles: [`
-    :host { display: block; }
-    
-    /* Background Gradient Radial */
-    .bg-gradient-radial {
-      background: radial-gradient(ellipse at center, var(--tw-gradient-from) 0%, var(--tw-gradient-via) 50%, var(--tw-gradient-to) 100%);
+    :host{
+      --bg:#0a0807; --bg-2:#0d0a08;
+      --panel:#15110c; --panel-2:#1c170f; --panel-3:#241d12;
+      --line:rgba(201,164,92,.16); --line-2:rgba(201,164,92,.30); --line-3:rgba(201,164,92,.50);
+      --gold:#d4af5a; --gold-bright:#f4e2a3; --gold-deep:#9a7530;
+      --gold-grad:linear-gradient(135deg,#f7eab2 0%,#dcb863 32%,#a9802f 58%,#f1da90 100%);
+      --gold-grad-v:linear-gradient(180deg,#f7eab2 0%,#dcb863 45%,#a9802f 100%);
+      --text:#f4ede0; --muted:#9d9583; --muted-2:#766f60;
+      --green:#1f3a28; --radius:16px; --radius-lg:22px;
+      --shadow:0 24px 60px -20px rgba(0,0,0,.8);
+      --shadow-gold:0 18px 50px -18px rgba(180,140,60,.45);
+      --maxw:1240px;
+
+      display:block; position:relative;
+      background:var(--bg); color:var(--text);
+      font-family:'Manrope',system-ui,sans-serif; font-size:16px; line-height:1.6;
+      -webkit-font-smoothing:antialiased; overflow-x:hidden;
     }
-    
-    /* Animated Gradient Text */
-    .animate-gradient {
-      animation: gradientShift 3s ease infinite;
-      -webkit-text-fill-color: transparent;
+    *{box-sizing:border-box}
+    img{display:block;max-width:100%}
+    a{color:inherit;text-decoration:none}
+    button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+
+    .bg-vignette{
+      position:fixed;inset:0;z-index:0;pointer-events:none;
+      background:
+        radial-gradient(1200px 700px at 50% -8%, rgba(120,92,40,.22), transparent 60%),
+        radial-gradient(900px 600px at 88% 12%, rgba(90,70,30,.14), transparent 55%);
     }
-    
-    @keyframes gradientShift {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-    }
-    
-    /* Floating Particles */
-    .floating-dot {
-      animation: floatUp linear infinite;
-    }
-    
-    @keyframes floatUp {
-      0% { transform: translateY(0) translateX(0); opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { transform: translateY(-150vh) translateX(50px); opacity: 0; }
-    }
-    
-    /* Hero Orb Animation */
-    .hero-orb {
-      animation: orbPulse 8s ease-in-out infinite;
-    }
-    
-    @keyframes orbPulse {
-      0%, 100% { opacity: 0.5; transform: scale(1); }
-      50% { opacity: 0.8; transform: scale(1.1); }
-    }
-    
-    /* Section Animations */
-    .section-label, .section-title {
-      opacity: 0;
-      transform: translateY(40px);
-    }
-    
-    .section-label.animate-in, .section-title.animate-in {
-      opacity: 1;
-      transform: translateY(0);
-      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    /* Card Glow on Hover */
-    .tournament-card:hover, .feature-card:hover, .pricing-card:hover, .testimonial-card:hover {
-      box-shadow: 0 0 60px rgba(212, 175, 55, 0.15);
-    }
-    
-    /* Stat Card Animation */
-    .stat-card {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    
-    .stat-card.animate-in {
-      opacity: 1;
-      transform: translateY(0);
-      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    /* Marquee Animation */
-    @keyframes marquee {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
-    
-    .animate-marquee {
-      animation: marquee 40s linear infinite;
-    }
-    
-    .animate-marquee:hover {
-      animation-play-state: paused;
-    }
-    
-    /* Sponsor Card */
-    .sponsor-card {
-      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    .football-element {
-      filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.3));
+    .bg-lines{
+      position:fixed;inset:0;z-index:0;opacity:.5;pointer-events:none;
+      background:repeating-linear-gradient(90deg, transparent 0 119px, rgba(201,164,92,.025) 119px 120px);
+      -webkit-mask:linear-gradient(180deg,transparent,#000 30%,#000 70%,transparent);
+      mask:linear-gradient(180deg,transparent,#000 30%,#000 70%,transparent);
     }
 
-    .gold-ember {
-      animation: emberFloat 6s ease-in-out infinite;
-      box-shadow: 0 0 10px #D4AF37;
+    /* ---------- shared utilities ---------- */
+    .wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+    .eyebrow{
+      font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;
+      letter-spacing:.42em;font-size:13px;color:var(--gold);
+      display:inline-flex;align-items:center;gap:14px;
+    }
+    .eyebrow::before{content:"";width:34px;height:2px;background:var(--gold-grad);display:inline-block}
+    .section-head{text-align:center;margin-bottom:54px}
+    .section-head .eyebrow::before{display:none}
+    .section-head h2{
+      font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase;
+      font-size:clamp(30px,4vw,52px);letter-spacing:.04em;line-height:1.04;margin-top:14px;
+    }
+    .section-head p{color:var(--muted);max-width:560px;margin:16px auto 0;font-size:16px}
+    .gold-text{
+      background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;
+      -webkit-text-fill-color:transparent;color:transparent;
+    }
+    section{position:relative;z-index:1;padding:64px 0}
+    /* anchored sections stop below the fixed nav when smooth-scrolled to */
+    section[id]{scroll-margin-top:84px}
+
+    /* glossy gold pill button */
+    .btn{
+      position:relative;overflow:hidden;
+      font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.12em;
+      font-size:14px;display:inline-flex;align-items:center;justify-content:center;gap:10px;
+      padding:16px 36px;border-radius:999px;
+      transition:transform .25s ease,box-shadow .3s ease,filter .25s ease;
+    }
+    .btn ep-icon{width:17px;height:17px;position:relative;z-index:1}
+    /* shine sweep on hover */
+    .btn::before{
+      content:"";position:absolute;top:0;bottom:0;left:-65%;width:45%;pointer-events:none;
+      background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);
+      transform:skewX(-18deg);transition:left .65s cubic-bezier(.22,.61,.36,1);
+    }
+    .btn:hover::before{left:135%}
+    .btn-gold{
+      background:linear-gradient(180deg,rgba(255,255,255,.4),rgba(255,255,255,.04) 46%,transparent 60%),var(--gold-grad);
+      color:#241803;
+      box-shadow:
+        0 12px 30px -8px rgba(200,160,80,.6),
+        inset 0 1px 0 rgba(255,255,255,.7),
+        inset 0 -3px 7px rgba(120,80,20,.28);
+    }
+    .btn-gold:hover{
+      transform:translateY(-2px);filter:brightness(1.05) saturate(1.04);
+      box-shadow:
+        0 20px 46px -10px rgba(224,184,92,.8),
+        0 0 0 1px rgba(244,226,163,.45),
+        inset 0 1px 0 rgba(255,255,255,.85),
+        inset 0 -3px 7px rgba(120,80,20,.3);
+    }
+    .btn-ghost{
+      background:rgba(255,255,255,.03);color:var(--text);
+      border:1px solid var(--line-2);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    .btn-ghost:hover{
+      border-color:var(--line-3);background:rgba(201,164,92,.08);transform:translateY(-2px);
+      box-shadow:0 12px 30px -12px rgba(201,164,92,.4),inset 0 1px 0 rgba(255,255,255,.08);
     }
 
-    @keyframes emberFloat {
-      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.2; }
-      50% { transform: translate(20px, -40px) scale(1.5); opacity: 0.6; }
+    /* ============================================================ NAV */
+    .nav{
+      position:fixed;top:0;left:0;right:0;z-index:60;
+      transition:background .35s ease,border-color .35s ease,backdrop-filter .35s ease;
+      border-bottom:1px solid transparent;
+    }
+    .nav.scrolled{
+      background:rgba(10,8,7,.82);backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--line);
+    }
+    .nav-inner{max-width:var(--maxw);margin:0 auto;padding:18px 28px;display:flex;align-items:center;gap:40px}
+    .brand{display:flex;align-items:center;gap:12px;font-family:'Oswald',sans-serif}
+    .brand .mark{
+      width:38px;height:38px;border-radius:10px;background:var(--gold-grad);
+      display:grid;place-items:center;color:#241803;font-weight:700;font-size:20px;
+      box-shadow:var(--shadow-gold),inset 0 1px 0 rgba(255,255,255,.5);
+    }
+    .brand .name{font-weight:700;text-transform:uppercase;letter-spacing:.22em;font-size:17px}
+    .brand .name small{display:block;font-size:9px;letter-spacing:.34em;color:var(--gold);font-weight:500;margin-top:1px}
+    .brand-logo{width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;box-shadow:var(--shadow-gold),0 0 0 1px var(--line-2)}
+    .brand-logo.sm{width:28px;height:28px}
+    .nav-links{display:flex;gap:34px;margin-left:auto}
+    .nav-links a{
+      font-family:'Oswald',sans-serif;font-weight:500;text-transform:uppercase;
+      letter-spacing:.14em;font-size:13px;color:var(--muted);transition:color .2s;position:relative;
+    }
+    .nav-links a::after{content:"";position:absolute;left:0;bottom:-6px;width:0;height:2px;background:var(--gold-grad);transition:width .25s}
+    .nav-links a:hover{color:var(--text)}
+    .nav-links a:hover::after{width:100%}
+    .nav-cta{padding:11px 22px;font-size:13px}
+    .lang-switch{display:inline-flex;align-items:center;gap:2px;padding:3px;border:1px solid var(--line-2);border-radius:999px;background:rgba(255,255,255,.02)}
+    .lang-switch button{
+      font-family:'Oswald',sans-serif;font-weight:600;letter-spacing:.1em;font-size:12px;
+      color:var(--muted);padding:6px 13px;border-radius:999px;transition:.2s;line-height:1;
+    }
+    .lang-switch button:hover{color:var(--text)}
+    .lang-switch button.on{background:var(--gold-grad);color:#241803;box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
+    .nav-burger{display:none;width:42px;height:42px;border-radius:10px;border:1px solid var(--line-2);place-items:center}
+
+    /* ============================================================ HERO */
+    .hero{position:relative;z-index:1;padding:150px 0 120px;overflow:hidden;min-height:90vh;display:flex;align-items:center}
+    .hero-pitch{
+      position:absolute;inset:0;z-index:0;
+      background:
+        radial-gradient(680px 560px at 64% 42%, rgba(214,168,78,.26), transparent 60%),
+        linear-gradient(180deg,rgba(8,7,6,.6),transparent 22%,transparent 78%,#080605),
+        url('/assets/images/landing-hero.webp') center/cover no-repeat,
+        #080605;
+    }
+    .hero-pitch::before{
+      content:"";position:absolute;inset:0;opacity:.45;
+      background:
+        conic-gradient(from 200deg at 28% 8%, transparent 0deg, rgba(230,190,100,.10) 12deg, transparent 26deg),
+        conic-gradient(from 150deg at 74% 6%, transparent 0deg, rgba(230,190,100,.08) 10deg, transparent 22deg);
+      -webkit-mask:linear-gradient(180deg,#000,transparent 70%);
+      mask:linear-gradient(180deg,#000,transparent 70%);
+    }
+    /* centered copy, flanked by floating props */
+    .hero-inner{position:relative;z-index:2;max-width:780px;margin:0 auto;text-align:center;padding:0 28px}
+    .hero h1{
+      font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase;
+      font-size:clamp(38px,6.2vw,84px);line-height:1.03;letter-spacing:.01em;margin:0;
+    }
+    /* German: "Turniermanagement" is one unbreakable word — at the 84px cap it
+       overflows .hero-inner, and overflowing glyphs of a background-clip:text
+       span paint transparent (no gradient behind them), hiding the last letters. */
+    .hero h1.lang-de{font-size:clamp(34px,5.4vw,70px)}
+    .hero h1 .gold-text{display:block}
+    .hero-sub{color:var(--muted);font-size:clamp(16px,1.5vw,19px);line-height:1.6;margin:24px auto 34px;max-width:540px}
+    .hero-cta{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+
+    .hero-ball,.hero-whistle{position:absolute;top:0;bottom:0;display:flex;align-items:center;z-index:1;pointer-events:none}
+    .hero-ball{left:0;width:min(34vw,420px);justify-content:flex-start}
+    .hero-whistle{right:0;width:min(26vw,330px);justify-content:flex-end}
+    .hero-ball img{
+      width:100%;height:auto;display:block;margin-left:-7%;
+      filter:drop-shadow(0 44px 54px rgba(0,0,0,.65)) drop-shadow(0 0 60px rgba(214,168,78,.32));
+      animation:floaty 7s ease-in-out infinite;
+    }
+    .hero-whistle img{
+      width:100%;height:auto;display:block;margin-right:-8%;transform:rotate(25deg);transform-origin:center;
+      filter:drop-shadow(0 28px 38px rgba(0,0,0,.6)) drop-shadow(0 0 36px rgba(214,168,78,.26));
+      animation:floaty2 7.5s ease-in-out infinite 1s;
+    }
+    @keyframes floaty2{0%,100%{transform:rotate(25deg) translateY(0)}50%{transform:rotate(25deg) translateY(-14px)}}
+    @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}
+    @media(prefers-reduced-motion:reduce){.hero-ball img,.hero-whistle img{animation:none}}
+
+    /* ============================================================ FEATURES */
+    .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:8px}
+    .feat-card{
+      padding:38px 32px 34px;border-radius:var(--radius-lg);position:relative;overflow:hidden;
+      background:linear-gradient(180deg,var(--panel-2),var(--panel));
+      border:1px solid var(--line);transition:transform .3s ease,border-color .3s ease,box-shadow .3s ease;
+    }
+    .feat-card::before{content:"";position:absolute;left:0;top:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(244,226,163,.5),transparent);opacity:0;transition:opacity .3s}
+    .feat-card:hover{transform:translateY(-7px);border-color:var(--line-2);box-shadow:var(--shadow),var(--shadow-gold)}
+    .feat-card:hover::before{opacity:1}
+    .feat-ico{
+      width:66px;height:66px;border-radius:16px;display:grid;place-items:center;margin-bottom:24px;
+      background:radial-gradient(circle at 35% 25%, rgba(244,226,163,.22), rgba(154,117,48,.08));
+      border:1px solid var(--line-2);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    .feat-ico ep-icon{width:30px;height:30px;color:var(--gold-bright)}
+    .feat-card h3{font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-size:21px;margin-bottom:11px}
+    .feat-card p{color:var(--muted);font-size:15px}
+    .feat-card .more{display:inline-flex;align-items:center;gap:8px;margin-top:20px;color:var(--gold);font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.12em;font-size:12px}
+    .feat-card .more ep-icon{width:15px;height:15px;transition:transform .25s}
+    .feat-card:hover .more ep-icon{transform:translateX(4px)}
+
+    /* ===== pitch backdrop shared by Dashboard + Bracket ===== */
+    .pitch-band{position:relative;z-index:1;overflow:hidden}
+    .pitch-band > section{padding-top:88px;padding-bottom:88px}
+    .pitch-band-bg{
+      position:absolute;inset:0;z-index:-1;pointer-events:none;
+      background:
+        radial-gradient(900px 520px at 50% 0%, rgba(214,168,78,.22), transparent 62%),
+        linear-gradient(180deg, rgba(8,7,6,.82), rgba(8,7,6,.62) 38%, rgba(8,7,6,.62) 62%, rgba(8,7,6,.86)),
+        url('/assets/images/landing-hero.webp') center/cover no-repeat;
+    }
+    .pitch-band::after{
+      content:"";position:absolute;left:0;right:0;top:0;height:1px;background:var(--line-2);
     }
 
-    .animate-pulse-subtle {
-      animation: pulseSubtle 4s ease-in-out infinite;
+    /* ============================================================ DASHBOARD */
+    .dash-shell{margin-top:10px}
+    .dash{
+      border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--line-2);
+      background:linear-gradient(180deg,#16120c,#100d09);box-shadow:var(--shadow),0 0 80px -30px rgba(180,140,60,.4);
+    }
+    .dash-top{display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--line);background:rgba(0,0,0,.25)}
+    .dash-dots{display:flex;gap:7px}
+    .dash-dots span{width:11px;height:11px;border-radius:50%;background:#2a241a;border:1px solid var(--line)}
+    .dash-dots span:first-child{background:var(--gold);border-color:transparent}
+    .dash-title{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.18em;font-size:12px;color:var(--muted)}
+    .dash-title b{color:var(--text);font-weight:600}
+    .dash-body{display:grid;grid-template-columns:208px 1fr;min-height:430px}
+    .dash-side{border-right:1px solid var(--line);padding:18px 14px;background:rgba(0,0,0,.18)}
+    .dash-side .brand-sm{display:flex;align-items:center;gap:9px;padding:6px 10px 16px;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.16em;font-size:13px}
+    .dash-side .brand-sm .mark{width:26px;height:26px;font-size:14px;border-radius:7px;background:var(--gold-grad);display:grid;place-items:center;color:#241803;font-weight:700;box-shadow:var(--shadow-gold),inset 0 1px 0 rgba(255,255,255,.5)}
+    .dnav{display:flex;flex-direction:column;gap:3px}
+    .dnav a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;color:var(--muted);font-size:13.5px;font-weight:500;transition:.2s;cursor:pointer}
+    .dnav a ep-icon{width:17px;height:17px}
+    .dnav a.active{background:linear-gradient(90deg,rgba(201,164,92,.16),transparent);color:var(--text);border:1px solid var(--line)}
+    .dnav a.active ep-icon{color:var(--gold-bright)}
+    .dnav a:hover:not(.active){color:var(--text);background:rgba(255,255,255,.02)}
+    .dash-main{padding:22px}
+    .dash-main .dh{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .dash-main .dh h4{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.06em;font-size:19px}
+    .dash-main .dh .pill{font-size:11px;color:var(--gold);border:1px solid var(--line-2);padding:6px 13px;border-radius:20px;text-transform:uppercase;letter-spacing:.1em;font-family:'Oswald',sans-serif}
+    .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+    .metric{background:linear-gradient(180deg,var(--panel-3),var(--panel));border:1px solid var(--line);border-radius:12px;padding:14px}
+    .metric .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted-2)}
+    .metric .v{font-family:'Oswald',sans-serif;font-weight:700;font-size:25px;margin-top:7px}
+    .metric .d{font-size:11px;color:#7cc28a;margin-top:3px}
+    .metric .d.dn{color:#c87c7c}
+    .dash-tables{display:grid;grid-template-columns:1.3fr 1fr;gap:14px}
+    .dbox{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:rgba(0,0,0,.15)}
+    .dbox .bh{padding:11px 14px;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:12px;color:var(--muted);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+    .drow{display:flex;align-items:center;gap:11px;padding:10px 14px;border-bottom:1px solid rgba(201,164,92,.07);font-size:13px}
+    .drow:last-child{border-bottom:none}
+    .av{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:700;color:#241803;font-family:'Oswald',sans-serif;flex-shrink:0}
+    .drow .nm{flex:1;color:var(--text)}
+    .drow .sub{color:var(--muted-2);font-size:11.5px}
+    .drow .sc{font-family:'Oswald',sans-serif;font-weight:700;color:var(--gold-bright)}
+    .bar-row{display:flex;align-items:center;gap:10px;padding:9px 14px;font-size:12.5px}
+    .bar-row .bl{width:70px;color:var(--muted);flex-shrink:0}
+    .bar{flex:1;height:7px;border-radius:6px;background:rgba(255,255,255,.05);overflow:hidden}
+    .bar i{display:block;height:100%;background:var(--gold-grad);border-radius:6px}
+    .bar-row .bv{font-family:'Oswald',sans-serif;color:var(--text);width:34px;text-align:right}
+
+    /* ============================================================ BRACKET (connector tree) */
+    .bracket-wrap{overflow-x:auto;padding:8px 4px 22px}
+    .bracket{display:flex;gap:48px;min-width:900px;min-height:520px;justify-content:center;position:relative}
+    .round{display:flex;flex-direction:column;min-width:190px}
+    .round-label{
+      align-self:center;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.18em;font-size:10.5px;
+      color:var(--gold);padding:5px 15px;margin-bottom:16px;border:1px solid var(--line-2);border-radius:20px;
+      background:rgba(201,164,92,.06);
+    }
+    .matches{flex:1;display:flex;flex-direction:column}
+    .match{flex:1;display:flex;align-items:center;justify-content:center;position:relative}
+    .match-card{
+      width:100%;border-radius:13px;overflow:hidden;position:relative;
+      background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--line);
+      box-shadow:0 12px 28px -18px rgba(0,0,0,.8);transition:border-color .3s,box-shadow .3s,transform .3s;
+    }
+    .match:hover .match-card{border-color:var(--line-2);box-shadow:var(--shadow-gold);transform:translateY(-2px)}
+
+    /* connectors: horizontal feed-out + the bracket "[" bar into each next match */
+    .round:not(.champ-col) .match::after{
+      content:"";position:absolute;left:100%;top:50%;width:48px;height:2px;margin-top:-1px;
+      background:linear-gradient(90deg,var(--line-3),rgba(201,164,92,.14));
+    }
+    .round:not(:first-child):not(.champ-col) .match::before{
+      content:"";position:absolute;right:100%;top:25%;height:50%;width:2px;background:var(--line-2);
     }
 
-    @keyframes pulseSubtle {
-      0%, 100% { opacity: 0.4; }
-      50% { opacity: 0.8; }
+    .team-row{display:flex;align-items:center;gap:10px;padding:11px 13px;position:relative}
+    .team-row+.team-row{border-top:1px solid rgba(201,164,92,.08)}
+    .team-row.win{background:linear-gradient(90deg,rgba(201,164,92,.16),transparent)}
+    .team-row.win::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold-grad)}
+    .team-row.win .tn,.team-row.win .ts{color:var(--gold-bright)}
+    .badge{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;border:1px solid rgba(255,255,255,.12)}
+    .badge ep-icon{width:13px;height:13px;color:#fff;opacity:.85}
+    .tn{flex:1;font-size:13px;font-weight:600;letter-spacing:.02em}
+    .ts{font-family:'Oswald',sans-serif;font-weight:700;font-size:15px;color:var(--muted)}
+    .team-row .adv{width:14px;height:14px;color:var(--gold-bright);flex-shrink:0}
+
+    /* champion */
+    .champ-col .matches{justify-content:center}
+    .champ{
+      display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;width:100%;padding:28px 22px;
+      border-radius:18px;border:1px solid var(--line-2);
+      background:radial-gradient(130% 120% at 50% 0%,rgba(201,164,92,.18),transparent 60%),linear-gradient(180deg,var(--panel-3),var(--panel));
+      box-shadow:var(--shadow),0 0 64px -28px rgba(200,160,80,.75);
     }
-  `]
+    .champ .cup{
+      width:74px;height:74px;border-radius:50%;display:grid;place-items:center;
+      background:radial-gradient(circle at 38% 28%,rgba(244,226,163,.42),rgba(154,117,48,.12));
+      border:1px solid var(--line-3);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 0 32px -6px rgba(214,168,78,.65);
+    }
+    .champ .cup ep-icon{width:36px;height:36px;color:var(--gold-bright)}
+    .champ .ct{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.18em;font-size:11px;color:var(--muted)}
+    .champ .cn{font-family:'Oswald',sans-serif;font-weight:700;font-size:18px}
+
+    /* ============================================================ PRICING */
+    .price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;align-items:stretch}
+    .price-card{
+      padding:36px 32px;border-radius:var(--radius-lg);position:relative;display:flex;flex-direction:column;
+      background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--line);transition:.3s;
+    }
+    .price-card:hover{transform:translateY(-6px);border-color:var(--line-2);box-shadow:var(--shadow)}
+    .price-card.featured{border-color:var(--line-3);background:linear-gradient(180deg,#221a0f,#15110b);box-shadow:var(--shadow),0 0 70px -26px rgba(180,140,60,.5)}
+    .price-card.featured::before{
+      content:"Most Popular";position:absolute;top:-13px;left:50%;transform:translateX(-50%);
+      background:var(--gold-grad);color:#241803;font-family:'Oswald',sans-serif;text-transform:uppercase;
+      letter-spacing:.14em;font-size:11px;font-weight:600;padding:6px 16px;border-radius:20px;box-shadow:var(--shadow-gold);
+    }
+    .price-card .tier{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.18em;font-size:14px;color:var(--gold)}
+    .price-card .desc{color:var(--muted);font-size:13.5px;margin-top:7px;min-height:38px}
+    .price-card .amt{font-family:'Oswald',sans-serif;font-weight:700;font-size:52px;line-height:1;margin:22px 0 4px}
+    .price-card .amt small{font-size:16px;color:var(--muted);font-weight:500;letter-spacing:0}
+    .price-card .per{color:var(--muted-2);font-size:13px;margin-bottom:24px}
+    .price-feats{list-style:none;display:flex;flex-direction:column;gap:13px;margin-bottom:30px;flex:1}
+    .price-feats li{display:flex;align-items:flex-start;gap:11px;font-size:14px;color:var(--text)}
+    .price-feats li ep-icon{width:18px;height:18px;color:var(--gold-bright);flex-shrink:0;margin-top:1px}
+    .price-feats li.off{color:var(--muted-2)}
+    .price-feats li.off ep-icon{color:var(--muted-2)}
+    .price-card .btn{justify-content:center;width:100%}
+
+    /* ============================================================ FIXTURES */
+    .fixtures{max-width:980px;margin:0 auto}
+    .fix-card{border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--line);background:linear-gradient(180deg,var(--panel-2),var(--panel));box-shadow:var(--shadow)}
+    .fix-head{display:flex;align-items:center;justify-content:space-between;padding:20px 26px;border-bottom:1px solid var(--line);background:rgba(0,0,0,.2)}
+    .fix-head h3{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:20px}
+    .fix-head .live{display:inline-flex;align-items:center;gap:8px;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.14em;font-size:11px;color:var(--gold);border:1px solid var(--line-2);padding:6px 14px;border-radius:20px}
+    .fix-head .live .dot{width:7px;height:7px;border-radius:50%;background:#e0533f;box-shadow:0 0 0 0 rgba(224,83,63,.6);animation:pulse 1.8s infinite}
+    @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(224,83,63,.5)}70%{box-shadow:0 0 0 7px rgba(224,83,63,0)}100%{box-shadow:0 0 0 0 rgba(224,83,63,0)}}
+    .fix-colhead{display:grid;grid-template-columns:1.6fr 1fr .8fr 130px;gap:14px;padding:11px 26px;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.14em;font-size:11px;color:var(--muted-2);border-bottom:1px solid var(--line)}
+    .fix-row{display:grid;grid-template-columns:1.6fr 1fr .8fr 130px;gap:14px;align-items:center;padding:15px 26px;border-bottom:1px solid rgba(201,164,92,.07);transition:background .2s}
+    .fix-row:last-child{border-bottom:none}
+    .fix-row:hover{background:rgba(201,164,92,.04)}
+    .matchup{display:flex;align-items:center;gap:10px}
+    .matchup .badge{width:30px;height:30px}
+    .matchup .vs{color:var(--muted-2);font-family:'Oswald',sans-serif;font-size:12px;padding:0 2px}
+    .matchup .tt{font-weight:600;font-size:14px}
+    .fix-row .venue{color:var(--muted);font-size:13.5px}
+    .fix-row .time{font-family:'Oswald',sans-serif;color:var(--text);font-size:15px}
+    .fix-row .time small{display:block;color:var(--muted-2);font-size:11px;letter-spacing:.1em}
+    .watch{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:11px;padding:9px 0;border-radius:9px;border:1px solid var(--line-2);text-align:center;color:var(--gold-bright);transition:.2s;display:inline-flex;align-items:center;justify-content:center;gap:7px}
+    .watch ep-icon{width:13px;height:13px}
+    .watch:hover{background:var(--gold-grad);color:#241803;border-color:transparent}
+
+    /* ============================================================ TESTIMONIALS (cards) */
+    .testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:18px}
+    .testi-card{
+      position:relative;text-align:center;padding:42px 30px 50px;border-radius:var(--radius-lg);overflow:visible;
+      background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--line-2);
+      transition:transform .3s ease,border-color .3s ease,box-shadow .3s ease;
+    }
+    .testi-card:hover{transform:translateY(-5px);border-color:var(--line-3)}
+    .testi-card.active{border-color:var(--line-3);box-shadow:var(--shadow),0 0 70px -34px rgba(180,140,60,.6)}
+    .testi-card .qmark{
+      display:block;font-family:'Oswald',sans-serif;font-weight:700;font-size:62px;line-height:.4;height:34px;
+      background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent;
+    }
+    .testi-quote{color:#cfc7b6;font-style:italic;font-size:15px;line-height:1.7;margin:20px auto 22px;max-width:300px}
+    .testi-name{
+      font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.07em;font-size:15px;
+      background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent;
+    }
+    .testi-card .avatar{
+      position:absolute;left:50%;bottom:-28px;transform:translateX(-50%);
+      width:56px;height:56px;border-radius:50%;display:grid;place-items:center;
+      font-family:'Oswald',sans-serif;font-weight:700;font-size:16px;color:#241803;
+      border:3px solid var(--bg);box-shadow:var(--shadow-gold),0 0 0 1px var(--line-2);
+    }
+    .testi-dots{display:flex;justify-content:center;gap:9px;margin-top:50px}
+    .testi-dots .dot{width:9px;height:9px;border-radius:50%;background:rgba(201,164,92,.28);transition:.25s}
+    .testi-dots .dot:hover{background:rgba(201,164,92,.55)}
+    .testi-dots .dot.on{background:var(--gold-grad);width:26px;border-radius:5px}
+
+    /* ============================================================ CTA BANNER (full-bleed) */
+    /* full-bleed band keeps the same vertical rhythm as every other section */
+    .cta-band{padding:64px 0 0}
+    .cta-inner{
+      position:relative;overflow:hidden;min-height:680px;
+      border-top:1px solid var(--line-2);border-bottom:1px solid var(--line-2);
+      background:#120f0a;
+      display:flex;align-items:center;
+    }
+    .cta-player{position:absolute;inset:0;width:100%}
+    .cta-player-art{
+      width:100%;height:100%;
+      background:
+        url('/assets/images/landing-cta.webp') center/cover no-repeat;
+    }
+    .cta-inner::after{
+      content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+      background:linear-gradient(90deg, transparent 24%, rgba(18,15,10,.5) 56%, rgba(18,15,10,.92) 100%),
+                 linear-gradient(180deg, rgba(18,15,10,.45), transparent 30%, transparent 72%, rgba(18,15,10,.55)),
+                 radial-gradient(460px 420px at 80% 40%, rgba(230,185,90,.20), transparent 64%);
+    }
+    .cta-wrap{position:relative;z-index:3;width:100%;display:flex}
+    .cta-copy{padding:64px 0;max-width:520px;margin-left:auto}
+    .cta-copy h2{font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase;font-size:clamp(34px,4.6vw,58px);line-height:1;margin-bottom:18px}
+    .cta-copy p{color:var(--muted);font-size:17px;max-width:430px;margin-bottom:30px}
+
+    /* ============================================================ FOOTER */
+    .footer{position:relative;z-index:1;padding:72px 0 34px;border-top:1px solid var(--line);margin-top:0}
+    .foot-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1.4fr;gap:40px;padding-bottom:48px;border-bottom:1px solid var(--line)}
+    .foot-brand .brand{margin-bottom:18px}
+    .foot-brand p{color:var(--muted);font-size:14px;max-width:280px;margin-bottom:22px}
+    .socials{display:flex;gap:11px}
+    .socials a{width:40px;height:40px;border-radius:10px;border:1px solid var(--line-2);display:grid;place-items:center;color:var(--muted);transition:.2s}
+    .socials a:hover{color:#241803;background:var(--gold-grad);border-color:transparent;transform:translateY(-2px)}
+    .socials a ep-icon{width:18px;height:18px}
+    .foot-col h5{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.16em;font-size:13px;color:var(--gold);margin-bottom:18px}
+    .foot-col a{display:block;color:var(--muted);font-size:14px;margin-bottom:12px;transition:color .2s}
+    .foot-col a:hover{color:var(--text)}
+    .news h5{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.16em;font-size:13px;color:var(--gold);margin-bottom:18px}
+    .news p{color:var(--muted);font-size:14px;margin-bottom:16px}
+    .news form{display:flex;gap:9px}
+    .news input{flex:1;background:rgba(0,0,0,.3);border:1px solid var(--line-2);border-radius:10px;padding:13px 15px;color:var(--text);font-family:inherit;font-size:14px}
+    .news input:focus{outline:none;border-color:var(--line-3)}
+    .news input::placeholder{color:var(--muted-2)}
+    .news button{padding:13px 18px}
+    .foot-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:26px;color:var(--muted-2);font-size:13px;flex-wrap:wrap;gap:12px}
+    .foot-bottom .links{display:flex;gap:24px}
+    .foot-bottom a:hover{color:var(--muted)}
+
+    /* ============================================================ reveal */
+    :host(.io-ready) .reveal{opacity:0;transform:translateY(34px);transition:opacity .85s cubic-bezier(.22,.61,.36,1),transform .85s cubic-bezier(.22,.61,.36,1)}
+    :host(.io-ready) .reveal.in{opacity:1;transform:none}
+
+    /* ============================================================ responsive */
+    @media(max-width:980px){
+      .nav-links{display:none}
+      .nav-burger{display:grid}
+      .lang-switch{margin-left:auto}
+      .hero{min-height:auto;padding:128px 0 88px}
+      .hero-ball{width:40vw;opacity:.6}
+      .hero-whistle{width:32vw;opacity:.6}
+      .feat-grid,.price-grid,.testi-grid{grid-template-columns:1fr}
+      .testi-grid{gap:54px}
+      .dash-tables,.metrics{grid-template-columns:1fr 1fr}
+      .dash-body{grid-template-columns:1fr}
+      .dash-side{display:none}
+      .foot-grid{grid-template-columns:1fr 1fr}
+      .cta-player{width:100%;opacity:.55}
+      .cta-inner::after{background:linear-gradient(180deg,rgba(21,17,11,.45),rgba(21,17,11,.88))}
+      .cta-copy{margin-left:0}
+    }
+    @media(max-width:600px){
+      section{padding:52px 0}
+      .metrics{grid-template-columns:1fr 1fr}
+      .dash-tables{grid-template-columns:1fr}
+      .foot-grid{grid-template-columns:1fr}
+      .fix-colhead,.fix-row{grid-template-columns:1.4fr 1fr;gap:10px}
+      .fix-row .venue,.fix-colhead span:nth-child(2){display:none}
+      .hero-ball{width:48vw;opacity:.4}
+      .hero-whistle{width:40vw;opacity:.4}
+    }
+  `],
 })
 export class PremiumLandingComponent implements OnInit, AfterViewInit, OnDestroy {
+  /* signal-backed host class: safe to flip from rAF without NG0100 */
+  ioReady = signal(false);
 
-  isScrolled = false;
-  mobileMenuOpen = false;
-  scrollHandler: (() => void) | null = null;
+  private host = inject(ElementRef<HTMLElement>);
+  private meta = inject(Meta);
+  private titleService = inject(Title);
+  private http = inject(HttpClient);
+  private gsapCtx: gsap.Context | null = null;
+  private gsapMM: gsap.MatchMedia | null = null;
+  private io: IntersectionObserver | null = null;
+  private navScrollFn: (() => void) | null = null;
+  private testiTimer: ReturnType<typeof setInterval> | null = null;
+  private reducedMotion = typeof window !== 'undefined'
+    && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
-  particles: Array<{ x: number, y: number, delay: number, duration: number }> = [];
+  navScrolled = signal(false);
+  testiIdx = signal(0);
+  isMobile = signal(false);
 
-  navLinks = [
-    { label: 'Home', href: '#hero' },
-    { label: 'Tournaments', href: '#tournaments' },
-    { label: 'Features', href: '#features' },
-    { label: 'Sponsors', href: '#sponsors' },
-    { label: 'Pricing', href: '#pricing' },
-    { label: 'Contact', href: '#contact' },
-  ];
+  contactForm = { name: '', email: '', subject: 'Newsletter', message: 'Newsletter signup' };
+  contactSubmitting = signal(false);
+  contactSuccess = signal(false);
 
-  footballIcons = [
-    { type: 'ball', x: 8, y: 20, size: 50, rotation: 15 },
-    { type: 'boot', x: 15, y: 55, size: 70, rotation: -25 },
-    { type: 'whistle', x: 12, y: 85, size: 40, rotation: 10 },
-    { type: 'trophy', x: 85, y: 25, size: 80, rotation: -15 },
-    { type: 'ball', x: 92, y: 50, size: 60, rotation: 45 },
-    { type: 'goal', x: 88, y: 80, size: 90, rotation: 5 },
-    { type: 'jersey', x: 5, y: 70, size: 55, rotation: -10 },
-    { type: 'trophy', x: 90, y: 15, size: 45, rotation: 20 },
-  ];
+  /* ---- i18n (English + Swiss German) ---- */
+  lang = signal<'en' | 'de'>('en');
+  langs = [{ id: 'en' as const, label: 'EN' }, { id: 'de' as const, label: 'DE' }];
 
-  heroStats = [
-    { value: '500+', label: 'Tournaments' },
-    { value: '50K+', label: 'Teams' },
-    { value: '1M+', label: 'Players' },
-    { value: '$10M+', label: 'Prizes' },
-  ];
-
-  tournaments = [
-    {
-      name: 'Champions League 2026',
-      description: 'The biggest club competition in world football. Top clubs battle for ultimate glory.',
-      date: 'March - June 2026',
-      prize: '$5M Prize Pool',
-      type: 'Professional',
-      image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600'
+  private i18n = {
+    en: {
+      navFeatures: 'Features', navDashboard: 'Dashboard', navBrackets: 'Brackets', navPricing: 'Pricing', navFixtures: 'Fixtures',
+      login: 'Login', signIn: 'Sign In',
+      heroTitle1: 'The Ultimate', heroTitle2: 'Tournament Management',
+      heroSub: 'Streamlined football administration — from fixtures and live scoring to brackets, payments and reporting, all from one central command center.',
+      featEyebrow: 'Features', featH2: 'Built For Serious Competition', featP: 'Everything an organizer needs to run a flawless season — engineered for federations, leagues and clubs alike.',
+      dashEyebrow: 'Dashboard Preview', dashH2: 'Your Admin Command Center', dashP: 'A single source of truth for the entire competition — clean, fast and built for match-day pressure.',
+      brackEyebrow: 'Live Bracket Demo', brackH2: 'Brackets That Build Themselves', brackP: 'Winners advance automatically. Every result ripples through the bracket in real time — no spreadsheets, no manual edits.',
+      priceEyebrow: 'Pricing', priceH2: 'Plans For Every Level', priceP: 'From grassroots clubs to national federations — scale your competition without scaling your workload.',
+      fixEyebrow: 'Fixtures Demo', fixH2: "Today's Matches", fixP: 'Every kickoff, venue and live stream in one organized match-day view.',
+      testiEyebrow: 'Testimonials', testiH2: 'Trusted By Organizers', testiP: 'From weekend cups to national leagues — administrators run their seasons on ATB Sports.',
+      ctaEyebrow: 'Join The Elite', ctaH2: 'Start Your Season Today', ctaP: 'Create your first tournament, invite your teams and run match-day like the pros — your competition deserves an elite stage.', ctaBtn: 'Start Your Season',
     },
-    {
-      name: 'World Cup Qualifiers',
-      description: 'National teams competing for a spot in the global showpiece.',
-      date: 'September - November 2026',
-      prize: '$2M Prize Pool',
-      type: 'International',
-      image: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=600'
+    de: {
+      navFeatures: 'Funktionen', navDashboard: 'Dashboard', navBrackets: 'Turnierbaum', navPricing: 'Preise', navFixtures: 'Spielplan',
+      login: 'Anmelden', signIn: 'Anmelden',
+      heroTitle1: 'Das ultimative', heroTitle2: 'Turniermanagement',
+      heroSub: 'Optimierte Fussballverwaltung – von Spielplänen und Live-Ergebnissen über Turnierbäume bis zu Zahlungen und Auswertungen, alles über eine zentrale Steuerzentrale.',
+      featEyebrow: 'Funktionen', featH2: 'Für ernsthaften Wettbewerb gemacht', featP: 'Alles, was ein Veranstalter für eine reibungslose Saison braucht – entwickelt für Verbände, Ligen und Vereine.',
+      dashEyebrow: 'Dashboard-Vorschau', dashH2: 'Ihre Verwaltungszentrale', dashP: 'Eine zentrale Informationsquelle für den gesamten Wettbewerb – klar, schnell und für den Spieltag gemacht.',
+      brackEyebrow: 'Live-Turnierbaum-Demo', brackH2: 'Turnierbäume, die sich selbst aufbauen', brackP: 'Sieger ziehen automatisch weiter. Jedes Ergebnis aktualisiert den Turnierbaum in Echtzeit – keine Tabellen, keine manuelle Pflege.',
+      priceEyebrow: 'Preise', priceH2: 'Pläne für jede Stufe', priceP: 'Vom Breitensportverein bis zum nationalen Verband – skalieren Sie Ihren Wettbewerb ohne Mehraufwand.',
+      fixEyebrow: 'Spielplan-Demo', fixH2: 'Spiele heute', fixP: 'Jeder Anpfiff, Austragungsort und Livestream in einer übersichtlichen Spieltagsansicht.',
+      testiEyebrow: 'Stimmen', testiH2: 'Von Veranstaltern geschätzt', testiP: 'Vom Wochenend-Cup bis zur nationalen Liga – Veranstalter organisieren ihre Saison mit ATB Sports.',
+      ctaEyebrow: 'Werden Sie Teil der Elite', ctaH2: 'Starten Sie Ihre Saison heute', ctaP: 'Erstellen Sie Ihr erstes Turnier, laden Sie Ihre Teams ein und meistern Sie den Spieltag wie die Profis – Ihr Wettbewerb verdient eine grosse Bühne.', ctaBtn: 'Saison starten',
     },
-    {
-      name: 'Youth Championship',
-      description: 'Future stars showcase their talent in this prestigious youth tournament.',
-      date: 'July - August 2026',
-      prize: '$500K Prize Pool',
-      type: 'Youth',
-      image: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=600'
-    },
-  ];
+  };
+
+  t = computed(() => this.i18n[this.lang()]);
+
+  navLinks = computed(() => [
+    { label: this.t().navFeatures, href: '#features' },
+    { label: this.t().navDashboard, href: '#dashboard' },
+    { label: this.t().navBrackets, href: '#bracket' },
+    { label: this.t().navPricing, href: '#pricing' },
+    { label: this.t().navFixtures, href: '#fixtures' },
+  ]);
+
+  setLang(l: 'en' | 'de') {
+    this.lang.set(l);
+    if (typeof document !== 'undefined') document.documentElement.lang = l;
+    try { localStorage.setItem('atb_lang', l); } catch {}
+  }
 
   features = [
+    { icon: 'trophy', title: 'Tournament Creation', desc: 'Spin up knockout, league or hybrid formats in minutes with automated seeding, scheduling and venue allocation.' },
+    { icon: 'gauge', title: 'Real-Time Scoring', desc: 'Push live scores, cards and substitutions from the touchline. Standings and brackets update instantly across every screen.' },
+    { icon: 'clipboard-list', title: 'Team Management', desc: 'Centralize rosters, eligibility, documents and player stats with role-based access for staff, coaches and referees.' },
+  ];
+
+  dashNav = [
+    { label: 'Overview', icon: 'layout-dashboard', active: true },
+    { label: 'Tournaments', icon: 'trophy', active: false },
+    { label: 'Fixtures', icon: 'calendar-days', active: false },
+    { label: 'Teams', icon: 'users', active: false },
+    { label: 'Brackets', icon: 'git-merge', active: false },
+    { label: 'Reports', icon: 'bar-chart-3', active: false },
+    { label: 'Settings', icon: 'settings', active: false },
+  ];
+
+  metrics = [
+    { k: 'Active Tournaments', v: '24', d: '▲ 4 this week', down: false },
+    { k: 'Matches Today', v: '86', d: '▲ 12 live', down: false },
+    { k: 'Registered Teams', v: '1,204', d: '▲ 38 new', down: false },
+    { k: 'Pending Approvals', v: '7', d: '▼ 3 overdue', down: true },
+  ];
+
+  recentResults = [
+    { av: 'FC', grad: 'linear-gradient(135deg,#d9b35e,#a8802f)', home: 'Falcons United', away: 'Riverside', score: '3 – 1' },
+    { av: 'RS', grad: 'linear-gradient(135deg,#7c9bd1,#3f5e96)', home: 'Royal Stags', away: 'Harbour', score: '2 – 2' },
+    { av: 'VC', grad: 'linear-gradient(135deg,#c87c7c,#8f3f3f)', home: 'Vale City', away: 'Northgate', score: '0 – 1' },
+    { av: 'AT', grad: 'linear-gradient(135deg,#7cc28a,#3f8f55)', home: 'Ashford Town', away: 'Pinehill', score: '4 – 0' },
+  ];
+
+  topScorers = [
+    { name: 'M. Okafor', pct: 96, goals: 24 },
+    { name: 'L. Costa', pct: 82, goals: 21 },
+    { name: 'D. Hassan', pct: 68, goals: 17 },
+    { name: 'J. Müller', pct: 54, goals: 14 },
+    { name: 'P. Silva', pct: 40, goals: 10 },
+  ];
+
+  bracket: { label: string; matches: Team[][] }[] = [
     {
-      title: 'Real-time Match Tracking',
-      description: 'Live scores, stats, and updates streamed instantly to fans worldwide with sub-second latency.',
-      icon: '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>'
+      label: 'Quarter Finals',
+      matches: [
+        [{ name: 'Falcons', score: 3, win: true, grad: 'linear-gradient(135deg,#d9b35e,#a8802f)' }, { name: 'Tanners', score: 1, grad: 'linear-gradient(135deg,#7c9bd1,#3f5e96)' }],
+        [{ name: 'Zenith', score: 0, grad: 'linear-gradient(135deg,#c87c7c,#8f3f3f)' }, { name: 'Boroughs', score: 2, win: true, grad: 'linear-gradient(135deg,#7cc28a,#3f8f55)' }],
+        [{ name: 'Saints', score: 4, win: true, grad: 'linear-gradient(135deg,#b59cd1,#6a4f96)' }, { name: 'Compton', score: 2, grad: 'linear-gradient(135deg,#d1a87c,#96673f)' }],
+        [{ name: 'Harbour', score: 1, grad: 'linear-gradient(135deg,#7cc2bf,#3f8f8a)' }, { name: 'Marshes', score: 3, win: true, grad: 'linear-gradient(135deg,#d9b35e,#a8802f)' }],
+      ],
     },
     {
-      title: 'Team Management',
-      description: 'Comprehensive tools for roster management, player stats, transfers, and performance analytics.',
-      icon: '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>'
+      label: 'Semi Finals',
+      matches: [
+        [{ name: 'Falcons', score: 2, win: true, grad: 'linear-gradient(135deg,#d9b35e,#a8802f)' }, { name: 'Boroughs', score: 1, grad: 'linear-gradient(135deg,#7cc28a,#3f8f55)' }],
+        [{ name: 'Saints', score: 0, grad: 'linear-gradient(135deg,#b59cd1,#6a4f96)' }, { name: 'Marshes', score: 2, win: true, grad: 'linear-gradient(135deg,#d9b35e,#a8802f)' }],
+      ],
     },
     {
-      title: 'Venue Scheduling',
-      description: 'Smart scheduling algorithms with conflict resolution, capacity management, and logistics optimization.',
-      icon: '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>'
-    },
-    {
-      title: 'Prize Distribution',
-      description: 'Automated prize money distribution with transparent tracking and multi-currency support.',
-      icon: '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>'
-    },
-    {
-      title: 'Live Streaming',
-      description: 'Integrated streaming solutions with multi-camera support and global CDN delivery.',
-      icon: '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>'
-    },
-    {
-      title: 'Analytics Dashboard',
-      description: 'Deep insights into tournament performance, engagement metrics, and predictive analytics.',
-      icon: '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>'
+      label: 'Final',
+      matches: [
+        [{ name: 'Falcons', score: 3, win: true, grad: 'linear-gradient(135deg,#d9b35e,#a8802f)' }, { name: 'Marshes', score: 2, grad: 'linear-gradient(135deg,#d9b35e,#a8802f)' }],
+      ],
     },
   ];
 
-  aboutPoints = [
-    'Industry-leading technology since 2020',
-    'Trusted by 500+ tournament organizers',
-    '24/7 dedicated expert support',
-    'Secure enterprise-grade infrastructure',
-  ];
-
-  mockStandings = [
-    { pos: 1, team: 'Real Madrid', pts: 72 },
-    { pos: 2, team: 'Barcelona', pts: 68 },
-    { pos: 3, team: 'Atletico', pts: 61 },
-    { pos: 4, team: 'Villarreal', pts: 55 },
-  ];
-
-  mockStats = [
-    { val: '18', label: 'Matches' },
-    { val: '47', label: 'Goals' },
-    { val: '94%', label: 'Uptime' },
-  ];
-
-  mockBars = [35, 50, 45, 78, 55, 82, 70, 95, 60, 88, 75, 100];
-  mockMonths = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-
-  pricingPlans = [
+  pricing = [
     {
-      name: 'Starter',
-      description: 'Perfect for small tournaments',
-      price: '$49',
-      period: 'month',
-      featured: false,
-      cta: 'Get Started',
-      ctaLink: '#',
-      features: [
-        'Up to 16 teams',
-        'Basic analytics dashboard',
-        'Email support',
-        'Standard branding',
-        '5GB storage',
-      ]
+      tier: 'Clubs', desc: 'For single clubs running local cups and friendlies.', amt: '$49', per: '/mo',
+      note: 'Billed monthly · cancel anytime', featured: false, cta: 'Get Started',
+      feats: [
+        { label: 'Up to 5 tournaments', off: false },
+        { label: '50 registered teams', off: false },
+        { label: 'Live scoring & standings', off: false },
+        { label: 'Email support', off: false },
+        { label: 'Custom branding', off: true },
+      ],
     },
     {
-      name: 'Professional',
-      description: 'For growing organizations',
-      price: '$149',
-      period: 'month',
-      featured: true,
-      cta: 'Start Free Trial',
-      ctaLink: '#',
-      features: [
-        'Unlimited teams',
-        'Advanced analytics & reports',
-        'Priority 24/7 support',
-        'Custom branding',
-        'Live streaming integration',
-        'API access',
-        '50GB storage',
-      ]
+      tier: 'Leagues', desc: 'For multi-division leagues and regional bodies.', amt: '$149', per: '/mo',
+      note: 'Billed monthly · cancel anytime', featured: true, cta: 'Get Started',
+      feats: [
+        { label: 'Unlimited tournaments', off: false },
+        { label: '500 registered teams', off: false },
+        { label: 'Advanced brackets & seeding', off: false },
+        { label: 'Custom branding', off: false },
+        { label: 'Priority support', off: false },
+      ],
     },
     {
-      name: 'Enterprise',
-      description: 'For large-scale events',
-      price: '$499',
-      period: 'month',
-      featured: false,
-      cta: 'Contact Us',
-      ctaLink: '#',
-      features: [
-        'Everything in Professional',
-        'Dedicated account manager',
-        'White-label options',
-        'Custom integrations',
-        'SLA guarantee',
-        'On-premise deployment',
-        'Unlimited storage',
-      ]
+      tier: 'Federations', desc: 'For national federations and enterprise operations.', amt: 'Custom', per: '',
+      note: 'Tailored to your competition', featured: false, cta: 'Talk to Sales',
+      feats: [
+        { label: 'Everything in Leagues', off: false },
+        { label: 'Unlimited teams & staff', off: false },
+        { label: 'SSO & audit logs', off: false },
+        { label: 'Dedicated success manager', off: false },
+        { label: 'SLA & on-prem options', off: false },
+      ],
     },
+  ];
+
+  fixtures = [
+    { home: { name: 'Falcons', grad: 'linear-gradient(135deg,#d9b35e,#a8802f)' }, away: { name: 'Vale City', grad: 'linear-gradient(135deg,#c87c7c,#8f3f3f)' }, venue: 'Marris Stadium', time: '15:00', day: 'SAT' },
+    { home: { name: 'Royal Stags', grad: 'linear-gradient(135deg,#7c9bd1,#3f5e96)' }, away: { name: 'Ashford', grad: 'linear-gradient(135deg,#7cc28a,#3f8f55)' }, venue: 'Pinehill Park', time: '17:30', day: 'SAT' },
+    { home: { name: 'Saints', grad: 'linear-gradient(135deg,#b59cd1,#6a4f96)' }, away: { name: 'Harbour', grad: 'linear-gradient(135deg,#7cc2bf,#3f8f8a)' }, venue: 'Boroughs Arena', time: '19:00', day: 'SAT' },
+    { home: { name: 'Compton', grad: 'linear-gradient(135deg,#d1a87c,#96673f)' }, away: { name: 'Marshes', grad: 'linear-gradient(135deg,#d9b35e,#a8802f)' }, venue: 'Northgate Ground', time: '20:45', day: 'SAT' },
+    { home: { name: 'Tanners', grad: 'linear-gradient(135deg,#7c9bd1,#3f5e96)' }, away: { name: 'Zenith', grad: 'linear-gradient(135deg,#b59cd1,#6a4f96)' }, venue: 'Riverside Field', time: '13:00', day: 'SUN' },
   ];
 
   testimonials = [
-    {
-      name: 'James Rodriguez',
-      role: 'Tournament Director, La Liga',
-      text: 'ATB SPORTS transformed how we manage our league. The platform handles everything from registration to live scoring seamlessly. Our fans love it!',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&crop=face'
-    },
-    {
-      name: 'Sarah Chen',
-      role: 'Club Manager, FC United',
-      text: 'The best investment we made for our club. The team management tools are incredible, and our fans love the real-time updates.',
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop&crop=face'
-    },
-    {
-      name: 'Michael Park',
-      role: 'League Commissioner, K-League',
-      text: 'We scaled from 20 to 200 teams in one year. ATB SPORTS handled it all without missing a beat. The support team is phenomenal!',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop&crop=face'
-    },
-  ];
-
-  sponsors = [
-    { name: 'Nike', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg' },
-    { name: 'Adidas', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg' },
-    { name: 'Emirates', logo: 'https://upload.wikimedia.org/wikipedia/commons/d/d0/Emirates_logo.svg' },
-    { name: 'Coca-Cola', logo: 'https://upload.wikimedia.org/wikipedia/commons/c/ce/Coca-Cola_logo.svg' },
-    { name: 'Red Bull', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e3/Red_Bull_logo.svg' },
-    { name: 'Qatar Airways', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/f6/Qatar_Airways_Logo.svg' },
-    { name: 'Mastercard', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg' },
-    { name: 'Huawei', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e8/Huawei_Logo.svg' },
-  ];
-
-  sponsorStats = [
-    { value: '50+', label: 'Official Sponsors' },
-    { value: '$5M+', label: 'Sponsorship Value' },
-    { value: '100+', label: 'Countries Reached' },
-    { value: '1B+', label: 'Brand Impressions' },
+    { initials: 'DM', grad: 'linear-gradient(135deg,#d9b35e,#a8802f)', text: 'We migrated three regional cups onto ATB Sports in a weekend. Live scoring and auto-advancing brackets cut our match-day admin in half.', name: 'Daniel Mertens', role: 'Director, Riverside League' },
+    { initials: 'SC', grad: 'linear-gradient(135deg,#b59cd1,#6a4f96)', text: 'The dashboard is the cleanest we\'ve used. Our referees push scores from the touchline and standings update before the final whistle.', name: 'Sofia Castellano', role: 'Ops Lead, Marshes FA' },
+    { initials: 'MA', grad: 'linear-gradient(135deg,#7cc28a,#3f8f55)', text: 'Registration, eligibility and payments in one place. ATB Sports made running our 64-team federation tournament genuinely effortless.', name: 'Marcus Adeyemi', role: 'Secretary, Boroughs Federation' },
   ];
 
   socials = [
-    { url: '#', icon: '<svg fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>' },
-    { url: '#', icon: '<svg fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.84 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>' },
-    { url: '#', icon: '<svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.132 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.584-.072-4.85c-.052-1.17-.247-1.803-.413-2.227-.217-.562-.477-.96-.896-1.382-.419-.419-.824-.679-1.38-.896-.42-.164-1.057-.36-2.227-.413-1.266-.057-1.646-.07-4.85-.07s-3.584.015-4.85.072c-1.17.052-1.803.247-2.227.413-.562.217-.96.477-1.382.896-.419.419-.679.824-.896 1.38-.164.42-.36 1.057-.413 2.227-.057 1.266-.07 1.646-.07 4.85s.015 3.584.072 4.85c.052 1.17.247 1.803.413 2.227.217.562.477.96.896 1.382.419.419.824.679 1.38.896.42.164 1.057.36 2.227.413 1.266.057 1.646.07 4.85.07zM12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 11-2.881 0 1.44 1.44 0 012.881 0z"/></svg>' },
-    { url: '#', icon: '<svg fill="currentColor" viewBox="0 0 24 24"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.39 18.592.026 11.985.026L12.017 0z"/></svg>' },
+    { label: 'X', icon: 'twitter' },
+    { label: 'Instagram', icon: 'instagram' },
+    { label: 'Facebook', icon: 'facebook' },
+    { label: 'YouTube', icon: 'youtube' },
+    { label: 'LinkedIn', icon: 'linkedin' },
   ];
 
-  footerLinks = [
-    {
-      title: 'Product',
-      links: [
-        { label: 'Features', href: '#features' },
-        { label: 'Pricing', href: '#pricing' },
-        { label: 'API', href: '#' },
-        { label: 'Integrations', href: '#' },
-      ]
-    },
-    {
-      title: 'Company',
-      links: [
-        { label: 'About', href: '#about' },
-        { label: 'Blog', href: '#' },
-        { label: 'Careers', href: '#' },
-        { label: 'Press', href: '#' },
-      ]
-    },
-    {
-      title: 'Support',
-      links: [
-        { label: 'Help Center', href: '#contact' },
-        { label: 'Contact', href: '#contact' },
-        { label: 'Privacy', href: '#' },
-        { label: 'Terms', href: '#' },
-      ]
-    },
+  footerCols = [
+    { title: 'Product', links: [{ label: 'Features', href: '#features' }, { label: 'Dashboard', href: '#dashboard' }, { label: 'Brackets', href: '#bracket' }, { label: 'Fixtures', href: '#fixtures' }, { label: 'Pricing', href: '#pricing' }] },
+    { title: 'Company', links: [{ label: 'About', href: '#' }, { label: 'Careers', href: '#' }, { label: 'Press', href: '#' }, { label: 'Partners', href: '#' }, { label: 'Contact', href: '#' }] },
   ];
-
-  contactForm = {
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
-  };
-
-  constructor(private el: ElementRef) {
-    this.generateParticles();
-  }
 
   ngOnInit() {
-    this.scrollHandler = this.onScroll.bind(this);
-    if (typeof window !== 'undefined') {
-      window.addEventListener('scroll', this.scrollHandler, { passive: true });
-      window.addEventListener('mousemove', this.onMouseMove.bind(this));
-    }
+    try {
+      const saved = localStorage.getItem('atb_lang');
+      if (saved === 'en' || saved === 'de') this.setLang(saved);
+    } catch {}
+    this.titleService.setTitle('ATB Sports — The Ultimate Tournament Management');
+    this.meta.updateTag({ name: 'description', content: 'Streamline every stage of football administration — fixtures, live scoring, brackets, payments and reporting — from one elite command center.' });
+    this.meta.updateTag({ property: 'og:title', content: 'ATB Sports — Tournament Management' });
+    this.meta.updateTag({ property: 'og:description', content: 'Run football tournaments with real-time scoring, brackets, and team management.' });
   }
 
   ngAfterViewInit() {
-    if (typeof window !== 'undefined') {
-      // Ensure Angular has finished rendering and DOM is stable
-      requestAnimationFrame(() => {
-        this.initGSAP();
-      });
-    }
+    if (typeof window === 'undefined') return;
+    this.syncViewport();
+    this.initNavScroll();
+    requestAnimationFrame(() => {
+      this.initReveals();
+      this.initHero();
+      this.initParallax();
+    });
+    this.startTesti();
   }
 
   ngOnDestroy() {
-    if (this.scrollHandler && typeof window !== 'undefined') {
-      window.removeEventListener('scroll', this.scrollHandler);
-      window.removeEventListener('mousemove', this.onMouseMove.bind(this));
-    }
+    this.io?.disconnect();
+    this.gsapCtx?.revert();
+    this.gsapMM?.revert();
+    if (this.navScrollFn) window.removeEventListener('scroll', this.navScrollFn);
+    this.stopTesti();
   }
 
-  private generateParticles() {
-    for (let i = 0; i < 40; i++) {
-      this.particles.push({
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        delay: Math.random() * 10,
-        duration: 10 + Math.random() * 15
-      });
-    }
+  @HostListener('window:resize')
+  onResize() { this.syncViewport(); }
+
+  /* Native passive listener instead of @HostListener('window:scroll') — in a
+     zoneless app a host listener schedules change detection on every scroll
+     event; the signal only notifies when the boolean actually flips. */
+  private initNavScroll() {
+    this.navScrollFn = () => this.navScrolled.set(window.scrollY > 30);
+    window.addEventListener('scroll', this.navScrollFn, { passive: true });
+    this.navScrollFn();
   }
 
-  private initGSAP() {
-    // ─── HERO ENTRANCE ───────────────────────────────────────────────────────
-    const heroTl = gsap.timeline({ delay: 0.2 });
-    heroTl
-      .from('.hero-badge', { opacity: 0, y: 40, duration: 0.8, ease: 'power3.out' })
-      .from('.hero-title', { opacity: 0, y: 80, duration: 1, ease: 'power4.out' }, '-=0.4')
-      .from('.hero-subtitle', { opacity: 0, y: 40, duration: 0.8, ease: 'power3.out' }, '-=0.5')
-      .from('.hero-buttons', { opacity: 0, y: 40, duration: 0.8, ease: 'power3.out' }, '-=0.5')
-      .to('.stat-card', { opacity: 1, y: 0, duration: 0.7, stagger: 0.12, ease: 'power3.out' }, '-=0.3');
-
-    // ─── HERO PARALLAX ───────────────────────────────────────────────────────
-    gsap.utils.toArray('.hero-orb').forEach((orb: any) => {
-      gsap.to(orb, { y: -160, scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 1.5 } });
-    });
-    gsap.utils.toArray('.parallax-layer').forEach((layer: any) => {
-      const speed = parseFloat(layer.dataset.speed) || 0.5;
-      gsap.to(layer, { y: -200 * speed, scrollTrigger: { trigger: 'body', start: 'top top', end: 'bottom top', scrub: true } });
-    });
-
-    // ─── SECTION LABELS / TITLES ─────────────────────────────────────────────
-    gsap.utils.toArray('section').forEach((section: any) => {
-      const label = section.querySelector('.section-label');
-      const title = section.querySelector('.section-title');
-      if (label) gsap.to(label, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', scrollTrigger: { trigger: section, start: 'top 82%', toggleActions: 'play none none reverse' } });
-      if (title) gsap.to(title, { opacity: 1, y: 0, duration: 0.9, delay: 0.1, ease: 'power4.out', scrollTrigger: { trigger: section, start: 'top 82%', toggleActions: 'play none none reverse' } });
-    });
-
-    // ─── FOOTBALL ELEMENTS ANIMATION ──────────────────────────────────────────
-    gsap.utils.toArray('.football-element').forEach((el: any) => {
-      // Floating motion
-      gsap.to(el, {
-        y: '+=30',
-        x: '+=15',
-        rotation: '+=20',
-        duration: gsap.utils.random(3, 5),
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-        delay: gsap.utils.random(0, 2)
-      });
-
-      // Parallax scroll
-      gsap.to(el, {
-        y: -150,
-        scrollTrigger: {
-          trigger: '#hero',
-          start: 'top top',
-          end: 'bottom top',
-          scrub: 1
-        }
-      });
-    });
-
-    // ─── ACTION PLAYERS ANIMATION ─────────────────────────────────────────────
-    gsap.from('.action-player-left', {
-      x: -250,
-      scale: 0.8,
-      opacity: 0,
-      duration: 2.5,
-      delay: 0.3,
-      ease: 'expo.out'
-    });
-    gsap.to('.action-player-left', {
-      y: -100,
-      rotation: -5,
-      scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 2 }
-    });
-
-    gsap.from('.action-player-right', {
-      x: 250,
-      scale: 0.8,
-      opacity: 0,
-      duration: 2.5,
-      delay: 0.5,
-      ease: 'expo.out'
-    });
-    gsap.to('.action-player-right', {
-      y: -120,
-      rotation: 5,
-      scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 2 }
-    });
-
-    // ─── TOURNAMENT CARDS ─────────────────────────────────────────────────────
-    gsap.utils.toArray('.tournament-card').forEach((card: any, i: number) => {
-      gsap.from(card, {
-        opacity: 0, y: 70, rotateX: 8, duration: 0.9, delay: i * 0.12, ease: 'power3.out',
-        scrollTrigger: { trigger: card, start: 'top 88%', toggleActions: 'play none none reverse' }
-      });
-    });
-
-    // ─── FEATURE CARDS ────────────────────────────────────────────────────────
-    gsap.utils.toArray('.feature-card').forEach((card: any, i: number) => {
-      gsap.from(card, {
-        opacity: 0, y: 60, scale: 0.96, duration: 0.8, delay: (i % 3) * 0.1, ease: 'power3.out',
-        scrollTrigger: { trigger: card, start: 'top 88%', toggleActions: 'play none none reverse' }
-      });
-    });
-
-    // ─── ABOUT SECTION ─────────────────────────────────────────────────────────
-    const aboutTl = gsap.timeline({ scrollTrigger: { trigger: '#about', start: 'top 70%', toggleActions: 'play none none reverse' } });
-    aboutTl
-      .from('#about .order-2', { opacity: 0, x: -60, duration: 1, ease: 'power3.out' })
-      .from('.about-bg-graph div', { scaleY: 0, opacity: 0, transformOrigin: 'bottom', duration: 1.5, stagger: 0.03, ease: 'power2.out' }, '-=0.8')
-      .from('.about-card-3', { opacity: 0, scale: 0.8, duration: 0.8, ease: 'back.out(1.7)' }, '-=1.2')
-      .from('.about-card-1', { opacity: 0, x: -30, y: 15, duration: 0.6, ease: 'power3.out' }, '-=0.6')
-      .from('.about-graph-bar', { scaleY: 0, opacity: 0, transformOrigin: 'bottom', duration: 0.8, stagger: 0.04, ease: 'power3.out' }, '-=0.4')
-      .from('.about-card-2', { opacity: 0, x: 30, y: -15, duration: 0.6, ease: 'power3.out' }, '-=0.4');
-
-    // Continuous dynamic effects for graphs
-    setTimeout(() => {
-      gsap.to('.about-graph-bar', {
-        scaleY: () => gsap.utils.random(0.3, 1.5),
-        duration: () => gsap.utils.random(0.4, 0.8),
-        yoyo: true,
-        repeat: -1,
-        repeatRefresh: true,
-        transformOrigin: 'bottom',
-        ease: 'power1.inOut',
-        stagger: { amount: 0.5, from: "random" }
-      });
-
-      gsap.to('.about-bg-graph div', {
-        scaleY: () => gsap.utils.random(0.7, 1.3),
-        duration: () => gsap.utils.random(2, 3),
-        yoyo: true,
-        repeat: -1,
-        repeatRefresh: true,
-        transformOrigin: 'bottom',
-        ease: 'sine.inOut',
-        stagger: { amount: 1.5, from: "random" }
-      });
-    }, 2000);
-
-    // Add parallax to background graph
-    gsap.to('.about-bg-graph', {
-      y: -80,
-      scrollTrigger: {
-        trigger: '#about',
-        start: 'top bottom',
-        end: 'bottom top',
-        scrub: true
-      }
-    });
-
-    // ─── PRICING CARDS ────────────────────────────────────────────────────────
-    gsap.utils.toArray('.pricing-card').forEach((card: any, i: number) => {
-      gsap.from(card, {
-        opacity: 0, y: 80, duration: 0.9, delay: i * 0.15, ease: 'power4.out',
-        scrollTrigger: { trigger: card, start: 'top 88%', toggleActions: 'play none none reverse' }
-      });
-    });
-
-    // ─── TESTIMONIAL CARDS ────────────────────────────────────────────────────
-    gsap.utils.toArray('.testimonial-card').forEach((card: any, i: number) => {
-      gsap.from(card, {
-        opacity: 0, y: 60, scale: 0.95, duration: 0.8, delay: i * 0.15, ease: 'power3.out',
-        scrollTrigger: { trigger: card, start: 'top 88%', toggleActions: 'play none none reverse' }
-      });
-    });
-
-    // ─── SPONSORS STATS COUNTER ─────────────────────────────────────────────
-    gsap.from('.sponsor-stat-val', {
-      opacity: 0, y: 30, duration: 0.7, stagger: 0.1, ease: 'power3.out',
-      scrollTrigger: { trigger: '#sponsors', start: 'top 80%', toggleActions: 'play none none reverse' }
-    });
-
-    // ─── CTA SECTION ──────────────────────────────────────────────────────────
-    const ctaTl = gsap.timeline({ scrollTrigger: { trigger: '#cta', start: 'top 75%', toggleActions: 'play none none reverse' } });
-    ctaTl
-      .from('.cta-title', { opacity: 0, y: 80, duration: 1, ease: 'power4.out' })
-      .from('.cta-subtitle', { opacity: 0, y: 40, duration: 0.8, ease: 'power3.out' }, '-=0.5')
-      .from('.cta-btn-primary, .cta-btn-secondary', { opacity: 0, y: 30, stagger: 0.15, duration: 0.7, ease: 'back.out(1.4)' }, '-=0.4');
-
-    // ─── FOOTER FADE ──────────────────────────────────────────────────────────
-    gsap.from('footer > div > div', {
-      opacity: 0, y: 40, duration: 0.9, ease: 'power3.out',
-      scrollTrigger: { trigger: 'footer', start: 'top 90%', toggleActions: 'play none none reverse' }
-    });
-
-    // ─── MAGNETIC BUTTONS ─────────────────────────────────────────────────────
-    gsap.utils.toArray('.magnetic').forEach((btn: any) => {
-      btn.addEventListener('mousemove', (e: MouseEvent) => {
-        const rect = btn.getBoundingClientRect();
-        const x = e.clientX - rect.left - rect.width / 2;
-        const y = e.clientY - rect.top - rect.height / 2;
-        gsap.to(btn, { x: x * 0.25, y: y * 0.25, duration: 0.3, ease: 'power2.out' });
-      });
-      btn.addEventListener('mouseleave', () => {
-        gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: 'elastic.out(1, 0.4)' });
-      });
-    });
-
-    // Refresh ScrollTrigger to ensure accurate positions after rendering
-    setTimeout(() => {
-      ScrollTrigger.refresh();
-    }, 100);
+  private syncViewport() {
+    this.isMobile.set(window.matchMedia('(max-width:980px)').matches);
   }
 
-  onScroll() {
-    this.isScrolled = window.scrollY > 50;
+  /* Reveal-on-scroll via IntersectionObserver — content stays visible if this never runs. */
+  private initReveals() {
+    if (!('IntersectionObserver' in window)) return;
+    this.ioReady.set(true);
+    const root: HTMLElement = this.host.nativeElement;
+
+    // cascade siblings that share a parent
+    root.querySelectorAll<HTMLElement>('.reveal').forEach((el) => {
+      const sibs = [...el.parentElement!.children].filter(c => c.classList.contains('reveal'));
+      const i = sibs.indexOf(el);
+      if (sibs.length > 1 && i > 0) el.style.transitionDelay = (i * 0.09) + 's';
+    });
+
+    this.io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) { e.target.classList.add('in'); this.io!.unobserve(e.target); }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    root.querySelectorAll('.reveal').forEach(el => this.io!.observe(el));
+
+    // Fail-safe: directly reveal anything already in view.
+    const revealInView = () => {
+      const h = window.innerHeight || document.documentElement.clientHeight;
+      root.querySelectorAll<HTMLElement>('.reveal:not(.in)').forEach((el) => {
+        if (el.getBoundingClientRect().top < h * 0.92) { el.classList.add('in'); this.io!.unobserve(el); }
+      });
+    };
+    requestAnimationFrame(revealInView);
+    setTimeout(revealInView, 200);
   }
 
-  get navClasses(): string {
-    return 'bg-black/60 backdrop-blur-xl border border-[#D4AF37]/30 shadow-2xl shadow-black/50';
+  /* GSAP on-load hero entrance (only hides while gsap is present). */
+  private initHero() {
+    if (this.reducedMotion || !gsap) return;
+    this.gsapCtx = gsap.context(() => {
+      gsap.from('.hero-inner > *', { opacity: 0, y: 34, duration: .9, stagger: .12, ease: 'power3.out', delay: .15 });
+      gsap.from('.hero-ball', { opacity: 0, xPercent: -45, rotation: -35, duration: 1.2, ease: 'power3.out' });
+      gsap.from('.hero-whistle', { opacity: 0, xPercent: 45, rotation: 25, duration: 1.2, ease: 'power3.out', delay: .1 });
+    }, this.host.nativeElement);
   }
 
-  toggleMobileMenu() {
-    this.mobileMenuOpen = !this.mobileMenuOpen;
+  /* Scrub-linked parallax. Transform-only tweens (translate + a small
+     pre-scale so the oversampled layers never expose their edges), pinned to
+     scroll position with scrub:true — no smoothing delay, no layout work per
+     frame. gsap.matchMedia keeps it off touch/mobile and reduced-motion, and
+     reverts every tween + ScrollTrigger automatically when conditions flip. */
+  private initParallax() {
+    if (!gsap || !('IntersectionObserver' in window)) return;
+    gsap.registerPlugin(ScrollTrigger);
+
+    this.gsapMM = gsap.matchMedia(this.host.nativeElement);
+    this.gsapMM.add('(min-width: 981px) and (prefers-reduced-motion: no-preference)', () => {
+      const scrub = { scrub: true } as const;
+
+      // hero: backdrop drifts slower than the page, props float at depths
+      gsap.fromTo('.hero-pitch', { yPercent: 0, scale: 1.12 }, {
+        yPercent: 10, scale: 1.12, ease: 'none',
+        scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', ...scrub },
+      });
+      gsap.to('.hero-ball', {
+        yPercent: 26, ease: 'none',
+        scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', ...scrub },
+      });
+      gsap.to('.hero-whistle', {
+        yPercent: 16, ease: 'none',
+        scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', ...scrub },
+      });
+      gsap.to('.hero-inner', {
+        yPercent: -12, opacity: .25, ease: 'none',
+        scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', ...scrub },
+      });
+
+      // dashboard + bracket band: stadium backdrop counter-drifts through it
+      gsap.fromTo('.pitch-band-bg', { yPercent: -8, scale: 1.18 }, {
+        yPercent: 8, scale: 1.18, ease: 'none',
+        scrollTrigger: { trigger: '.pitch-band', start: 'top bottom', end: 'bottom top', ...scrub },
+      });
+
+      // CTA banner: player art glides against the band
+      gsap.fromTo('.cta-player-art', { yPercent: -8, scale: 1.16 }, {
+        yPercent: 8, scale: 1.16, ease: 'none',
+        scrollTrigger: { trigger: '.cta-inner', start: 'top bottom', end: 'bottom top', ...scrub },
+      });
+    });
   }
 
-  closeMobileMenu() {
-    this.mobileMenuOpen = false;
+  nextTesti() { this.testiIdx.set((this.testiIdx() + 1) % this.testimonials.length); }
+
+  /* card carousel: dots highlight the active card, auto-advancing with hover pause */
+  selectTesti(i: number) { this.testiIdx.set(i); this.startTesti(); }
+  pauseTesti() { this.stopTesti(); }
+  resumeTesti() { this.startTesti(); }
+
+  private startTesti() {
+    if (this.reducedMotion || typeof window === 'undefined') return;
+    this.stopTesti();
+    this.testiTimer = setInterval(() => this.nextTesti(), 6000);
+  }
+  private stopTesti() {
+    if (this.testiTimer) { clearInterval(this.testiTimer); this.testiTimer = null; }
   }
 
   onSubmit() {
-    console.log('Form submitted:', this.contactForm);
-    alert('Thank you for your message! We will get back to you soon.');
-    this.contactForm = { name: '', email: '', subject: '', message: '' };
-  }
-
-  onMouseMove(e: MouseEvent) {
-    if (typeof window === 'undefined') return;
-    const x = (e.clientX - window.innerWidth / 2) / 50;
-    const y = (e.clientY - window.innerHeight / 2) / 50;
-
-    const leftEl = document.getElementById('parallax-left');
-    const rightEl = document.getElementById('parallax-right');
-
-    if (leftEl) {
-      gsap.to(leftEl, { x: x * 2, y: y * 2, duration: 1, ease: 'power2.out' });
-    }
-    if (rightEl) {
-      gsap.to(rightEl, { x: -x * 2, y: -y * 2, duration: 1, ease: 'power2.out' });
-    }
-  }
-
-  getIconSvg(type: string): string {
-    const icons: any = {
-      ball: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20M7 5l10 14M17 5L7 19"/></svg>`,
-      boot: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M4 16c0 1.1.9 2 2 2h12a2 2 0 002-2v-4a2 2 0 00-2-2h-3l-2-4H5a2 2 0 00-2 2v8z"/><path d="M14 10V8M17 10V8M8 18l-1 4M12 18l-1 4M16 18l-1 4"/></svg>`,
-      whistle: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M18 7H6a3 3 0 00-3 3v4a3 3 0 003 3h4l3 3 1-1-1-2h5a3 3 0 003-3v-4a3 3 0 00-3-3z"/><circle cx="8" cy="12" r="2"/></svg>`,
-      trophy: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M6 9H4.5a2.5 2.5 0 010-5H6M18 9h1.5a2.5 2.5 0 000-5H18M4 22h16M10 14.66V17c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-2.34M12 4v4M12 17.5V22M7 4h10c0 4.42-3.58 8-8 8s-8-3.58-8-8z"/></svg>`,
-      goal: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M6 6v14M18 6v14M2 13h20M2 17h20M9 6v14M15 6v14"/></svg>`,
-      jersey: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 1.88v4.31a2 2 0 00.58 1.42l3.14 3.14V20a2 2 0 002 2h8a2 2 0 002-2v-5.79l3.14-3.14a2 2 0 00.58-1.42V5.34a2 2 0 00-1.34-1.88z"/></svg>`
-    };
-    return icons[type] || '';
+    if (this.contactSubmitting() || !this.contactForm.email) return;
+    this.contactSubmitting.set(true);
+    this.contactSuccess.set(false);
+    this.http.post(`${API_URL}/api/public/contact`, this.contactForm).subscribe({
+      next: () => { this.contactSuccess.set(true); this.contactSubmitting.set(false); this.contactForm.email = ''; },
+      error: () => this.contactSubmitting.set(false),
+    });
   }
 }

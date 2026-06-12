@@ -14,10 +14,11 @@
     <!-- Center: Teams & Score -->
     <div class="flex-1 w-full flex items-center justify-between lg:px-12 relative">
         <!-- LIVE badge if active -->
-        <div *ngIf="activeTab === 'live'"
+        <div *ngIf="activeTab === 'live' || match?.status === 'live'"
             class="absolute -top-6 left-1/2 -transform -translate-x-1/2 flex items-center gap-1.5 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded text-[10px] text-red-500 font-black tracking-widest uppercase shadow-lg">
             <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
             Live
+            <span *ngIf="liveClock()" class="text-white tabular-nums normal-case tracking-normal">{{ liveClock() }}</span>
         </div>
 
         <!-- Home Team -->

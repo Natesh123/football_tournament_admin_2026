@@ -12,6 +12,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 export class TournamentVenuesComponent implements OnInit {
     private translate = inject(TranslateService);
     @Input() data!: any;
+    @Input() showValidationErrors = false;
 
     ngOnInit() {
         if (!this.data.pitches) {

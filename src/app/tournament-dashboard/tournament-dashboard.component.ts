@@ -198,6 +198,16 @@ export class TournamentDashboardComponent implements OnInit {
             return; // Prevent navigating to the requested tab
         }
 
+        // Connected data: matches are scheduled at the tournament venue,
+        // so venue details must exist before the schedule can be configured.
+        if (tabId === 'schedule' && !this.hasVenueDetails()) {
+            this.showValidationErrors.set(true);
+            this.ui.showToast('TOURNAMENT_DASHBOARD.SCHEDULE.ERR_VENUE_REQUIRED', 'error');
+            this.saveChanges(true);
+            this.setTab('venues');
+            return;
+        }
+
         this.showValidationErrors.set(false);
         this.syncRegFee();
 
@@ -206,6 +216,17 @@ export class TournamentDashboardComponent implements OnInit {
 
         // Switch immediately for a smooth UX
         this.setTab(tabId);
+    }
+
+    hasVenueDetails(): boolean {
+        return !!this.settings.venues?.primaryVenue?.trim();
+    }
+
+    // Triggered by child components when an action needs venue details that are missing
+    onRequireVenue() {
+        this.showValidationErrors.set(true);
+        this.ui.showToast('TOURNAMENT_DASHBOARD.SCHEDULE.ERR_VENUE_REQUIRED', 'error');
+        this.setTab('venues');
     }
 
     private syncRegFee() {
@@ -326,7 +347,6 @@ export class TournamentDashboardComponent implements OnInit {
                 }
             },
             error: (err) => {
-                console.error('Failed to load tournament:', err);
                 this.isLoading.set(false);
             }
         });
@@ -435,7 +455,6 @@ export class TournamentDashboardComponent implements OnInit {
                 try {
                     incomingFormatData = JSON.parse(incomingFormatData);
                 } catch (e) {
-                    console.error('[TournamentDashboard] Failed to parse format_data:', e);
                 }
             }
 
@@ -569,7 +588,6 @@ export class TournamentDashboardComponent implements OnInit {
                             }
                         },
                         error: (err) => {
-                            console.error('Failed to generate structure:', err);
                             if (!silent) {
                                 this.ui.endAction();
                                 this.showToast(err?.error?.message || 'TOURNAMENT_DASHBOARD.TOAST.STRUCTURE_ERROR', 'error');
@@ -584,7 +602,6 @@ export class TournamentDashboardComponent implements OnInit {
                 }
             },
             error: (err) => {
-                console.error('Failed to save:', err);
                 if (!silent) {
                     this.ui.endAction();
                     this.showToast('TOURNAMENT_DASHBOARD.TOAST.SAVE_ERROR', 'error');

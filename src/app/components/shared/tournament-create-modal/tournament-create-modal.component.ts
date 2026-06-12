@@ -87,7 +87,6 @@ export class TournamentCreateModalComponent {
                 this.router.navigate(['/admin/tournaments', created.id]);
             },
             error: (err) => {
-                console.error('Failed to create tournament:', err);
                 this.isCreating.set(false);
                 // We could emit error here too if needed
             }

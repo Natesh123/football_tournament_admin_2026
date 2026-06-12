@@ -2,6 +2,8 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 
+export type MatchTab = 'timeline' | 'stats' | 'info' | 'penalties' | 'standings';
+
 @Component({
     selector: 'app-match-tabs',
     standalone: true,
@@ -9,11 +11,12 @@ import { TranslateModule } from '@ngx-translate/core';
     templateUrl: './match-tabs.component.html'
 })
 export class MatchTabsComponent {
-    @Input() activeTab: 'timeline' | 'stats' | 'info' | 'standings' = 'info';
+    @Input() activeTab: MatchTab = 'info';
     @Input() showStandings: boolean = true;
-    @Output() tabChange = new EventEmitter<'timeline' | 'stats' | 'info' | 'standings'>();
+    @Input() showPenalties: boolean = false;
+    @Output() tabChange = new EventEmitter<MatchTab>();
 
-    onTabClick(tab: 'timeline' | 'stats' | 'info' | 'standings') {
+    onTabClick(tab: MatchTab) {
         this.tabChange.emit(tab);
     }
 }

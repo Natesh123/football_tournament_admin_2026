@@ -1,13 +1,11 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../auth/auth.service';
 import { HeroComponent } from './components/hero/hero.component';
 import { MatchFeedComponent } from './components/match-feed/match-feed.component';
 import { WidgetsComponent } from './components/widgets/widgets.component';
 import { StatsBoard } from '../components/stats-board/stats-board';
-import { TournamentService } from '../tournament/tournament.service';
 import { DashboardService } from './dashboard.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { LoaderComponent } from '../components/loader/loader.component';
@@ -31,7 +29,6 @@ import { TournamentCreateModalComponent } from '../components/shared/tournament-
     ]
 })
 export class DashboardComponent implements OnInit {
-    private tournamentService = inject(TournamentService);
     private dashboardService = inject(DashboardService);
 
     showCreateModal = signal(false);
@@ -53,11 +50,7 @@ export class DashboardComponent implements OnInit {
     ]);
 
 
-    constructor(private router: Router, public auth: AuthService) {
-        if (!this.auth.isAuthenticated()) {
-            this.router.navigate(['/login']);
-        }
-    }
+    auth = inject(AuthService);
 
     ngOnInit() {
         this.loadDashboardStats();
@@ -82,7 +75,6 @@ export class DashboardComponent implements OnInit {
                 this.isLoadingStats.set(false);
             },
             error: (err) => {
-                console.error('Failed to load dashboard stats:', err);
                 this.isLoadingStats.set(false);
             }
         });
@@ -96,9 +88,9 @@ export class DashboardComponent implements OnInit {
         this.showCreateModal.set(false);
     }
 
-    onTournamentCreated(created: any) {
+    onTournamentCreated(_created: any) {
         this.showToast('Tournament created successfully!', 'success');
-        this.loadDashboardStats(); // refresh counts after creating
+        this.loadDashboardStats();
     }
 
     showToast(text: string, type: 'success' | 'error' | 'info' = 'success') {

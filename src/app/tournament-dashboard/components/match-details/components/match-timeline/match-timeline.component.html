@@ -13,7 +13,7 @@
         }
     </div>
 
-    @if (events.length === 0) {
+    @if (sortedEvents.length === 0) {
     <div class="text-center py-12 border border-dashed border-white/10 rounded-xl bg-white/5">
         <div
             class="w-12 h-12 rounded-full bg-black flex items-center justify-center mx-auto mb-4 border border-white/10">
@@ -46,6 +46,36 @@
                         <p class="text-[10px] sm:text-xs font-black text-white uppercase tracking-wider">{{ event.playerName | translate }}</p>
                         <p class="text-[8px] sm:text-[9px] text-zinc-500 uppercase">{{ event.details | translate }}</p>
                     </div>
+                </div>
+            </div>
+            } @else if (event.type === 'added_time') {
+            <div class="relative flex items-center justify-center py-4 w-full">
+                <div class="z-10 bg-black-card border border-red-500/30 rounded-full px-4 sm:px-6 py-2 flex items-center gap-2 sm:gap-3 shadow-lg">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-500/10 flex items-center justify-center shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-[10px] sm:text-xs font-black text-white uppercase tracking-wider">{{ 'MATCH_DETAILS.TIMELINE.ADDED_TIME' | translate }}</p>
+                        <p class="text-[8px] sm:text-[9px] text-red-400 font-black uppercase">{{ event.details }} {{ 'COMMON.MIN' | translate }}</p>
+                    </div>
+                </div>
+            </div>
+            } @else if (event.type === 'penalty_kick') {
+            <div class="relative flex items-center justify-center py-3 w-full">
+                <div class="z-10 bg-black-card rounded-full px-4 sm:px-6 py-2 flex items-center gap-3 shadow-lg border"
+                    [ngClass]="event.scored ? 'border-emerald-500/30' : 'border-red-500/30'">
+                    <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-wider"
+                        [ngClass]="getEventSide(event) === 'home' ? 'text-gold-400' : 'text-blue-400'">
+                        {{ getEventSide(event) === 'home' ? (match?.homeTeam?.shortName || match?.homeTeam?.name) : (match?.awayTeam?.shortName || match?.awayTeam?.name) }}
+                    </span>
+                    <span class="text-xs sm:text-sm font-bold text-white truncate">{{ event.playerName }}</span>
+                    @if (event.scored) {
+                    <span class="text-[10px] sm:text-xs font-black text-emerald-400 flex items-center gap-1">⚽ {{ 'MATCH_DETAILS.TIMELINE.PENALTY_SCORED' | translate }}</span>
+                    } @else {
+                    <span class="text-[10px] sm:text-xs font-black text-red-400 flex items-center gap-1">✗ {{ 'MATCH_DETAILS.TIMELINE.PENALTY_MISSED' | translate }}</span>
+                    }
                 </div>
             </div>
             } @else {
@@ -91,14 +121,25 @@
                             </svg>
                             } @else if (event.type === 'penalty') {
                             <span class="text-[10px] sm:text-xs font-black text-purple-400 shrink-0">P</span>
+                            } @else if (event.type === 'penalty_missed') {
+                            <span class="text-[10px] sm:text-xs font-black text-red-400 shrink-0">P✗</span>
                             } @else if (event.type === 'corner') {
-                            <span class="text-[10px] sm:text-xs font-black text-blue-400 shrink-0">🚩</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 sm:h-4 sm:w-4 text-blue-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2z" />
+                            </svg>
                             } @else if (event.type === 'foul') {
-                            <span class="text-[10px] sm:text-xs font-black text-orange-400 shrink-0">🤜</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 sm:h-4 sm:w-4 text-orange-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
+                            </svg>
                             } @else if (event.type === 'offside') {
-                            <span class="text-[10px] sm:text-xs font-black text-zinc-400 shrink-0">🚫</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 sm:h-4 sm:w-4 text-zinc-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                            </svg>
                             } @else if (event.type === 'free_kick') {
-                            <span class="text-[10px] sm:text-xs font-black text-cyan-400 shrink-0">🎯</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 sm:h-4 sm:w-4 text-cyan-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.5 12a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+                            </svg>
                             }
                         </div>
                         <div class="text-[9px] sm:text-xs text-zinc-500 font-bold uppercase truncate"

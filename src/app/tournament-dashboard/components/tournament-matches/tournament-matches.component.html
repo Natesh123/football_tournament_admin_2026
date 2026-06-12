@@ -52,8 +52,16 @@
             @for (match of filteredMatches(); track match.id) {
             <div (click)="openMatchDetails(match.id)" class="p-4 flex items-center justify-between hover:bg-zinc-800/80 transition-colors cursor-pointer group">
                 <div class="flex items-center gap-4 flex-1">
-                    <span class="text-xs font-bold text-zinc-500 w-24 text-center">{{match.stage?.name ||
-                        ('MATCH_DETAILS.INFO.TITLE' | translate)}}</span>
+                    <div class="w-24 flex flex-col items-center gap-1">
+                        <span class="text-xs font-bold text-zinc-500 text-center">{{match.stage?.name ||
+                            ('MATCH_DETAILS.INFO.TITLE' | translate)}}</span>
+                        @if (match.status === 'live') {
+                        <span class="flex items-center gap-1 bg-red-500/10 border border-red-500/20 px-1.5 py-0.5 rounded text-[9px] font-black text-red-500 uppercase tracking-wider">
+                            <span class="w-1 h-1 rounded-full bg-red-500 animate-pulse"></span>
+                            <span class="text-white tabular-nums">{{ liveClock(match) }}</span>
+                        </span>
+                        }
+                    </div>
 
                     <div class="flex-1 flex justify-end items-center gap-2">
                         <span class="text-sm font-bold text-white">{{match.homeTeam?.name || ('COMMON.TBD' | translate)}}</span>

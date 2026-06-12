@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, signal, inject, HostListener, ElementRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, signal, inject, HostListener, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -18,7 +18,9 @@ import { UiService } from '../../../services/ui.service';
 export class TournamentScheduleComponent implements OnInit {
     @Input() data!: any;
     @Input() tournamentId!: string;
+    @Input() venues: any = null;
     @Input() showValidationErrors = false;
+    @Output() requireVenue = new EventEmitter<void>();
 
     private translate = inject(TranslateService);
     private tournamentService = inject(TournamentService);
@@ -89,6 +91,30 @@ export class TournamentScheduleComponent implements OnInit {
         this.data.timeSlots = selected.join(', ');
     }
 
+    // ─── Venue (connected data) ──────────────────────────────────────────────
+    get hasVenueDetails(): boolean {
+        return !!this.venues?.primaryVenue?.trim();
+    }
+
+    get venueOptions(): string[] {
+        const options: string[] = [];
+        const primary = this.venues?.primaryVenue?.trim();
+        if (primary) {
+            options.push(primary);
+            if (this.venues?.multipleVenues && Array.isArray(this.venues?.pitches)) {
+                for (const pitch of this.venues.pitches) {
+                    const name = pitch?.name?.trim();
+                    if (name) options.push(`${primary} - ${name}`);
+                }
+            }
+        }
+        // Keep a venue already saved on the match selectable even if it is not
+        // part of the tournament venue setup anymore
+        const current = this.editingMatch?.venue?.trim();
+        if (current && !options.includes(current)) options.push(current);
+        return options;
+    }
+
     // ─── Lifecycle ───────────────────────────────────────────────────────────
     ngOnInit() {
         if (this.tournamentId) this.loadStructure();
@@ -106,6 +132,11 @@ export class TournamentScheduleComponent implements OnInit {
     generateSchedule() {
         if (!this.tournamentId) return;
 
+        // Matches are played at the tournament venue — require it before scheduling
+        if (!this.hasVenueDetails) {
+            this.requireVenue.emit();
+            return;
+        }
         if (!this.data?.startDate) {
             this.ui.showToast('TOURNAMENT_DASHBOARD.SCHEDULE.ERR_START_DATE', 'error');
             return;
@@ -146,6 +177,8 @@ export class TournamentScheduleComponent implements OnInit {
     openMatchEditor(match: any) {
         this.editingMatch = {
             ...match,
+            // Default the match venue to the tournament's primary venue
+            venue: match.venue || this.venues?.primaryVenue?.trim() || '',
             matchTime: match.startTime ? new Date(match.startTime).toISOString().slice(0, 16) : ''
         };
     }
@@ -185,6 +218,12 @@ export class TournamentScheduleComponent implements OnInit {
         const matchId = this.editingMatch.id;
         if (!matchId) {
             this.ui.showToast('TOURNAMENT_DASHBOARD.SCHEDULE.ERR_MATCH_ID', 'error');
+            return;
+        }
+
+        // A scheduled match must have a venue
+        if (!this.editingMatch.venue?.trim()) {
+            this.ui.showToast('TOURNAMENT_DASHBOARD.SCHEDULE.ERR_MATCH_VENUE', 'error');
             return;
         }
 

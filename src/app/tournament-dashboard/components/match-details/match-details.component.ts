@@ -12,13 +12,14 @@ import { MatchTimelineComponent } from './components/match-timeline/match-timeli
 import { MatchEventEditorModalComponent } from './components/match-event-editor-modal/match-event-editor-modal.component';
 import { MatchEditModalComponent } from './components/match-edit-modal/match-edit-modal.component';
 import { MatchHeaderComponent } from './components/match-header/match-header.component';
-import { MatchTabsComponent } from './components/match-tabs/match-tabs.component';
+import { MatchTabsComponent, MatchTab } from './components/match-tabs/match-tabs.component';
 import { MatchInfoComponent } from './components/match-info/match-info.component';
 import { H2hComponent } from './components/h2h/h2h.component';
 import { LineupEditorComponent } from './components/lineup-editor/lineup-editor.component';
 import { MatchStatsComponent } from './components/match-stats/match-stats.component';
 import { ConfirmModalComponent } from '../../../components/shared/confirm-modal.component';
 import { TeamMemberService, TeamMember } from '../../../teams/team-member.service';
+import { getLiveMinute } from '../../../core/utils/live-clock.util';
 
 @Component({
     selector: 'app-match-details',
@@ -62,7 +63,7 @@ export class MatchDetailsComponent implements OnInit {
     awayScore = signal<number | null>(null);
 
     // Dynamic state
-    activeTab = signal<'timeline' | 'stats' | 'info' | 'standings'>('timeline');
+    activeTab = signal<MatchTab>('timeline');
     events = signal<any[]>([]);
 
     // Event Add/Edit State
@@ -97,6 +98,15 @@ export class MatchDetailsComponent implements OnInit {
     eventFormPlayerName = signal<string>('');
     eventFormAssistPlayerName = signal<string>('');
     eventFormDetails = signal<string>('');
+    // For a 'penalty' event: was it scored (goal) or missed/saved?
+    eventFormPenaltyScored = signal<boolean>(true);
+
+    // Referee added time — free numeric input (minutes)
+    addedTimeInput = signal<number | null>(null);
+
+    // Penalty shootout — currently selected taker per side
+    penaltyTakerHome = signal<string>('');
+    penaltyTakerAway = signal<string>('');
 
     ngOnInit() {
         this.tournamentId.set(this.route.snapshot.paramMap.get('id') || '');
@@ -138,7 +148,6 @@ export class MatchDetailsComponent implements OnInit {
                 this.fetchTeamMembersData(); // Fetch extra details like photos
             },
             error: (err) => {
-                console.error("Failed to load match details", err);
                 this.isLoading.set(false);
             }
         });
@@ -147,15 +156,7 @@ export class MatchDetailsComponent implements OnInit {
     private calculateLiveMinute(): number {
         const m = this.match();
         if (!m?.periodStartedAt) return 1;
-        const start = new Date(m.periodStartedAt).getTime();
-        const now = new Date().getTime();
-        const diffMs = now - start;
-        const diffMins = Math.floor(diffMs / 60000);
-
-        // Base minute (e.g. 45 for second half) plus elapsed time in current period
-        const currentMinute = (m.live_minute || 0) + diffMins + 1;
-
-        return currentMinute;
+        return getLiveMinute(m);
     }
 
     private fetchTeamMembersData() {
@@ -165,13 +166,13 @@ export class MatchDetailsComponent implements OnInit {
         if (homeTeamId) {
             this.teamMemberService.getByTeamId(homeTeamId.toString()).subscribe({
                 next: (players) => this.homePlayers.set(players),
-                error: (err) => console.error("Error fetching home players", err)
+                error: () => {}
             });
         }
         if (awayTeamId) {
             this.teamMemberService.getByTeamId(awayTeamId.toString()).subscribe({
                 next: (players) => this.awayPlayers.set(players),
-                error: (err) => console.error("Error fetching away players", err)
+                error: () => {}
             });
         }
     }
@@ -204,7 +205,7 @@ export class MatchDetailsComponent implements OnInit {
                     this.lineups.set(res.data);
                 }
             },
-            error: (err) => console.error("Error fetching lineups", err)
+            error: () => {}
         });
 
         this.http.get<{ success: boolean, data: any }>(`${environment.apiUrl}/api/matches/${this.matchId()}/h2h`).subscribe({
@@ -213,7 +214,7 @@ export class MatchDetailsComponent implements OnInit {
                     this.h2hData.set(res.data);
                 }
             },
-            error: (err) => console.error("Error fetching H2H", err)
+            error: () => {}
         });
     }
 
@@ -255,7 +256,6 @@ export class MatchDetailsComponent implements OnInit {
                 this.showToast(this.translate.instant('MATCH_DETAILS.TOAST.UPDATE_SUCCESS'), 'success');
             },
             error: (err) => {
-                console.error("Failed to update match", err);
                 this.ui.endAction();
                 this.showToast(this.translate.instant('MATCH_DETAILS.TOAST.UPDATE_ERROR'), 'error');
             }
@@ -273,7 +273,6 @@ export class MatchDetailsComponent implements OnInit {
                 this.showToast(this.translate.instant('MATCH_DETAILS.TOAST.LINEUP_UPDATE_SUCCESS'), 'success');
             },
             error: (err) => {
-                console.error("Failed to update lineups", err);
                 this.ui.endAction();
                 this.showToast(this.translate.instant('MATCH_DETAILS.TOAST.LINEUP_UPDATE_ERROR'), 'error');
             }
@@ -292,7 +291,6 @@ export class MatchDetailsComponent implements OnInit {
                     this.showToast(this.translate.instant('MATCH_DETAILS.TOAST.EVENT_UPDATE_SUCCESS'), 'success');
                 },
                 error: (err: any) => {
-                    console.error("Failed to update event", err);
                     this.ui.endAction();
                     this.showToast(this.translate.instant('MATCH_DETAILS.TOAST.EVENT_UPDATE_ERROR'), 'error');
                 }
@@ -307,7 +305,6 @@ export class MatchDetailsComponent implements OnInit {
                     this.showToast(this.translate.instant('MATCH_DETAILS.TOAST.EVENT_ADD_SUCCESS'), 'success');
                 },
                 error: (err: any) => {
-                    console.error("Failed to add event", err);
                     this.ui.endAction();
                     this.showToast(this.translate.instant('MATCH_DETAILS.TOAST.EVENT_ADD_ERROR'), 'error');
                 }
@@ -371,8 +368,13 @@ export class MatchDetailsComponent implements OnInit {
             return;
         }
 
+        // A penalty can be scored (counts as a goal) or missed/saved (no score change)
+        const resolvedType = this.eventFormType() === 'penalty' && !this.eventFormPenaltyScored()
+            ? 'penalty_missed'
+            : this.eventFormType();
+
         const data: any = {
-            type: this.eventFormType(),
+            type: resolvedType,
             minute: parseInt(this.eventFormMinute() as any, 10),
             team: this.eventFormTeam(),
             teamId: this.eventFormTeam() === 'home' ? this.match()?.homeTeam?.id : this.match()?.awayTeam?.id,
@@ -402,11 +404,99 @@ export class MatchDetailsComponent implements OnInit {
                 this.eventFormPlayerName.set('');
                 this.eventFormAssistPlayerName.set('');
                 this.eventFormDetails.set('');
+                this.eventFormPenaltyScored.set(true);
             },
             error: (err: any) => {
-                console.error("Failed to add event", err);
                 this.ui.endAction();
                 this.showToast(this.translate.instant('MATCH_DETAILS.TOAST.EVENT_ADD_ERROR'), 'error');
+            }
+        });
+    }
+
+    // ── Referee added/stoppage time ──────────────────────────────────────────────
+    setAddedTime() {
+        const minutes = Number(this.addedTimeInput());
+        if (!minutes || minutes < 1) {
+            this.showToast(this.translate.instant('MATCH_DETAILS.TOAST.ENTER_MINUTE'), 'error');
+            return;
+        }
+        this.patchLiveState({ addedMinutes: minutes }, 'MATCH_DETAILS.TOAST.ADDED_TIME_SET');
+        this.addedTimeInput.set(null);
+    }
+
+    clearAddedTime() {
+        this.patchLiveState({ addedMinutes: null });
+        this.addedTimeInput.set(null);
+    }
+
+    // ── Penalty shootout ─────────────────────────────────────────────────────────
+    goToPenalties() {
+        this.patchLiveState({ match_period: 'penalties' }, 'MATCH_DETAILS.TOAST.PENALTIES_STARTED');
+        this.activeTab.set('penalties');
+    }
+
+    get penaltyKicks(): any[] {
+        return this.match()?.penaltyShootout?.kicks || [];
+    }
+
+    /** Side to take the next kick — home shoots first, then strictly alternate. */
+    nextKickTeam(): 'home' | 'away' {
+        return this.penaltyKicks.length % 2 === 0 ? 'home' : 'away';
+    }
+
+    recordPenaltyKick(team: string, playerName: string, scored: boolean) {
+        if (!playerName) {
+            this.showToast(this.translate.instant('MATCH_DETAILS.TOAST.SELECT_PLAYER'), 'error');
+            return;
+        }
+        const kicks = [...this.penaltyKicks, { order: this.penaltyKicks.length + 1, team, playerName, scored }];
+        this.patchLiveState({ penaltyShootout: { kicks } });
+    }
+
+    undoLastKick() {
+        const kicks = this.penaltyKicks.slice(0, -1);
+        this.patchLiveState({ penaltyShootout: { kicks } });
+    }
+
+    /** Players eligible to take a penalty: starting XI + any subbed-on players. */
+    penaltyTakers(team: string): TeamMember[] {
+        const lineup = team === 'home' ? this.homeLineupData : this.awayLineupData;
+        const players = team === 'home' ? this.homePlayers() : this.awayPlayers();
+        const names = new Set<string>();
+        const collect = (list: any[]) => {
+            for (const obj of list || []) {
+                if (typeof obj === 'string' || typeof obj === 'number') {
+                    const found = players.find(p => p.id?.toString() === obj.toString());
+                    names.add(found ? found.name : obj.toString());
+                } else if (obj?.name) {
+                    names.add(obj.name);
+                }
+            }
+        };
+        if (lineup?.starting) collect(lineup.starting);
+        if (lineup?.subs) collect(lineup.subs);
+        if (!names.size) return players; // no lineup recorded → fall back to full squad
+        return players.filter(p => names.has(p.name));
+    }
+
+    /** The team's goalkeeper from the starting lineup (by position). */
+    goalkeeper(team: string): string {
+        const players = this.penaltyTakers(team);
+        const gk = players.find(p => /gk|goal/i.test(p.position || ''));
+        return gk?.name || this.translate.instant('COMMON.TBD');
+    }
+
+    private patchLiveState(body: any, successKey?: string) {
+        this.ui.startAction();
+        this.http.patch<{ success: boolean, data: any }>(`${environment.apiUrl}/api/matches/${this.matchId()}/live`, body).subscribe({
+            next: (res) => {
+                this.match.set(res.data);
+                this.ui.endAction();
+                if (successKey) this.showToast(this.translate.instant(successKey), 'success');
+            },
+            error: () => {
+                this.ui.endAction();
+                this.showToast(this.translate.instant('MATCH_DETAILS.TOAST.UPDATE_ERROR'), 'error');
             }
         });
     }
@@ -430,7 +520,6 @@ export class MatchDetailsComponent implements OnInit {
                 this.eventToDeleteId.set(null);
             },
             error: (err: any) => {
-                console.error("Failed to delete event", err);
                 this.ui.endAction();
                 this.showToast(this.translate.instant('MATCH_DETAILS.TOAST.EVENT_DELETE_ERROR'), 'error');
             }
@@ -495,7 +584,6 @@ export class MatchDetailsComponent implements OnInit {
                 this.showToast(this.translate.instant('MATCH_DETAILS.TOAST.MATCH_START_SUCCESS'), 'success');
             },
             error: (err: any) => {
-                console.error("Failed to start match", err);
                 this.ui.endAction();
                 this.showToast(this.translate.instant('MATCH_DETAILS.TOAST.MATCH_START_ERROR'), 'error');
             }
@@ -516,7 +604,6 @@ export class MatchDetailsComponent implements OnInit {
                 this.loadMatchDetails(); // Refresh all data to see finalized standings/events
             },
             error: (err: any) => {
-                console.error("Failed to complete match", err);
                 this.ui.endAction();
                 this.showToast(this.translate.instant('MATCH_DETAILS.TOAST.MATCH_COMPLETE_ERROR'), 'error');
             }
@@ -540,7 +627,6 @@ export class MatchDetailsComponent implements OnInit {
                 this.showToast(this.translate.instant('MATCH_DETAILS.TOAST.RESULT_SAVE_SUCCESS'), 'success');
             },
             error: (err: any) => {
-                console.error("Failed to save match result", err);
                 this.ui.endAction();
                 this.showToast(this.translate.instant('MATCH_DETAILS.TOAST.RESULT_SAVE_ERROR'), 'error');
             }

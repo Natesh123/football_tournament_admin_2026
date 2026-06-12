@@ -38,7 +38,6 @@ export class TournamentResultsComponent implements OnInit {
                 this.isLoadingStructure.set(false);
             },
             error: (err: any) => {
-                console.error("Failed to load tournament structure", err);
                 this.isLoadingStructure.set(false);
             }
         });
@@ -52,7 +51,6 @@ export class TournamentResultsComponent implements OnInit {
                 this.isLoadingMatches.set(false);
             },
             error: (err: any) => {
-                console.error("Failed to load match results", err);
                 this.isLoadingMatches.set(false);
             }
         });
@@ -66,7 +64,6 @@ export class TournamentResultsComponent implements OnInit {
                 this.isLoadingPerformance.set(false);
             },
             error: (err: any) => {
-                console.error("Failed to load top performance stats", err);
                 this.isLoadingPerformance.set(false);
             }
         });

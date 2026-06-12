@@ -134,7 +134,7 @@ export class LineupEditorComponent implements OnInit {
                     // Sort players by name or number
                     this.homePlayers.sort((a, b) => a.name.localeCompare(b.name));
                 },
-                error: (err: any) => console.error('Failed to fetch home players', err)
+                error: () => {}
             });
         }
         if (awayTeamId) {
@@ -143,7 +143,7 @@ export class LineupEditorComponent implements OnInit {
                     this.awayPlayers = players;
                     this.awayPlayers.sort((a, b) => a.name.localeCompare(b.name));
                 },
-                error: (err: any) => console.error('Failed to fetch away players', err)
+                error: () => {}
             });
         }
     }

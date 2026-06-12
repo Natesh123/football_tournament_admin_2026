@@ -57,7 +57,6 @@ export class MatchCenterComponent implements OnInit, OnDestroy {
                 this.isLoading.set(false);
             },
             error: (err: any) => {
-                console.error("Failed to load matches", err);
                 this.isLoading.set(false);
             }
         });
@@ -78,7 +77,7 @@ export class MatchCenterComponent implements OnInit, OnDestroy {
             next: (data: any[]) => {
                 this.matches.set(data);
             },
-            error: (err: any) => console.error("Poll failed", err)
+            error: () => {}
         });
     }
 

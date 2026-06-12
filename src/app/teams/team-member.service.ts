@@ -11,16 +11,10 @@ export interface TeamMember {
     jerseyNumber?: number;
     teamId: string;
     createdAt: string;
-    // UI Mock fields
     status?: 'active' | 'injured' | 'suspended';
     photoUrl?: string;
     dob?: string;
     preferredFoot?: 'right' | 'left' | 'both';
-    mockStats?: {
-        matches: number;
-        goals: number;
-        assists: number;
-    };
 }
 
 @Injectable({
@@ -36,6 +30,10 @@ export class TeamMemberService {
 
     create(teamId: string, data: Partial<TeamMember>): Observable<TeamMember> {
         return this.http.post<TeamMember>(`${this.apiUrl}/${teamId}/members`, data);
+    }
+
+    update(id: string, data: Partial<TeamMember>): Observable<TeamMember> {
+        return this.http.put<TeamMember>(`${this.apiUrl}/members/${id}`, data);
     }
 
     delete(id: string): Observable<void> {

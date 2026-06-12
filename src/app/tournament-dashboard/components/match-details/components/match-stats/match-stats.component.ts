@@ -31,9 +31,9 @@ export class MatchStatsComponent implements OnChanges {
         yellowCards:  'MATCH_DETAILS.STATS.YELLOW_CARDS',
         redCards:     'MATCH_DETAILS.STATS.RED_CARDS',
         corners:      'MATCH_DETAILS.STATS.CORNERS',
-        offsides:     'MATCH_DETAILS.STATS.OFFSIDE',
-        fouls:        'MATCH_DETAILS.STATS.FOUL',
-        freeKicks:    'MATCH_DETAILS.STATS.FREE_KICK',
+        offsides:     'MATCH_DETAILS.STATS.OFFSIDES',
+        fouls:        'MATCH_DETAILS.STATS.FOULS',
+        freeKicks:    'MATCH_DETAILS.STATS.FREE_KICKS',
         substitutions:'MATCH_DETAILS.STATS.SUBSTITUTIONS',
         penalties:    'MATCH_DETAILS.STATS.PENALTIES',
     };

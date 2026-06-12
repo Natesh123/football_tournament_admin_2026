@@ -12,7 +12,10 @@
             
             <div class="relative z-10 flex-grow">
                 <div class="flex items-center gap-2 mb-1">
-                    <span *ngIf="recentEvent().type === 'goal'" class="text-2xl">⚽</span>
+                    <svg *ngIf="recentEvent().type === 'goal'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
                     <span *ngIf="recentEvent().type === 'yellow_card'" class="w-4 h-5 bg-yellow-500 rounded-sm inline-block"></span>
                     <span *ngIf="recentEvent().type === 'red_card'" class="w-4 h-5 bg-red-500 rounded-sm inline-block"></span>
                     <h4 class="text-xl font-black uppercase text-white tracking-tight">{{ recentEvent().type | titlecase }}!</h4>
@@ -92,7 +95,10 @@
                     <!-- Live Timer Badge -->
                     <div class="px-8 py-3 bg-red-600/10 text-red-500 font-bold uppercase tracking-widest text-2xl lg:text-3xl rounded-full border border-red-500/30 flex items-center justify-center gap-3 mb-6 shadow-[0_0_30px_rgba(239,68,68,0.2)]">
                         <span class="w-4 h-4 rounded-full bg-red-500 animate-pulse border border-white/20"></span>
-                        <span *ngIf="portal.match.status === 'live'">LIVE {{ portal.match.minute ? portal.match.minute + ' min' : '' }}</span>
+                        <span *ngIf="portal.match.status === 'live'" class="flex items-center gap-3">
+                            <span>LIVE</span>
+                            <span class="tabular-nums text-white">{{ liveClock() || (portal.match.minute ? portal.match.minute + "'" : '') }}</span>
+                        </span>
                         <span *ngIf="portal.match.status !== 'live'">{{ portal.match.status }}</span>
                     </div>
 

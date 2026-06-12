@@ -88,8 +88,10 @@ export class TeamMembersComponent implements OnInit {
   }
 
   private getInitialMemberState(role: 'player' | 'staff' | 'captain' | 'vice_captain' | 'coach' | 'manager' = 'player'): Partial<TeamMember> {
+    // 'staff' is a UI grouping, not a persisted role — default it to a concrete staff role
+    const resolvedRole = role === 'staff' ? 'coach' : role;
     return {
-      role: role as any,
+      role: resolvedRole as any,
       status: 'active',
       position: '',
       jerseyNumber: undefined,
@@ -101,20 +103,7 @@ export class TeamMembersComponent implements OnInit {
   loadMembers() {
     if (!this.teamId) return;
     this.memberService.getByTeamId(this.teamId).subscribe(data => {
-      // Inject mock data for UI demonstration purposes
-      const enhancedData = data.map(member => {
-        // Randomize mock stats and status if not present
-        if (!member.status) member.status = Math.random() > 0.8 ? 'injured' : 'active';
-        if (!member.mockStats && ['player', 'captain', 'vice_captain'].includes(member.role)) {
-          member.mockStats = {
-            matches: Math.floor(Math.random() * 30),
-            goals: Math.floor(Math.random() * 15),
-            assists: Math.floor(Math.random() * 10)
-          };
-        }
-        return member;
-      });
-      this.members.set(enhancedData);
+      this.members.set(data);
     });
   }
 
@@ -153,17 +142,18 @@ export class TeamMembersComponent implements OnInit {
 
     this.isSubmitting.set(true);
 
-    // In a real scenario, this would distinguish between create and update
-    // Since we only have 'create' in the service right now from the planning, we will simulate it.
+    const editingId = this.editingMemberId();
+    const request$ = editingId
+      ? this.memberService.update(editingId, this.newMember)
+      : this.memberService.create(this.teamId, this.newMember);
 
-    this.memberService.create(this.teamId, this.newMember).subscribe({
+    request$.subscribe({
       next: () => {
         this.isSubmitting.set(false);
         this.closeModal();
         this.loadMembers();
       },
-      error: (err) => {
-        console.error('Failed to save member', err);
+      error: () => {
         this.isSubmitting.set(false);
       }
     });
@@ -175,7 +165,7 @@ export class TeamMembersComponent implements OnInit {
 
     this.memberService.delete(id).subscribe({
       next: () => this.loadMembers(),
-      error: (err) => console.error('Failed to eliminate member', err)
+      error: () => {}
     });
   }
 }

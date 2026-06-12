@@ -79,16 +79,26 @@
 
             <!-- Score Placeholder / Versus -->
             <div class="flex flex-col items-center shrink-0 px-4 md:px-8">
+                <!-- Penalty shootout label -->
+                <div class="mb-3 flex items-center gap-3 px-5 py-2 rounded-full bg-gold-500/15 border border-gold-500/30 shadow-[0_0_20px_rgba(212,175,55,0.2)]" *ngIf="match?.status === 'live' && match?.match_period === 'penalties'">
+                    <span class="w-2.5 h-2.5 rounded-full bg-gold-400 animate-pulse"></span>
+                    <span class="text-gold-400 tabular-nums font-black text-xl md:text-2xl uppercase tracking-wider">{{ 'MATCH_DETAILS.HEADER.PENALTIES' | translate }}</span>
+                    <span class="text-white tabular-nums font-black text-xl md:text-2xl bg-white/10 border border-white/15 rounded-lg px-2.5 py-0.5">{{ match?.penaltyHome ?? 0 }} - {{ match?.penaltyAway ?? 0 }}</span>
+                </div>
+                <!-- Live running timer, centered above the score -->
+                <div class="mb-3 flex items-center gap-3 px-5 py-2 rounded-full bg-red-500/15 border border-red-500/30 shadow-[0_0_20px_rgba(239,68,68,0.2)]" *ngIf="match?.status === 'live' && match?.match_period !== 'penalties'">
+                    <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
+                    <span class="text-gold-400 tabular-nums font-black text-xl md:text-2xl">{{ liveMinute() }}'</span>
+                    <span class="text-white tabular-nums font-black text-xl md:text-2xl bg-white/10 border border-white/15 rounded-lg px-2.5 py-0.5">{{ liveClock() }}</span>
+                    <span *ngIf="match?.addedMinutes" class="text-red-400 tabular-nums font-black text-lg md:text-xl bg-red-500/10 border border-red-500/20 rounded-lg px-2 py-0.5">+{{ match.addedMinutes }}'</span>
+                </div>
                 <div class="bg-black border border-zinc-800 px-6 py-3 rounded-xl shadow-inner mb-2">
                     <span class="text-3xl md:text-5xl font-black text-white tracking-widest" [class.text-white/50]="match?.status === 'scheduled'">
                         {{ match?.homeScore ?? 0 }} : {{ match?.awayScore ?? 0 }}
                     </span>
                 </div>
                 <span class="text-xs font-bold text-zinc-500 uppercase tracking-widest" *ngIf="match?.status === 'scheduled'">
-                    {{ 'MATCH_DETAILS.HEADER.STARTS_IN' | translate }} <span class="text-gold-400">{{ countdown }}</span>
-                </span>
-                <span class="text-xs font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2" *ngIf="match?.status === 'live'">
-                    {{ 'MATCH_DETAILS.HEADER.MATCH_TIME' | translate }} <span class="text-gold-400 tabular-nums font-black">{{ liveMinute }}'</span>
+                    {{ 'MATCH_DETAILS.HEADER.STARTS_IN' | translate }} <span class="text-gold-400">{{ countdown() }}</span>
                 </span>
             </div>
 

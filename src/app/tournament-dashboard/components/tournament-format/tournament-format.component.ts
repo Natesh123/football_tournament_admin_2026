@@ -194,7 +194,7 @@ export class TournamentFormatComponent implements OnInit, OnChanges {
                 this.recomputeSlotOptions();
                 this.cdr.detectChanges();
             },
-            error: (err) => console.error('Failed to load teams for format board:', err)
+            error: () => {}
         });
     }
 

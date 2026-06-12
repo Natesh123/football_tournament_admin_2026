@@ -214,7 +214,6 @@ export class SponsorModalComponent {
         this.close.emit();
       },
       error: (err) => {
-        console.error('Error saving sponsor:', err);
         this.loading = false;
       }
     });

@@ -27,7 +27,8 @@ export class AuthService {
     }
 
     get isAdmin(): boolean {
-        return this.userSignal()?.roleId === 1;
+        const u = this.userSignal();
+        return u?.roleId === 1 || u?.role?.toLowerCase() === 'admin';
     }
 
     get isOrganizer(): boolean {
@@ -71,15 +72,31 @@ export class AuthService {
         return !!localStorage.getItem('token');
     }
 
+    /**
+     * Refreshes the cached user (e.g. with freshly validated permissions) without
+     * touching the token. Lets admin permission changes take effect on the next
+     * navigation instead of requiring a full re-login.
+     */
+    refreshUser(user: any) {
+        if (!user) return;
+        localStorage.setItem('user', JSON.stringify(user));
+        this.userSignal.set(user);
+    }
+
     hasPermission(permission: string): boolean {
         const user = this.user;
         if (!user) return false;
 
-        // Role ID 1 is Admin, has all permissions
-        if (user.roleId === 1) return true;
+        // Admins implicitly have every permission.
+        if (this.isAdmin) return true;
 
         if (!user.permissions) return false;
         const access = user.permissions.module_access || {};
         return !!access[permission];
+    }
+
+    /** Whether the current user may access a module (admin bypass + module_access). */
+    canAccess(permission: string): boolean {
+        return this.isAdmin || this.hasPermission(permission);
     }
 }

@@ -1,0 +1,23 @@
+#!/bin/bash
+find src -type f -name "*.html" -o -name "*.ts" -o -name "*.css" | xargs sed -i \
+  -e 's/bg-neutral-950/bg-background/g' \
+  -e 's/text-neutral-950/text-background/g' \
+  -e 's/text-gold-[0-9]\{3\}/text-off-white/g' \
+  -e 's/bg-gold-[0-9]\{3\}/bg-action-orange/g' \
+  -e 's/border-gold-[0-9]\{3\}/border-action-orange/g' \
+  -e 's/text-gold/text-off-white/g' \
+  -e 's/bg-gold/bg-action-orange/g' \
+  -e 's/border-gold/border-action-orange/g' \
+  -e 's/bg-black-card/bg-surface-container-low/g' \
+  -e 's/border-black-border/border-outline-variant/g' \
+  -e 's/bg-[#1e1e20]/bg-surface-container/g' \
+  -e 's/border-[#333]/border-outline/g' \
+  -e 's/bg-white/bg-off-white/g' \
+  -e 's/text-white/text-off-white/g' \
+  -e 's/text-black/text-background/g' \
+  -e 's/rounded-xl/rounded-none/g' \
+  -e 's/rounded-lg/rounded-none/g' \
+  -e 's/rounded-md/rounded-none/g' \
+  -e 's/rounded-2xl/rounded-none/g' \
+  -e 's/rounded-3xl/rounded-none/g' \
+  -e 's/rounded-full/rounded-none/g'

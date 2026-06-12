@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { API_URL } from '../../../core/config/app.config';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { UiService } from '../../../services/ui.service';
+import { AuthService } from '../../../auth/auth.service';
 
 interface Team {
     id: string;
@@ -36,6 +37,13 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
     private http = inject(HttpClient);
     public ui = inject(UiService);
     private translate = inject(TranslateService);
+    private auth = inject(AuthService);
+
+    // Only admins manage the shared global team registry. Organizers register
+    // teams from the existing pool (no "create new team" mode).
+    get isAdmin(): boolean {
+        return this.auth.isAdmin;
+    }
 
     teams = signal<TournamentTeam[]>([]);
     availableTeams = signal<Team[]>([]); // Teams not in this tournament
@@ -95,8 +103,9 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
     fetchTeams() {
         this.isLoading.set(true);
 
-        // Fetch all teams
-        this.http.get<Team[]>(`${API_URL}/api/teams`).subscribe({
+        // Fetch the full shared team pool (all=true) so organizers can register
+        // any team into their own tournament, even those not yet in their tournaments.
+        this.http.get<Team[]>(`${API_URL}/api/teams?all=true`).subscribe({
             next: (allTeams) => {
                 // Fetch tournament registrations
                 this.http.get<{ success: boolean, data: TournamentTeam[] }>(`${API_URL}/api/tournaments/${this.tournamentId}/teams`).subscribe({
@@ -112,13 +121,11 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
                         this.isLoading.set(false);
                     },
                     error: (err) => {
-                        console.error('Error fetching tournament teams:', err);
                         this.isLoading.set(false);
                     }
                 });
             },
             error: (err) => {
-                console.error('Error fetching all teams:', err);
                 this.isLoading.set(false);
             }
         });
@@ -137,6 +144,8 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
             logoUrl: ''
         });
         this.selectedExistingTeamIds.set([]);
+        // Organizers can only register from the existing pool.
+        this.modalMode.set('existing');
         this.isModalOpen.set(true);
     }
 
@@ -170,24 +179,35 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
             }
 
             this.ui.startAction();
-            this.http.post<{ success: boolean, data: TournamentTeam[] }>(`${API_URL}/api/tournaments/${this.tournamentId}/teams/bulk`, { teamIds })
+            this.http.post<{ success: boolean, data: TournamentTeam[], skipped?: { teamId: any, reason: string }[] }>(`${API_URL}/api/tournaments/${this.tournamentId}/teams/bulk`, { teamIds })
                 .subscribe({
                     next: (res) => {
                         const newRegistrations = res.data || [];
                         this.teams.update(t => [...newRegistrations, ...t]);
 
-                        // Remove assigned teams from available list
-                        const addedSet = new Set(teamIds);
+                        // Remove only the teams that were actually added from the available list
+                        const addedSet = new Set(newRegistrations.map(r => r.team.id));
                         this.availableTeams.update(av => av.filter(a => !addedSet.has(a.id)));
 
                         this.ui.endAction();
-                        this.ui.showToast('TOURNAMENT_DASHBOARD.TOAST.ADD_TEAMS_SUCCESS', 'success');
+
+                        const skipped = res.skipped || [];
+                        if (skipped.length > 0) {
+                            // Surface each conflict (overlap / shared player) to the organizer.
+                            for (const s of skipped) {
+                                this.ui.showToast(s.reason, 'error');
+                            }
+                            if (newRegistrations.length > 0) {
+                                this.ui.showToast('TOURNAMENT_DASHBOARD.TOAST.ADD_TEAMS_SUCCESS', 'success');
+                            }
+                        } else {
+                            this.ui.showToast('TOURNAMENT_DASHBOARD.TOAST.ADD_TEAMS_SUCCESS', 'success');
+                        }
                         this.closeModal();
                     },
                     error: (err) => {
-                        console.error('Error assigning teams:', err);
                         this.ui.endAction();
-                        this.ui.showToast('TOURNAMENT_DASHBOARD.TOAST.ADD_TEAMS_ERROR', 'error');
+                        this.ui.showToast(err?.error?.message || 'TOURNAMENT_DASHBOARD.TOAST.ADD_TEAMS_ERROR', 'error');
                     }
                 });
         } else {
@@ -207,14 +227,12 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
                                 this.closeModal();
                             },
                             error: (err) => {
-                                console.error('Error mapping new team to tournament:', err);
                                 this.ui.endAction();
-                                this.ui.showToast('TOURNAMENT_DASHBOARD.TOAST.MAPPING_ERROR', 'error');
+                                this.ui.showToast(err?.error?.message || 'TOURNAMENT_DASHBOARD.TOAST.MAPPING_ERROR', 'error');
                             }
                         });
                 },
                 error: (err) => {
-                    console.error('Error saving team:', err);
                     this.ui.endAction();
                     this.ui.showToast('TOURNAMENT_DASHBOARD.TOAST.CREATE_TEAM_ERROR', 'error');
                 }
@@ -234,7 +252,6 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
                         this.ui.endAction();
                     },
                     error: (err) => {
-                        console.error('Error unassigning team:', err);
                         this.ui.showToast('TOURNAMENT_DASHBOARD.TOAST.REMOVE_TEAM_ERROR', 'error');
                         this.ui.endAction();
                     }
@@ -258,7 +275,6 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
                 });
             },
             error: (err) => {
-                console.error('Error updating approval status:', err);
                 reg.status = oldStatus; // Revert on error
                 this.ui.endAction();
                 this.ui.showToast('TOURNAMENT_DASHBOARD.TOAST.SAVE_ERROR', 'error');
@@ -281,7 +297,6 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
                 });
             },
             error: (err) => {
-                console.error('Error updating payment status:', err);
                 reg.paymentStatus = oldPaymentStatus; // Revert on error
                 this.ui.endAction();
                 this.ui.showToast('TOURNAMENT_DASHBOARD.TOAST.SAVE_ERROR', 'error');

@@ -16,12 +16,10 @@ export class SocketService {
         });
 
         this.socket.on('connect', () => {
-            console.log('Socket connected');
             this.isConnected.set(true);
         });
 
         this.socket.on('disconnect', () => {
-            console.log('Socket disconnected');
             this.isConnected.set(false);
         });
     }

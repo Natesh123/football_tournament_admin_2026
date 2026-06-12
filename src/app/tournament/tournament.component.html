@@ -29,29 +29,10 @@
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                <input type="text" [(ngModel)]="searchQuery"
+                <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="onFilterChange()"
                     [placeholder]="'TOURNAMENTS.SEARCH_PLACEHOLDER' | translate"
                     class="w-full bg-white/5 border border-black-border rounded-lg pl-10 pr-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all" />
             </div>
-
-            <!-- Status Filter -->
-            <select [(ngModel)]="filterStatus"
-                class="bg-white/5 border border-black-border rounded-lg px-4 py-2.5 text-sm text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all">
-                <option value="all" class="bg-black-card">{{ 'TOURNAMENTS.FILTER_STATUSES.ALL' | translate }}</option>
-                <option value="live" class="bg-black-card">{{ 'TOURNAMENTS.FILTER_STATUSES.LIVE' | translate }}</option>
-                <option value="progress" class="bg-black-card">{{ 'TOURNAMENTS.FILTER_STATUSES.IN_PROGRESS' | translate
-                    }}</option>
-                <option value="registration" class="bg-black-card">{{ 'TOURNAMENTS.FILTER_STATUSES.REGISTRATION' |
-                    translate }}</option>
-                <option value="starts" class="bg-black-card">{{ 'TOURNAMENTS.FILTER_STATUSES.STARTING_SOON' | translate
-                    }}</option>
-                <option value="completed" class="bg-black-card">{{ 'TOURNAMENTS.FILTER_STATUSES.COMPLETED' | translate
-                    }}</option>
-                <option value="draft" class="bg-black-card">{{ 'TOURNAMENTS.FILTER_STATUSES.DRAFT' | translate }}
-                </option>
-                <option value="archived" class="bg-black-card">{{ 'TOURNAMENTS.FILTER_STATUSES.ARCHIVED' | translate }}
-                </option>
-            </select>
 
             <!-- Date Range -->
             <div
@@ -64,7 +45,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <input type="date" [(ngModel)]="filterDateFrom"
+                    <input type="date" [(ngModel)]="filterDateFrom" (ngModelChange)="onFilterChange()"
                         class="bg-transparent text-sm text-white focus:outline-none [color-scheme:dark] w-[130px]" />
                 </div>
 
@@ -84,7 +65,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <input type="date" [(ngModel)]="filterDateTo"
+                    <input type="date" [(ngModel)]="filterDateTo" (ngModelChange)="onFilterChange()"
                         class="bg-transparent text-sm text-white focus:outline-none [color-scheme:dark] w-[130px]" />
                 </div>
             </div>
@@ -117,6 +98,14 @@
 
         <!-- Tabs -->
         <div class="border-b border-black-border flex gap-8">
+            <button
+                class="pb-3 text-sm font-bold tracking-wider relative transition-colors text-zinc-500 hover:text-white"
+                [class.text-gold-400]="currentTab() === 'all'" (click)="switchTab('all')">
+                {{ 'TOURNAMENTS.TABS.ALL' | translate | uppercase }}
+                @if (currentTab() === 'all') {
+                <span class="absolute bottom-0 left-0 w-full h-0.5 bg-gold-400"></span>
+                }
+            </button>
             <button class="pb-3 text-sm font-bold tracking-wider relative transition-colors"
                 [class.text-gold-400]="currentTab() === 'live'" [class.text-zinc-500]="currentTab() !== 'live'"
                 (click)="switchTab('live')">
@@ -282,6 +271,16 @@
                         </svg>
                         {{ 'TOURNAMENTS.MANAGE' | translate }}
                     </button>
+                    <button (click)="requestDelete(tournament); $event.stopPropagation()"
+                        class="flex-1 bg-transparent hover:bg-red-500/10 border border-black-border text-zinc-400 hover:border-red-500/50 hover:text-red-400 font-bold py-2.5 px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 group/del">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4 transition-transform group-hover/del:scale-110" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        {{ 'TOURNAMENTS.DELETE' | translate }}
+                    </button>
                 </div>
             </div>
             }
@@ -299,6 +298,15 @@
     (onClose)="closeCreateModal()"
     (onSuccess)="onTournamentCreated($event)">
 </app-tournament-create-modal>
+
+<!-- Delete Confirmation Modal -->
+<app-confirm-modal
+    [show]="!!tournamentToDelete()"
+    [title]="'TOURNAMENTS.DELETE_CONFIRM_TITLE' | translate"
+    [message]="(('TOURNAMENTS.DELETE_CONFIRM_MESSAGE' | translate) + ' ' + (tournamentToDelete()?.name || ''))"
+    (onConfirm)="confirmDelete()"
+    (onCancel)="cancelDelete()">
+</app-confirm-modal>
 
 <!-- Toast Notification -->
 @if (toastMessage()) {

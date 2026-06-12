@@ -1,17 +1,18 @@
-import { Component, Input, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TournamentService } from '../../../tournament/tournament.service';
 import { UiService } from '../../../services/ui.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { formatLiveClock } from '../../../core/utils/live-clock.util';
 @Component({
     selector: 'app-tournament-matches',
     standalone: true,
     imports: [CommonModule, FormsModule, TranslateModule],
     templateUrl: './tournament-matches.component.html'
 })
-export class TournamentMatchesComponent implements OnInit {
+export class TournamentMatchesComponent implements OnInit, OnDestroy {
     @Input() tournamentId!: string;
 
     private router = inject(Router);
@@ -22,6 +23,14 @@ export class TournamentMatchesComponent implements OnInit {
     isLoading = signal(true);
 
     activeTab = signal<'upcoming' | 'live' | 'past'>('upcoming');
+
+    // Ticks every second so live clocks in the list keep running
+    now = signal<number>(Date.now());
+    private clockTimer: any;
+
+    liveClock(match: any): string {
+        return formatLiveClock(match, this.now());
+    }
 
     filteredMatches = computed(() => {
         const matches = this.structure()?.matches || [];
@@ -51,6 +60,11 @@ export class TournamentMatchesComponent implements OnInit {
         if (this.tournamentId) {
             this.loadMatches();
         }
+        this.clockTimer = setInterval(() => this.now.set(Date.now()), 1000);
+    }
+
+    ngOnDestroy() {
+        if (this.clockTimer) clearInterval(this.clockTimer);
     }
 
     loadMatches() {
@@ -61,7 +75,6 @@ export class TournamentMatchesComponent implements OnInit {
                 this.isLoading.set(false);
             },
             error: (err: any) => {
-                console.error("Failed to load tournament matches", err);
                 this.isLoading.set(false);
             }
         });
@@ -113,7 +126,6 @@ export class TournamentMatchesComponent implements OnInit {
                 this.closeMatchEditor();
             },
             error: (err: any) => {
-                console.error("Failed to update schedule:", err);
                 this.ui.endAction();
                 this.showToast('TOURNAMENT_DASHBOARD.TOAST.MATCH_UPDATE_ERROR', 'error');
             }

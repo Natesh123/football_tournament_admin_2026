@@ -179,12 +179,10 @@ export class SponsorsComponent implements OnInit {
     this.isFetchingData.set(true);
     this.sponsorService.getAll(this.filters).subscribe({
       next: (data: any) => {
-        console.log('Sponsors data received:', data);
         this.sponsors = data.data || data;
         this.isFetchingData.set(false);
       },
       error: (err) => {
-        console.error('Error loading sponsors:', err);
         this.isFetchingData.set(false);
       }
     });
@@ -218,7 +216,6 @@ export class SponsorsComponent implements OnInit {
         this.ui.showToast('Sponsor deleted successfully', 'success');
       },
       error: (err) => {
-        console.error('Error deleting sponsor:', err);
         this.ui.endAction();
         this.ui.showToast('Failed to delete sponsor', 'error');
       }

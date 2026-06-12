@@ -84,7 +84,6 @@ export class RegisterComponent {
                 },
                 error: (err) => {
                     this.isLoading = false;
-                    console.error('Registration error:', err);
                     this.errorMessage = err.error?.error || 'Registration failed. Please try again.';
                 }
             });

@@ -221,7 +221,8 @@
 
             @if (activeTab() === 'schedule') {
             <app-tournament-schedule [data]="settings.schedule" [tournamentId]="tournament()?.id || ''"
-                [showValidationErrors]="showValidationErrors()"></app-tournament-schedule>
+                [venues]="settings.venues" [showValidationErrors]="showValidationErrors()"
+                (requireVenue)="onRequireVenue()"></app-tournament-schedule>
             }
 
             @if (activeTab() === 'rules') {
@@ -229,7 +230,8 @@
             }
 
             @if (activeTab() === 'venues') {
-            <app-tournament-venues [data]="settings.venues"></app-tournament-venues>
+            <app-tournament-venues [data]="settings.venues"
+                [showValidationErrors]="showValidationErrors()"></app-tournament-venues>
             }
 
             @if (activeTab() === 'finance') {

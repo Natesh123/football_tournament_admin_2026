@@ -18,9 +18,13 @@
 
             <div class="space-y-5">
                 <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.VENUES.PRIMARY_VENUE' | translate }}</label>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.VENUES.PRIMARY_VENUE' | translate }} <span class="text-red-500">*</span></label>
                     <input type="text" [(ngModel)]="data.primaryVenue" [placeholder]="'TOURNAMENT_DASHBOARD.VENUES.PLACEHOLDERS.PRIMARY_VENUE' | translate"
-                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all" />
+                        class="w-full bg-white/5 border rounded-lg px-4 py-3 text-white focus:outline-none transition-all"
+                        [ngClass]="showValidationErrors && !data.primaryVenue?.trim() ? 'border-red-500 ring-1 ring-red-500/50 focus:border-red-500 focus:ring-red-500/50' : 'border-black-border focus:border-gold-400 focus:ring-1 focus:ring-gold-400/50'" />
+                    @if (showValidationErrors && !data.primaryVenue?.trim()) {
+                    <p class="text-xs text-red-500 mt-1.5 font-bold">{{ 'TOURNAMENT_DASHBOARD.VENUES.PRIMARY_VENUE_REQUIRED' | translate }}</p>
+                    }
                 </div>
                 <div>
                     <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.VENUES.VENUE_ADDRESS' | translate }}</label>

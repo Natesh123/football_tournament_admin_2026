@@ -330,6 +330,8 @@
                 <span class="absolute bottom-0 left-0 w-full h-0.5 bg-gold-400"></span>
                 }
             </button>
+            <!-- Only admins manage the shared global team registry. -->
+            @if (isAdmin) {
             <button (click)="setModalMode('new')"
                 class="pb-3 text-sm font-bold tracking-wider relative transition-colors"
                 [class.text-gold-400]="modalMode() === 'new'" [class.text-zinc-500]="modalMode() !== 'new'">
@@ -338,6 +340,7 @@
                 <span class="absolute bottom-0 left-0 w-full h-0.5 bg-gold-400"></span>
                 }
             </button>
+            }
         </div>
 
         <div class="p-6 space-y-4">

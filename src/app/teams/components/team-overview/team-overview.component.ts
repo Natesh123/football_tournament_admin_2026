@@ -1,11 +1,13 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, signal, OnInit } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
+import { TeamService, TeamStats } from '../../team.service';
 
 @Component({
   selector: 'app-team-overview',
   standalone: true,
-  imports: [CommonModule, TranslateModule],
+  imports: [CommonModule, TranslateModule, DatePipe],
   template: `
     <div class="space-y-6">
       
@@ -15,49 +17,49 @@ import { TranslateModule } from '@ngx-translate/core';
         <div class="bg-black-card border border-black-border rounded-xl p-4 flex flex-col gap-1 relative overflow-hidden group hover:border-gold-500/30 transition-colors">
             <div class="absolute -right-4 -top-4 w-16 h-16 bg-gold-500/5 rounded-full blur-xl group-hover:bg-gold-500/10 transition-colors"></div>
             <span class="text-zinc-500 text-xs uppercase tracking-wider z-10">{{ 'TEAM_OVERVIEW.PERFORMANCE.TOTAL_MATCHES' | translate }}</span>
-            <span class="text-2xl font-bold text-white z-10">{{ performance.totalMatches }}</span>
+            <span class="text-2xl font-bold text-white z-10">{{ stats()?.totalMatches }}</span>
         </div>
         <!-- Card: Wins -->
         <div class="bg-black-card border border-black-border rounded-xl p-4 flex flex-col gap-1 relative overflow-hidden group hover:border-gold-500/30 transition-colors">
             <div class="absolute -right-4 -top-4 w-16 h-16 bg-gold-500/5 rounded-full blur-xl group-hover:bg-gold-500/10 transition-colors"></div>
             <span class="text-zinc-500 text-xs uppercase tracking-wider z-10">{{ 'TEAM_OVERVIEW.PERFORMANCE.WINS' | translate }}</span>
-            <span class="text-2xl font-bold text-green-500 z-10">{{ performance.wins }}</span>
+            <span class="text-2xl font-bold text-green-500 z-10">{{ stats()?.wins }}</span>
         </div>
         <!-- Card: Draws -->
         <div class="bg-black-card border border-black-border rounded-xl p-4 flex flex-col gap-1 relative overflow-hidden group hover:border-gold-500/30 transition-colors">
             <div class="absolute -right-4 -top-4 w-16 h-16 bg-gold-500/5 rounded-full blur-xl group-hover:bg-gold-500/10 transition-colors"></div>
             <span class="text-zinc-500 text-xs uppercase tracking-wider z-10">{{ 'TEAM_OVERVIEW.PERFORMANCE.DRAWS' | translate }}</span>
-            <span class="text-2xl font-bold text-zinc-300 z-10">{{ performance.draws }}</span>
+            <span class="text-2xl font-bold text-zinc-300 z-10">{{ stats()?.draws }}</span>
         </div>
         <!-- Card: Losses -->
         <div class="bg-black-card border border-black-border rounded-xl p-4 flex flex-col gap-1 relative overflow-hidden group hover:border-gold-500/30 transition-colors">
             <div class="absolute -right-4 -top-4 w-16 h-16 bg-gold-500/5 rounded-full blur-xl group-hover:bg-gold-500/10 transition-colors"></div>
             <span class="text-zinc-500 text-xs uppercase tracking-wider z-10">{{ 'TEAM_OVERVIEW.PERFORMANCE.LOSSES' | translate }}</span>
-            <span class="text-2xl font-bold text-red-500 z-10">{{ performance.losses }}</span>
+            <span class="text-2xl font-bold text-red-500 z-10">{{ stats()?.losses }}</span>
         </div>
         <!-- Card: Goals Scored -->
         <div class="bg-black-card border border-black-border rounded-xl p-4 flex flex-col gap-1 relative overflow-hidden group hover:border-gold-500/30 transition-colors">
             <div class="absolute -right-4 -top-4 w-16 h-16 bg-gold-500/5 rounded-full blur-xl group-hover:bg-gold-500/10 transition-colors"></div>
             <span class="text-zinc-500 text-xs uppercase tracking-wider z-10">{{ 'TEAM_OVERVIEW.PERFORMANCE.GOALS_SCORED' | translate }}</span>
-            <span class="text-2xl font-bold text-white z-10">{{ performance.goalsScored }}</span>
+            <span class="text-2xl font-bold text-white z-10">{{ stats()?.goalsScored }}</span>
         </div>
         <!-- Card: Goals Conceded -->
         <div class="bg-black-card border border-black-border rounded-xl p-4 flex flex-col gap-1 relative overflow-hidden group hover:border-gold-500/30 transition-colors">
             <div class="absolute -right-4 -top-4 w-16 h-16 bg-gold-500/5 rounded-full blur-xl group-hover:bg-gold-500/10 transition-colors"></div>
             <span class="text-zinc-500 text-xs uppercase tracking-wider z-10">{{ 'TEAM_OVERVIEW.PERFORMANCE.GOALS_CONCEDED' | translate }}</span>
-            <span class="text-2xl font-bold text-white z-10">{{ performance.goalsConceded }}</span>
+            <span class="text-2xl font-bold text-white z-10">{{ stats()?.goalsConceded }}</span>
         </div>
         <!-- Card: Clean Sheets -->
         <div class="bg-black-card border border-black-border rounded-xl p-4 flex flex-col gap-1 relative overflow-hidden group hover:border-gold-500/30 transition-colors">
             <div class="absolute -right-4 -top-4 w-16 h-16 bg-gold-500/5 rounded-full blur-xl group-hover:bg-gold-500/10 transition-colors"></div>
             <span class="text-zinc-500 text-xs uppercase tracking-wider z-10">{{ 'TEAM_OVERVIEW.PERFORMANCE.CLEAN_SHEETS' | translate }}</span>
-            <span class="text-2xl font-bold text-white z-10">{{ performance.cleanSheets }}</span>
+            <span class="text-2xl font-bold text-white z-10">{{ stats()?.cleanSheets }}</span>
         </div>
         <!-- Card: Win Percentage -->
         <div class="bg-black-card border border-black-border rounded-xl p-4 flex flex-col gap-1 relative overflow-hidden group hover:border-gold-500/30 transition-colors">
             <div class="absolute -right-4 -top-4 w-16 h-16 bg-gold-500/5 rounded-full blur-xl group-hover:bg-gold-500/10 transition-colors"></div>
             <span class="text-zinc-500 text-xs uppercase tracking-wider z-10">{{ 'TEAM_OVERVIEW.PERFORMANCE.WIN_PERCENTAGE' | translate }}</span>
-            <span class="text-2xl font-bold text-gold-400 z-10">{{ performance.winPercentage }}%</span>
+            <span class="text-2xl font-bold text-gold-400 z-10">{{ stats()?.winPercentage }}%</span>
         </div>
       </div>
 
@@ -81,7 +83,7 @@ import { TranslateModule } from '@ngx-translate/core';
               </tr>
             </thead>
             <tbody class="text-sm">
-              <tr *ngFor="let match of recentMatches" class="border-b border-black-border/50 hover:bg-black/20 transition-colors">
+              <tr *ngFor="let match of stats()?.recentMatches ?? []" class="border-b border-black-border/50 hover:bg-black/20 transition-colors">
                 <td class="p-4 text-white font-medium flex items-center gap-3">
                   <div class="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs text-zinc-400 border border-zinc-700">
                     {{ match.opponent.substring(0,2) | uppercase }}
@@ -99,10 +101,10 @@ import { TranslateModule } from '@ngx-translate/core';
                     {{ match.result }}
                   </span>
                 </td>
-                <td class="p-4 text-zinc-400">{{ match.date }}</td>
+                <td class="p-4 text-zinc-400">{{ match.date | date:'mediumDate' }}</td>
                 <td class="p-4 text-zinc-400">{{ match.tournament }}</td>
               </tr>
-              <tr *ngIf="recentMatches.length === 0">
+              <tr *ngIf="(stats()?.recentMatches?.length ?? 0) === 0">
                 <td colspan="5" class="p-8 text-center text-zinc-500">
                   {{ 'TEAM_OVERVIEW.RECENT_MATCHES.EMPTY' | translate }}
                 </td>
@@ -115,25 +117,18 @@ import { TranslateModule } from '@ngx-translate/core';
     </div>
   `
 })
-export class TeamOverviewComponent {
-  // Mock Performance Data
-  performance = {
-    totalMatches: 24,
-    wins: 15,
-    draws: 5,
-    losses: 4,
-    goalsScored: 42,
-    goalsConceded: 18,
-    cleanSheets: 10,
-    winPercentage: Math.round((15 / 24) * 100)
-  };
+export class TeamOverviewComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private teamService = inject(TeamService);
 
-  // Mock Recent Matches Data
-  recentMatches = [
-    { opponent: 'Lions FC', score: '2 - 0', result: 'W', date: 'Oct 24, 2026', tournament: 'Champions League' },
-    { opponent: 'Eagles United', score: '1 - 1', result: 'D', date: 'Oct 18, 2026', tournament: 'Premier Cup' },
-    { opponent: 'Tigers City', score: '3 - 1', result: 'W', date: 'Oct 10, 2026', tournament: 'Champions League' },
-    { opponent: 'Wolves Athletic', score: '0 - 2', result: 'L', date: 'Oct 02, 2026', tournament: 'Champions League' },
-    { opponent: 'Bears FC', score: '4 - 0', result: 'W', date: 'Sep 25, 2026', tournament: 'Premier Cup' }
-  ];
+  stats = signal<TeamStats | null>(null);
+
+  ngOnInit() {
+    const teamId = this.route.parent?.snapshot.paramMap.get('id');
+    if (!teamId) return;
+    this.teamService.getStats(teamId).subscribe({
+      next: (data) => this.stats.set(data),
+      error: () => this.stats.set(null)
+    });
+  }
 }

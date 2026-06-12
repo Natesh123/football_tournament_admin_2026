@@ -35,7 +35,6 @@ export class TournamentPortalComponent implements OnInit {
                 this.isLoading.set(false);
             },
             error: (err) => {
-                console.error("Portal load error", err);
                 this.error.set('Failed to load tournament data');
                 this.isLoading.set(false);
             }

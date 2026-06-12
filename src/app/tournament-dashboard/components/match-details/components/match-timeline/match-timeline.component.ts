@@ -20,7 +20,7 @@ export class MatchTimelineComponent {
 
     get sortedEvents() {
         const list = [...this.events];
-        
+
         // Add virtual lineup event if lineups are configured
         if (this.homeLineup || this.awayLineup) {
             list.push({
@@ -30,6 +30,30 @@ export class MatchTimelineComponent {
                 playerName: 'MATCH_DETAILS.TIMELINE.LINEUPS_ANNOUNCED',
                 details: 'MATCH_DETAILS.TIMELINE.LINEUPS_ANNOUNCED_DESC',
                 teamSide: 'center'
+            });
+        }
+
+        // Referee added/stoppage time marker (high minute so it sits near full time)
+        if (this.match?.addedMinutes) {
+            list.push({
+                id: 'virtual_added_time',
+                type: 'added_time',
+                minute: 900,
+                details: `+${this.match.addedMinutes}`,
+                teamSide: 'center'
+            });
+        }
+
+        // Penalty shootout kicks — synthetic, sorted to the very bottom (after full time)
+        const kicks = this.match?.penaltyShootout?.kicks || [];
+        for (const kick of kicks) {
+            list.push({
+                id: `virtual_pen_${kick.order}`,
+                type: 'penalty_kick',
+                minute: 1000 + kick.order,
+                playerName: kick.playerName,
+                teamSide: kick.team,
+                scored: kick.scored
             });
         }
 

@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { AuthGuard } from './auth/auth.guard';
 import { NoAuthGuard } from './auth/no-auth.guard';
+import { PermissionGuard } from './auth/permission.guard';
 import { MainLayoutComponent } from './components/main-layout/main-layout.component';
 
 export const routes: Routes = [
@@ -38,6 +39,16 @@ export const routes: Routes = [
         loadComponent: () => import('./auth/otp/otp.component').then(m => m.OtpComponent)
     },
     {
+        path: 'forgot-password',
+        canActivate: [NoAuthGuard],
+        loadComponent: () => import('./auth/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent)
+    },
+    {
+        path: 'reset-password',
+        canActivate: [NoAuthGuard],
+        loadComponent: () => import('./auth/reset-password/reset-password.component').then(m => m.ResetPasswordComponent)
+    },
+    {
         path: 'admin',
         component: MainLayoutComponent,
         canActivate: [AuthGuard],
@@ -45,30 +56,44 @@ export const routes: Routes = [
             { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
             {
                 path: 'dashboard',
+                canActivate: [PermissionGuard],
+                data: { permission: 'can_dashboard' },
                 loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent)
             },
             {
                 path: 'tournaments',
+                canActivate: [PermissionGuard],
+                data: { permission: 'can_tournaments' },
                 loadComponent: () => import('./tournament/tournament.component').then(m => m.TournamentComponent)
             },
             {
                 path: 'tournaments/:id',
+                canActivate: [PermissionGuard],
+                data: { permission: 'can_tournaments' },
                 loadComponent: () => import('./tournament-dashboard/tournament-dashboard.component').then(m => m.TournamentDashboardComponent)
             },
             {
                 path: 'tournaments/:id/match-center',
+                canActivate: [PermissionGuard],
+                data: { permission: 'can_tournaments' },
                 loadComponent: () => import('./tournament-dashboard/components/match-center/match-center.component').then(m => m.MatchCenterComponent)
             },
             {
                 path: 'tournaments/:id/matches/:matchId',
+                canActivate: [PermissionGuard],
+                data: { permission: 'can_tournaments' },
                 loadComponent: () => import('./tournament-dashboard/components/match-details/match-details.component').then(m => m.MatchDetailsComponent)
             },
             {
                 path: 'teams',
+                canActivate: [PermissionGuard],
+                data: { permission: 'can_teams' },
                 loadComponent: () => import('./teams/teams.component').then(m => m.TeamsComponent)
             },
             {
                 path: 'teams/:id',
+                canActivate: [PermissionGuard],
+                data: { permission: 'can_teams' },
                 loadComponent: () => import('./teams/team-layout.component').then(m => m.TeamLayoutComponent),
                 children: [
                     { path: '', redirectTo: 'overview', pathMatch: 'full' },
@@ -81,13 +106,30 @@ export const routes: Routes = [
             },
             {
                 path: 'settings',
+                canActivate: [PermissionGuard],
+                data: { permission: 'can_settings' },
                 loadChildren: () => import('./settings/settings.routes').then(m => m.SETTINGS_ROUTES)
             }
         ]
     },
 
-    // { path: 'auth', loadChildren: () => import('./auth/auth-module').then(m => m.AuthModule) },
-    // { path: 'dashboard', loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent) },
+    // Legal / Info Pages
+    {
+        path: 'privacy',
+        loadComponent: () => import('./public/legal/privacy/privacy.component').then(m => m.PrivacyComponent)
+    },
+    {
+        path: 'terms',
+        loadComponent: () => import('./public/legal/terms/terms.component').then(m => m.TermsComponent)
+    },
+    {
+        path: 'cookie',
+        loadComponent: () => import('./public/legal/cookie/cookie.component').then(m => m.CookieComponent)
+    },
+    {
+        path: 'support',
+        loadComponent: () => import('./public/legal/support/support.component').then(m => m.SupportComponent)
+    },
 
     // Error Pages
     {

@@ -98,7 +98,6 @@ export class LoginComponent implements OnInit {
                 },
                 error: (err) => {
                     this.isLoading = false;
-                    console.error('Login error:', err);
 
                     if (err.error?.error === "User not found") {
                         this.errorMessage = 'Account not found. Please create an account.';

@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=Outfit:wght@900&display=swap');
+/* Fonts are loaded via <link> tags in index.html — an @import here would
+   block rendering behind the compiled CSS instead of downloading in parallel. */
 @import "tailwindcss";
 
 @plugin "daisyui";
@@ -51,6 +52,40 @@ body {
     @apply bg-neutral-950 text-gold-100;
 }
 
+/* Dropdowns: solid high-contrast styling so they stay readable on
+   projectors and compressed screen shares (e.g. Google Meet).
+   Unlayered on purpose: overrides per-template Tailwind utilities
+   like bg-white/5 and border-black-border. */
+select {
+    background-color: #18181b;
+    color: #ffffff;
+    border-color: #52525b;
+    color-scheme: dark;
+}
+
+select:focus {
+    border-color: #d4af37;
+}
+
+select:disabled {
+    color: #a1a1aa;
+}
+
+select option,
+select optgroup {
+    background-color: #18181b;
+    color: #f5ebd6;
+}
+
+select option:checked {
+    background-color: #d4af37;
+    color: #000000;
+}
+
+select option:disabled {
+    color: #71717a;
+}
+
 .custom-scrollbar::-webkit-scrollbar {
     width: 4px;
 }
@@ -89,4 +124,15 @@ body {
 
 .animate-pulse {
     animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Smooth in-page anchor scrolling (landing nav, footer links) */
+html {
+    scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
 }
