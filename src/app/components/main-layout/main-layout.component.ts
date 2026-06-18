@@ -18,17 +18,8 @@ import { BreadcrumbComponent } from '../breadcrumb/breadcrumb.component';
 
       <!-- Main Content -->
       <div class="flex flex-col flex-1 min-w-0">
-        <!-- Top Bar with mobile hamburger -->
-        <div class="flex items-center gap-3 px-4 border-b border-white/5 bg-neutral-950 lg:hidden">
-          <button (click)="sidebar.open()"
-                  class="p-2 text-zinc-400 hover:text-white transition-colors">
-            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-            </svg>
-          </button>
-          <span class="text-sm font-bold text-[#D4AF37] tracking-widest">ATB SPORTS</span>
-        </div>
-        <app-top-bar></app-top-bar>
+        <!-- Top bar; its mobile hamburger opens the sidebar drawer -->
+        <app-top-bar (menuClick)="sidebar.open()"></app-top-bar>
         <app-breadcrumb></app-breadcrumb>
         <main class="flex-grow p-4 md:p-6 lg:p-8 relative">
           @if (isLoading()) {
@@ -41,8 +32,7 @@ import { BreadcrumbComponent } from '../breadcrumb/breadcrumb.component';
         </main>
         
         <app-footer></app-footer>
-      </div>
-          
+      </div>          
     </div>
   `
 })

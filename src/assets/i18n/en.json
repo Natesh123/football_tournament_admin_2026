@@ -92,6 +92,8 @@
       "UNPAID": "Unpaid"
     },
     "NA": "N/A",
+    "SAVE_CHANGES": "Save Changes",
+    "SAVING": "Saving...",
     "TBD": "TBD",
     "MIN": "min",
     "CLEAR": "Clear",
@@ -677,6 +679,8 @@
       "GENERATED_MATCHES": "Generated Matches",
       "MATCH": "Match",
       "EDIT_MATCH_TITLE": "Edit Match Schedule",
+      "HOME_TEAM_LABEL": "Home Team",
+      "AWAY_TEAM_LABEL": "Away Team",
       "MATCH_TIME_LABEL": "Match Start Time",
       "VENUE_LABEL": "Match Venue",
       "EXTRA_BREAK": "Break Duration (Min)",
@@ -1073,7 +1077,8 @@
       "PENALTIES": "Penalties",
       "DATE_TIME": "Date & Time",
       "VENUE": "Venue",
-      "REFEREE": "Referee"
+      "REFEREE": "Referee",
+      "EXTRA_TIME": "Extra Time"
     },
     "ADDED_TIME": {
       "TITLE": "Referee Added Time",
@@ -1098,7 +1103,8 @@
       "PENALTIES": "Penalties",
       "STANDINGS": "Standings",
       "LINEUPS": "Lineups",
-      "H2H": "H2H"
+      "H2H": "H2H",
+      "EXTRA_TIME": "Extra Time"
     },
     "TIMELINE": {
       "TITLE": "Match Events",
@@ -1260,7 +1266,14 @@
       "SELECT_PLAYER": "Please select a player.",
       "SELECT_SUB_IN": "Please select a substitute player to come in.",
       "LINEUP_INVALID": "Starting lineups must have exactly {{ playersOnField }} players, and substitutes cannot exceed {{ subsLimit }} players per team.",
-      "ENTER_SCORES": "Please enter scores for both teams."
+      "ENTER_SCORES": "Please enter scores for both teams.",
+      "EXTRA_TIME_STARTED": "Extra time started."
+    },
+    "EXTRA_TIME": {
+      "TITLE": "Extra Time",
+      "GO_TO_EXTRA_TIME": "Go to Extra Time",
+      "DESC": "The match is level at full time and has gone to extra time. Goals scored now count towards the result. Add goals from the Timeline tab. If the scores are still level after extra time, proceed to the penalty shootout.",
+      "BACK_TO_EXTRA_TIME": "Back to Extra Time"
     }
   }
 }

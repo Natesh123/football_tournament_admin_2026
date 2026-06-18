@@ -40,6 +40,20 @@
 
 
 
+    <!-- Extra Time Tab -->
+    @if (showExtraTime) {
+    <button (click)="onTabClick('extra_time')" [class.bg-white/10]="activeTab === 'extra_time'"
+        [class.text-white]="activeTab === 'extra_time'" [class.shadow-sm]="activeTab === 'extra_time'"
+        [class.text-zinc-500]="activeTab !== 'extra_time'" [class.hover:text-zinc-300]="activeTab !== 'extra_time'"
+        [class.hover:bg-white/5]="activeTab !== 'extra_time'"
+        class="flex-1 sm:flex-none px-6 py-2.5 rounded-lg text-sm font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        {{ 'MATCH_DETAILS.TABS.EXTRA_TIME' | translate }}
+    </button>
+    }
+
     <!-- Penalties Tab -->
     @if (showPenalties) {
     <button (click)="onTabClick('penalties')" [class.bg-white/10]="activeTab === 'penalties'"

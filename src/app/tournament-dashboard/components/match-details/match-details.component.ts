@@ -429,6 +429,12 @@ export class MatchDetailsComponent implements OnInit {
         this.addedTimeInput.set(null);
     }
 
+    // ── Extra time ───────────────────────────────────────────────────────────────
+    goToExtraTime() {
+        this.patchLiveState({ match_period: 'extra_time' }, 'MATCH_DETAILS.TOAST.EXTRA_TIME_STARTED');
+        this.activeTab.set('extra_time');
+    }
+
     // ── Penalty shootout ─────────────────────────────────────────────────────────
     goToPenalties() {
         this.patchLiveState({ match_period: 'penalties' }, 'MATCH_DETAILS.TOAST.PENALTIES_STARTED');
@@ -617,7 +623,7 @@ export class MatchDetailsComponent implements OnInit {
         }
 
         this.ui.startAction();
-        this.http.post<{ success: boolean, data: any }>(`${environment.apiUrl}/api/matches/${this.matchId()}/result`, {
+        this.http.patch<{ success: boolean, data: any }>(`${environment.apiUrl}/api/matches/${this.matchId()}/result`, {
             homeScore: this.homeScore(),
             awayScore: this.awayScore()
         }).subscribe({

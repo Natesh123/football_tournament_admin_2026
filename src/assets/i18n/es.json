@@ -94,6 +94,8 @@
     "NA": "N/D",
     "UPLOAD": "Subir",
     "REMOVE": "Eliminar",
+    "SAVE_CHANGES": "Guardar cambios",
+    "SAVING": "Guardando...",
     "TBD": "Por definir",
     "GOAL": "Gol",
     "OWN_GOAL": "Gol en propia",
@@ -676,6 +678,8 @@
       "GENERATED_MATCHES": "Partidos generados",
       "MATCH": "Partido",
       "EDIT_MATCH_TITLE": "Editar calendario de partidos",
+      "HOME_TEAM_LABEL": "Equipo local",
+      "AWAY_TEAM_LABEL": "Equipo visitante",
       "MATCH_TIME_LABEL": "Hora de inicio del partido",
       "VENUE_LABEL": "Sede del partido",
       "EXTRA_BREAK": "Duración del descanso (min)",
@@ -1072,7 +1076,8 @@
       "DATE_TIME": "Fecha y hora",
       "VENUE": "Sede",
       "REFEREE": "Árbitro",
-      "PENALTIES": "Penaltis"
+      "PENALTIES": "Penaltis",
+      "EXTRA_TIME": "Tiempo Extra"
     },
     "TABS": {
       "TIMELINE": "Cronología",
@@ -1080,7 +1085,8 @@
       "INFO": "Info del partido",
       "STANDINGS": "Clasificación",
       "LINEUPS": "Alineaciones",
-      "H2H": "Cara a cara"
+      "H2H": "Cara a cara",
+      "EXTRA_TIME": "Tiempo Extra"
     },
     "TIMELINE": {
       "TITLE": "Eventos del partido",
@@ -1239,7 +1245,8 @@
       "LINEUP_INVALID": "Las alineaciones titulares deben tener exactamente {{ playersOnField }} jugadores, y los suplentes no pueden superar los {{ subsLimit }} jugadores por equipo.",
       "ENTER_SCORES": "Introduce los marcadores de ambos equipos.",
       "ADDED_TIME_SET": "Tiempo añadido actualizado.",
-      "PENALTIES_STARTED": "Tanda de penaltis iniciada."
+      "PENALTIES_STARTED": "Tanda de penaltis iniciada.",
+      "EXTRA_TIME_STARTED": "Tiempo extra iniciado."
     },
     "ADDED_TIME": {
       "TITLE": "Tiempo añadido",
@@ -1256,6 +1263,12 @@
       "MISSED": "Fallado",
       "NEXT": "Siguiente en lanzar",
       "UNDO": "Deshacer último lanzamiento"
+    },
+    "EXTRA_TIME": {
+      "TITLE": "Tiempo Extra",
+      "GO_TO_EXTRA_TIME": "Ir al Tiempo Extra",
+      "DESC": "El partido está empatado al final del tiempo reglamentario y pasa a la prórroga. Los goles marcados ahora cuentan para el resultado. Añade los goles desde la pestaña Cronología. Si el marcador sigue empatado tras la prórroga, se procede a la tanda de penaltis.",
+      "BACK_TO_EXTRA_TIME": "Volver al Tiempo Extra"
     }
   }
 }

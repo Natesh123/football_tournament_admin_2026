@@ -1,4 +1,4 @@
-import { Component, signal, inject, HostListener, computed } from '@angular/core';
+import { Component, signal, inject, HostListener, computed, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
@@ -18,6 +18,9 @@ export class TopBarComponent {
     auth = inject(AuthService);
     private tournamentService = inject(TournamentService);
     private router = inject(Router);
+
+    /** Emitted when the mobile hamburger is tapped; the layout opens the sidebar drawer. */
+    @Output() menuClick = new EventEmitter<void>();
 
     currentLang = signal('en');
     showProfile = signal(false);

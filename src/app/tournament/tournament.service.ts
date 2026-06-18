@@ -93,6 +93,12 @@ export class TournamentService {
         return this.http.patch<ApiResponse<any>>(`${API_URL}/api/matches/${matchId}/schedule`, payload);
     }
 
+    getTeams(id: string): Observable<any[]> {
+        return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/${id}/teams`).pipe(
+            map(res => res.data)
+        );
+    }
+
     // Match Center & Event Management
     getMatchesByStatus(status: string, tournamentId?: string): Observable<any[]> {
         let url = `${API_URL}/api/matches?status=${status}`;

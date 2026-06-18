@@ -94,6 +94,8 @@
     "NA": "N/D",
     "UPLOAD": "Télécharger",
     "REMOVE": "Supprimer",
+    "SAVE_CHANGES": "Enregistrer les modifications",
+    "SAVING": "Enregistrement...",
     "TBD": "À définir",
     "GOAL": "But",
     "OWN_GOAL": "But contre son camp",
@@ -676,6 +678,8 @@
       "GENERATED_MATCHES": "Matchs générés",
       "MATCH": "Match",
       "EDIT_MATCH_TITLE": "Modifier le calendrier des matchs",
+      "HOME_TEAM_LABEL": "Équipe à domicile",
+      "AWAY_TEAM_LABEL": "Équipe à l'extérieur",
       "MATCH_TIME_LABEL": "Heure de début du match",
       "VENUE_LABEL": "Lieu du match",
       "EXTRA_BREAK": "Durée de la pause (min)",
@@ -1072,7 +1076,8 @@
       "DATE_TIME": "Date et heure",
       "VENUE": "Site",
       "REFEREE": "Arbitre",
-      "PENALTIES": "Tirs au but"
+      "PENALTIES": "Tirs au but",
+      "EXTRA_TIME": "Prolongation"
     },
     "TABS": {
       "TIMELINE": "Chronologie",
@@ -1080,7 +1085,8 @@
       "INFO": "Infos du match",
       "STANDINGS": "Classement",
       "LINEUPS": "Compositions",
-      "H2H": "Face-à-face"
+      "H2H": "Face-à-face",
+      "EXTRA_TIME": "Prolongation"
     },
     "TIMELINE": {
       "TITLE": "Événements du match",
@@ -1239,7 +1245,8 @@
       "LINEUP_INVALID": "Les compositions de départ doivent comporter exactement {{ playersOnField }} joueurs, et les remplaçants ne peuvent pas dépasser {{ subsLimit }} joueurs par équipe.",
       "ENTER_SCORES": "Veuillez saisir les scores des deux équipes.",
       "ADDED_TIME_SET": "Temps additionnel mis à jour.",
-      "PENALTIES_STARTED": "Séance de tirs au but lancée."
+      "PENALTIES_STARTED": "Séance de tirs au but lancée.",
+      "EXTRA_TIME_STARTED": "Prolongation commencée."
     },
     "ADDED_TIME": {
       "TITLE": "Temps additionnel",
@@ -1256,6 +1263,12 @@
       "MISSED": "Manqué",
       "NEXT": "Prochain tireur",
       "UNDO": "Annuler le dernier tir"
+    },
+    "EXTRA_TIME": {
+      "TITLE": "Prolongation",
+      "GO_TO_EXTRA_TIME": "Passer à la prolongation",
+      "DESC": "Le match est à égalité à la fin du temps réglementaire et passe en prolongation. Les buts marqués maintenant comptent pour le résultat. Ajoutez les buts depuis l'onglet Chronologie. Si les scores sont toujours à égalité après la prolongation, passez à la séance de tirs au but.",
+      "BACK_TO_EXTRA_TIME": "Retour à la prolongation"
     }
   }
 }

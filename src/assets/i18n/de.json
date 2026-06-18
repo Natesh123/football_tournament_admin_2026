@@ -94,6 +94,8 @@
     "NA": "N/V",
     "UPLOAD": "Hochladen",
     "REMOVE": "Entfernen",
+    "SAVE_CHANGES": "Änderungen speichern",
+    "SAVING": "Speichern...",
     "TBD": "Offen",
     "GOAL": "Tor",
     "OWN_GOAL": "Eigentor",
@@ -676,6 +678,8 @@
       "GENERATED_MATCHES": "Generierte Spiele",
       "MATCH": "Spiel",
       "EDIT_MATCH_TITLE": "Spielplan bearbeiten",
+      "HOME_TEAM_LABEL": "Heimmannschaft",
+      "AWAY_TEAM_LABEL": "Auswärtsmannschaft",
       "MATCH_TIME_LABEL": "Anstoßzeit",
       "VENUE_LABEL": "Spielort",
       "EXTRA_BREAK": "Pausendauer (Min)",
@@ -1072,7 +1076,8 @@
       "DATE_TIME": "Datum & Uhrzeit",
       "VENUE": "Spielstätte",
       "REFEREE": "Schiedsrichter",
-      "PENALTIES": "Elfmeterschießen"
+      "PENALTIES": "Elfmeterschießen",
+      "EXTRA_TIME": "Verlängerung"
     },
     "TABS": {
       "TIMELINE": "Zeitleiste",
@@ -1080,7 +1085,8 @@
       "INFO": "Spielinfo",
       "STANDINGS": "Tabelle",
       "LINEUPS": "Aufstellungen",
-      "H2H": "Direkter Vergleich"
+      "H2H": "Direkter Vergleich",
+      "EXTRA_TIME": "Verlängerung"
     },
     "TIMELINE": {
       "TITLE": "Spielereignisse",
@@ -1239,7 +1245,8 @@
       "LINEUP_INVALID": "Startaufstellungen müssen genau {{ playersOnField }} Spieler haben, und die Anzahl der Auswechselspieler darf {{ subsLimit }} pro Mannschaft nicht überschreiten.",
       "ENTER_SCORES": "Bitte geben Sie die Ergebnisse für beide Mannschaften ein.",
       "ADDED_TIME_SET": "Nachspielzeit aktualisiert.",
-      "PENALTIES_STARTED": "Elfmeterschießen gestartet."
+      "PENALTIES_STARTED": "Elfmeterschießen gestartet.",
+      "EXTRA_TIME_STARTED": "Verlängerung gestartet."
     },
     "ADDED_TIME": {
       "TITLE": "Nachspielzeit",
@@ -1256,6 +1263,12 @@
       "MISSED": "Verschossen",
       "NEXT": "Als Nächstes",
       "UNDO": "Letzten Schuss rückgängig"
+    },
+    "EXTRA_TIME": {
+      "TITLE": "Verlängerung",
+      "GO_TO_EXTRA_TIME": "Zur Verlängerung",
+      "DESC": "Das Spiel steht nach regulärer Spielzeit unentschieden und geht in die Verlängerung. Jetzt erzielte Tore zählen für das Ergebnis. Tore über den Tab Verlauf hinzufügen. Steht es nach der Verlängerung weiterhin unentschieden, folgt das Elfmeterschießen.",
+      "BACK_TO_EXTRA_TIME": "Zurück zur Verlängerung"
     }
   }
 }

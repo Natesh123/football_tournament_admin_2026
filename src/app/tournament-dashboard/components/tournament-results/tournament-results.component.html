@@ -204,16 +204,16 @@
 
             <!-- MATCH RESULTS SECTION -->
             <div class="mt-12">
-                <h2 class="text-xl font-bold text-white mb-6">Match Results</h2>
-                
+                <h2 class="text-xl font-bold text-white mb-6">Matches & Results</h2>
+
                 <div *ngIf="matches().length === 0" class="bg-black-card border border-black-border border-dashed rounded-xl p-12 text-center">
                     <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                     </div>
-                    <h3 class="text-white font-bold mb-1">No Completed Matches</h3>
-                    <p class="text-zinc-500 text-sm">Results will appear here automatically once matches are finished.</p>
+                    <h3 class="text-white font-bold mb-1">No Matches Yet</h3>
+                    <p class="text-zinc-500 text-sm">Generate the structure or schedule matches and they'll appear here.</p>
                 </div>
 
                 <div *ngIf="matches().length > 0">
@@ -232,13 +232,22 @@
                                         </div>
                                         
                                         <div class="flex flex-col items-center justify-center w-1/5">
-                                            <div class="bg-zinc-900 border border-zinc-800 px-3 py-1 rounded text-lg font-black text-white text-center shadow-inner whitespace-nowrap">
-                                                {{ match.homeScore }} - {{ match.awayScore }}
-                                            </div>
-                                            <span *ngIf="match.matchPeriod === 'pso'" class="text-[10px] font-bold text-zinc-500 uppercase mt-1">
-                                                PSO ({{ match.penaltyHome }} - {{ match.penaltyAway }})
-                                            </span>
-                                            <span *ngIf="match.matchPeriod === 'aet'" class="text-[10px] font-bold text-zinc-500 uppercase mt-1">AET</span>
+                                            <ng-container *ngIf="match.status === 'completed' || match.status === 'live'; else scheduledSlot">
+                                                <div class="bg-zinc-900 border border-zinc-800 px-3 py-1 rounded text-lg font-black text-white text-center shadow-inner whitespace-nowrap">
+                                                    {{ match.homeScore }} - {{ match.awayScore }}
+                                                </div>
+                                                <span *ngIf="match.status === 'live'" class="text-[10px] font-bold text-rose-500 uppercase mt-1">LIVE</span>
+                                                <span *ngIf="match.matchPeriod === 'pso'" class="text-[10px] font-bold text-zinc-500 uppercase mt-1">
+                                                    PSO ({{ match.penaltyHome }} - {{ match.penaltyAway }})
+                                                </span>
+                                                <span *ngIf="match.matchPeriod === 'aet'" class="text-[10px] font-bold text-zinc-500 uppercase mt-1">AET</span>
+                                            </ng-container>
+                                            <ng-template #scheduledSlot>
+                                                <div class="bg-zinc-900 border border-zinc-800 px-3 py-1 rounded text-xs font-bold text-zinc-400 text-center whitespace-nowrap">
+                                                    {{ match.startTime ? (match.startTime | date:'MMM d, HH:mm') : 'TBD' }}
+                                                </div>
+                                                <span class="text-[10px] font-bold text-zinc-600 uppercase mt-1">Scheduled</span>
+                                            </ng-template>
                                         </div>
                                         
                                         <div class="flex items-center gap-3 w-2/5 justify-end text-right">

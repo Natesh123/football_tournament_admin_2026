@@ -85,6 +85,14 @@ export const routes: Routes = [
                 loadComponent: () => import('./tournament-dashboard/components/match-details/match-details.component').then(m => m.MatchDetailsComponent)
             },
             {
+                // Deep-link a dashboard tab by path, e.g. tournaments/:id/matches.
+                // Kept after the literal routes above so they continue to win.
+                path: 'tournaments/:id/:tab',
+                canActivate: [PermissionGuard],
+                data: { permission: 'can_tournaments' },
+                loadComponent: () => import('./tournament-dashboard/tournament-dashboard.component').then(m => m.TournamentDashboardComponent)
+            },
+            {
                 path: 'teams',
                 canActivate: [PermissionGuard],
                 data: { permission: 'can_teams' },

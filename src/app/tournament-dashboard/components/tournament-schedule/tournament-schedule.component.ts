@@ -30,6 +30,7 @@ export class TournamentScheduleComponent implements OnInit {
     structure = signal<any>(null);
     isLoadingStructure = signal(false);
     isSavingMatch = signal(false);
+    availableTeams = signal<{ id: number; name: string }[]>([]);
 
     // ─── Time Slot Dropdown ──────────────────────────────────────────────────
     isTimeSlotDropdownOpen = signal(false);
@@ -117,7 +118,22 @@ export class TournamentScheduleComponent implements OnInit {
 
     // ─── Lifecycle ───────────────────────────────────────────────────────────
     ngOnInit() {
-        if (this.tournamentId) this.loadStructure();
+        if (this.tournamentId) {
+            this.loadStructure();
+            this.loadTeams();
+        }
+    }
+
+    loadTeams() {
+        this.tournamentService.getTeams(this.tournamentId).subscribe({
+            next: (regs: any[]) => {
+                const teams = (regs || [])
+                    .filter(r => r.status === 'approved' && r.team)
+                    .map(r => ({ id: r.team.id, name: r.team.name }));
+                this.availableTeams.set(teams);
+            },
+            error: () => { /* non-blocking: team editing just won't be available */ }
+        });
     }
 
     loadStructure() {
@@ -179,7 +195,12 @@ export class TournamentScheduleComponent implements OnInit {
             ...match,
             // Default the match venue to the tournament's primary venue
             venue: match.venue || this.venues?.primaryVenue?.trim() || '',
-            matchTime: match.startTime ? new Date(match.startTime).toISOString().slice(0, 16) : ''
+            matchTime: match.startTime ? new Date(match.startTime).toISOString().slice(0, 16) : '',
+            // TBD knockout slots come through as label objects (no id) -> null selection
+            homeTeamId: match.homeTeam?.id ?? null,
+            awayTeamId: match.awayTeam?.id ?? null,
+            _origHomeTeamId: match.homeTeam?.id ?? null,
+            _origAwayTeamId: match.awayTeam?.id ?? null
         };
     }
 
@@ -229,12 +250,27 @@ export class TournamentScheduleComponent implements OnInit {
 
         this.isSavingMatch.set(true);
 
-        const payload = {
+        const payload: any = {
             venue: this.editingMatch.venue ?? null,
             matchTime: this.editingMatch.matchTime || null,
             breakDuration: this.editingMatch.breakDuration ?? null,
             matchReferees: this.editingMatch.matchReferees ?? null
         };
+
+        // Only send team assignments when they actually changed, so editing the
+        // time/venue of a finished match doesn't trip the backend's team guard.
+        const normId = (v: any) => (v === '' || v === undefined ? null : v === null ? null : Number(v));
+        const home = normId(this.editingMatch.homeTeamId);
+        const away = normId(this.editingMatch.awayTeamId);
+        if (home !== (this.editingMatch._origHomeTeamId ?? null)) payload.homeTeamId = home;
+        if (away !== (this.editingMatch._origAwayTeamId ?? null)) payload.awayTeamId = away;
+
+        if (payload.homeTeamId !== undefined && payload.awayTeamId !== undefined
+            && payload.homeTeamId !== null && payload.homeTeamId === payload.awayTeamId) {
+            this.ui.showToast('Home and away teams must be different.', 'error');
+            this.isSavingMatch.set(false);
+            return;
+        }
 
         this.tournamentService.updateMatchSchedule(matchId, payload).subscribe({
             next: (res: any) => {

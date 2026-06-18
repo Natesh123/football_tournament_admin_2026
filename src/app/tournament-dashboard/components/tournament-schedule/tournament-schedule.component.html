@@ -285,6 +285,30 @@
 
         <!-- Body -->
         <div class="p-6 overflow-y-auto space-y-5">
+            <!-- Teams -->
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.HOME_TEAM_LABEL' | translate }}</label>
+                    <select [(ngModel)]="editingMatch.homeTeamId" [disabled]="editingMatch.status === 'completed'"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-3 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all disabled:opacity-40">
+                        <option [ngValue]="null" class="bg-black-card">{{ 'COMMON.TBD' | translate }}</option>
+                        @for (team of availableTeams(); track team.id) {
+                        <option [ngValue]="team.id" class="bg-black-card">{{ team.name }}</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.AWAY_TEAM_LABEL' | translate }}</label>
+                    <select [(ngModel)]="editingMatch.awayTeamId" [disabled]="editingMatch.status === 'completed'"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-3 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all disabled:opacity-40">
+                        <option [ngValue]="null" class="bg-black-card">{{ 'COMMON.TBD' | translate }}</option>
+                        @for (team of availableTeams(); track team.id) {
+                        <option [ngValue]="team.id" class="bg-black-card">{{ team.name }}</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
             <!-- Start Time -->
             <div>
                 <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.MATCH_TIME_LABEL' | translate }}</label>

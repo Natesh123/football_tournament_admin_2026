@@ -155,7 +155,7 @@
                 <!-- Center Content: Main Management -->
                 <div class="lg:col-span-3 space-y-8">
                     <div class="mt-4">
-                        <app-match-tabs [activeTab]="activeTab()" [showStandings]="!!h2hData()?.groupStandings" [showPenalties]="match().match_period === 'penalties'" (tabChange)="activeTab.set($event)">
+                        <app-match-tabs [activeTab]="activeTab()" [showStandings]="!!h2hData()?.groupStandings" [showExtraTime]="match().match_period === 'extra_time'" [showPenalties]="match().match_period === 'penalties'" (tabChange)="activeTab.set($event)">
                         </app-match-tabs>
                     </div>
 
@@ -190,9 +190,15 @@
                             </div>
                         </div>
 
-                        <!-- Go to penalties (only when scores are level) -->
+                        <!-- Go to extra time / penalties (only when scores are level) -->
                         @if (match().homeScore === match().awayScore) {
-                        <div class="pt-2 border-t border-white/5">
+                        <div class="pt-2 border-t border-white/5 space-y-3">
+                            @if (match().match_period !== 'extra_time') {
+                            <button (click)="goToExtraTime()" [disabled]="ui.isLoadingAction()"
+                                class="w-full px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm font-black uppercase tracking-wider hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2 disabled:opacity-50">
+                                {{ 'MATCH_DETAILS.EXTRA_TIME.GO_TO_EXTRA_TIME' | translate }}
+                            </button>
+                            }
                             <button (click)="goToPenalties()" [disabled]="ui.isLoadingAction()"
                                 class="w-full px-4 py-3 rounded-lg bg-gold-500/10 border border-gold-500/30 text-gold-400 text-sm font-black uppercase tracking-wider hover:bg-gold-500 hover:text-black transition-all flex items-center justify-center gap-2 disabled:opacity-50">
                                 {{ 'MATCH_DETAILS.SHOOTOUT.GO_TO_PENALTIES' | translate }}
@@ -418,6 +424,27 @@
                         } @else if (activeTab() === 'standings') {
                         <app-h2h [homeTeam]="match()?.homeTeam" [awayTeam]="match()?.awayTeam" [h2hData]="h2hData()" mode="standings">
                         </app-h2h>
+                        } @else if (activeTab() === 'extra_time') {
+                        <!-- ── Extra Time Tab ───────────────────────────────────────────────── -->
+                        <div class="space-y-6">
+                            <div class="bg-black-card border border-black-border rounded-xl p-6 space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-sm font-black text-gold-400 uppercase tracking-wider">{{ 'MATCH_DETAILS.EXTRA_TIME.TITLE' | translate }}</h3>
+                                    <span class="text-2xl font-black text-white tabular-nums">{{ match().homeScore ?? 0 }} &ndash; {{ match().awayScore ?? 0 }}</span>
+                                </div>
+                                <p class="text-xs text-zinc-400 leading-relaxed">{{ 'MATCH_DETAILS.EXTRA_TIME.DESC' | translate }}</p>
+
+                                <!-- Go to penalties (only when still level) -->
+                                @if (match().status === 'live' && match().homeScore === match().awayScore) {
+                                <div class="pt-2 border-t border-white/5">
+                                    <button (click)="goToPenalties()" [disabled]="ui.isLoadingAction()"
+                                        class="w-full px-4 py-3 rounded-lg bg-gold-500/10 border border-gold-500/30 text-gold-400 text-sm font-black uppercase tracking-wider hover:bg-gold-500 hover:text-black transition-all flex items-center justify-center gap-2 disabled:opacity-50">
+                                        {{ 'MATCH_DETAILS.SHOOTOUT.GO_TO_PENALTIES' | translate }}
+                                    </button>
+                                </div>
+                                }
+                            </div>
+                        </div>
                         } @else if (activeTab() === 'penalties') {
                         <!-- ── Penalty Shootout Tab ─────────────────────────────────────────── -->
                         <div class="space-y-6">
@@ -489,6 +516,14 @@
                                     </button>
                                 </div>
                                 }
+
+                                <!-- Back to extra time (correct a premature switch to penalties) -->
+                                <div class="pt-2 border-t border-white/5">
+                                    <button (click)="goToExtraTime()" [disabled]="ui.isLoadingAction()"
+                                        class="w-full px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm font-black uppercase tracking-wider hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2 disabled:opacity-50">
+                                        {{ 'MATCH_DETAILS.EXTRA_TIME.BACK_TO_EXTRA_TIME' | translate }}
+                                    </button>
+                                </div>
                             </div>
                             }
 

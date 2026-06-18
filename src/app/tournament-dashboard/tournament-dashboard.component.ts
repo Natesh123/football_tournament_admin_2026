@@ -149,6 +149,7 @@ export class TournamentDashboardComponent implements OnInit {
     tournament = signal<TournamentDTO | null>(null);
     isLoading = signal(true);
     activeTab = signal<string>('general');
+    private pendingTab?: string;
     formatChanged = false;
     showValidationErrors = signal(false);
 
@@ -172,6 +173,8 @@ export class TournamentDashboardComponent implements OnInit {
     ngOnInit() {
         this.route.paramMap.subscribe(params => {
             const id = params.get('id');
+            // Deep-linked tab via path (tournaments/:id/:tab) or ?tab= query param.
+            this.pendingTab = params.get('tab') ?? this.route.snapshot.queryParamMap.get('tab') ?? undefined;
             if (id) {
                 this.loadTournament(id);
             }
@@ -341,6 +344,11 @@ export class TournamentDashboardComponent implements OnInit {
                 this.tournament.set(tournament);
                 const hadMissingDefaults = this.mergeTournamentToSettings(tournament);
                 this.isLoading.set(false);
+                // Honour a deep-linked tab now that settings are loaded.
+                if (this.pendingTab && this.sidebarItems.some(t => t.id === this.pendingTab)) {
+                    this.setTab(this.pendingTab);
+                    this.pendingTab = undefined;
+                }
                 // Auto-save if we had to inject default values so the DB is consistent
                 if (hadMissingDefaults) {
                     this.saveChanges(true);
