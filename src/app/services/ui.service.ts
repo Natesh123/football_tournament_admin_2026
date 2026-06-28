@@ -1,9 +1,11 @@
 import { Injectable, signal } from '@angular/core';
 import Swal from 'sweetalert2';
 
+export type ToastType = 'success' | 'error' | 'info' | 'warning';
+
 export interface ToastMessage {
   text: string;
-  type: 'success' | 'error' | 'info';
+  type: ToastType;
 }
 
 @Injectable({
@@ -21,7 +23,7 @@ export class UiService {
     this.isLoadingAction.set(false);
   }
 
-  showToast(text: string, type: 'success' | 'error' | 'info' = 'success') {
+  showToast(text: string, type: ToastType = 'success') {
     const Toast = Swal.mixin({
       toast: true,
       position: 'top-end',
@@ -52,6 +54,11 @@ export class UiService {
     } else if (type === 'success') {
       Toast.fire({
         icon: 'success',
+        title: text
+      });
+    } else if (type === 'warning') {
+      Toast.fire({
+        icon: 'warning',
         title: text
       });
     } else {

@@ -29,38 +29,42 @@
         </div>
 
         <!-- Modal Body -->
-        <div class="p-6 space-y-5">
+        <form [formGroup]="form" class="p-6 space-y-5">
             <!-- Tournament Name -->
             <div>
-                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{
-                    'DASHBOARD.MODAL.NAME' | translate }} *</label>
-                <input type="text" [(ngModel)]="newTournament.name"
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block required-mark">{{
+                    'DASHBOARD.MODAL.NAME' | translate }}</label>
+                <input type="text" formControlName="name"
                     [placeholder]="'DASHBOARD.MODAL.NAME_PLACEHOLDER' | translate"
                     class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all" />
+                <app-validation [control]="form.controls['name']" label="Tournament name" />
             </div>
 
             <!-- Description -->
             <div>
                 <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{
                     'DASHBOARD.MODAL.DESCRIPTION' | translate }}</label>
-                <textarea [(ngModel)]="newTournament.description"
+                <textarea formControlName="description"
                     [placeholder]="'DASHBOARD.MODAL.DESCRIPTION_PLACEHOLDER' | translate" rows="3"
                     class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all resize-none"></textarea>
+                <app-validation [control]="form.controls['description']" label="Description" />
             </div>
 
             <!-- Dates Row -->
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{
-                        'DASHBOARD.MODAL.START_DATE' | translate }} *</label>
-                    <input type="date" [(ngModel)]="newTournament.startDate" [min]="todayDate"
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block required-mark">{{
+                        'DASHBOARD.MODAL.START_DATE' | translate }}</label>
+                    <input type="date" formControlName="startDate" [min]="todayDate"
                         class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all [color-scheme:dark]" />
+                    <app-validation [control]="form.controls['startDate']" label="Start date" />
                 </div>
                 <div>
                     <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{
                         'DASHBOARD.MODAL.END_DATE' | translate }}</label>
-                    <input type="date" [(ngModel)]="newTournament.endDate" [min]="newTournament.startDate || todayDate"
+                    <input type="date" formControlName="endDate" [min]="form.controls['startDate'].value || todayDate"
                         class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all [color-scheme:dark]" />
+                    <app-validation [control]="form.controls['endDate']" label="End date" />
                 </div>
             </div>
 
@@ -68,7 +72,7 @@
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'COMMON.FORMAT' | translate }}</label>
-                    <select [(ngModel)]="newTournament.type" (change)="onFormatChange()"
+                    <select formControlName="type" (change)="onFormatChange()"
                         class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all">
                         <option value="group" class="bg-black-card">{{ 'DASHBOARD.MODAL.FORMATS.GROUP' | translate }}</option>
                         <option value="group_knockout" class="bg-black-card">{{ 'DASHBOARD.MODAL.FORMATS.GROUP_KNOCKOUT' | translate }}</option>
@@ -79,7 +83,7 @@
                 <div>
                     <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.PARTICIPANTS.MIN_TEAMS' | translate }}</label>
                     <div class="w-full bg-white/10 border border-white/5 rounded-lg px-4 py-3 text-zinc-400 transition-all flex items-center justify-between cursor-not-allowed">
-                        <span>{{ newTournament.minTeams }} {{ 'COMMON.TEAMS_MINIMUM' | translate }}</span>
+                        <span>{{ minTeams }} {{ 'COMMON.TEAMS_MINIMUM' | translate }}</span>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
                 </div>
@@ -90,7 +94,7 @@
                 <div>
                     <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{
                         'DASHBOARD.MODAL.MAX_TEAMS' | translate }}</label>
-                    <select [(ngModel)]="newTournament.maxTeams"
+                    <select formControlName="maxTeams"
                         class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all">
                         <option value="4" class="bg-black-card">4 {{ 'COMMON.TEAMS' | translate }}</option>
                         <option value="8" class="bg-black-card">8 {{ 'COMMON.TEAMS' | translate }}</option>
@@ -104,7 +108,7 @@
                 <div>
                     <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{
                         'DASHBOARD.MODAL.STATUS' | translate }}</label>
-                    <select [(ngModel)]="newTournament.status"
+                    <select formControlName="status"
                         class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all">
                         <option value="draft" class="bg-black-card">{{ 'DASHBOARD.MODAL.STATUS_DRAFT' | translate }}
                         </option>
@@ -113,7 +117,7 @@
                     </select>
                 </div>
             </div>
-        </div>
+        </form>
 
         <!-- Modal Footer -->
         <div class="flex items-center justify-end gap-3 p-6 border-t border-black-border">
@@ -121,8 +125,7 @@
                 class="px-6 py-2.5 rounded-lg border border-black-border text-zinc-400 hover:text-white hover:border-zinc-500 font-bold transition-all duration-300 disabled:opacity-40">
                 {{ 'COMMON.CANCEL' | translate }}
             </button>
-            <button (click)="createTournament()"
-                [disabled]="!newTournament.name || !newTournament.startDate || isCreating()"
+            <button (click)="createTournament()" [disabled]="isCreating()"
                 class="px-6 py-2.5 rounded-lg bg-gold-400 hover:bg-gold-400/90 text-black font-bold transition-all duration-300 hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none flex items-center gap-2">
                 @if (isCreating()) {
                 <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

@@ -133,7 +133,7 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
 
     openModal() {
         if (this.isTeamLimitReached()) {
-            this.ui.showToast('TOURNAMENT_DASHBOARD.TOAST.MAX_TEAMS_REACHED', 'error');
+            this.notify('TOURNAMENT_DASHBOARD.TOAST.MAX_TEAMS_REACHED', 'error');
             return;
         }
         this.newTeam.set({
@@ -174,7 +174,7 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
 
             // Check max teams limit
             if (this.teams().length + teamIds.length > this.maxTeams) {
-                this.ui.showToast('TOURNAMENT_DASHBOARD.TOAST.MAX_TEAMS_EXCEEDED', 'error');
+                this.notify('TOURNAMENT_DASHBOARD.TOAST.MAX_TEAMS_EXCEEDED', 'error');
                 return;
             }
 
@@ -198,16 +198,16 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
                                 this.ui.showToast(s.reason, 'error');
                             }
                             if (newRegistrations.length > 0) {
-                                this.ui.showToast('TOURNAMENT_DASHBOARD.TOAST.ADD_TEAMS_SUCCESS', 'success');
+                                this.notify('TOURNAMENT_DASHBOARD.TOAST.ADD_TEAMS_SUCCESS', 'success');
                             }
                         } else {
-                            this.ui.showToast('TOURNAMENT_DASHBOARD.TOAST.ADD_TEAMS_SUCCESS', 'success');
+                            this.notify('TOURNAMENT_DASHBOARD.TOAST.ADD_TEAMS_SUCCESS', 'success');
                         }
                         this.closeModal();
                     },
                     error: (err) => {
                         this.ui.endAction();
-                        this.ui.showToast(err?.error?.message || 'TOURNAMENT_DASHBOARD.TOAST.ADD_TEAMS_ERROR', 'error');
+                        this.notify(err?.error?.message || 'TOURNAMENT_DASHBOARD.TOAST.ADD_TEAMS_ERROR', 'error');
                     }
                 });
         } else {
@@ -223,21 +223,30 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
                             next: (res) => {
                                 this.teams.update(t => [res.data, ...t]);
                                 this.ui.endAction();
-                                this.ui.showToast('TOURNAMENT_DASHBOARD.TOAST.CREATE_TEAM_SUCCESS', 'success');
+                                this.notify('TOURNAMENT_DASHBOARD.TOAST.CREATE_TEAM_SUCCESS', 'success');
                                 this.closeModal();
                             },
                             error: (err) => {
                                 this.ui.endAction();
-                                this.ui.showToast(err?.error?.message || 'TOURNAMENT_DASHBOARD.TOAST.MAPPING_ERROR', 'error');
+                                this.notify(err?.error?.message || 'TOURNAMENT_DASHBOARD.TOAST.MAPPING_ERROR', 'error');
                             }
                         });
                 },
                 error: (err) => {
                     this.ui.endAction();
-                    this.ui.showToast('TOURNAMENT_DASHBOARD.TOAST.CREATE_TEAM_ERROR', 'error');
+                    // 409 = a team with this name already exists → guide the user.
+                    const key = err?.status === 409
+                        ? 'TOURNAMENT_DASHBOARD.TOAST.TEAM_NAME_EXISTS'
+                        : 'TOURNAMENT_DASHBOARD.TOAST.CREATE_TEAM_ERROR';
+                    this.notify(key, 'error');
                 }
             });
         }
+    }
+
+    /** Show a toast from an i18n key (or already-resolved text). */
+    private notify(keyOrText: string, type: 'success' | 'error' | 'info' = 'success') {
+        this.ui.showToast(this.translate.instant(keyOrText), type);
     }
 
     deleteTeam(regId: string, teamId: string) {
@@ -247,12 +256,12 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
                 // Delete the registration link
                 this.http.delete(`${API_URL}/api/tournaments/${this.tournamentId}/teams/${teamId}`).subscribe({
                     next: () => {
-                        this.ui.showToast('TOURNAMENT_DASHBOARD.TOAST.REMOVE_TEAM_SUCCESS', 'success');
+                        this.notify('TOURNAMENT_DASHBOARD.TOAST.REMOVE_TEAM_SUCCESS', 'success');
                         this.fetchTeams(); // Refetch to update both lists
                         this.ui.endAction();
                     },
                     error: (err) => {
-                        this.ui.showToast('TOURNAMENT_DASHBOARD.TOAST.REMOVE_TEAM_ERROR', 'error');
+                        this.notify('TOURNAMENT_DASHBOARD.TOAST.REMOVE_TEAM_ERROR', 'error');
                         this.ui.endAction();
                     }
                 });
@@ -277,7 +286,7 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
             error: (err) => {
                 reg.status = oldStatus; // Revert on error
                 this.ui.endAction();
-                this.ui.showToast('TOURNAMENT_DASHBOARD.TOAST.SAVE_ERROR', 'error');
+                this.notify('TOURNAMENT_DASHBOARD.TOAST.SAVE_ERROR', 'error');
             }
         });
     }
@@ -299,7 +308,7 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
             error: (err) => {
                 reg.paymentStatus = oldPaymentStatus; // Revert on error
                 this.ui.endAction();
-                this.ui.showToast('TOURNAMENT_DASHBOARD.TOAST.SAVE_ERROR', 'error');
+                this.notify('TOURNAMENT_DASHBOARD.TOAST.SAVE_ERROR', 'error');
             }
         });
     }

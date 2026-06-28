@@ -7,39 +7,37 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Venue Configuration -->
-        <div class="bg-black-card border border-black-border rounded-xl p-6 space-y-6">
+        <form [formGroup]="form" class="bg-black-card border border-black-border rounded-xl p-6 space-y-6">
             <div class="flex items-center justify-between border-b border-black-border pb-4">
                 <h2 class="text-lg font-bold text-white">{{ 'TOURNAMENT_DASHBOARD.VENUES.LOCATIONS_SETUP' | translate }}</h2>
                 <label class="cursor-pointer label flex items-center gap-2 m-0 p-0">
                     <span class="label-text text-zinc-400 font-bold mr-2">{{ 'TOURNAMENT_DASHBOARD.VENUES.MULTIPLE_PITCHES' | translate }}</span>
-                    <input type="checkbox" [(ngModel)]="data.multipleVenues" class="toggle toggle-warning" />
+                    <input type="checkbox" formControlName="multipleVenues" class="toggle toggle-warning" />
                 </label>
             </div>
 
             <div class="space-y-5">
                 <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.VENUES.PRIMARY_VENUE' | translate }} <span class="text-red-500">*</span></label>
-                    <input type="text" [(ngModel)]="data.primaryVenue" [placeholder]="'TOURNAMENT_DASHBOARD.VENUES.PLACEHOLDERS.PRIMARY_VENUE' | translate"
-                        class="w-full bg-white/5 border rounded-lg px-4 py-3 text-white focus:outline-none transition-all"
-                        [ngClass]="showValidationErrors && !data.primaryVenue?.trim() ? 'border-red-500 ring-1 ring-red-500/50 focus:border-red-500 focus:ring-red-500/50' : 'border-black-border focus:border-gold-400 focus:ring-1 focus:ring-gold-400/50'" />
-                    @if (showValidationErrors && !data.primaryVenue?.trim()) {
-                    <p class="text-xs text-red-500 mt-1.5 font-bold">{{ 'TOURNAMENT_DASHBOARD.VENUES.PRIMARY_VENUE_REQUIRED' | translate }}</p>
-                    }
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block required-mark">{{ 'TOURNAMENT_DASHBOARD.VENUES.PRIMARY_VENUE' | translate }}</label>
+                    <input type="text" formControlName="primaryVenue" [placeholder]="'TOURNAMENT_DASHBOARD.VENUES.PLACEHOLDERS.PRIMARY_VENUE' | translate"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:ring-1 focus:ring-gold-400/50 focus:outline-none transition-all" />
+                    <app-validation [control]="form.controls['primaryVenue']" label="Primary venue" />
                 </div>
                 <div>
                     <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.VENUES.VENUE_ADDRESS' | translate }}</label>
-                    <textarea rows="2" [(ngModel)]="data.venueAddress" [placeholder]="'TOURNAMENT_DASHBOARD.VENUES.PLACEHOLDERS.VENUE_ADDRESS' | translate"
+                    <textarea rows="2" formControlName="venueAddress" [placeholder]="'TOURNAMENT_DASHBOARD.VENUES.PLACEHOLDERS.VENUE_ADDRESS' | translate"
                         class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all resize-none"></textarea>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.VENUES.TOTAL_PITCHES' | translate }}</label>
-                        <input type="number" [(ngModel)]="data.pitchCount" [disabled]="data.multipleVenues" [class.opacity-50]="data.multipleVenues"
+                        <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block required-mark">{{ 'TOURNAMENT_DASHBOARD.VENUES.TOTAL_PITCHES' | translate }}</label>
+                        <input type="number" formControlName="pitchCount" [attr.disabled]="form.controls['multipleVenues'].value ? '' : null" [class.opacity-50]="form.controls['multipleVenues'].value"
                             class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all" />
+                        <app-validation [control]="form.controls['pitchCount']" label="Total pitches" />
                     </div>
                     <div>
                         <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.VENUES.FIELD_TYPE' | translate }}</label>
-                        <select [(ngModel)]="data.fieldType"
+                        <select formControlName="fieldType"
                             class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all">
                             <option value="grass" class="bg-black-card">{{ 'TOURNAMENT_DASHBOARD.VENUES.NATURAL_GRASS' | translate }}</option>
                             <option value="turf" class="bg-black-card">{{ 'TOURNAMENT_DASHBOARD.VENUES.ARTIFICIAL_TURF' | translate }}</option>
@@ -48,7 +46,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </form>
 
         <!-- Pitches List placeholder -->
         <div class="bg-black-card border border-black-border rounded-xl flex flex-col" [class.opacity-50]="!data.multipleVenues" [class.pointer-events-none]="!data.multipleVenues">

@@ -114,42 +114,46 @@
                         <!-- Row 1: Name & Username -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2 group">
-                                <label class="text-xs font-bold text-neutral-400 uppercase tracking-widest">{{
+                                <label class="text-xs font-bold text-neutral-400 uppercase tracking-widest required-mark">{{
                                     'AUTH.REGISTER.ORG_NAME' | translate }}</label>
                                 <input type="text" formControlName="name"
                                     class="w-full bg-[#1e1e20] border-b-2 border-[#333] px-4 py-3 text-white placeholder-neutral-600 focus:outline-none focus:border-gold-500 focus:bg-[#252528] transition-all duration-300 rounded-t-lg text-sm font-medium"
                                     placeholder="Victorian FA">
+                                <app-validation [control]="registerForm.controls['name']" label="Name" />
                             </div>
                             <div class="space-y-2 group">
-                                <label class="text-xs font-bold text-neutral-400 uppercase tracking-widest">{{
+                                <label class="text-xs font-bold text-neutral-400 uppercase tracking-widest required-mark">{{
                                     'AUTH.REGISTER.USERNAME' | translate }}</label>
                                 <input type="text" formControlName="user_name"
                                     class="w-full bg-[#1e1e20] border-b-2 border-[#333] px-4 py-3 text-white placeholder-neutral-600 focus:outline-none focus:border-gold-500 focus:bg-[#252528] transition-all duration-300 rounded-t-lg text-sm font-medium"
                                     placeholder="john_doe">
+                                <app-validation [control]="registerForm.controls['user_name']" label="Username" />
                             </div>
                         </div>
 
                         <!-- Row 2: Phone & Email -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2 group">
-                                <label class="text-xs font-bold text-neutral-400 uppercase tracking-widest">{{
+                                <label class="text-xs font-bold text-neutral-400 uppercase tracking-widest required-mark">{{
                                     'AUTH.REGISTER.PHONE' | translate }}</label>
                                 <input type="text" formControlName="phone_number"
                                     class="w-full bg-[#1e1e20] border-b-2 border-[#333] px-4 py-3 text-white placeholder-neutral-600 focus:outline-none focus:border-gold-500 focus:bg-[#252528] transition-all duration-300 rounded-t-lg text-sm font-medium"
                                     placeholder="1234567890">
+                                <app-validation [control]="registerForm.controls['phone_number']" label="Mobile number" />
                             </div>
                             <div class="space-y-2 group">
-                                <label class="text-xs font-bold text-neutral-400 uppercase tracking-widest">{{
+                                <label class="text-xs font-bold text-neutral-400 uppercase tracking-widest required-mark">{{
                                     'AUTH.REGISTER.EMAIL' | translate }}</label>
                                 <input type="email" formControlName="email"
                                     class="w-full bg-[#1e1e20] border-b-2 border-[#333] px-4 py-3 text-white placeholder-neutral-600 focus:outline-none focus:border-gold-500 focus:bg-[#252528] transition-all duration-300 rounded-t-lg text-sm font-medium"
                                     placeholder="admin@org.com">
+                                <app-validation [control]="registerForm.controls['email']" label="Email" />
                             </div>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2 group">
-                                <label class="text-xs font-bold text-neutral-400 uppercase tracking-widest">{{
+                                <label class="text-xs font-bold text-neutral-400 uppercase tracking-widest required-mark">{{
                                     'AUTH.REGISTER.PASSWORD' | translate }}</label>
                                 <div class="relative">
                                     <input [type]="showPassword() ? 'text' : 'password'" formControlName="password"
@@ -167,14 +171,15 @@
                                         </svg>
                                     </button>
                                 </div>
+                                <app-validation [control]="registerForm.controls['password']" label="Password" />
                             </div>
                             <div class="space-y-2 group">
-                                <label class="text-xs font-bold text-neutral-400 uppercase tracking-widest">{{
+                                <label class="text-xs font-bold text-neutral-400 uppercase tracking-widest required-mark">{{
                                     'AUTH.REGISTER.CONFIRM_PASSWORD' | translate }}</label>
                                 <div class="relative">
                                     <input [type]="showConfirmPassword() ? 'text' : 'password'" formControlName="confirmPassword"
                                         class="w-full bg-[#1e1e20] border-b-2 border-[#333] px-4 py-3 pr-10 text-white placeholder-neutral-600 focus:outline-none focus:border-gold-500 focus:bg-[#252528] transition-all duration-300 rounded-t-lg text-sm font-medium"
-                                        [class.border-red-500]="registerForm.get('confirmPassword')?.touched && registerForm.hasError('mismatch', 'confirmPassword')"
+                                        [class.border-red-500]="registerForm.get('confirmPassword')?.touched && registerForm.get('confirmPassword')?.invalid"
                                         placeholder="••••••••">
                                     <button type="button" (click)="showConfirmPassword.set(!showConfirmPassword())"
                                         class="absolute right-3 top-3 text-neutral-600 hover:text-gold-500 transition-colors focus:outline-none">
@@ -191,11 +196,7 @@
                             </div>
                         </div>
 
-                        @if (registerForm.get('confirmPassword')?.touched && registerForm.hasError('mismatch',
-                        'confirmPassword')) {
-                        <p class="text-[10px] font-bold text-red-400 -mt-2">{{ 'AUTH.REGISTER.PASSWORDS_MISMATCH' |
-                            translate }}</p>
-                        }
+                        <app-validation [control]="registerForm.controls['confirmPassword']" label="Confirm password" />
 
                         <!-- Terms -->
                         <div class="flex items-start gap-3 py-2 group cursor-pointer">
@@ -213,6 +214,7 @@
                                     'AUTH.REGISTER.PRIVACY_POLICY' | translate }}</a>.
                             </label>
                         </div>
+                        <app-validation [control]="registerForm.controls['agreeTerms']" label="Terms agreement" />
 
                         <!-- Feedback -->
                         @if (errorMessage) {
@@ -227,7 +229,7 @@
                         }
 
                         <!-- Submit -->
-                        <button type="submit" [disabled]="registerForm.invalid || isLoading"
+                        <button type="submit" [disabled]="isLoading"
                             class="group w-full relative overflow-hidden py-4 bg-white hover:bg-gold-500 text-black font-black text-sm uppercase tracking-[0.15em] rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(234,179,8,0.4)] transform active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:shadow-none mt-2 border border-white/10">
                             <div
                                 class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:animate-[shimmer_1s_infinite]">

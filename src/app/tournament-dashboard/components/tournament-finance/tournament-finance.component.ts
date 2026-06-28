@@ -1,22 +1,46 @@
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { FormsModule, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
+import { ValidationComponent } from '../../../shared/components/validation/validation.component';
 
 @Component({
     selector: 'app-tournament-finance',
     standalone: true,
-    imports: [CommonModule, FormsModule, TranslateModule],
+    // FormsModule kept for the prize-distribution array (ngModel); ReactiveForms for the validated income card.
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslateModule, ValidationComponent],
     templateUrl: './tournament-finance.component.html'
 })
-export class TournamentFinanceComponent implements OnInit {
-    private translate = inject(TranslateService);
+export class TournamentFinanceComponent implements OnInit, OnChanges {
     @Input() data!: any;
+    @Output() formReady = new EventEmitter<FormGroup>();
+
+    private fb = inject(FormBuilder);
+    form!: FormGroup;
 
     ngOnInit() {
         if (!this.data.prizeDistribution) {
             this.data.prizeDistribution = [0, 0, 0];
         }
+        this.buildForm();
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes['data'] && this.data) {
+            if (!this.data.prizeDistribution) this.data.prizeDistribution = [0, 0, 0];
+            this.buildForm();
+        }
+    }
+
+    private buildForm() {
+        if (!this.data) return;
+        this.form = this.fb.group({
+            regFee: [this.data.regFee ?? 0, [Validators.required, Validators.min(0)]],
+            paymentMethod: [this.data.paymentMethod || 'bank'],
+            paymentInfo: [this.data.paymentInfo || '', [Validators.maxLength(1000)]]
+        });
+        this.form.valueChanges.subscribe(val => Object.assign(this.data, val));
+        this.formReady.emit(this.form);
     }
     
     getTotalDistribution(): number {

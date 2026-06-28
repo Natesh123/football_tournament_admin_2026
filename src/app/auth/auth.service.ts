@@ -56,6 +56,16 @@ export class AuthService {
         return this.http.post(`${this.baseUrl}/resend-otp`, data);
     }
 
+    /** Request a password-reset email containing a tokenized link. */
+    forgotPassword(email: string) {
+        return this.http.post(`${this.baseUrl}/forgot-password`, { email });
+    }
+
+    /** Set a new password using the token from the reset-link email. */
+    resetPassword(token: string, newPassword: string) {
+        return this.http.post(`${this.baseUrl}/reset-password`, { token, newPassword });
+    }
+
     setAuthenticatedUser(user: any, token: string) {
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user));

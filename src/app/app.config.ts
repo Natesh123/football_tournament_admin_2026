@@ -6,6 +6,7 @@ import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { errorInterceptor } from './core/interceptors/error.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -13,7 +14,9 @@ export const appConfig: ApplicationConfig = {
     // Preload all lazy routes in the background after the initial view renders,
     // so subsequent navigations are instant instead of waiting on a chunk fetch.
     provideRouter(routes, withPreloading(PreloadAllModules)),
-    provideHttpClient(withInterceptors([authInterceptor])),
+    // authInterceptor runs first (owns 401 + token); errorInterceptor surfaces
+    // toasts for all other transport/server errors.
+    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
     provideTranslateService({
       defaultLanguage: 'en',
       fallbackLang: 'en'

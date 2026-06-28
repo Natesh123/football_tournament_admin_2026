@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { API_URL } from '../core/config/app.config';
+import { SKIP_ERROR_TOAST } from '../core/interceptors/error.interceptor';
 
 export interface TournamentDTO {
     id?: string;
@@ -71,8 +72,16 @@ export class TournamentService {
         return this.http.delete<void>(`${this.baseUrl}/${id}`);
     }
 
-    generateStructure(id: string, scheduleConfig?: any): Observable<any> {
-        return this.http.post<ApiResponse<any>>(`${this.baseUrl}/${id}/generate-structure`, scheduleConfig || {}).pipe(
+    /** Finalize tournament setup → server validates completeness and sets status to registration_open. */
+    submit(id: string): Observable<TournamentDTO> {
+        return this.http.post<ApiResponse<TournamentDTO>>(`${this.baseUrl}/${id}/submit`, {}).pipe(
+            map(res => res.data)
+        );
+    }
+
+    generateStructure(id: string, scheduleConfig?: any, silentErrors = false): Observable<any> {
+        const context = silentErrors ? new HttpContext().set(SKIP_ERROR_TOAST, true) : undefined;
+        return this.http.post<ApiResponse<any>>(`${this.baseUrl}/${id}/generate-structure`, scheduleConfig || {}, { context }).pipe(
             map(res => res.data)
         );
     }
