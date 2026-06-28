@@ -1,11 +1,13 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TournamentService, TournamentDTO } from '../tournament/tournament.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { revealAndFocusInvalid } from '../shared/utils/form.util';
 
 import { TournamentGeneralComponent } from './components/tournament-general/tournament-general.component';
+import { TournamentOrganizerComponent } from './components/tournament-organizer/tournament-organizer.component';
 import { TournamentParticipantsComponent } from './components/tournament-participants/tournament-participants.component';
 import { TournamentFormatComponent } from './components/tournament-format/tournament-format.component';
 import { TournamentScheduleComponent } from './components/tournament-schedule/tournament-schedule.component';
@@ -17,6 +19,7 @@ import { TournamentResultsComponent } from './components/tournament-results/tour
 import { TournamentTeamsComponent } from './components/tournament-teams/tournament-teams.component';
 import { TournamentMatchesComponent } from './components/tournament-matches/tournament-matches.component';
 import { TournamentSponsorsComponent } from './components/tournament-sponsors/tournament-sponsors.component';
+import { TournamentStatusComponent } from './components/tournament-status/tournament-status.component';
 import { LoaderComponent } from '../components/loader/loader.component';
 
 import { UiService } from '../services/ui.service';
@@ -123,6 +126,7 @@ export interface TournamentSettings {
         CommonModule,
         FormsModule,
         TournamentGeneralComponent,
+        TournamentOrganizerComponent,
         TournamentParticipantsComponent,
         TournamentFormatComponent,
         TournamentScheduleComponent,
@@ -134,6 +138,7 @@ export interface TournamentSettings {
         TournamentTeamsComponent,
         TournamentMatchesComponent,
         TournamentSponsorsComponent,
+        TournamentStatusComponent,
         LoaderComponent,
         TranslateModule
     ],
@@ -153,22 +158,94 @@ export class TournamentDashboardComponent implements OnInit {
     formatChanged = false;
     showValidationErrors = signal(false);
 
+    /** The reactive FormGroup of the currently-mounted migrated tab (null for non-form tabs). */
+    activeForm = signal<FormGroup | null>(null);
+
     settings: TournamentSettings = this.getDefaultSettings();
 
-    sidebarItems = [
-        { id: 'general', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.GENERAL', icon: 'settings' },
-        { id: 'participants', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.PARTICIPANTS', icon: 'users' },
-        { id: 'format', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.FORMAT', icon: 'grid' },
-        { id: 'teams', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.TEAMS', icon: 'shield' },
-        { id: 'rules', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.RULES', icon: 'scale-balanced' },
-        { id: 'venues', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.VENUES', icon: 'map-pin' },
-        { id: 'schedule', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.SCHEDULE', icon: 'calendar' },
-        { id: 'matches', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.MATCHES', icon: 'list' },
-        { id: 'finance', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.FINANCE', icon: 'coins' },
-        { id: 'presentation', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.PRESENTATION', icon: 'monitor' },
-        { id: 'sponsors', label: 'Sponsors', icon: 'list' },
-        { id: 'results', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.RESULTS', icon: 'bar-chart' }
+    // Wizard steps in display order. `gated` steps must be completed sequentially;
+    // non-gated (runtime) steps unlock once all gated steps are complete.
+    wizardTabs = [
+        { id: 'general', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.GENERAL', icon: 'settings', gated: true },
+        { id: 'organizer', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.ORGANIZER', icon: 'user', gated: true },
+        { id: 'participants', label: 'TOURNAMENT_DASHBOARD.WIZARD.PARTICIPATION', icon: 'users', gated: true },
+        { id: 'rules', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.RULES', icon: 'scale-balanced', gated: true },
+        { id: 'venues', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.VENUES', icon: 'map-pin', gated: true },
+        { id: 'format', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.FORMAT', icon: 'grid', gated: true },
+        { id: 'finance', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.FINANCE', icon: 'coins', gated: true },
+        { id: 'sponsors', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.SPONSORS', icon: 'list', gated: false },
+        { id: 'teams', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.TEAMS', icon: 'shield', gated: false },
+        { id: 'schedule', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.SCHEDULE', icon: 'calendar', gated: false },
+        { id: 'matches', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.MATCHES', icon: 'list', gated: false },
+        { id: 'presentation', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.PRESENTATION', icon: 'monitor', gated: false },
+        { id: 'status', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.STATUS', icon: 'flag', gated: false },
+        { id: 'results', label: 'TOURNAMENT_DASHBOARD.SIDEBAR.RESULTS', icon: 'bar-chart', gated: false }
     ];
+
+    /** Ordered ids of the gated setup steps (drives sequential locking + submit validation). */
+    private gatedOrder = ['general', 'organizer', 'participants', 'rules', 'venues', 'format', 'finance'];
+
+    /** Per-step completion predicates evaluated from `settings` (mount-independent). */
+    private completionRules: Record<string, (s: TournamentSettings) => boolean> = {
+        general: s => !!s.general.name?.trim() && !!s.general.type,
+        organizer: s => !!s.general.organizer?.name?.trim()
+            && !!s.general.organizer?.email?.trim()
+            && !!s.general.organizer?.phone?.trim(),
+        participants: s => s.participants.minTeams > 0 && s.participants.maxTeams >= s.participants.minTeams
+            && !!s.participants.regOpenDate && !!s.participants.regCloseDate,
+        rules: () => true,
+        venues: s => !!s.venues.primaryVenue?.trim(),
+        format: s => !!s.format.type,
+        finance: s => s.finance.regFee >= 0
+    };
+
+    // ── Wizard completion / gating ──────────────────────────────────────────
+    isComplete(tabId: string): boolean {
+        const rule = this.completionRules[tabId];
+        return rule ? rule(this.settings) : true;
+    }
+
+    private allGatedComplete(): boolean {
+        return this.gatedOrder.every(id => this.isComplete(id));
+    }
+
+    /** A step is locked when a required predecessor is incomplete. */
+    isLocked(tabId: string): boolean {
+        const tab = this.wizardTabs.find(t => t.id === tabId);
+        if (!tab) return false;
+        if (!tab.gated) return !this.allGatedComplete();
+        const idx = this.gatedOrder.indexOf(tabId);
+        for (let i = 0; i < idx; i++) {
+            if (!this.isComplete(this.gatedOrder[i])) return true;
+        }
+        return false;
+    }
+
+    /** Visual state for the stepper. */
+    tabState(tabId: string): 'active' | 'complete' | 'locked' | 'pending' {
+        if (this.activeTab() === tabId) return 'active';
+        if (this.isLocked(tabId)) return 'locked';
+        if (this.isComplete(tabId)) return 'complete';
+        return 'pending';
+    }
+
+    private firstIncompleteGatedLabel(): string {
+        const id = this.gatedOrder.find(g => !this.isComplete(g));
+        const tab = this.wizardTabs.find(t => t.id === id);
+        return tab ? this.translate.instant(tab.label) : '';
+    }
+
+    /** Stepper click handler — blocks navigation to a locked step with a message. */
+    goToTab(tabId: string) {
+        if (this.isLocked(tabId)) {
+            this.ui.showToast(
+                this.translate.instant('TOURNAMENT_DASHBOARD.WIZARD.LOCKED_MSG', { section: this.firstIncompleteGatedLabel() }),
+                'error'
+            );
+            return;
+        }
+        this.setTab(tabId);
+    }
 
     ngOnInit() {
         this.route.paramMap.subscribe(params => {
@@ -181,43 +258,8 @@ export class TournamentDashboardComponent implements OnInit {
         });
     }
 
-    setActiveTab(tabId: string, skipSave = false) {
-        if (skipSave) {
-            this.setTab(tabId);
-            return;
-        }
-
-        // Enforce validation before allowing tab switch
-        if (!this.settings.general.name || !this.settings.general.type || !this.settings.schedule.startDate || !this.settings.schedule.endDate) {
-            this.showValidationErrors.set(true);
-            this.ui.showToast('Please fill all mandatory fields before proceeding.', 'error');
-
-            // Stay on or navigate to the tab with missing fields
-            if (!this.settings.general.name || !this.settings.general.type) {
-                if (this.activeTab() !== 'general') this.setTab('general');
-            } else if (!this.settings.schedule.startDate || !this.settings.schedule.endDate) {
-                if (this.activeTab() !== 'schedule') this.setTab('schedule');
-            }
-            return; // Prevent navigating to the requested tab
-        }
-
-        // Connected data: matches are scheduled at the tournament venue,
-        // so venue details must exist before the schedule can be configured.
-        if (tabId === 'schedule' && !this.hasVenueDetails()) {
-            this.showValidationErrors.set(true);
-            this.ui.showToast('TOURNAMENT_DASHBOARD.SCHEDULE.ERR_VENUE_REQUIRED', 'error');
-            this.saveChanges(true);
-            this.setTab('venues');
-            return;
-        }
-
-        this.showValidationErrors.set(false);
-        this.syncRegFee();
-
-        // Auto-save changes silently in the background
-        this.saveChanges(true);
-
-        // Switch immediately for a smooth UX
+    /** Low-level tab switch used by the save error-jump. No auto-save. */
+    setActiveTab(tabId: string, _skipSave = false) {
         this.setTab(tabId);
     }
 
@@ -342,17 +384,14 @@ export class TournamentDashboardComponent implements OnInit {
         this.tournamentService.getById(id).subscribe({
             next: (tournament) => {
                 this.tournament.set(tournament);
-                const hadMissingDefaults = this.mergeTournamentToSettings(tournament);
+                this.mergeTournamentToSettings(tournament);
                 this.isLoading.set(false);
                 // Honour a deep-linked tab now that settings are loaded.
-                if (this.pendingTab && this.sidebarItems.some(t => t.id === this.pendingTab)) {
+                if (this.pendingTab && this.wizardTabs.some(t => t.id === this.pendingTab)) {
                     this.setTab(this.pendingTab);
                     this.pendingTab = undefined;
                 }
-                // Auto-save if we had to inject default values so the DB is consistent
-                if (hadMissingDefaults) {
-                    this.saveChanges(true);
-                }
+                // No auto-save: changes persist only when the user clicks Save / Save & Next.
             },
             error: (err) => {
                 this.isLoading.set(false);
@@ -486,11 +525,103 @@ export class TournamentDashboardComponent implements OnInit {
     }
 
     setTab(tab: string) {
+        // Reset the active form reference; the newly-mounted migrated tab (if any) re-emits via (formReady).
+        this.activeForm.set(null);
         this.activeTab.set(tab);
         if (tab === 'format' && this.settings.format) {
             // Force a new object reference so ngOnChanges fires in the child component
             this.settings.format = { ...this.settings.format };
         }
+    }
+
+    /** A migrated reactive tab reports its FormGroup so the wizard can validate it on Save. */
+    onActiveForm(form: FormGroup) {
+        this.activeForm.set(form);
+    }
+
+    isResultsTab(): boolean {
+        return this.activeTab() === 'results';
+    }
+
+    activeStepNumber(): number {
+        return this.wizardTabs.findIndex(t => t.id === this.activeTab()) + 1;
+    }
+
+    /** Index helper for "Save & Next" navigation. */
+    private nextTabId(): string | null {
+        const idx = this.wizardTabs.findIndex(t => t.id === this.activeTab());
+        const next = this.wizardTabs[idx + 1];
+        return next ? next.id : null;
+    }
+
+    isFirstTab(): boolean {
+        return this.activeTab() === this.wizardTabs[0].id;
+    }
+
+    /** Go back one step without saving (previous steps are already complete). */
+    goPrevious() {
+        const idx = this.wizardTabs.findIndex(t => t.id === this.activeTab());
+        const prev = this.wizardTabs[idx - 1];
+        if (prev) this.setTab(prev.id);
+    }
+
+    /**
+     * Save handler for the footer buttons.
+     * Validates the active tab's reactive form (if any) before persisting; on success
+     * optionally advances to the next step.
+     */
+    saveCurrent(goNext: boolean) {
+        const form = this.activeForm();
+        if (form && !revealAndFocusInvalid(form)) {
+            // revealAndFocusInvalid already surfaced <app-validation> messages + focused the field.
+            this.ui.showToast(this.translate.instant('TOURNAMENT_DASHBOARD.WIZARD.FIX_FIELDS'), 'error');
+            return;
+        }
+
+        this.saveChanges(false, () => {
+            if (goNext) {
+                const next = this.nextTabId();
+                if (next && !this.isLocked(next)) this.setTab(next);
+            }
+        });
+    }
+
+    /** Final-step action: validate all gated steps, confirm, then submit. */
+    async submitTournament() {
+        if (!this.allGatedComplete()) {
+            this.ui.showToast(
+                this.translate.instant('TOURNAMENT_DASHBOARD.WIZARD.LOCKED_MSG', { section: this.firstIncompleteGatedLabel() }),
+                'error'
+            );
+            const firstIncomplete = this.gatedOrder.find(g => !this.isComplete(g));
+            if (firstIncomplete) this.setTab(firstIncomplete);
+            return;
+        }
+
+        const confirmed = await this.ui.confirmAction(
+            this.translate.instant('TOURNAMENT_DASHBOARD.WIZARD.SUBMIT_CONFIRM_TITLE'),
+            this.translate.instant('TOURNAMENT_DASHBOARD.WIZARD.SUBMIT_CONFIRM_MSG'),
+            this.translate.instant('TOURNAMENT_DASHBOARD.WIZARD.SUBMIT')
+        );
+        if (!confirmed) return;
+
+        const t = this.tournament();
+        if (!t || !t.id) return;
+
+        this.ui.startAction();
+        this.tournamentService.submit(t.id).subscribe({
+            next: (updated) => {
+                this.ui.endAction();
+                this.tournament.set(updated);
+                this.settings.general.status = updated.status;
+                this.showToast('TOURNAMENT_DASHBOARD.WIZARD.SUBMIT_SUCCESS', 'success');
+                this.router.navigate(['/admin/tournaments']);
+            },
+            error: () => {
+                // The global error interceptor surfaces the server's "missing sections" message.
+                this.ui.endAction();
+            }
+        });
     }
 
     handleSettingsUpdate(key: keyof TournamentSettings, data: any) {
@@ -525,7 +656,7 @@ export class TournamentDashboardComponent implements OnInit {
         this.formatChanged = true;
     }
 
-    saveChanges(silent: boolean = false) {
+    saveChanges(silent: boolean = false, onSuccess?: () => void) {
         const t = this.tournament();
         if (!t || !t.id) return;
 
@@ -585,28 +716,23 @@ export class TournamentDashboardComponent implements OnInit {
             next: (updated) => {
                 this.tournament.set(updated);
 
-                // If format changed, also let's generate the structure
+                // The tournament data is now saved. If the format changed, also try to
+                // (re)generate the structure — but this is best-effort: it legitimately
+                // fails until there are ≥2 approved teams, so we suppress that error and
+                // let it regenerate automatically on a later save once teams exist.
                 if (this.formatChanged && t.id) {
-                    this.tournamentService.generateStructure(t.id).subscribe({
+                    this.tournamentService.generateStructure(t.id, undefined, true).subscribe({
                         next: () => {
                             this.formatChanged = false;
-                            if (!silent) {
-                                this.ui.endAction();
-                                this.showToast('TOURNAMENT_DASHBOARD.TOAST.STRUCTURE_SUCCESS', 'success');
-                            }
+                            this.finishSave(silent, onSuccess, 'TOURNAMENT_DASHBOARD.TOAST.STRUCTURE_SUCCESS');
                         },
-                        error: (err) => {
-                            if (!silent) {
-                                this.ui.endAction();
-                                this.showToast(err?.error?.message || 'TOURNAMENT_DASHBOARD.TOAST.STRUCTURE_ERROR', 'error');
-                            }
+                        error: () => {
+                            // Structure not ready yet (e.g. needs teams) — the save still succeeded.
+                            this.finishSave(silent, onSuccess, 'TOURNAMENT_DASHBOARD.TOAST.SAVE_SUCCESS');
                         }
                     });
                 } else {
-                    if (!silent) {
-                        this.ui.endAction();
-                        this.showToast('TOURNAMENT_DASHBOARD.TOAST.SAVE_SUCCESS', 'success');
-                    }
+                    this.finishSave(silent, onSuccess, 'TOURNAMENT_DASHBOARD.TOAST.SAVE_SUCCESS');
                 }
             },
             error: (err) => {
@@ -618,6 +744,15 @@ export class TournamentDashboardComponent implements OnInit {
         });
     }
 
+    /** Common save-completion: stop the loader, toast success, and advance if requested. */
+    private finishSave(silent: boolean, onSuccess: (() => void) | undefined, successKey: string) {
+        if (!silent) {
+            this.ui.endAction();
+            this.showToast(successKey, 'success');
+        }
+        onSuccess?.();
+    }
+
     closeDashboard() {
         this.router.navigate(['/admin/tournaments']);
     }
@@ -627,7 +762,10 @@ export class TournamentDashboardComponent implements OnInit {
     }
 
     showToast(key: string, type: 'success' | 'error' | 'info' = 'success') {
-        this.ui.showToast(key, type);
+        // `key` is an i18n key (e.g. TOURNAMENT_DASHBOARD.TOAST.SAVE_SUCCESS). Resolve it
+        // before display; if it's already plain text (e.g. a server error message),
+        // translate.instant returns it unchanged, so this is safe for both cases.
+        this.ui.showToast(this.translate.instant(key), type);
     }
 
     getStatusLabel(status: string): string {

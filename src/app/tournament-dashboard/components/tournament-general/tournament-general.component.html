@@ -1,4 +1,4 @@
-<div class="space-y-8">
+<form [formGroup]="form" class="space-y-8">
     <!-- Page Title -->
     <div>
         <h1 class="text-3xl font-black text-white tracking-tight">{{ 'TOURNAMENT_DASHBOARD.GENERAL.TITLE' | translate }}
@@ -83,27 +83,24 @@
             <!-- Name & Short Name -->
             <div class="space-y-5">
                 <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{
-                        'TOURNAMENT_DASHBOARD.GENERAL.FORM.NAME' | translate }} *</label>
-                    <input type="text" [(ngModel)]="data.name"
-                        class="w-full bg-white/5 border rounded-lg px-4 py-3 text-white focus:outline-none transition-all"
-                        [ngClass]="showValidationErrors && !data.name ? 'border-red-500 ring-1 ring-red-500/50 focus:border-red-500 focus:ring-red-500/50' : 'border-black-border focus:border-gold-400 focus:ring-1 focus:ring-gold-400/50'" />
-                    @if (showValidationErrors && !data.name) {
-                    <p class="text-xs text-red-500 mt-1.5 font-bold">{{ 'COMMON.REQUIRED_FIELD' | translate }}</p>
-                    }
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block required-mark">{{
+                        'TOURNAMENT_DASHBOARD.GENERAL.FORM.NAME' | translate }}</label>
+                    <input type="text" formControlName="name"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:ring-1 focus:ring-gold-400/50 focus:outline-none transition-all" />
+                    <app-validation [control]="form.controls['name']" label="Tournament name" />
                 </div>
                 <div>
                     <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{
                         'TOURNAMENT_DASHBOARD.GENERAL.FORM.SHORT_NAME' | translate }}</label>
-                    <input type="text" [(ngModel)]="data.shortName"
+                    <input type="text" formControlName="shortName"
                         class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all" />
+                    <app-validation [control]="form.controls['shortName']" label="Short name" />
                 </div>
                 <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{
-                        'TOURNAMENT_DASHBOARD.GENERAL.FORM.TYPE' | translate }} *</label>
-                    <select [(ngModel)]="selectedType"
-                        class="w-full bg-white/5 border rounded-lg px-4 py-3 text-white focus:outline-none transition-all"
-                        [ngClass]="showValidationErrors && !data.type ? 'border-red-500 ring-1 ring-red-500/50 focus:border-red-500 focus:ring-red-500/50' : 'border-black-border focus:border-gold-400 focus:ring-1 focus:ring-gold-400/50'">
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block required-mark">{{
+                        'TOURNAMENT_DASHBOARD.GENERAL.FORM.TYPE' | translate }}</label>
+                    <select formControlName="type"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:ring-1 focus:ring-gold-400/50 focus:outline-none transition-all">
                         <option value="futsal" class="bg-black-card">{{ 'TOURNAMENT_DASHBOARD.GENERAL.TYPES.FUTSAL' |
                             translate }}</option>
                         <option value="7aside" class="bg-black-card">{{ 'TOURNAMENT_DASHBOARD.GENERAL.TYPES.7ASIDE' |
@@ -113,9 +110,7 @@
                         <option value="custom" class="bg-black-card">{{ 'TOURNAMENT_DASHBOARD.GENERAL.TYPES.CUSTOM' |
                             translate }}</option>
                     </select>
-                    @if (showValidationErrors && !data.type) {
-                    <p class="text-xs text-red-500 mt-1.5 font-bold">{{ 'COMMON.REQUIRED_FIELD' | translate }}</p>
-                    }
+                    <app-validation [control]="form.controls['type']" label="Tournament type" />
                 </div>
             </div>
 
@@ -124,87 +119,12 @@
                 <div>
                     <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{
                         'TOURNAMENT_DASHBOARD.GENERAL.FORM.DESCRIPTION' | translate }}</label>
-                    <textarea [(ngModel)]="data.description" rows="5"
+                    <textarea formControlName="description" rows="5"
                         class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all resize-none"></textarea>
+                    <app-validation [control]="form.controls['description']" label="Description" />
                 </div>
 
             </div>
         </div>
     </div>
-
-    <!-- Organizer Card -->
-    <div class="bg-black-card border border-black-border rounded-xl p-6">
-        <h2 class="text-lg font-bold text-white mb-6">{{ 'TOURNAMENT_DASHBOARD.GENERAL.FORM.ORGANIZER_DETAILS' |
-            translate }}</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1 block">{{
-                    'TOURNAMENT_DASHBOARD.GENERAL.FORM.ORG_NAME' | translate }}</label>
-                <input type="text" [(ngModel)]="data.organizer.name"
-                    [placeholder]="'TOURNAMENT_DASHBOARD.GENERAL.PLACEHOLDERS.ORG_NAME' | translate"
-                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-2.5 text-sm text-white focus:border-gold-400 focus:outline-none transition-all" />
-            </div>
-            <div>
-                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1 block">{{
-                    'TOURNAMENT_DASHBOARD.GENERAL.FORM.ORG_EMAIL' | translate }}</label>
-                <input type="email" [(ngModel)]="data.organizer.email"
-                    [placeholder]="'TOURNAMENT_DASHBOARD.GENERAL.PLACEHOLDERS.ORG_EMAIL' | translate"
-                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-2.5 text-sm text-white focus:border-gold-400 focus:outline-none transition-all" />
-            </div>
-            <div>
-                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1 block">{{
-                    'TOURNAMENT_DASHBOARD.GENERAL.FORM.ORG_PHONE' | translate }}</label>
-                <input type="tel" [(ngModel)]="data.organizer.phone"
-                    [placeholder]="'TOURNAMENT_DASHBOARD.GENERAL.PLACEHOLDERS.ORG_PHONE' | translate"
-                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-2.5 text-sm text-white focus:border-gold-400 focus:outline-none transition-all" />
-            </div>
-            <div>
-                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1 block">{{
-                    'TOURNAMENT_DASHBOARD.GENERAL.FORM.ORG_WEBSITE' | translate }}</label>
-                <input type="url" [(ngModel)]="data.organizer.website"
-                    [placeholder]="'TOURNAMENT_DASHBOARD.GENERAL.PLACEHOLDERS.ORG_WEBSITE' | translate"
-                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-2.5 text-sm text-white focus:border-gold-400 focus:outline-none transition-all" />
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Control Card -->
-    <div class="bg-black-card border border-black-border rounded-xl p-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{
-                    'TOURNAMENT_DASHBOARD.GENERAL.FORM.STATUS' | translate }}</label>
-                <select [(ngModel)]="data.status"
-                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all">
-                    <option value="draft" class="bg-black-card">{{ 'TOURNAMENT_DASHBOARD.GENERAL.STATUS.DRAFT' |
-                        translate }}</option>
-                    <option value="registration_open" class="bg-black-card">{{
-                        'TOURNAMENT_DASHBOARD.GENERAL.STATUS.REGISTRATION' | translate }}</option>
-                    <option value="in_progress" class="bg-black-card">{{ 'TOURNAMENT_DASHBOARD.GENERAL.STATUS.LIVE' |
-                        translate }}</option>
-                    <option value="completed" class="bg-black-card">{{ 'TOURNAMENT_DASHBOARD.GENERAL.STATUS.COMPLETED' |
-                        translate }}</option>
-                </select>
-            </div>
-            <div>
-                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{
-                    'TOURNAMENT_DASHBOARD.GENERAL.FORM.VISIBILITY' | translate }}</label>
-                <div class="flex gap-4 mt-2">
-                    <label class="cursor-pointer label flex items-center gap-2">
-                        <input type="radio" name="visibility" value="public" [(ngModel)]="data.visibility"
-                            class="radio border-gold-400 checked:bg-gold-400" />
-                        <span class="label-text text-white">{{ 'TOURNAMENT_DASHBOARD.GENERAL.FORM.PUBLIC' | translate
-                            }}</span>
-                    </label>
-                    <label class="cursor-pointer label flex items-center gap-2">
-                        <input type="radio" name="visibility" value="private" [(ngModel)]="data.visibility"
-                            class="radio border-gold-400 checked:bg-gold-400" />
-                        <span class="label-text text-white">{{ 'TOURNAMENT_DASHBOARD.GENERAL.FORM.PRIVATE' | translate
-                            }}</span>
-                    </label>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+</form>

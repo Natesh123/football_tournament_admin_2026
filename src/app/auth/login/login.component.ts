@@ -5,13 +5,15 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { UiService } from '../../services/ui.service';
+import { ValidationComponent } from '../../shared/components/validation/validation.component';
+import { revealAndFocusInvalid } from '../../shared/utils/form.util';
 
 @Component({
     selector: 'app-login',
     templateUrl: './login.html',
     styleUrl: './login.css',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslateModule]
+    imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslateModule, ValidationComponent]
 })
 export class LoginComponent implements OnInit {
 
@@ -62,11 +64,8 @@ export class LoginComponent implements OnInit {
     }
 
     login() {
-        if (this.loginForm.invalid) {
-            // Mark all fields as touched to show validation errors
-            Object.keys(this.loginForm.controls).forEach(key => {
-                this.loginForm.get(key)?.markAsTouched();
-            });
+        // Reveal all validation messages and focus the first invalid field.
+        if (!revealAndFocusInvalid(this.loginForm)) {
             return;
         }
 

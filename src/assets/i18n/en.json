@@ -571,7 +571,42 @@
       "VENUES": "Venues",
       "FINANCE": "Finance",
       "PRESENTATION": "Presentation",
-      "RESULTS": "Results"
+      "RESULTS": "Results",
+      "SPONSORS": "Sponsors",
+      "ORGANIZER": "Organizer",
+      "STATUS": "Status"
+    },
+    "STATUS_TAB": {
+      "TITLE": "Status & Visibility",
+      "SUBTITLE": "Control the tournament lifecycle status, who can see it, and team approval."
+    },
+    "ORGANIZER": {
+      "TITLE": "Organizer",
+      "SUBTITLE": "Contact details of the person or body running this tournament.",
+      "DETAILS": "Organizer Details",
+      "NAME": "Name",
+      "EMAIL": "Email",
+      "PHONE": "Phone",
+      "WEBSITE": "Website / Link (optional)",
+      "PLACEHOLDERS": {
+        "NAME": "e.g. Elite Sports Fed",
+        "EMAIL": "e.g. contact@sportsfed.com",
+        "PHONE": "e.g. +1 555 123 4567",
+        "WEBSITE": "e.g. https://sportsfed.com"
+      }
+    },
+    "WIZARD": {
+      "PARTICIPATION": "Participation",
+      "SAVE": "Save",
+      "SAVE_NEXT": "Save & Next",
+      "PREVIOUS": "Previous",
+      "SUBMIT": "Submit Tournament",
+      "STEP": "Step",
+      "FIX_FIELDS": "Please fix the highlighted fields before continuing.",
+      "LOCKED_MSG": "You must complete the {{section}} section before proceeding.",
+      "SUBMIT_CONFIRM_TITLE": "Submit Tournament",
+      "SUBMIT_CONFIRM_MSG": "Are you sure you want to submit this tournament? After submission, certain information may become read-only.",
+      "SUBMIT_SUCCESS": "Tournament submitted successfully."
     },
     "HEADER": {
       "MANAGER": "Tournament Manager",
@@ -1013,6 +1048,7 @@
       "ADD_TEAMS_ERROR": "Failed to add existing teams.",
       "CREATE_TEAM_SUCCESS": "New team created and added successfully",
       "CREATE_TEAM_ERROR": "Failed to create new team.",
+      "TEAM_NAME_EXISTS": "A team with this name already exists. Go to the Existing Teams tab and select it, or change the team name.",
       "MAPPING_ERROR": "Created team but failed to add to tournament.",
       "REMOVE_TEAM_SUCCESS": "Team removed from tournament successfully.",
       "REMOVE_TEAM_ERROR": "Failed to remove team.",

@@ -4,13 +4,16 @@ import { TranslateModule } from '@ngx-translate/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../auth.service';
+import { ValidationComponent } from '../../shared/components/validation/validation.component';
+import { CustomValidators } from '../../shared/validators/custom-validators';
+import { revealAndFocusInvalid } from '../../shared/utils/form.util';
 
 @Component({
     selector: 'app-register',
     templateUrl: './register.html',
     styleUrl: './register.css',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslateModule]
+    imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslateModule, ValidationComponent]
 })
 export class RegisterComponent {
 
@@ -30,39 +33,17 @@ export class RegisterComponent {
         this.registerForm = this.fb.group({
             name: ['', [Validators.required]],
             user_name: ['', [Validators.required]],
-            phone_number: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+            phone_number: ['', [Validators.required, CustomValidators.mobile]],
             email: ['', [Validators.required, Validators.email]],
-            password: ['', [Validators.required, Validators.minLength(6)]],
+            password: ['', [Validators.required, CustomValidators.passwordStrength]],
             confirmPassword: ['', [Validators.required]],
             agreeTerms: [false, [Validators.requiredTrue]]
-        }, { validators: this.passwordMatchValidator });
-    }
-
-    passwordMatchValidator(form: FormGroup) {
-        const password = form.get('password');
-        const confirmPassword = form.get('confirmPassword');
-
-        if (!password || !confirmPassword) {
-            return null;
-        }
-
-        if (password.value !== confirmPassword.value) {
-            confirmPassword.setErrors({ ...confirmPassword.errors, mismatch: true });
-        } else {
-            if (confirmPassword.hasError('mismatch')) {
-                const errors = { ...confirmPassword.errors };
-                delete errors['mismatch'];
-                confirmPassword.setErrors(Object.keys(errors).length ? errors : null);
-            }
-        }
-        return null;
+        }, { validators: CustomValidators.matchFields('password', 'confirmPassword') });
     }
 
     submit() {
-        if (this.registerForm.invalid) {
-            Object.keys(this.registerForm.controls).forEach(key => {
-                this.registerForm.get(key)?.markAsTouched();
-            });
+        // Reveal all validation messages and focus the first invalid field.
+        if (!revealAndFocusInvalid(this.registerForm)) {
             return;
         }
 

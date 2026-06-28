@@ -109,7 +109,7 @@
                     <form [formGroup]="loginForm" (ngSubmit)="login()" class="space-y-8">
                         <!-- Email -->
                         <div class="space-y-2 group">
-                            <label class="text-xs font-bold text-neutral-400 uppercase tracking-widest">{{
+                            <label class="text-xs font-bold text-neutral-400 uppercase tracking-widest required-mark">{{
                                 'AUTH.LOGIN.EMAIL_LABEL' | translate }}</label>
                             <div class="relative">
                                 <input type="email" formControlName="email"
@@ -125,20 +125,12 @@
                                     </svg>
                                 </div>
                             </div>
-                            @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
-                                <div class="text-[10px] text-red-500 font-bold uppercase tracking-wider">
-                                    @if (loginForm.get('email')?.errors?.['required']) {
-                                        Email is required.
-                                    } @else if (loginForm.get('email')?.errors?.['email']) {
-                                        Please enter a valid email address.
-                                    }
-                                </div>
-                            }
+                            <app-validation [control]="loginForm.controls['email']" label="Email" />
                         </div>
 
                         <!-- Password -->
                         <div class="space-y-2 group">
-                            <label class="block text-xs font-bold text-neutral-400 uppercase tracking-widest">{{
+                            <label class="block text-xs font-bold text-neutral-400 uppercase tracking-widest required-mark">{{
                                 'AUTH.LOGIN.PASSWORD_LABEL' | translate }}</label>
                             <div class="relative">
                                 <input [type]="showPassword() ? 'text' : 'password'" formControlName="password"
@@ -157,11 +149,7 @@
                                     </svg>
                                 </button>
                             </div>
-                            @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
-                                <div class="text-[10px] text-red-500 font-bold uppercase tracking-wider">
-                                    Password is required.
-                                </div>
-                            }
+                            <app-validation [control]="loginForm.controls['password']" label="Password" />
                             <div class="flex justify-end pt-1">
                                 <a routerLink="/forgot-password"
                                     class="text-[11px] text-gold-500 hover:text-gold-400 transition-colors font-bold uppercase tracking-wider">{{
@@ -192,7 +180,7 @@
                         }
 
                         <!-- Submit -->
-                        <button type="submit" [disabled]="loginForm.invalid || isLoading"
+                        <button type="submit" [disabled]="isLoading"
                             class="group w-full relative overflow-hidden py-4 bg-white hover:bg-gold-500 text-black font-black text-sm uppercase tracking-[0.15em] rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(234,179,8,0.4)] transform active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:shadow-none mt-6 border border-white/10">
                             <div
                                 class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:animate-[shimmer_1s_infinite]">

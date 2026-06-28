@@ -1,8 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, Router, ActivatedRoute } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { API_URL } from '../../core/config/app.config';
+import { AuthService } from '../auth.service';
 
 @Component({
     selector: 'app-reset-password',
@@ -53,16 +52,50 @@ import { API_URL } from '../../core/config/app.config';
 
             <form (ngSubmit)="submit()">
               <div class="mb-5">
-                <label class="block text-sm font-medium text-zinc-400 mb-2">New Password</label>
-                <input type="password" [(ngModel)]="newPassword" name="newPassword" required minlength="8"
-                       placeholder="Minimum 8 characters"
-                       class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-[#D4AF37]/50 focus:bg-[#D4AF37]/5 transition-all">
+                <label class="block text-sm font-medium text-zinc-400 mb-2 required-mark">New Password</label>
+                <div class="relative">
+                  <input [type]="showPassword() ? 'text' : 'password'" [(ngModel)]="newPassword" name="newPassword" required minlength="8"
+                         placeholder="Minimum 8 characters"
+                         class="w-full px-5 py-4 pr-12 bg-white/5 border border-white/10 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-[#D4AF37]/50 focus:bg-[#D4AF37]/5 transition-all">
+                  <button type="button" (click)="showPassword.set(!showPassword())"
+                          [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+                          class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-[#D4AF37] transition-colors focus:outline-none">
+                    @if (!showPassword()) {
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    } @else {
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064-7 9.542-7 1.153 0 2.253.197 3.275.558M16.516 16.516l3.484 3.484M4.221 4.221l15.558 15.558" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                    }
+                  </button>
+                </div>
               </div>
               <div class="mb-8">
-                <label class="block text-sm font-medium text-zinc-400 mb-2">Confirm Password</label>
-                <input type="password" [(ngModel)]="confirmPassword" name="confirmPassword" required
-                       placeholder="Repeat your new password"
-                       class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-[#D4AF37]/50 focus:bg-[#D4AF37]/5 transition-all">
+                <label class="block text-sm font-medium text-zinc-400 mb-2 required-mark">Confirm Password</label>
+                <div class="relative">
+                  <input [type]="showConfirmPassword() ? 'text' : 'password'" [(ngModel)]="confirmPassword" name="confirmPassword" required
+                         placeholder="Repeat your new password"
+                         class="w-full px-5 py-4 pr-12 bg-white/5 border border-white/10 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-[#D4AF37]/50 focus:bg-[#D4AF37]/5 transition-all">
+                  <button type="button" (click)="showConfirmPassword.set(!showConfirmPassword())"
+                          [attr.aria-label]="showConfirmPassword() ? 'Hide password' : 'Show password'"
+                          class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-[#D4AF37] transition-colors focus:outline-none">
+                    @if (!showConfirmPassword()) {
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    } @else {
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064-7 9.542-7 1.153 0 2.253.197 3.275.558M16.516 16.516l3.484 3.484M4.221 4.221l15.558 15.558" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                    }
+                  </button>
+                </div>
               </div>
 
               <button type="submit" [disabled]="loading()"
@@ -83,9 +116,11 @@ export class ResetPasswordComponent implements OnInit {
     loading = signal(false);
     success = signal(false);
     error = signal('');
+    showPassword = signal(false);
+    showConfirmPassword = signal(false);
 
     constructor(
-        private http: HttpClient,
+        private auth: AuthService,
         private route: ActivatedRoute,
         private router: Router
     ) {}
@@ -108,10 +143,7 @@ export class ResetPasswordComponent implements OnInit {
         if (this.loading()) return;
 
         this.loading.set(true);
-        this.http.post(`${API_URL}/api/auth/reset-password`, {
-            token: this.token(),
-            newPassword: this.newPassword
-        }).subscribe({
+        this.auth.resetPassword(this.token(), this.newPassword).subscribe({
             next: () => {
                 this.loading.set(false);
                 this.success.set(true);

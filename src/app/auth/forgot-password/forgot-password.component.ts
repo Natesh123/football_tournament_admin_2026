@@ -1,8 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { API_URL } from '../../core/config/app.config';
+import { AuthService } from '../auth.service';
 
 @Component({
     selector: 'app-forgot-password',
@@ -34,7 +33,7 @@ import { API_URL } from '../../core/config/app.config';
 
             <form (ngSubmit)="submit()">
               <div class="mb-6">
-                <label class="block text-sm font-medium text-zinc-400 mb-2">Email Address</label>
+                <label class="block text-sm font-medium text-zinc-400 mb-2 required-mark">Email Address</label>
                 <input type="email" [(ngModel)]="email" name="email" required
                        placeholder="you@example.com"
                        class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-[#D4AF37]/50 focus:bg-[#D4AF37]/5 transition-all">
@@ -76,14 +75,14 @@ export class ForgotPasswordComponent {
     sent = signal(false);
     error = signal('');
 
-    constructor(private http: HttpClient) {}
+    constructor(private auth: AuthService) {}
 
     submit() {
         if (!this.email || this.loading()) return;
         this.loading.set(true);
         this.error.set('');
 
-        this.http.post(`${API_URL}/api/auth/forgot-password`, { email: this.email }).subscribe({
+        this.auth.forgotPassword(this.email).subscribe({
             next: () => {
                 this.loading.set(false);
                 this.sent.set(true);

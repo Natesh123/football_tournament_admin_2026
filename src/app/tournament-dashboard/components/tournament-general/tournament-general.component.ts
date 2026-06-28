@@ -1,90 +1,65 @@
-import { Component, Input, ChangeDetectorRef, inject, HostListener, ElementRef, ViewChild, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectorRef, inject, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { API_URL } from '../../../core/config/app.config';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
+import { ValidationComponent } from '../../../shared/components/validation/validation.component';
 
 @Component({
     selector: 'app-tournament-general',
     standalone: true,
     imports: [
         CommonModule,
-        FormsModule,
-        TranslateModule
+        ReactiveFormsModule,
+        TranslateModule,
+        ValidationComponent
     ],
     templateUrl: './tournament-general.component.html'
 })
 export class TournamentGeneralComponent implements OnInit, OnChanges {
-    private translate = inject(TranslateService);
     @Input() data: any;
     @Input() showValidationErrors = false;
+    /** Emits the reactive form so the wizard can validate this tab on Save / Save & Next. */
+    @Output() formReady = new EventEmitter<FormGroup>();
+
     private cdr = inject(ChangeDetectorRef);
+    private fb = inject(FormBuilder);
+
+    form!: FormGroup;
+    private validTypes = ['futsal', '7aside', '11aside', 'custom'];
 
     ngOnInit() {
-        this.applyDefaults();
+        this.buildForm();
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        if (changes['data']) {
-            this.applyDefaults();
+        if (changes['data'] && this.data) {
+            this.buildForm();
         }
     }
 
-    private validTypes = ['futsal', '7aside', '11aside', 'custom'];
+    private buildForm() {
+        if (!this.data) return;
+        const type = this.validTypes.includes(this.data.type) ? this.data.type : '11aside';
 
-    private applyDefaults() {
-        if (this.data && !this.validTypes.includes(this.data.type)) {
-            this.data.type = '11aside';
-            this.cdr.markForCheck();
-        }
+        this.form = this.fb.group({
+            name: [this.data.name || '', [Validators.required, Validators.maxLength(80)]],
+            shortName: [this.data.shortName || '', [Validators.maxLength(20)]],
+            type: [type, [Validators.required]],
+            description: [this.data.description || '', [Validators.maxLength(500)]]
+        });
+
+        // Keep the shared settings object in sync so the parent's single save payload stays correct.
+        // (Organizer fields now live in the dedicated Organizer tab.)
+        this.form.valueChanges.subscribe(val => Object.assign(this.data, val));
+
+        // Persist the normalized type back immediately if it was defaulted.
+        if (this.data.type !== type) this.data.type = type;
+
+        this.formReady.emit(this.form);
     }
 
-    get selectedType(): string {
-        return this.validTypes.includes(this.data?.type) ? this.data.type : '11aside';
-    }
-
-    set selectedType(value: string) {
-        if (this.data) {
-            this.data.type = value;
-        }
-    }
-
-    availableSponsors = [
-        'Nike', 'Adidas', 'Puma', 'Under Armour', 'Red Bull',
-        'Qatar Airways', 'Emirates', 'Heineken', 'Coca-Cola',
-        'Pepsi', 'Visa', 'Mastercard', 'Local Partner'
-    ];
-
-    sponsorDropdownOpen = false;
-    sponsorSearchQuery = '';
-
-    @ViewChild('sponsorDropdown') sponsorDropdown!: ElementRef;
-
-    @HostListener('document:click', ['$event'])
-    onClickOutside(event: Event) {
-        if (this.sponsorDropdownOpen && this.sponsorDropdown && !this.sponsorDropdown.nativeElement.contains(event.target)) {
-            this.sponsorDropdownOpen = false;
-            this.cdr.detectChanges();
-        }
-    }
-
-    get filteredSponsors() {
-        if (!this.sponsorSearchQuery) return this.availableSponsors;
-        const q = this.sponsorSearchQuery.toLowerCase();
-        return this.availableSponsors.filter(s => s.toLowerCase().includes(q));
-    }
-
-    toggleSponsor(sponsor: string) {
-        if (!this.data.sponsors) this.data.sponsors = [];
-        const index = this.data.sponsors.indexOf(sponsor);
-        if (index === -1) {
-            this.data.sponsors.push(sponsor);
-        } else {
-            this.data.sponsors.splice(index, 1);
-        }
-        this.cdr.detectChanges();
-    }
-
+    // ── Image upload (kept outside the form; stored directly on `data`) ──────
     onFileSelected(event: any, field: 'logo' | 'coverImage') {
         const input = event.target;
         const file = input.files[0];
@@ -96,15 +71,13 @@ export class TournamentGeneralComponent implements OnInit, OnChanges {
             };
             reader.readAsDataURL(file);
         }
-
-        // Reset the input value so the same file can be selected again if removed
         input.value = '';
     }
 
     removeImage(field: 'logo' | 'coverImage', event: Event) {
         event.stopPropagation();
         this.data[field] = '';
-        this.cdr.detectChanges(); // Required for Zoneless
+        this.cdr.detectChanges();
     }
 
     getImageUrl(path?: string): string {
