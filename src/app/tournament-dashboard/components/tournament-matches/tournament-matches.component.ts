@@ -14,6 +14,7 @@ import { formatLiveClock } from '../../../core/utils/live-clock.util';
 })
 export class TournamentMatchesComponent implements OnInit, OnDestroy {
     @Input() tournamentId!: string;
+    @Input() venues: any = null;
 
     private router = inject(Router);
     private tournamentService = inject(TournamentService);
@@ -21,6 +22,11 @@ export class TournamentMatchesComponent implements OnInit, OnDestroy {
     private translate = inject(TranslateService);
     structure = signal<any>(null);
     isLoading = signal(true);
+    isSavingMatch = signal(false);
+
+    // Connected data for the edit modal (teams + tournament referee pool)
+    availableTeams = signal<{ id: number; name: string }[]>([]);
+    referees = signal<any[]>([]);
 
     activeTab = signal<'upcoming' | 'live' | 'past'>('upcoming');
 
@@ -59,8 +65,60 @@ export class TournamentMatchesComponent implements OnInit, OnDestroy {
     ngOnInit() {
         if (this.tournamentId) {
             this.loadMatches();
+            this.loadTeams();
+            this.loadReferees();
         }
         this.clockTimer = setInterval(() => this.now.set(Date.now()), 1000);
+    }
+
+    loadTeams() {
+        this.tournamentService.getTeams(this.tournamentId).subscribe({
+            next: (regs: any[]) => {
+                const teams = (regs || [])
+                    .filter(r => r.status === 'approved' && r.team)
+                    .map(r => ({ id: r.team.id, name: r.team.name }));
+                this.availableTeams.set(teams);
+            },
+            error: () => { /* non-blocking */ }
+        });
+    }
+
+    loadReferees() {
+        this.tournamentService.getReferees(this.tournamentId).subscribe({
+            next: (list) => this.referees.set(list || []),
+            error: () => { /* non-blocking */ }
+        });
+    }
+
+    // Venue options derived from the tournament's venue setup (same as Schedule tab).
+    get venueOptions(): string[] {
+        const options: string[] = [];
+        const primary = this.venues?.primaryVenue?.trim();
+        if (primary) {
+            options.push(primary);
+            if (this.venues?.multipleVenues && Array.isArray(this.venues?.pitches)) {
+                for (const pitch of this.venues.pitches) {
+                    const name = pitch?.name?.trim();
+                    if (name) options.push(`${primary} - ${name}`);
+                }
+            }
+        }
+        const current = this.editingMatch?.venue?.trim();
+        if (current && !options.includes(current)) options.push(current);
+        return options;
+    }
+
+    // Referee names from the tournament-level pool, used by the 4 referee dropdowns.
+    get refereeOptions(): string[] {
+        const options = this.referees()
+            .map(r => r?.name?.trim())
+            .filter((n): n is string => !!n);
+        const refs = this.editingMatch?.referees;
+        for (const cur of [refs?.main, refs?.assistant1, refs?.assistant2, refs?.fourthOfficial]) {
+            const v = cur?.trim?.();
+            if (v && !options.includes(v)) options.push(v);
+        }
+        return options;
     }
 
     ngOnDestroy() {
@@ -91,7 +149,21 @@ export class TournamentMatchesComponent implements OnInit, OnDestroy {
     openMatchEditor(match: any) {
         this.editingMatch = {
             ...match,
-            matchTime: match.startTime ? new Date(match.startTime).toISOString().slice(0, 16) : ''
+            // Default the match venue to the tournament's primary venue
+            venue: match.venue || this.venues?.primaryVenue?.trim() || '',
+            matchTime: match.startTime ? new Date(match.startTime).toISOString().slice(0, 16) : '',
+            // Structured referee assignment (1 main + 2 assistants + 4th official).
+            // Seed from the saved object, falling back to legacy free text for `main`.
+            referees: {
+                main: match.referees?.main || match.matchReferees || '',
+                assistant1: match.referees?.assistant1 || '',
+                assistant2: match.referees?.assistant2 || '',
+                fourthOfficial: match.referees?.fourthOfficial || ''
+            },
+            homeTeamId: match.homeTeam?.id ?? null,
+            awayTeamId: match.awayTeam?.id ?? null,
+            _origHomeTeamId: match.homeTeam?.id ?? null,
+            _origAwayTeamId: match.awayTeam?.id ?? null
         };
     }
 
@@ -99,34 +171,90 @@ export class TournamentMatchesComponent implements OnInit, OnDestroy {
         this.editingMatch = null;
     }
 
+    // ─── Prev/next navigation within the current tab's match list ────────────
+    get hasPrevMatch(): boolean {
+        if (!this.editingMatch) return false;
+        return this.filteredMatches().findIndex((m: any) => m.id === this.editingMatch.id) > 0;
+    }
+
+    get hasNextMatch(): boolean {
+        if (!this.editingMatch) return false;
+        const list = this.filteredMatches();
+        const idx = list.findIndex((m: any) => m.id === this.editingMatch.id);
+        return idx > -1 && idx < list.length - 1;
+    }
+
+    editPrevMatch() {
+        const list = this.filteredMatches();
+        const idx = list.findIndex((m: any) => m.id === this.editingMatch.id);
+        if (idx > 0) this.openMatchEditor(list[idx - 1]);
+    }
+
+    editNextMatch() {
+        const list = this.filteredMatches();
+        const idx = list.findIndex((m: any) => m.id === this.editingMatch.id);
+        if (idx > -1 && idx < list.length - 1) this.openMatchEditor(list[idx + 1]);
+    }
+
     saveMatchSchedule() {
         if (!this.editingMatch) return;
-        this.ui.startAction();
 
-        const payload = {
-            venue: this.editingMatch.venue,
+        const matchId = this.editingMatch.id;
+        if (!matchId) {
+            this.showToast('TOURNAMENT_DASHBOARD.SCHEDULE.ERR_MATCH_ID', 'error');
+            return;
+        }
+
+        // A scheduled match must have a venue
+        if (!this.editingMatch.venue?.trim()) {
+            this.showToast('TOURNAMENT_DASHBOARD.SCHEDULE.ERR_MATCH_VENUE', 'error');
+            return;
+        }
+
+        this.isSavingMatch.set(true);
+
+        const payload: any = {
+            venue: this.editingMatch.venue ?? null,
             matchTime: this.editingMatch.matchTime || null,
-            breakDuration: this.editingMatch.breakDuration,
-            events: this.editingMatch.events,
-            matchReferees: this.editingMatch.matchReferees
+            breakDuration: this.editingMatch.breakDuration ?? null,
+            events: this.editingMatch.events ?? null,
+            referees: this.editingMatch.referees ?? null,
+            // Keep the legacy free-text field in sync with the main referee.
+            matchReferees: this.editingMatch.referees?.main ?? null
         };
 
-        this.tournamentService.updateMatchSchedule(this.editingMatch.id, payload).subscribe({
-            next: (updatedMatch: any) => {
+        // Only send team assignments when they actually changed, so editing the
+        // time/venue of a finished match doesn't trip the backend's team guard.
+        const normId = (v: any) => (v === '' || v === undefined ? null : v === null ? null : Number(v));
+        const home = normId(this.editingMatch.homeTeamId);
+        const away = normId(this.editingMatch.awayTeamId);
+        if (home !== (this.editingMatch._origHomeTeamId ?? null)) payload.homeTeamId = home;
+        if (away !== (this.editingMatch._origAwayTeamId ?? null)) payload.awayTeamId = away;
+
+        if (payload.homeTeamId !== undefined && payload.awayTeamId !== undefined
+            && payload.homeTeamId !== null && payload.homeTeamId === payload.awayTeamId) {
+            this.showToast('Home and away teams must be different.', 'error');
+            this.isSavingMatch.set(false);
+            return;
+        }
+
+        this.tournamentService.updateMatchSchedule(matchId, payload).subscribe({
+            next: (res: any) => {
+                const updated = res?.data || res;
                 const struct = this.structure();
                 if (struct && struct.matches) {
-                    const idx = struct.matches.findIndex((m: any) => m.id === this.editingMatch.id);
+                    const idx = struct.matches.findIndex((m: any) => m.id === matchId);
                     if (idx !== -1) {
-                        struct.matches[idx] = { ...struct.matches[idx], ...updatedMatch.data };
+                        struct.matches[idx] = { ...struct.matches[idx], ...updated };
                         this.structure.set({ ...struct });
                     }
                 }
-                this.ui.endAction();
+                this.isSavingMatch.set(false);
                 this.showToast('TOURNAMENT_DASHBOARD.TOAST.MATCH_UPDATE_SUCCESS', 'success');
                 this.closeMatchEditor();
             },
             error: (err: any) => {
-                this.ui.endAction();
+                this.isSavingMatch.set(false);
                 this.showToast('TOURNAMENT_DASHBOARD.TOAST.MATCH_UPDATE_ERROR', 'error');
             }
         });

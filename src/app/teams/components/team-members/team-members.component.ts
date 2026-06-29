@@ -1,9 +1,12 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { API_URL } from '../../../core/config/app.config';
 import { TeamMemberService, TeamMember } from '../../team-member.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { UiService } from '../../../services/ui.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-team-members',
@@ -28,9 +31,22 @@ import { TranslateModule } from '@ngx-translate/core';
 })
 export class TeamMembersComponent implements OnInit {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private http = inject(HttpClient);
   private memberService = inject(TeamMemberService);
+  private ui = inject(UiService);
+  private translate = inject(TranslateService);
 
   private teamId = this.route.parent?.snapshot.paramMap.get('id');
+
+  // Tournament context (present when arriving from "Add Team to Tournament").
+  // Lets this page gate a "next step" back into that tournament once the squad is complete.
+  tournamentId = this.route.snapshot.queryParamMap.get('tournamentId');
+  tournamentName = this.route.snapshot.queryParamMap.get('tournamentName') || '';
+
+  /** Minimum squad size required before a team can join — passed from the tournament. */
+  readonly requiredMembers = Number(this.route.snapshot.queryParamMap.get('required')) || 16;
+  isJoining = signal(false);
 
   // State
   members = signal<TeamMember[]>([]);
@@ -38,6 +54,11 @@ export class TeamMembersComponent implements OnInit {
   isSubmitting = signal(false);
   editingMemberId = signal<string | null>(null);
   activeMenuId = signal<string | null>(null);
+
+  /** True when arriving from a tournament's add-team flow. */
+  hasTournamentContext = computed(() => !!this.tournamentId);
+  /** Whether the squad has reached the tournament's minimum member count. */
+  hasEnoughMembers = computed(() => this.members().length >= this.requiredMembers);
 
   // Filters
   searchTerm = signal('');
@@ -155,6 +176,28 @@ export class TeamMembersComponent implements OnInit {
       },
       error: () => {
         this.isSubmitting.set(false);
+      }
+    });
+  }
+
+  /**
+   * Squad is complete — add this team to the originating tournament and return to its
+   * dashboard (Teams tab). The backend enforces the same member minimum, so this only
+   * succeeds once the threshold is met.
+   */
+  goToTournamentNextStep() {
+    if (!this.teamId || !this.tournamentId || !this.hasEnoughMembers()) return;
+
+    this.isJoining.set(true);
+    this.http.post(`${API_URL}/api/tournaments/${this.tournamentId}/teams/${this.teamId}`, {}).subscribe({
+      next: () => {
+        this.isJoining.set(false);
+        this.ui.showToast(this.translate.instant('TEAM_MEMBERS.JOINED_TOURNAMENT'), 'success');
+        this.router.navigate(['/admin/tournaments', this.tournamentId], { queryParams: { tab: 'teams' } });
+      },
+      error: (err) => {
+        this.isJoining.set(false);
+        this.ui.showToast(err?.error?.message || this.translate.instant('TEAM_MEMBERS.JOIN_ERROR'), 'error');
       }
     });
   }

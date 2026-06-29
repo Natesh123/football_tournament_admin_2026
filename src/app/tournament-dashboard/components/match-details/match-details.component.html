@@ -82,7 +82,7 @@
         <div class="max-w-[1500px] mx-auto">
             <!-- Persistent Header: Always visible at the top -->
             <div class="mb-8">
-                <app-match-header [match]="match()" [isLoading]="ui.isLoadingAction()" (addLineup)="openLineupModal()"
+                <app-match-header [match]="match()" [isLoading]="ui.isLoadingAction()" [canStart]="isLineupValid" (addLineup)="openLineupModal()"
                     (startMatch)="handleStartMatch()" (completeMatch)="handleCompleteMatch()">
                 </app-match-header>
             </div>

@@ -18,12 +18,15 @@ export class TournamentSponsorsComponent implements OnInit, OnChanges {
 
   private sponsorService = inject(SponsorService);
   public ui = inject(UiService);
+  private translate = inject(TranslateService);
 
   mappings = signal<TournamentSponsor[]>([]);
   availableSponsors = signal<Sponsor[]>([]);
   isLoading = signal(true);
   isAssignModalOpen = signal(false);
   isCreateModalOpen = signal(false);
+  isEditModalOpen = signal(false);
+  editingSponsor = signal<Sponsor | null>(null);
   selectedSponsorId = signal<number | null>(null);
   
   // Modals
@@ -78,6 +81,23 @@ export class TournamentSponsorsComponent implements OnInit, OnChanges {
     this.isCreateModalOpen.set(true);
   }
 
+  openEditModal(mapping: TournamentSponsor) {
+    if (!mapping?.sponsor) return;
+    this.editingSponsor.set(mapping.sponsor);
+    this.isEditModalOpen.set(true);
+  }
+
+  closeEditModal() {
+    this.isEditModalOpen.set(false);
+    this.editingSponsor.set(null);
+  }
+
+  onSponsorUpdated(_sponsor: Sponsor) {
+    this.closeEditModal();
+    this.loadData();
+    this.ui.showToast('Sponsor updated successfully', 'success');
+  }
+
   onSponsorCreated(sponsor: Sponsor) {
     if (sponsor.id && this.tournamentId) {
       this.ui.startAction();
@@ -121,9 +141,8 @@ export class TournamentSponsorsComponent implements OnInit, OnChanges {
   async removeMapping(mapping: TournamentSponsor) {
     if (!mapping) return;
 
-    const translate = inject(TranslateService);
-    const title = translate.instant('TOURNAMENT_DASHBOARD.SPONSORS.CONFIRM_REMOVE_TITLE');
-    const message = translate.instant('TOURNAMENT_DASHBOARD.SPONSORS.CONFIRM_REMOVE_MSG');
+    const title = this.translate.instant('TOURNAMENT_DASHBOARD.SPONSORS.CONFIRM_REMOVE_TITLE');
+    const message = this.translate.instant('TOURNAMENT_DASHBOARD.SPONSORS.CONFIRM_REMOVE_MSG');
 
     const confirmed = await this.ui.confirmAction(title, message);
 

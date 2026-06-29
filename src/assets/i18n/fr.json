@@ -121,7 +121,13 @@
     "ADD_EVENT": "Ajouter un événement",
     "DELETE_CONFIRM": "Supprimer l'événement",
     "MIN": "min",
-    "CLEAR": "Effacer"
+    "CLEAR": "Effacer",
+    "PENALTY_MISSED": "Penalty manqué",
+    "CONFIGURE": "Configurer",
+    "CURRENTLY_SELECTED": "Actuellement sélectionné",
+    "GENERATING": "Génération en cours…",
+    "REQUIRED_FIELD": "Ce champ est obligatoire",
+    "SELECT_TIME_SLOTS": "Sélectionnez des créneaux horaires"
   },
   "HERO": {
     "TITLE": "Tournoi",
@@ -150,6 +156,9 @@
     "PAST_MATCH": {
       "DETAILS": "Détails",
       "STATUS_FT": "FM"
+    },
+    "HEADER": {
+      "TITLE": "Fil du match"
     }
   },
   "DASHBOARD": {
@@ -220,7 +229,11 @@
       "PRIZE_POOL": "Cagnotte",
       "ROUND": "Tour",
       "SCHEDULE": "Calendrier",
-      "VIEW": "Voir"
+      "VIEW": "Voir",
+      "VENUE": "Lieu",
+      "FORMAT": "Format",
+      "FIRST_PLACE": "1re place",
+      "ENTRY_FEE": "Frais d'inscription"
     },
     "EMPTY": "Aucun tournoi trouvé.",
     "FILTER_STATUSES": {
@@ -264,7 +277,11 @@
     "DELETE_MESSAGE": "Êtes-vous sûr de vouloir supprimer « {{name}} » ? Cette action est irréversible.",
     "DELETED": "Équipe supprimée avec succès",
     "UPDATED": "Équipe mise à jour avec succès",
-    "DELETE_FAILED": "Échec de la suppression de l'équipe"
+    "DELETE_FAILED": "Échec de la suppression de l'équipe",
+    "MODAL": {
+      "FULL_NAME": "Nom complet",
+      "FULL_NAME_PLACEHOLDER": "p. ex. Manchester United"
+    }
   },
   "TEAM_LAYOUT": {
     "TEAM_MANAGER": "Responsable d'Équipe",
@@ -389,7 +406,13 @@
       "EDIT": "Modifier",
       "REMOVE": "Supprimer",
       "VIEW_PROFILE": "Voir Profil"
-    }
+    },
+    "SQUAD_FOR": "Constitution de l'effectif pour « {{ name }} »",
+    "SQUAD_PROGRESS": "{{ count }} / {{ required }} membres",
+    "SQUAD_REMAINING": "Encore {{ remaining }} pour se qualifier",
+    "NEXT_STEP": "Suivant : Ajouter au tournoi",
+    "JOINED_TOURNAMENT": "Équipe ajoutée au tournoi",
+    "JOIN_ERROR": "Impossible d'ajouter l'équipe au tournoi"
   },
   "TEAM_GALLERY": {
     "TITLE": "Galerie",
@@ -570,7 +593,10 @@
       "VENUES": "Sites",
       "FINANCE": "Finances",
       "PRESENTATION": "Présentation",
-      "RESULTS": "Résultats"
+      "RESULTS": "Résultats",
+      "SPONSORS": "Sponsors",
+      "ORGANIZER": "Organisateur",
+      "STATUS": "Statut"
     },
     "HEADER": {
       "MANAGER": "Gestionnaire de tournoi",
@@ -701,7 +727,24 @@
       "SELECT_VENUE": "Sélectionnez un lieu...",
       "VENUE_REQUIRED_TITLE": "Détails du lieu requis",
       "VENUE_REQUIRED_DESC": "Les matchs sont planifiés au lieu du tournoi. Ajoutez les détails du lieu avant de générer le calendrier.",
-      "GO_TO_VENUES": "Ajouter le lieu"
+      "GO_TO_VENUES": "Ajouter le lieu",
+      "REFEREES": {
+        "TITLE": "Arbitres du match",
+        "EMPTY": "Aucun arbitre ajouté pour le moment. Ajoutez les officiels qui géreront les matchs.",
+        "NAME": "Nom de l'arbitre",
+        "ROLE": "Rôle",
+        "PHONE": "Téléphone",
+        "ADD": "Ajouter",
+        "ADDED": "Arbitre ajouté",
+        "REMOVED": "Arbitre supprimé",
+        "ERR_NAME": "Le nom de l'arbitre est requis.",
+        "ERR_ADD": "Impossible d'ajouter l'arbitre.",
+        "ERR_REMOVE": "Impossible de supprimer l'arbitre.",
+        "SELECT_MAIN": "Sélectionner l'arbitre principal",
+        "SELECT_ASSIST1": "Sélectionner l'arbitre assistant 1",
+        "SELECT_ASSIST2": "Sélectionner l'arbitre assistant 2",
+        "SELECT_FOURTH": "Sélectionner le quatrième arbitre"
+      }
     },
     "RULES": {
       "TITLE": "Règles du match",
@@ -905,7 +948,11 @@
       "QUICK_ACTIONS": "Actions rapides",
       "ADD_SELECTED_TEAMS": "Ajouter les équipes sélectionnées",
       "ADD_SELECTED_TEAM": "Ajouter l'équipe sélectionnée",
-      "CREATE_MAP_TEAM": "Créer et associer l'équipe"
+      "CREATE_MAP_TEAM": "Créer et associer l'équipe",
+      "SQUAD_REQUIRED_TITLE": "Effectif requis d'abord",
+      "SQUAD_REQUIRED_MSG": "Équipe créée. Une équipe doit compter au moins {{ min }} membres avant de pouvoir participer au tournoi. Ajoutez l'effectif maintenant pour continuer.",
+      "CREATE_MEMBERS_BTN": "Créer les membres de l'équipe",
+      "CONFIRM_REMOVE": "Êtes-vous sûr de vouloir retirer cette équipe du tournoi ?"
     },
     "MATCHES": {
       "TITLE": "Matchs du tournoi",
@@ -1018,7 +1065,8 @@
       "MAX_TEAMS_REACHED": "Limite maximale d'équipes atteinte. Impossible d'ajouter d'autres équipes.",
       "MAX_TEAMS_EXCEEDED": "L'ajout de ces équipes dépasserait la limite maximale d'équipes.",
       "MATCH_UPDATE_SUCCESS": "Calendrier des matchs mis à jour avec succès !",
-      "MATCH_UPDATE_ERROR": "Échec de la mise à jour du calendrier des matchs."
+      "MATCH_UPDATE_ERROR": "Échec de la mise à jour du calendrier des matchs.",
+      "TEAM_NAME_EXISTS": "Une équipe portant ce nom existe déjà. Accédez à l'onglet Équipes existantes et sélectionnez-la, ou changez le nom de l'équipe."
     },
     "SPONSORS": {
       "TITLE": "Sponsors du tournoi",
@@ -1048,12 +1096,44 @@
       "REMOVE_ERROR": "Échec du retrait du sponsor.",
       "ASSIGN_SUCCESS": "Sponsor attribué avec succès !",
       "ASSIGN_ERROR": "Échec de l'attribution du sponsor."
+    },
+    "STATUS_TAB": {
+      "TITLE": "Statut et visibilité",
+      "SUBTITLE": "Contrôlez le statut du cycle de vie du tournoi, qui peut le voir et l'approbation des équipes."
+    },
+    "ORGANIZER": {
+      "TITLE": "Organisateur",
+      "SUBTITLE": "Coordonnées de la personne ou de l'organisme qui gère ce tournoi.",
+      "DETAILS": "Détails de l'organisateur",
+      "NAME": "Nom",
+      "EMAIL": "E-mail",
+      "PHONE": "Téléphone",
+      "WEBSITE": "Site web / Lien (facultatif)",
+      "PLACEHOLDERS": {
+        "NAME": "p. ex. Elite Sports Fed",
+        "EMAIL": "p. ex. contact@sportsfed.com",
+        "PHONE": "p. ex. +1 555 123 4567",
+        "WEBSITE": "p. ex. https://sportsfed.com"
+      }
+    },
+    "WIZARD": {
+      "PARTICIPATION": "Participation",
+      "SAVE": "Enregistrer",
+      "SAVE_NEXT": "Enregistrer et suivant",
+      "PREVIOUS": "Précédent",
+      "SUBMIT": "Soumettre le tournoi",
+      "STEP": "Étape",
+      "FIX_FIELDS": "Veuillez corriger les champs en surbrillance avant de continuer.",
+      "LOCKED_MSG": "Vous devez compléter la section {{section}} avant de continuer.",
+      "SUBMIT_CONFIRM_TITLE": "Soumettre le tournoi",
+      "SUBMIT_CONFIRM_MSG": "Êtes-vous sûr de vouloir soumettre ce tournoi ? Après la soumission, certaines informations peuvent devenir en lecture seule.",
+      "SUBMIT_SUCCESS": "Tournoi soumis avec succès."
     }
   },
   "MATCH_DETAILS": {
     "ALERTS": {
       "LINEUPS_REQUIRED": "Action requise : compositions du match",
-      "LINEUPS_REQUIRED_DESC": "Les compositions de départ doivent être confirmées ({{ playersOnField }} joueurs chacune) avant de pouvoir commencer le match. Limite de remplaçants : {{ subsLimit }}.",
+      "LINEUPS_REQUIRED_DESC": "Obligatoire : confirmez les compositions de départ ({{ playersOnField }} joueurs chacune, limite de remplaçants {{ subsLimit }}) avant de pouvoir démarrer le match.",
       "LINEUPS_READY": "Compositions confirmées",
       "LINEUPS_READY_DESC": "Les deux équipes ont confirmé leur composition de départ. Vous pouvez maintenant commencer le match."
     },
@@ -1086,7 +1166,8 @@
       "STANDINGS": "Classement",
       "LINEUPS": "Compositions",
       "H2H": "Face-à-face",
-      "EXTRA_TIME": "Prolongation"
+      "EXTRA_TIME": "Prolongation",
+      "PENALTIES": "Penaltys"
     },
     "TIMELINE": {
       "TITLE": "Événements du match",
@@ -1118,7 +1199,10 @@
         "PLACEHOLDER_DETAILS_GENERAL": "ex. type de faute, détails du remplacement",
         "SUBMIT_ADD": "Ajouter un événement",
         "SUBMIT_EDIT": "Enregistrer les modifications",
-        "SUBMITTING": "Enregistrement..."
+        "SUBMITTING": "Enregistrement...",
+        "PENALTY_OUTCOME": "Résultat du penalty",
+        "PENALTY_GOAL": "But",
+        "PENALTY_MISS": "Manqué"
       },
       "ADDED_TIME": "Temps additionnel",
       "PENALTY_SCORED": "Marqué",
@@ -1143,7 +1227,9 @@
       "STARTERS": "Joueurs titulaires",
       "SUBS": "Remplaçants",
       "PLACEHOLDER_VENUE": "ex. Stade principal",
-      "PLACEHOLDER_OFFICIALS": "ex. Jean Dupont, Marie Martin"
+      "PLACEHOLDER_OFFICIALS": "ex. Jean Dupont, Marie Martin",
+      "HOME": "Domicile",
+      "AWAY": "Extérieur"
     },
     "STATS": {
       "TITLE": "Statistiques du match",
@@ -1246,7 +1332,9 @@
       "ENTER_SCORES": "Veuillez saisir les scores des deux équipes.",
       "ADDED_TIME_SET": "Temps additionnel mis à jour.",
       "PENALTIES_STARTED": "Séance de tirs au but lancée.",
-      "EXTRA_TIME_STARTED": "Prolongation commencée."
+      "EXTRA_TIME_STARTED": "Prolongation commencée.",
+      "EVENT_DELETE_CONFIRM_TITLE": "Supprimer l'événement",
+      "EVENT_DELETE_CONFIRM_MSG": "Êtes-vous sûr de vouloir supprimer cet événement ?"
     },
     "ADDED_TIME": {
       "TITLE": "Temps additionnel",

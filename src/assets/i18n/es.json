@@ -121,7 +121,13 @@
     "ADD_EVENT": "Añadir evento",
     "DELETE_CONFIRM": "Eliminar evento",
     "MIN": "min",
-    "CLEAR": "Borrar"
+    "CLEAR": "Borrar",
+    "PENALTY_MISSED": "Penalti fallado",
+    "CONFIGURE": "Configurar",
+    "CURRENTLY_SELECTED": "Seleccionado actualmente",
+    "GENERATING": "Generando...",
+    "REQUIRED_FIELD": "Este campo es obligatorio",
+    "SELECT_TIME_SLOTS": "Seleccione franjas horarias"
   },
   "HERO": {
     "TITLE": "Torneo",
@@ -150,6 +156,9 @@
     "PAST_MATCH": {
       "DETAILS": "Detalles",
       "STATUS_FT": "FIN"
+    },
+    "HEADER": {
+      "TITLE": "Feed del partido"
     }
   },
   "DASHBOARD": {
@@ -220,7 +229,11 @@
       "PRIZE_POOL": "Premio",
       "ROUND": "Ronda",
       "SCHEDULE": "Calendario",
-      "VIEW": "Ver"
+      "VIEW": "Ver",
+      "VENUE": "Sede",
+      "FORMAT": "Formato",
+      "FIRST_PLACE": "1.er puesto",
+      "ENTRY_FEE": "Cuota de inscripción"
     },
     "EMPTY": "No se encontraron torneos.",
     "FILTER_STATUSES": {
@@ -264,7 +277,11 @@
     "DELETE_MESSAGE": "¿Seguro que deseas eliminar «{{name}}»? Esta acción no se puede deshacer.",
     "DELETED": "Equipo eliminado correctamente",
     "UPDATED": "Equipo actualizado correctamente",
-    "DELETE_FAILED": "No se pudo eliminar el equipo"
+    "DELETE_FAILED": "No se pudo eliminar el equipo",
+    "MODAL": {
+      "FULL_NAME": "Nombre completo",
+      "FULL_NAME_PLACEHOLDER": "p. ej. Manchester United"
+    }
   },
   "TEAM_LAYOUT": {
     "TEAM_MANAGER": "Gerente de Equipo",
@@ -389,7 +406,13 @@
       "EDIT": "Editar",
       "REMOVE": "Eliminar",
       "VIEW_PROFILE": "Ver Perfil"
-    }
+    },
+    "SQUAD_FOR": "Formando plantilla para \"{{ name }}\"",
+    "SQUAD_PROGRESS": "{{ count }} / {{ required }} miembros",
+    "SQUAD_REMAINING": "{{ remaining }} más para clasificar",
+    "NEXT_STEP": "Siguiente: Añadir al torneo",
+    "JOINED_TOURNAMENT": "Equipo añadido al torneo",
+    "JOIN_ERROR": "No se pudo añadir el equipo al torneo"
   },
   "TEAM_GALLERY": {
     "TITLE": "Galería",
@@ -570,7 +593,10 @@
       "VENUES": "Sedes",
       "FINANCE": "Finanzas",
       "PRESENTATION": "Presentación",
-      "RESULTS": "Resultados"
+      "RESULTS": "Resultados",
+      "SPONSORS": "Patrocinadores",
+      "ORGANIZER": "Organizador",
+      "STATUS": "Estado"
     },
     "HEADER": {
       "MANAGER": "Gestor de torneo",
@@ -701,7 +727,24 @@
       "SELECT_VENUE": "Seleccione una sede...",
       "VENUE_REQUIRED_TITLE": "Se requieren los detalles de la sede",
       "VENUE_REQUIRED_DESC": "Los partidos se programan en la sede del torneo. Añada los detalles de la sede antes de generar el calendario.",
-      "GO_TO_VENUES": "Añadir sede"
+      "GO_TO_VENUES": "Añadir sede",
+      "REFEREES": {
+        "TITLE": "Árbitros del partido",
+        "EMPTY": "Aún no se han añadido árbitros. Añada oficiales que gestionarán los partidos.",
+        "NAME": "Nombre del árbitro",
+        "ROLE": "Función",
+        "PHONE": "Teléfono",
+        "ADD": "Añadir",
+        "ADDED": "Árbitro añadido",
+        "REMOVED": "Árbitro eliminado",
+        "ERR_NAME": "El nombre del árbitro es obligatorio.",
+        "ERR_ADD": "No se pudo añadir el árbitro.",
+        "ERR_REMOVE": "No se pudo eliminar el árbitro.",
+        "SELECT_MAIN": "Seleccionar árbitro principal",
+        "SELECT_ASSIST1": "Seleccionar árbitro asistente 1",
+        "SELECT_ASSIST2": "Seleccionar árbitro asistente 2",
+        "SELECT_FOURTH": "Seleccionar cuarto árbitro"
+      }
     },
     "RULES": {
       "TITLE": "Reglas del partido",
@@ -905,7 +948,11 @@
       "QUICK_ACTIONS": "Acciones rápidas",
       "ADD_SELECTED_TEAMS": "Añadir equipos seleccionados",
       "ADD_SELECTED_TEAM": "Añadir equipo seleccionado",
-      "CREATE_MAP_TEAM": "Crear y asociar equipo"
+      "CREATE_MAP_TEAM": "Crear y asociar equipo",
+      "SQUAD_REQUIRED_TITLE": "Primero se necesita plantilla",
+      "SQUAD_REQUIRED_MSG": "Equipo creado. Un equipo debe tener al menos {{ min }} miembros antes de poder unirse al torneo. Añada la plantilla ahora para continuar.",
+      "CREATE_MEMBERS_BTN": "Crear miembros del equipo",
+      "CONFIRM_REMOVE": "¿Está seguro de que desea quitar este equipo del torneo?"
     },
     "MATCHES": {
       "TITLE": "Partidos del torneo",
@@ -1018,7 +1065,8 @@
       "MAX_TEAMS_REACHED": "Se alcanzó el límite máximo de equipos. No se pueden añadir más equipos.",
       "MAX_TEAMS_EXCEEDED": "Añadir estos equipos superaría el límite máximo de equipos.",
       "MATCH_UPDATE_SUCCESS": "¡Calendario de partidos actualizado correctamente!",
-      "MATCH_UPDATE_ERROR": "No se pudo actualizar el calendario de partidos."
+      "MATCH_UPDATE_ERROR": "No se pudo actualizar el calendario de partidos.",
+      "TEAM_NAME_EXISTS": "Ya existe un equipo con este nombre. Vaya a la pestaña Equipos existentes y selecciónelo, o cambie el nombre del equipo."
     },
     "SPONSORS": {
       "TITLE": "Patrocinadores del torneo",
@@ -1048,12 +1096,44 @@
       "REMOVE_ERROR": "No se pudo eliminar el patrocinador.",
       "ASSIGN_SUCCESS": "¡Patrocinador asignado correctamente!",
       "ASSIGN_ERROR": "No se pudo asignar el patrocinador."
+    },
+    "STATUS_TAB": {
+      "TITLE": "Estado y visibilidad",
+      "SUBTITLE": "Controla el estado del ciclo de vida del torneo, quién puede verlo y la aprobación de equipos."
+    },
+    "ORGANIZER": {
+      "TITLE": "Organizador",
+      "SUBTITLE": "Datos de contacto de la persona u organismo que dirige este torneo.",
+      "DETAILS": "Detalles del organizador",
+      "NAME": "Nombre",
+      "EMAIL": "Correo electrónico",
+      "PHONE": "Teléfono",
+      "WEBSITE": "Sitio web / Enlace (opcional)",
+      "PLACEHOLDERS": {
+        "NAME": "p. ej. Elite Sports Fed",
+        "EMAIL": "p. ej. contact@sportsfed.com",
+        "PHONE": "p. ej. +1 555 123 4567",
+        "WEBSITE": "p. ej. https://sportsfed.com"
+      }
+    },
+    "WIZARD": {
+      "PARTICIPATION": "Participación",
+      "SAVE": "Guardar",
+      "SAVE_NEXT": "Guardar y siguiente",
+      "PREVIOUS": "Anterior",
+      "SUBMIT": "Enviar torneo",
+      "STEP": "Paso",
+      "FIX_FIELDS": "Corrija los campos resaltados antes de continuar.",
+      "LOCKED_MSG": "Debe completar la sección {{section}} antes de continuar.",
+      "SUBMIT_CONFIRM_TITLE": "Enviar torneo",
+      "SUBMIT_CONFIRM_MSG": "¿Está seguro de que desea enviar este torneo? Después del envío, cierta información puede pasar a ser de solo lectura.",
+      "SUBMIT_SUCCESS": "Torneo enviado correctamente."
     }
   },
   "MATCH_DETAILS": {
     "ALERTS": {
       "LINEUPS_REQUIRED": "Acción requerida: alineaciones del partido",
-      "LINEUPS_REQUIRED_DESC": "Las alineaciones titulares deben confirmarse ({{ playersOnField }} jugadores cada una) antes de poder iniciar el partido. Límite de suplentes: {{ subsLimit }}.",
+      "LINEUPS_REQUIRED_DESC": "Obligatorio: confirme las alineaciones titulares ({{ playersOnField }} jugadores cada una, límite de suplentes {{ subsLimit }}) antes de poder iniciar el partido.",
       "LINEUPS_READY": "Alineaciones confirmadas",
       "LINEUPS_READY_DESC": "Ambos equipos han confirmado sus alineaciones titulares. Ya puedes iniciar el partido."
     },
@@ -1086,7 +1166,8 @@
       "STANDINGS": "Clasificación",
       "LINEUPS": "Alineaciones",
       "H2H": "Cara a cara",
-      "EXTRA_TIME": "Tiempo Extra"
+      "EXTRA_TIME": "Tiempo Extra",
+      "PENALTIES": "Penaltis"
     },
     "TIMELINE": {
       "TITLE": "Eventos del partido",
@@ -1118,7 +1199,10 @@
         "PLACEHOLDER_DETAILS_GENERAL": "p. ej. tipo de falta, detalles de la sustitución",
         "SUBMIT_ADD": "Añadir evento",
         "SUBMIT_EDIT": "Guardar cambios",
-        "SUBMITTING": "Guardando..."
+        "SUBMITTING": "Guardando...",
+        "PENALTY_OUTCOME": "Resultado del penalti",
+        "PENALTY_GOAL": "Gol",
+        "PENALTY_MISS": "Fallado"
       },
       "ADDED_TIME": "Tiempo añadido",
       "PENALTY_SCORED": "Anotado",
@@ -1143,7 +1227,9 @@
       "STARTERS": "Jugadores titulares",
       "SUBS": "Suplentes",
       "PLACEHOLDER_VENUE": "p. ej. Estadio principal",
-      "PLACEHOLDER_OFFICIALS": "p. ej. Juan Pérez, María García"
+      "PLACEHOLDER_OFFICIALS": "p. ej. Juan Pérez, María García",
+      "HOME": "Local",
+      "AWAY": "Visitante"
     },
     "STATS": {
       "TITLE": "Estadísticas del partido",
@@ -1246,7 +1332,9 @@
       "ENTER_SCORES": "Introduce los marcadores de ambos equipos.",
       "ADDED_TIME_SET": "Tiempo añadido actualizado.",
       "PENALTIES_STARTED": "Tanda de penaltis iniciada.",
-      "EXTRA_TIME_STARTED": "Tiempo extra iniciado."
+      "EXTRA_TIME_STARTED": "Tiempo extra iniciado.",
+      "EVENT_DELETE_CONFIRM_TITLE": "Eliminar evento",
+      "EVENT_DELETE_CONFIRM_MSG": "¿Está seguro de que desea eliminar este evento?"
     },
     "ADDED_TIME": {
       "TITLE": "Tiempo añadido",

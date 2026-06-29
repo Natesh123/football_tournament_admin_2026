@@ -30,7 +30,7 @@ export class TournamentParticipantsComponent implements OnInit, OnChanges {
             playerLimit: [this.data.playerLimit ?? 1, [Validators.required, Validators.min(1)]],
             regOpenDate: [this.data.regOpenDate || '', [Validators.required]],
             regCloseDate: [this.data.regCloseDate || '', [Validators.required]],
-            regFee: [this.data.regFee ?? 0, [Validators.required, Validators.min(0)]]
+            regFee: [this.data.regFee ?? 0, [Validators.min(0)]]
         }, { validators: [this.crossFieldValidator] });
 
         this.form.valueChanges.subscribe(val => Object.assign(this.data, val));

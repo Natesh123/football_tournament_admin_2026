@@ -3,8 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TournamentService } from '../../../tournament/tournament.service';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
+import { SKIP_ERROR_TOAST } from '../../../core/interceptors/error.interceptor';
 import { UiService } from '../../../services/ui.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
@@ -195,7 +196,12 @@ export class MatchDetailsComponent implements OnInit {
     }
 
     private fetchPreMatchData() {
-        this.http.get<{ success: boolean, data: any }>(`${environment.apiUrl}/api/matches/${this.matchId()}/lineups`).subscribe({
+        // Lineups & H2H are best-effort side panels. They legitimately fail/404 when a
+        // team isn't assigned yet (e.g. a TBD knockout slot), so suppress the global
+        // error toast and just leave the panel empty.
+        const silent = { context: new HttpContext().set(SKIP_ERROR_TOAST, true) };
+
+        this.http.get<{ success: boolean, data: any }>(`${environment.apiUrl}/api/matches/${this.matchId()}/lineups`, silent).subscribe({
             next: (res) => {
                 if (res.success) {
                     this.lineups.set(res.data);
@@ -204,7 +210,7 @@ export class MatchDetailsComponent implements OnInit {
             error: () => {}
         });
 
-        this.http.get<{ success: boolean, data: any }>(`${environment.apiUrl}/api/matches/${this.matchId()}/h2h`).subscribe({
+        this.http.get<{ success: boolean, data: any }>(`${environment.apiUrl}/api/matches/${this.matchId()}/h2h`, silent).subscribe({
             next: (res) => {
                 if (res.success) {
                     this.h2hData.set(res.data);
@@ -569,12 +575,13 @@ export class MatchDetailsComponent implements OnInit {
     }
 
     handleStartMatch() {
+        // Lineups are mandatory: both teams must have a complete, valid lineup
+        // (exact starters + subs within limit) before the match can start.
         if (!this.isLineupValid) {
             const { playersOnField, subsLimit } = this.getRequiredLineupCounts();
             this.showToast(this.translate.instant('MATCH_DETAILS.TOAST.LINEUP_INVALID', { playersOnField, subsLimit }), 'error');
             return;
         }
-
         this.ui.startAction();
         this.http.put<{ success: boolean, data: any }>(`${environment.apiUrl}/api/matches/${this.matchId()}`, {
             status: 'live'

@@ -108,6 +108,23 @@ export class TournamentService {
         );
     }
 
+    // Referees (tournament-level pool)
+    getReferees(id: string): Observable<any[]> {
+        return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/${id}/referees`).pipe(
+            map(res => res.data || [])
+        );
+    }
+
+    addReferee(id: string, referee: { name: string; role?: string; phone?: string }): Observable<any> {
+        return this.http.post<ApiResponse<any>>(`${this.baseUrl}/${id}/referees`, referee).pipe(
+            map(res => res.data)
+        );
+    }
+
+    deleteReferee(id: string, refereeId: string): Observable<any> {
+        return this.http.delete<ApiResponse<any>>(`${this.baseUrl}/${id}/referees/${refereeId}`);
+    }
+
     // Match Center & Event Management
     getMatchesByStatus(status: string, tournamentId?: string): Observable<any[]> {
         let url = `${API_URL}/api/matches?status=${status}`;

@@ -81,6 +81,14 @@
                     </div>
 
                     <div class="ml-4 flex items-center gap-2">
+                        <button (click)="openMatchEditor(match); $event.stopPropagation()"
+                            [title]="'TOURNAMENT_DASHBOARD.MATCHES.EDIT_SCHEDULE' | translate"
+                            class="px-4 py-2 rounded-lg bg-white/5 border border-black-border hover:bg-white/10 hover:text-white font-bold text-[10px] uppercase tracking-wider text-zinc-400 transition-all shadow-[0_4px_10px_rgba(0,0,0,0.5)] flex items-center gap-1.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                            {{ 'TOURNAMENT_DASHBOARD.MATCHES.EDIT_SCHEDULE' | translate }}
+                        </button>
                         <button (click)="openMatchDetails(match.id); $event.stopPropagation()"
                             class="px-4 py-2 rounded-lg bg-white/5 border border-black-border group-hover:bg-gold-500 group-hover:text-black font-bold text-[10px] uppercase tracking-wider text-zinc-400 transition-all shadow-[0_4px_10px_rgba(0,0,0,0.5)]">
                             {{ 'TOURNAMENT_DASHBOARD.MATCHES.MANAGE_RESULT' | translate }}
@@ -157,14 +165,18 @@
 
 <!-- MATCH SCHEDULING MODAL -->
 <div *ngIf="editingMatch" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+    <!-- Backdrop -->
     <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="closeMatchEditor()"></div>
+
+    <!-- Modal Content -->
     <div
         class="relative w-full max-w-lg bg-black-card border border-black-border rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <!-- Header -->
         <div class="px-6 py-5 border-b border-black-border bg-zinc-900/50 flex items-center justify-between">
             <div>
-                <h3 class="text-lg font-black text-white">{{ 'TOURNAMENT_DASHBOARD.MATCHES.MODAL.TITLE' | translate }}</h3>
-                <p class="text-sm text-zinc-400 mt-1">{{ editingMatch.homeTeam?.name || ('MATCH_DETAILS.INFO.TITLE' | translate) }} vs {{
-                    editingMatch.awayTeam?.name || ('MATCH_DETAILS.INFO.TITLE' | translate) }}</p>
+                <h3 class="text-lg font-black text-white">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.EDIT_MATCH_TITLE' | translate }}</h3>
+                <p class="text-sm text-zinc-400 mt-1">{{ editingMatch.homeTeam?.name || 'TBD' }} vs {{
+                    editingMatch.awayTeam?.name || 'TBD' }}</p>
             </div>
             <button (click)="closeMatchEditor()" class="text-zinc-500 hover:text-white transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
@@ -174,39 +186,145 @@
             </button>
         </div>
 
+        <!-- Body -->
         <div class="p-6 overflow-y-auto space-y-5">
+            <!-- Teams -->
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.HOME_TEAM_LABEL' | translate }}</label>
+                    <select [(ngModel)]="editingMatch.homeTeamId" [disabled]="editingMatch.status === 'completed'"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-3 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all disabled:opacity-40">
+                        <option [ngValue]="null" class="bg-black-card">{{ 'COMMON.TBD' | translate }}</option>
+                        @for (team of availableTeams(); track team.id) {
+                        <option [ngValue]="team.id" class="bg-black-card">{{ team.name }}</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.AWAY_TEAM_LABEL' | translate }}</label>
+                    <select [(ngModel)]="editingMatch.awayTeamId" [disabled]="editingMatch.status === 'completed'"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-3 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all disabled:opacity-40">
+                        <option [ngValue]="null" class="bg-black-card">{{ 'COMMON.TBD' | translate }}</option>
+                        @for (team of availableTeams(); track team.id) {
+                        <option [ngValue]="team.id" class="bg-black-card">{{ team.name }}</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <!-- Start Time -->
             <div>
-                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">
-                    {{ 'MATCH_DETAILS.INFO.DATE_TIME' | translate }}
-                </label>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.MATCH_TIME_LABEL' | translate }}</label>
                 <input type="datetime-local" [(ngModel)]="editingMatch.matchTime"
                     class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all [color-scheme:dark]" />
             </div>
+
+            <!-- Venue -->
             <div>
-                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">
-                    {{ 'MATCH_DETAILS.INFO.VENUE' | translate }}
-                </label>
-                <input type="text" [(ngModel)]="editingMatch.venue" [placeholder]="'MATCH_DETAILS.INFO.PLACEHOLDER_VENUE' | translate"
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.VENUE_LABEL' | translate }} <span class="text-red-500">*</span></label>
+                @if (venueOptions.length > 0) {
+                <select [(ngModel)]="editingMatch.venue"
+                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all">
+                    <option value="" disabled class="bg-black-card">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.SELECT_VENUE' | translate }}</option>
+                    @for (option of venueOptions; track option) {
+                    <option [value]="option" class="bg-black-card">{{ option }}</option>
+                    }
+                </select>
+                } @else {
+                <div class="bg-amber-400/10 border border-amber-400/30 rounded-lg px-4 py-3">
+                    <p class="text-sm text-amber-400">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.VENUE_REQUIRED_DESC' | translate }}</p>
+                </div>
+                }
+            </div>
+
+            <!-- Break Duration -->
+            <div>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.EXTRA_BREAK' | translate }}</label>
+                <input type="number" [(ngModel)]="editingMatch.breakDuration" placeholder="e.g. 15"
                     class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all" />
             </div>
+
+            <!-- Referees -->
             <div>
-                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">
-                    {{ 'MATCH_DETAILS.INFO.OFFICIALS' | translate }}
-                </label>
-                <input type="text" [(ngModel)]="editingMatch.matchReferees" [placeholder]="'MATCH_DETAILS.INFO.PLACEHOLDER_OFFICIALS' | translate"
-                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all" />
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.REFEREES_LABEL' | translate }}</label>
+                @if (refereeOptions.length > 0) {
+                <div class="space-y-2">
+                    <select [(ngModel)]="editingMatch.referees.main"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all">
+                        <option value="" class="bg-black-card">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.REFEREES.SELECT_MAIN' | translate }}</option>
+                        @for (option of refereeOptions; track option) {
+                        <option [value]="option" class="bg-black-card">{{ option }}</option>
+                        }
+                    </select>
+                    <select [(ngModel)]="editingMatch.referees.assistant1"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all">
+                        <option value="" class="bg-black-card">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.REFEREES.SELECT_ASSIST1' | translate }}</option>
+                        @for (option of refereeOptions; track option) {
+                        <option [value]="option" class="bg-black-card">{{ option }}</option>
+                        }
+                    </select>
+                    <select [(ngModel)]="editingMatch.referees.assistant2"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all">
+                        <option value="" class="bg-black-card">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.REFEREES.SELECT_ASSIST2' | translate }}</option>
+                        @for (option of refereeOptions; track option) {
+                        <option [value]="option" class="bg-black-card">{{ option }}</option>
+                        }
+                    </select>
+                    <select [(ngModel)]="editingMatch.referees.fourthOfficial"
+                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all">
+                        <option value="" class="bg-black-card">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.REFEREES.SELECT_FOURTH' | translate }}</option>
+                        @for (option of refereeOptions; track option) {
+                        <option [value]="option" class="bg-black-card">{{ option }}</option>
+                        }
+                    </select>
+                </div>
+                } @else {
+                <div class="bg-white/5 border border-black-border rounded-lg px-4 py-3">
+                    <p class="text-sm text-zinc-500">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.REFEREES.EMPTY' | translate }}</p>
+                </div>
+                }
+            </div>
+
+            <!-- Events -->
+            <div>
+                <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.NOTES_LABEL' | translate }}</label>
+                <textarea [(ngModel)]="editingMatch.events" rows="3"
+                    placeholder="{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.NOTES_LABEL' | translate }}"
+                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-sm text-white focus:border-gold-400 focus:outline-none transition-all resize-none"></textarea>
             </div>
         </div>
 
-        <div class="px-6 py-4 border-t border-black-border bg-zinc-900/50 flex justify-end gap-3">
-            <button (click)="closeMatchEditor()"
-                class="px-4 py-2 rounded-lg text-sm font-bold text-zinc-400 hover:text-white transition-colors">{{ 'COMMON.CANCEL' | translate }}</button>
-            <button (click)="saveMatchSchedule()" [disabled]="ui.isLoadingAction()"
-                class="px-6 py-2 bg-gold-500 hover:bg-gold-400 text-black rounded-lg text-sm font-bold transition-colors flex items-center gap-2">
-                <span *ngIf="ui.isLoadingAction()"
-                    class="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin"></span>
-                {{ (ui.isLoadingAction() ? 'COMMON.SAVING' : 'COMMON.SAVE') | translate }}
-            </button>
+        <!-- Footer -->
+        <div class="px-6 py-4 border-t border-black-border bg-zinc-900/50 flex items-center justify-between gap-3">
+            <div class="flex gap-2">
+                <button (click)="editPrevMatch()" [disabled]="!hasPrevMatch"
+                    class="px-3 py-2 bg-white/5 disabled:opacity-30 border border-black-border rounded-lg text-white hover:bg-white/10 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <button (click)="editNextMatch()" [disabled]="!hasNextMatch"
+                    class="px-3 py-2 bg-white/5 disabled:opacity-30 border border-black-border rounded-lg text-white hover:bg-white/10 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="flex gap-3">
+                <button (click)="closeMatchEditor()"
+                    class="px-4 py-2 rounded-lg text-sm font-bold text-zinc-400 hover:text-white transition-colors">
+                    {{ 'COMMON.CANCEL' | translate }}
+                </button>
+                <button (click)="saveMatchSchedule()" [disabled]="isSavingMatch()"
+                    class="px-6 py-2 bg-gold-500 hover:bg-gold-400 text-black rounded-lg text-sm font-bold transition-colors flex items-center gap-2">
+                    <span *ngIf="isSavingMatch()"
+                        class="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin"></span>
+                    {{ isSavingMatch() ? ('COMMON.SAVING' | translate) : ('COMMON.SAVE_CHANGES' | translate) }}
+                </button>
+            </div>
         </div>
     </div>
 </div>

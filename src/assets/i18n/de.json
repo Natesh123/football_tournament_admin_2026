@@ -121,7 +121,13 @@
     "ADD_EVENT": "Ereignis hinzufügen",
     "DELETE_CONFIRM": "Ereignis löschen",
     "MIN": "Min",
-    "CLEAR": "Löschen"
+    "CLEAR": "Löschen",
+    "PENALTY_MISSED": "Elfmeter verschossen",
+    "CONFIGURE": "Konfigurieren",
+    "CURRENTLY_SELECTED": "Aktuell ausgewählt",
+    "GENERATING": "Wird generiert …",
+    "REQUIRED_FIELD": "Dieses Feld ist erforderlich",
+    "SELECT_TIME_SLOTS": "Zeitfenster auswählen"
   },
   "HERO": {
     "TITLE": "Turnier",
@@ -150,6 +156,9 @@
     "PAST_MATCH": {
       "DETAILS": "Details",
       "STATUS_FT": "ENDSTAND"
+    },
+    "HEADER": {
+      "TITLE": "Spiel-Feed"
     }
   },
   "DASHBOARD": {
@@ -220,7 +229,11 @@
       "PRIZE_POOL": "Preisgeld",
       "ROUND": "Runde",
       "SCHEDULE": "Zeitplan",
-      "VIEW": "Ansehen"
+      "VIEW": "Ansehen",
+      "VENUE": "Austragungsort",
+      "FORMAT": "Format",
+      "FIRST_PLACE": "1. Platz",
+      "ENTRY_FEE": "Startgebühr"
     },
     "EMPTY": "Keine Turniere gefunden.",
     "FILTER_STATUSES": {
@@ -264,7 +277,11 @@
     "DELETE_MESSAGE": "Möchten Sie „{{name}}“ wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
     "DELETED": "Team erfolgreich gelöscht",
     "UPDATED": "Team erfolgreich aktualisiert",
-    "DELETE_FAILED": "Team konnte nicht gelöscht werden"
+    "DELETE_FAILED": "Team konnte nicht gelöscht werden",
+    "MODAL": {
+      "FULL_NAME": "Vollständiger Name",
+      "FULL_NAME_PLACEHOLDER": "z. B. Manchester United"
+    }
   },
   "TEAM_LAYOUT": {
     "TEAM_MANAGER": "Mannschaftsbetreuer",
@@ -389,7 +406,13 @@
       "EDIT": "Bearbeiten",
       "REMOVE": "Entfernen",
       "VIEW_PROFILE": "Profil Ansehen"
-    }
+    },
+    "SQUAD_FOR": "Kader für \"{{ name }}\" zusammenstellen",
+    "SQUAD_PROGRESS": "{{ count }} / {{ required }} Mitglieder",
+    "SQUAD_REMAINING": "Noch {{ remaining }} zum Qualifizieren",
+    "NEXT_STEP": "Weiter: Zum Turnier hinzufügen",
+    "JOINED_TOURNAMENT": "Team zum Turnier hinzugefügt",
+    "JOIN_ERROR": "Team konnte nicht zum Turnier hinzugefügt werden"
   },
   "TEAM_GALLERY": {
     "TITLE": "Galerie",
@@ -570,7 +593,10 @@
       "VENUES": "Spielstätten",
       "FINANCE": "Finanzen",
       "PRESENTATION": "Präsentation",
-      "RESULTS": "Ergebnisse"
+      "RESULTS": "Ergebnisse",
+      "SPONSORS": "Sponsoren",
+      "ORGANIZER": "Veranstalter",
+      "STATUS": "Status"
     },
     "HEADER": {
       "MANAGER": "Turnierverwalter",
@@ -701,7 +727,24 @@
       "SELECT_VENUE": "Spielstätte auswählen...",
       "VENUE_REQUIRED_TITLE": "Spielstätten-Details erforderlich",
       "VENUE_REQUIRED_DESC": "Spiele werden an der Spielstätte des Turniers geplant. Fügen Sie die Spielstätten-Details hinzu, bevor Sie den Spielplan generieren.",
-      "GO_TO_VENUES": "Spielstätte hinzufügen"
+      "GO_TO_VENUES": "Spielstätte hinzufügen",
+      "REFEREES": {
+        "TITLE": "Spielschiedsrichter",
+        "EMPTY": "Noch keine Schiedsrichter hinzugefügt. Fügen Sie Offizielle hinzu, die die Spiele leiten.",
+        "NAME": "Name des Schiedsrichters",
+        "ROLE": "Rolle",
+        "PHONE": "Telefon",
+        "ADD": "Hinzufügen",
+        "ADDED": "Schiedsrichter hinzugefügt",
+        "REMOVED": "Schiedsrichter entfernt",
+        "ERR_NAME": "Name des Schiedsrichters ist erforderlich.",
+        "ERR_ADD": "Schiedsrichter konnte nicht hinzugefügt werden.",
+        "ERR_REMOVE": "Schiedsrichter konnte nicht entfernt werden.",
+        "SELECT_MAIN": "Hauptschiedsrichter auswählen",
+        "SELECT_ASSIST1": "Schiedsrichterassistent 1 auswählen",
+        "SELECT_ASSIST2": "Schiedsrichterassistent 2 auswählen",
+        "SELECT_FOURTH": "Vierten Offiziellen auswählen"
+      }
     },
     "RULES": {
       "TITLE": "Spielregeln",
@@ -905,7 +948,11 @@
       "QUICK_ACTIONS": "Schnellaktionen",
       "ADD_SELECTED_TEAMS": "Ausgewählte Mannschaften hinzufügen",
       "ADD_SELECTED_TEAM": "Ausgewählte Mannschaft hinzufügen",
-      "CREATE_MAP_TEAM": "Mannschaft erstellen & zuordnen"
+      "CREATE_MAP_TEAM": "Mannschaft erstellen & zuordnen",
+      "SQUAD_REQUIRED_TITLE": "Zuerst Kader erforderlich",
+      "SQUAD_REQUIRED_MSG": "Team erstellt. Ein Team muss mindestens {{ min }} Mitglieder haben, bevor es am Turnier teilnehmen kann. Fügen Sie jetzt den Kader hinzu, um fortzufahren.",
+      "CREATE_MEMBERS_BTN": "Teammitglieder erstellen",
+      "CONFIRM_REMOVE": "Möchten Sie dieses Team wirklich aus dem Turnier entfernen?"
     },
     "MATCHES": {
       "TITLE": "Turnierspiele",
@@ -1018,7 +1065,8 @@
       "MAX_TEAMS_REACHED": "Maximale Mannschaftsanzahl erreicht. Es können keine weiteren Mannschaften hinzugefügt werden.",
       "MAX_TEAMS_EXCEEDED": "Das Hinzufügen dieser Mannschaften würde die maximale Mannschaftsanzahl überschreiten.",
       "MATCH_UPDATE_SUCCESS": "Spielplan erfolgreich aktualisiert!",
-      "MATCH_UPDATE_ERROR": "Spielplan konnte nicht aktualisiert werden."
+      "MATCH_UPDATE_ERROR": "Spielplan konnte nicht aktualisiert werden.",
+      "TEAM_NAME_EXISTS": "Ein Team mit diesem Namen existiert bereits. Wechseln Sie zur Registerkarte „Bestehende Teams“ und wählen Sie es aus, oder ändern Sie den Teamnamen."
     },
     "SPONSORS": {
       "TITLE": "Turniersponsoren",
@@ -1048,12 +1096,44 @@
       "REMOVE_ERROR": "Sponsor konnte nicht entfernt werden.",
       "ASSIGN_SUCCESS": "Sponsor erfolgreich zugewiesen!",
       "ASSIGN_ERROR": "Sponsor konnte nicht zugewiesen werden."
+    },
+    "STATUS_TAB": {
+      "TITLE": "Status & Sichtbarkeit",
+      "SUBTITLE": "Steuern Sie den Lebenszyklus-Status des Turniers, wer es sehen kann und die Team-Genehmigung."
+    },
+    "ORGANIZER": {
+      "TITLE": "Veranstalter",
+      "SUBTITLE": "Kontaktdaten der Person oder Organisation, die dieses Turnier durchführt.",
+      "DETAILS": "Veranstalterdetails",
+      "NAME": "Name",
+      "EMAIL": "E-Mail",
+      "PHONE": "Telefon",
+      "WEBSITE": "Website / Link (optional)",
+      "PLACEHOLDERS": {
+        "NAME": "z. B. Elite Sports Fed",
+        "EMAIL": "z. B. contact@sportsfed.com",
+        "PHONE": "z. B. +1 555 123 4567",
+        "WEBSITE": "z. B. https://sportsfed.com"
+      }
+    },
+    "WIZARD": {
+      "PARTICIPATION": "Teilnahme",
+      "SAVE": "Speichern",
+      "SAVE_NEXT": "Speichern & Weiter",
+      "PREVIOUS": "Zurück",
+      "SUBMIT": "Turnier einreichen",
+      "STEP": "Schritt",
+      "FIX_FIELDS": "Bitte korrigieren Sie die markierten Felder, bevor Sie fortfahren.",
+      "LOCKED_MSG": "Sie müssen den Abschnitt {{section}} abschließen, bevor Sie fortfahren.",
+      "SUBMIT_CONFIRM_TITLE": "Turnier einreichen",
+      "SUBMIT_CONFIRM_MSG": "Möchten Sie dieses Turnier wirklich einreichen? Nach der Einreichung können bestimmte Informationen schreibgeschützt werden.",
+      "SUBMIT_SUCCESS": "Turnier erfolgreich eingereicht."
     }
   },
   "MATCH_DETAILS": {
     "ALERTS": {
       "LINEUPS_REQUIRED": "Aktion erforderlich: Spielaufstellungen",
-      "LINEUPS_REQUIRED_DESC": "Die Startaufstellungen müssen bestätigt werden ({{ playersOnField }} Spieler je Mannschaft), bevor das Spiel beginnen kann. Auswechsellimit: {{ subsLimit }}.",
+      "LINEUPS_REQUIRED_DESC": "Erforderlich: Bestätigen Sie die Startaufstellungen (je {{ playersOnField }} Spieler, Auswechsellimit {{ subsLimit }}), bevor das Spiel beginnen kann.",
       "LINEUPS_READY": "Aufstellungen bestätigt",
       "LINEUPS_READY_DESC": "Beide Mannschaften haben ihre Startaufstellungen bestätigt. Sie können das Spiel jetzt starten."
     },
@@ -1086,7 +1166,8 @@
       "STANDINGS": "Tabelle",
       "LINEUPS": "Aufstellungen",
       "H2H": "Direkter Vergleich",
-      "EXTRA_TIME": "Verlängerung"
+      "EXTRA_TIME": "Verlängerung",
+      "PENALTIES": "Elfmeter"
     },
     "TIMELINE": {
       "TITLE": "Spielereignisse",
@@ -1118,7 +1199,10 @@
         "PLACEHOLDER_DETAILS_GENERAL": "z. B. Foulart, Auswechseldetails",
         "SUBMIT_ADD": "Ereignis hinzufügen",
         "SUBMIT_EDIT": "Änderungen speichern",
-        "SUBMITTING": "Speichern..."
+        "SUBMITTING": "Speichern...",
+        "PENALTY_OUTCOME": "Elfmeter-Ergebnis",
+        "PENALTY_GOAL": "Tor",
+        "PENALTY_MISS": "Verschossen"
       },
       "ADDED_TIME": "Nachspielzeit",
       "PENALTY_SCORED": "Getroffen",
@@ -1143,7 +1227,9 @@
       "STARTERS": "Startspieler",
       "SUBS": "Auswechselspieler",
       "PLACEHOLDER_VENUE": "z. B. Hauptstadion",
-      "PLACEHOLDER_OFFICIALS": "z. B. Max Mustermann, Erika Musterfrau"
+      "PLACEHOLDER_OFFICIALS": "z. B. Max Mustermann, Erika Musterfrau",
+      "HOME": "Heim",
+      "AWAY": "Auswärts"
     },
     "STATS": {
       "TITLE": "Spielstatistiken",
@@ -1246,7 +1332,9 @@
       "ENTER_SCORES": "Bitte geben Sie die Ergebnisse für beide Mannschaften ein.",
       "ADDED_TIME_SET": "Nachspielzeit aktualisiert.",
       "PENALTIES_STARTED": "Elfmeterschießen gestartet.",
-      "EXTRA_TIME_STARTED": "Verlängerung gestartet."
+      "EXTRA_TIME_STARTED": "Verlängerung gestartet.",
+      "EVENT_DELETE_CONFIRM_TITLE": "Ereignis löschen",
+      "EVENT_DELETE_CONFIRM_MSG": "Möchten Sie dieses Ereignis wirklich löschen?"
     },
     "ADDED_TIME": {
       "TITLE": "Nachspielzeit",

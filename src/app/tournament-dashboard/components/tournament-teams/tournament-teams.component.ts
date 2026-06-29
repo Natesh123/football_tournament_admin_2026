@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal, computed, Input, OnChanges, SimpleCh
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { API_URL } from '../../../core/config/app.config';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { UiService } from '../../../services/ui.service';
@@ -32,12 +33,21 @@ interface TournamentTeam {
 })
 export class TournamentTeamsComponent implements OnInit, OnChanges {
     @Input() tournamentId!: string;
+    @Input() tournamentName: string = '';
     @Input() maxTeams: number = 16;
+    /** Required squad size (members) for a team to join — from the tournament's settings. */
+    @Input() squadSize: number = 16;
+
+    /** A team must field at least this many members before it can join a tournament. */
+    get minMembers(): number {
+        return this.squadSize || 16;
+    }
 
     private http = inject(HttpClient);
     public ui = inject(UiService);
     private translate = inject(TranslateService);
     private auth = inject(AuthService);
+    private router = inject(Router);
 
     // Only admins manage the shared global team registry. Organizers register
     // teams from the existing pool (no "create new team" mode).
@@ -211,26 +221,18 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
                     }
                 });
         } else {
-            const teamData = { ...this.newTeam(), tournamentId: this.tournamentId };
+            const teamData = { ...this.newTeam() };
             if (!teamData.name || !teamData.teamType) return;
 
+            // A brand-new team has no squad yet, so it can't be mapped to the tournament
+            // (min 16 members required). Create the team only, then guide the organizer to
+            // build its squad — it gets auto-added once it reaches the member threshold.
             this.ui.startAction();
             this.http.post<Team>(`${API_URL}/api/teams`, teamData).subscribe({
                 next: (newTeam) => {
-                    // Step 2: Now map it to the tournament
-                    this.http.post<{ success: boolean, data: TournamentTeam }>(`${API_URL}/api/tournaments/${this.tournamentId}/teams/${newTeam.id}`, {})
-                        .subscribe({
-                            next: (res) => {
-                                this.teams.update(t => [res.data, ...t]);
-                                this.ui.endAction();
-                                this.notify('TOURNAMENT_DASHBOARD.TOAST.CREATE_TEAM_SUCCESS', 'success');
-                                this.closeModal();
-                            },
-                            error: (err) => {
-                                this.ui.endAction();
-                                this.notify(err?.error?.message || 'TOURNAMENT_DASHBOARD.TOAST.MAPPING_ERROR', 'error');
-                            }
-                        });
+                    this.ui.endAction();
+                    this.closeModal();
+                    this.promptCreateMembers(newTeam.id);
                 },
                 error: (err) => {
                     this.ui.endAction();
@@ -239,6 +241,29 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
                         ? 'TOURNAMENT_DASHBOARD.TOAST.TEAM_NAME_EXISTS'
                         : 'TOURNAMENT_DASHBOARD.TOAST.CREATE_TEAM_ERROR';
                     this.notify(key, 'error');
+                }
+            });
+        }
+    }
+
+    /**
+     * After a new team is created, confirm whether to build its squad now. On confirm,
+     * redirect to the team-members page carrying the tournament context so that page can
+     * offer a "next step" back into this tournament once 16 members exist.
+     */
+    private async promptCreateMembers(teamId: string) {
+        const confirmed = await this.ui.confirmAction(
+            this.translate.instant('TOURNAMENT_DASHBOARD.TEAMS.SQUAD_REQUIRED_TITLE'),
+            this.translate.instant('TOURNAMENT_DASHBOARD.TEAMS.SQUAD_REQUIRED_MSG', { min: this.minMembers }),
+            this.translate.instant('TOURNAMENT_DASHBOARD.TEAMS.CREATE_MEMBERS_BTN'),
+            this.translate.instant('COMMON.CLOSE')
+        );
+        if (confirmed) {
+            this.router.navigate(['/admin/teams', teamId, 'members'], {
+                queryParams: {
+                    tournamentId: this.tournamentId,
+                    tournamentName: this.tournamentName,
+                    required: this.minMembers
                 }
             });
         }

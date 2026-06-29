@@ -117,11 +117,74 @@ export class TournamentScheduleComponent implements OnInit {
         return options;
     }
 
+    // Referee names from the tournament-level pool (added in this Schedule tab),
+    // used to populate the match referee dropdowns. Keeps an already-assigned
+    // referee selectable even if they were later removed from the pool.
+    get refereeOptions(): string[] {
+        const options = this.referees()
+            .map(r => r?.name?.trim())
+            .filter((n): n is string => !!n);
+        const refs = this.editingMatch?.referees;
+        for (const cur of [refs?.main, refs?.assistant1, refs?.assistant2, refs?.fourthOfficial]) {
+            const v = cur?.trim?.();
+            if (v && !options.includes(v)) options.push(v);
+        }
+        return options;
+    }
+
+    // ─── Referees (tournament-level pool) ────────────────────────────────────
+    referees = signal<any[]>([]);
+    isAddingReferee = signal(false);
+    newReferee: { name: string; role: string; phone: string } = { name: '', role: 'Referee', phone: '' };
+
+    loadReferees() {
+        this.tournamentService.getReferees(this.tournamentId).subscribe({
+            next: (list) => this.referees.set(list || []),
+            error: () => { /* non-blocking */ }
+        });
+    }
+
+    addReferee() {
+        const name = this.newReferee.name.trim();
+        if (!name) {
+            this.ui.showToast('TOURNAMENT_DASHBOARD.SCHEDULE.REFEREES.ERR_NAME', 'error');
+            return;
+        }
+        this.isAddingReferee.set(true);
+        this.tournamentService.addReferee(this.tournamentId, {
+            name,
+            role: this.newReferee.role.trim() || 'Referee',
+            phone: this.newReferee.phone.trim()
+        }).subscribe({
+            next: (ref) => {
+                this.referees.update(list => [...list, ref]);
+                this.newReferee = { name: '', role: 'Referee', phone: '' };
+                this.isAddingReferee.set(false);
+                this.ui.showToast('TOURNAMENT_DASHBOARD.SCHEDULE.REFEREES.ADDED', 'success');
+            },
+            error: (err: any) => {
+                this.isAddingReferee.set(false);
+                this.ui.showToast(err?.error?.message || 'TOURNAMENT_DASHBOARD.SCHEDULE.REFEREES.ERR_ADD', 'error');
+            }
+        });
+    }
+
+    removeReferee(ref: any) {
+        this.tournamentService.deleteReferee(this.tournamentId, ref.id).subscribe({
+            next: () => {
+                this.referees.update(list => list.filter(r => String(r.id) !== String(ref.id)));
+                this.ui.showToast('TOURNAMENT_DASHBOARD.SCHEDULE.REFEREES.REMOVED', 'success');
+            },
+            error: () => this.ui.showToast('TOURNAMENT_DASHBOARD.SCHEDULE.REFEREES.ERR_REMOVE', 'error')
+        });
+    }
+
     // ─── Lifecycle ───────────────────────────────────────────────────────────
     ngOnInit() {
         if (this.tournamentId) {
             this.loadStructure();
             this.loadTeams();
+            this.loadReferees();
         }
     }
 
@@ -168,7 +231,7 @@ export class TournamentScheduleComponent implements OnInit {
             next: (data: any) => {
                 this.structure.set(data);
                 this.ui.endAction();
-                this.ui.showToast('TOURNAMENT_DASHBOARD.SCHEDULE.SUCCESS_GENERATE', 'success');
+                this.ui.showToast('Scheduled successfully', 'success');
             },
             error: (err: any) => {
                 this.ui.endAction();
@@ -197,6 +260,15 @@ export class TournamentScheduleComponent implements OnInit {
             // Default the match venue to the tournament's primary venue
             venue: match.venue || this.venues?.primaryVenue?.trim() || '',
             matchTime: match.startTime ? new Date(match.startTime).toISOString().slice(0, 16) : '',
+            // Structured referee assignment (1 main + 2 assistants). Seed from the
+            // saved object, falling back to the legacy free-text field for `main`.
+            // Preserve fourthOfficial so it isn't wiped on save.
+            referees: {
+                main: match.referees?.main || match.matchReferees || '',
+                assistant1: match.referees?.assistant1 || '',
+                assistant2: match.referees?.assistant2 || '',
+                fourthOfficial: match.referees?.fourthOfficial || ''
+            },
             // TBD knockout slots come through as label objects (no id) -> null selection
             homeTeamId: match.homeTeam?.id ?? null,
             awayTeamId: match.awayTeam?.id ?? null,
@@ -255,7 +327,10 @@ export class TournamentScheduleComponent implements OnInit {
             venue: this.editingMatch.venue ?? null,
             matchTime: this.editingMatch.matchTime || null,
             breakDuration: this.editingMatch.breakDuration ?? null,
-            matchReferees: this.editingMatch.matchReferees ?? null
+            referees: this.editingMatch.referees ?? null,
+            // Keep the legacy free-text field in sync with the main referee so
+            // older read paths still show an assigned official.
+            matchReferees: this.editingMatch.referees?.main ?? null
         };
 
         // Only send team assignments when they actually changed, so editing the

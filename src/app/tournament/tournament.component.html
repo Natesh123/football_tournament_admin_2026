@@ -190,7 +190,7 @@
                                 {{ 'TOURNAMENTS.CARD.SCHEDULE' | translate }}
                             </div>
                             <div class="text-sm font-semibold text-white flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gold-400" fill="none"
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gold-400 shrink-0" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -200,9 +200,24 @@
                         </div>
                         <div>
                             <div class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-1">
+                                {{ 'TOURNAMENTS.CARD.VENUE' | translate }}
+                            </div>
+                            <div class="text-sm font-semibold text-white flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gold-400 shrink-0" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <span class="truncate">{{ tournament.settings?.venues?.primaryVenue || ('COMMON.TBD' | translate) }}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-1">
                                 {{ 'TOURNAMENTS.CARD.PARTICIPANTS' | translate }}</div>
                             <div class="text-sm font-semibold text-white flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gold-400" fill="none"
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gold-400 shrink-0" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -211,18 +226,56 @@
                             </div>
                         </div>
                         <div>
+                            <div class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-1">
+                                {{ 'TOURNAMENTS.CARD.FORMAT' | translate }}
+                            </div>
+                            <div class="text-sm font-semibold text-white flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gold-400 shrink-0" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                </svg>
+                                <span class="truncate">{{ tournament.format?.format_type === 'groups' ? ('TOURNAMENT_DASHBOARD.FORMAT.TYPE_GROUP' | translate) :
+                                   tournament.format?.format_type === 'knockout' ? ('TOURNAMENT_DASHBOARD.FORMAT.TYPE_KNOCKOUT' | translate) :
+                                   tournament.format?.format_type === 'groups_knockout' ? ('TOURNAMENT_DASHBOARD.FORMAT.TYPE_GROUP_KNOCKOUT' | translate) :
+                                   (tournament.type || ('COMMON.TBD' | translate)) }}</span>
+                            </div>
+                        </div>
+                        @if (tournament.settings?.finance?.prizePool > 0) {
+                        <div>
                             <div class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-1">{{
                                 'TOURNAMENTS.PRIZE_POOL' | translate }}
                             </div>
                             <div class="text-sm font-semibold text-gold-400 flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24"
                                     stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                {{ 'COMMON.TBD' | translate }}
+                                {{ tournament.settings.finance.prizePool | number }}
+                            </div>
+                            @if (tournament.settings?.finance?.prizeDistribution?.[0] > 0) {
+                            <div class="text-[11px] font-semibold text-zinc-400 mt-0.5">
+                                {{ 'TOURNAMENTS.CARD.FIRST_PLACE' | translate }}: <span class="text-gold-400/80">{{ tournament.settings.finance.prizeDistribution[0] | number }}</span>
+                            </div>
+                            }
+                        </div>
+                        }
+                        @if (tournament.settings?.finance?.regFee > 0) {
+                        <div>
+                            <div class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-1">{{
+                                'TOURNAMENTS.CARD.ENTRY_FEE' | translate }}
+                            </div>
+                            <div class="text-sm font-semibold text-white flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gold-400 shrink-0" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                </svg>
+                                {{ tournament.settings.finance.regFee | number }}
                             </div>
                         </div>
+                        }
                         <div>
                             <div class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-1">
                                 @if(currentTab() === 'archived') { {{ 'TOURNAMENTS.WINNER' |
@@ -230,7 +283,7 @@
                                 {{ 'TOURNAMENTS.CURRENT_ROUND' | translate }} }
                             </div>
                             <div class="text-sm font-semibold text-white flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gold-400" fill="none"
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gold-400 shrink-0" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />

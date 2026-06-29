@@ -122,7 +122,12 @@
     "OFFSIDE": "Offside",
     "FREE_KICK": "Free Kick",
     "ADD_EVENT": "Add Event",
-    "DELETE_CONFIRM": "Delete Event"
+    "DELETE_CONFIRM": "Delete Event",
+    "CONFIGURE": "Configure",
+    "CURRENTLY_SELECTED": "Currently Selected",
+    "GENERATING": "Generating...",
+    "REQUIRED_FIELD": "This field is required",
+    "SELECT_TIME_SLOTS": "Select time slots"
   },
   "MATCH_FEED": {
     "TABS": {
@@ -141,6 +146,9 @@
     "PAST_MATCH": {
       "DETAILS": "Details",
       "STATUS_FT": "FT"
+    },
+    "HEADER": {
+      "TITLE": "Match Feed"
     }
   },
   "FOOTER": {
@@ -235,7 +243,11 @@
       "PRIZE_POOL": "Prize Pool",
       "ROUND": "Round",
       "SCHEDULE": "Schedule",
-      "VIEW": "View Match"
+      "VIEW": "View Match",
+      "VENUE": "Venue",
+      "FORMAT": "Format",
+      "FIRST_PLACE": "1st Place",
+      "ENTRY_FEE": "Entry Fee"
     },
     "EMPTY": "No tournaments found matching your criteria.",
     "FILTER_STATUSES": {
@@ -279,7 +291,11 @@
     "DELETE_MESSAGE": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
     "DELETED": "Team deleted successfully",
     "UPDATED": "Team updated successfully",
-    "DELETE_FAILED": "Failed to delete team"
+    "DELETE_FAILED": "Failed to delete team",
+    "MODAL": {
+      "FULL_NAME": "Full Name",
+      "FULL_NAME_PLACEHOLDER": "e.g. Manchester United"
+    }
   },
   "TEAM_LAYOUT": {
     "TEAM_MANAGER": "Team Manager",
@@ -338,6 +354,12 @@
     "TOTAL_PLAYERS": "Total Players",
     "ADD_PLAYER": "Add Player",
     "ADD_STAFF": "Add Staff",
+    "SQUAD_FOR": "Building squad for \"{{ name }}\"",
+    "SQUAD_PROGRESS": "{{ count }} / {{ required }} members",
+    "SQUAD_REMAINING": "{{ remaining }} more to qualify",
+    "NEXT_STEP": "Next: Add to Tournament",
+    "JOINED_TOURNAMENT": "Team added to the tournament",
+    "JOIN_ERROR": "Could not add the team to the tournament",
     "SEARCH_PLACEHOLDER": "Search by name or jersey...",
     "FILTER": {
       "ALL": "All",
@@ -696,6 +718,23 @@
       "END_DATE_HINT": "Final match / prize ceremony",
       "TIME_SLOTS": "Allowed Match Time Slots",
       "TIME_SLOTS_HINT": "Comma separated (e.g. 18:00, 20:00, 21:30)",
+      "REFEREES": {
+        "TITLE": "Match Referees",
+        "EMPTY": "No referees added yet. Add officials who will manage matches.",
+        "NAME": "Referee name",
+        "ROLE": "Role",
+        "PHONE": "Phone",
+        "ADD": "Add",
+        "ADDED": "Referee added",
+        "REMOVED": "Referee removed",
+        "ERR_NAME": "Referee name is required.",
+        "ERR_ADD": "Could not add referee.",
+        "ERR_REMOVE": "Could not remove referee.",
+        "SELECT_MAIN": "Select main referee",
+        "SELECT_ASSIST1": "Select assistant referee 1",
+        "SELECT_ASSIST2": "Select assistant referee 2",
+        "SELECT_FOURTH": "Select fourth official"
+      },
       "MATCH_TIMING_TITLE": "Match Durations & Timings",
       "MATCH_DURATION": "Match Duration",
       "HALF_DURATION": "Half Duration",
@@ -906,6 +945,9 @@
       "TITLE": "Participating Teams",
       "SUBTITLE": "Review and manage all teams registered for this tournament.",
       "ADD_TEAM": "Add Team",
+      "SQUAD_REQUIRED_TITLE": "Squad needed first",
+      "SQUAD_REQUIRED_MSG": "Team created. A team must have at least {{ min }} members before it can join the tournament. Add the squad now to continue.",
+      "CREATE_MEMBERS_BTN": "Create Team Members",
       "SEARCH_PLACEHOLDER": "Filter teams by name or city...",
       "EMPTY_STATE_TITLE": "No teams registered yet",
       "EMPTY_STATE_SUBTITLE": "Registered teams will appear here. You can manually add existing teams or create new ones.",
@@ -941,7 +983,8 @@
       "QUICK_ACTIONS": "Quick Actions",
       "ADD_SELECTED_TEAMS": "Add Selected Teams",
       "ADD_SELECTED_TEAM": "Add Selected Team",
-      "CREATE_MAP_TEAM": "Create & Map Team"
+      "CREATE_MAP_TEAM": "Create & Map Team",
+      "CONFIRM_REMOVE": "Are you sure you want to remove this team from the tournament?"
     },
     "MATCHES": {
       "TITLE": "Tournament Matches",
@@ -1089,8 +1132,8 @@
   },
   "MATCH_DETAILS": {
     "ALERTS": {
-      "LINEUPS_REQUIRED": "Action Required: Match Lineups",
-      "LINEUPS_REQUIRED_DESC": "Starting lineups must be confirmed ({{ playersOnField }} players each) before the match can be started. Sub limit: {{ subsLimit }}.",
+      "LINEUPS_REQUIRED": "Match Lineups",
+      "LINEUPS_REQUIRED_DESC": "Required: confirm starting lineups ({{ playersOnField }} players each, sub limit {{ subsLimit }}) before the match can start.",
       "LINEUPS_READY": "Lineups Confirmed",
       "LINEUPS_READY_DESC": "Both teams have confirmed their starting lineups. You can now start the match."
     },
@@ -1200,7 +1243,9 @@
       "STARTERS": "Starting Players",
       "SUBS": "Substitutes",
       "PLACEHOLDER_VENUE": "e.g. Main Stadium",
-      "PLACEHOLDER_OFFICIALS": "e.g. John Doe, Jane Smith"
+      "PLACEHOLDER_OFFICIALS": "e.g. John Doe, Jane Smith",
+      "HOME": "Home",
+      "AWAY": "Away"
     },
     "STATS": {
       "TITLE": "Match Statistics",
@@ -1303,7 +1348,9 @@
       "SELECT_SUB_IN": "Please select a substitute player to come in.",
       "LINEUP_INVALID": "Starting lineups must have exactly {{ playersOnField }} players, and substitutes cannot exceed {{ subsLimit }} players per team.",
       "ENTER_SCORES": "Please enter scores for both teams.",
-      "EXTRA_TIME_STARTED": "Extra time started."
+      "EXTRA_TIME_STARTED": "Extra time started.",
+      "EVENT_DELETE_CONFIRM_TITLE": "Delete Event",
+      "EVENT_DELETE_CONFIRM_MSG": "Are you sure you want to delete this event?"
     },
     "EXTRA_TIME": {
       "TITLE": "Extra Time",

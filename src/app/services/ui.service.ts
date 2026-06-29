@@ -69,7 +69,7 @@ export class UiService {
     }
   }
 
-  confirmAction(title: string, text: string, confirmText: string = 'Yes, delete it!'): Promise<boolean> {
+  confirmAction(title: string, text: string, confirmText: string = 'Yes, delete it!', cancelText: string = 'Cancel'): Promise<boolean> {
     return Swal.fire({
       title: title,
       text: text,
@@ -78,7 +78,7 @@ export class UiService {
       confirmButtonColor: '#ef4444',
       cancelButtonColor: '#27272a',
       confirmButtonText: confirmText,
-      cancelButtonText: 'Cancel',
+      cancelButtonText: cancelText,
       background: '#1a1a1a',
       color: '#ffffff',
       customClass: {

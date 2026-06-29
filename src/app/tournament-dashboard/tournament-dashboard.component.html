@@ -41,12 +41,12 @@
             }
         </div>
         } @else {
-        <nav class="flex items-stretch gap-1 px-6 py-3 min-w-max">
+        <nav class="flex items-end gap-1 px-6 min-w-max border-b border-black-border">
             @for (tab of wizardTabs; track tab.id; let i = $index) {
             <button (click)="goToTab(tab.id)" [disabled]="tabState(tab.id) === 'locked'"
-                class="group flex items-center gap-2.5 px-3.5 py-2 rounded-lg font-bold text-xs transition-all whitespace-nowrap"
+                class="group relative flex items-center gap-2.5 px-4 py-2.5 rounded-t-lg font-bold text-xs transition-all whitespace-nowrap -mb-px"
                 [ngClass]="{
-                    'bg-gold-400 text-black shadow-[0_0_18px_rgba(212,175,55,0.35)]': tabState(tab.id) === 'active',
+                    'bg-white text-black shadow-[0_-2px_12px_rgba(0,0,0,0.35)]': tabState(tab.id) === 'active',
                     'text-emerald-300 hover:bg-emerald-400/10': tabState(tab.id) === 'complete',
                     'text-zinc-600 cursor-not-allowed opacity-60': tabState(tab.id) === 'locked',
                     'text-zinc-400 hover:bg-white/5 hover:text-white': tabState(tab.id) === 'pending'
@@ -55,7 +55,7 @@
                 <!-- Step indicator: number / check / lock -->
                 <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] border shrink-0"
                     [ngClass]="{
-                        'bg-black/20 border-black/30 text-black': tabState(tab.id) === 'active',
+                        'bg-gold-400/20 border-gold-400/50 text-black': tabState(tab.id) === 'active',
                         'bg-emerald-400/20 border-emerald-400/40 text-emerald-300': tabState(tab.id) === 'complete',
                         'border-zinc-700 text-zinc-600': tabState(tab.id) === 'locked',
                         'border-zinc-600 text-zinc-400': tabState(tab.id) === 'pending'
@@ -76,6 +76,10 @@
                     }
                 </span>
                 <span>{{ tab.label | translate }}</span>
+
+                @if (tabState(tab.id) === 'active') {
+                <span class="absolute bottom-0 left-0 w-full h-0.5 bg-gold-400 rounded-full"></span>
+                }
             </button>
             }
         </nav>
@@ -133,6 +137,8 @@
 
             @if (activeTab() === 'teams') {
             <app-tournament-teams [tournamentId]="tournament()?.id || ''"
+                [tournamentName]="settings.general.name"
+                [squadSize]="settings.participants.squadSize"
                 [maxTeams]="settings.participants.maxTeams"></app-tournament-teams>
             }
 
@@ -143,7 +149,8 @@
             }
 
             @if (activeTab() === 'matches') {
-            <app-tournament-matches [tournamentId]="tournament()?.id || ''"></app-tournament-matches>
+            <app-tournament-matches [tournamentId]="tournament()?.id || ''"
+                [venues]="settings.venues"></app-tournament-matches>
             }
 
             @if (activeTab() === 'presentation') {

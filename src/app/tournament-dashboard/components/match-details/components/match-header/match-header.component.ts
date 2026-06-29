@@ -14,6 +14,8 @@ export class MatchHeaderComponent implements OnInit, OnDestroy, OnChanges {
     private translate = inject(TranslateService);
     @Input() match: any;
     @Input() isLoading = false;
+    // Whether both teams have a complete, valid lineup. Gates the Start Match button.
+    @Input() canStart = false;
 
     @Output() editMatch = new EventEmitter<void>();
     @Output() addLineup = new EventEmitter<void>();
