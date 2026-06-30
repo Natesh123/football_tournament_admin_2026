@@ -2,17 +2,18 @@ import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChange
 import { CommonModule } from '@angular/common';
 import { FormsModule, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
-import { ValidationComponent } from '../../../shared/components/validation/validation.component';
 
 @Component({
     selector: 'app-tournament-finance',
     standalone: true,
     // FormsModule kept for the prize-distribution array (ngModel); ReactiveForms for the validated income card.
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslateModule, ValidationComponent],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslateModule],
     templateUrl: './tournament-finance.component.html'
 })
 export class TournamentFinanceComponent implements OnInit, OnChanges {
     @Input() data!: any;
+    /** Base entry fee set in the Participation step — the single source of truth for the registration fee. */
+    @Input() baseEntryFee?: number;
     @Output() formReady = new EventEmitter<FormGroup>();
 
     private fb = inject(FormBuilder);
@@ -29,13 +30,19 @@ export class TournamentFinanceComponent implements OnInit, OnChanges {
         if (changes['data'] && this.data) {
             if (!this.data.prizeDistribution) this.data.prizeDistribution = [0, 0, 0];
             this.buildForm();
+        } else if (changes['baseEntryFee'] && this.form) {
+            // Keep the (read-only) registration fee mirroring the Base Entry Fee.
+            this.form.patchValue({ regFee: this.baseEntryFee ?? 0 });
         }
     }
 
     private buildForm() {
         if (!this.data) return;
+        // The registration fee is sourced from the Base Entry Fee (Participation step); it is
+        // displayed read-only here so it can't diverge from the single source of truth.
+        const regFee = this.baseEntryFee ?? this.data.regFee ?? 0;
         this.form = this.fb.group({
-            regFee: [this.data.regFee ?? 0, [Validators.required, Validators.min(0)]],
+            regFee: [regFee, [Validators.required, Validators.min(0)]],
             paymentMethod: [this.data.paymentMethod || 'bank'],
             paymentInfo: [this.data.paymentInfo || '', [Validators.maxLength(1000)]]
         });

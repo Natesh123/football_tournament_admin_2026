@@ -7,6 +7,7 @@ import { API_URL } from '../../../core/config/app.config';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { UiService } from '../../../services/ui.service';
 import { AuthService } from '../../../auth/auth.service';
+import { CreateTeamModalComponent } from '../../../teams/components/create-team-modal/create-team-modal.component';
 
 interface Team {
     id: string;
@@ -27,7 +28,7 @@ interface TournamentTeam {
 @Component({
     selector: 'app-tournament-teams',
     standalone: true,
-    imports: [CommonModule, FormsModule, TranslateModule],
+    imports: [CommonModule, FormsModule, TranslateModule, CreateTeamModalComponent],
     templateUrl: './tournament-teams.component.html',
     styleUrls: []
 })
@@ -59,16 +60,11 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
     availableTeams = signal<Team[]>([]); // Teams not in this tournament
     isLoading = signal(true);
     isModalOpen = signal(false);
-    modalMode = signal<'new' | 'existing'>('existing');
     selectedExistingTeamIds = signal<string[]>([]);
 
-    newTeam = signal<Partial<Team>>({
-        name: '',
-        shortName: '',
-        teamType: 'Club',
-        city: '',
-        logoUrl: ''
-    });
+    // The full "Register New Team" popup (shared CreateTeamModalComponent), opened by
+    // admins to create a brand-new team into the global pool from this tournament.
+    isCreateTeamModalOpen = signal(false);
 
     // Data Table State
     searchQuery = signal('');
@@ -146,16 +142,7 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
             this.notify('TOURNAMENT_DASHBOARD.TOAST.MAX_TEAMS_REACHED', 'error');
             return;
         }
-        this.newTeam.set({
-            name: '',
-            shortName: '',
-            teamType: 'Club',
-            city: '',
-            logoUrl: ''
-        });
         this.selectedExistingTeamIds.set([]);
-        // Organizers can only register from the existing pool.
-        this.modalMode.set('existing');
         this.isModalOpen.set(true);
     }
 
@@ -163,8 +150,26 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
         this.isModalOpen.set(false);
     }
 
-    setModalMode(mode: 'new' | 'existing') {
-        this.modalMode.set(mode);
+    /**
+     * Admin-only: launch the full "Register New Team" popup to create a brand-new team.
+     * Closes the existing-team picker so only one modal is shown at a time.
+     */
+    openCreateTeamModal() {
+        this.isModalOpen.set(false);
+        this.isCreateTeamModalOpen.set(true);
+    }
+
+    closeCreateTeamModal() {
+        this.isCreateTeamModalOpen.set(false);
+    }
+
+    /**
+     * After a brand-new team is created via the popup, close it and guide the admin to
+     * build the team's squad — a team with no members can't be mapped to a tournament yet.
+     */
+    onNewTeamCreated(teamId: string) {
+        this.closeCreateTeamModal();
+        this.promptCreateMembers(teamId);
     }
 
     toggleExistingTeamSelection(teamId: string) {
@@ -178,72 +183,47 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
     }
 
     saveTeam() {
-        if (this.modalMode() === 'existing') {
-            const teamIds = this.selectedExistingTeamIds();
-            if (!teamIds || teamIds.length === 0) return;
+        const teamIds = this.selectedExistingTeamIds();
+        if (!teamIds || teamIds.length === 0) return;
 
-            // Check max teams limit
-            if (this.teams().length + teamIds.length > this.maxTeams) {
-                this.notify('TOURNAMENT_DASHBOARD.TOAST.MAX_TEAMS_EXCEEDED', 'error');
-                return;
-            }
+        // Check max teams limit
+        if (this.teams().length + teamIds.length > this.maxTeams) {
+            this.notify('TOURNAMENT_DASHBOARD.TOAST.MAX_TEAMS_EXCEEDED', 'error');
+            return;
+        }
 
-            this.ui.startAction();
-            this.http.post<{ success: boolean, data: TournamentTeam[], skipped?: { teamId: any, reason: string }[] }>(`${API_URL}/api/tournaments/${this.tournamentId}/teams/bulk`, { teamIds })
-                .subscribe({
-                    next: (res) => {
-                        const newRegistrations = res.data || [];
-                        this.teams.update(t => [...newRegistrations, ...t]);
+        this.ui.startAction();
+        this.http.post<{ success: boolean, data: TournamentTeam[], skipped?: { teamId: any, reason: string }[] }>(`${API_URL}/api/tournaments/${this.tournamentId}/teams/bulk`, { teamIds })
+            .subscribe({
+                next: (res) => {
+                    const newRegistrations = res.data || [];
+                    this.teams.update(t => [...newRegistrations, ...t]);
 
-                        // Remove only the teams that were actually added from the available list
-                        const addedSet = new Set(newRegistrations.map(r => r.team.id));
-                        this.availableTeams.update(av => av.filter(a => !addedSet.has(a.id)));
+                    // Remove only the teams that were actually added from the available list
+                    const addedSet = new Set(newRegistrations.map(r => r.team.id));
+                    this.availableTeams.update(av => av.filter(a => !addedSet.has(a.id)));
 
-                        this.ui.endAction();
+                    this.ui.endAction();
 
-                        const skipped = res.skipped || [];
-                        if (skipped.length > 0) {
-                            // Surface each conflict (overlap / shared player) to the organizer.
-                            for (const s of skipped) {
-                                this.ui.showToast(s.reason, 'error');
-                            }
-                            if (newRegistrations.length > 0) {
-                                this.notify('TOURNAMENT_DASHBOARD.TOAST.ADD_TEAMS_SUCCESS', 'success');
-                            }
-                        } else {
+                    const skipped = res.skipped || [];
+                    if (skipped.length > 0) {
+                        // Surface each conflict (overlap / shared player) to the organizer.
+                        for (const s of skipped) {
+                            this.ui.showToast(s.reason, 'error');
+                        }
+                        if (newRegistrations.length > 0) {
                             this.notify('TOURNAMENT_DASHBOARD.TOAST.ADD_TEAMS_SUCCESS', 'success');
                         }
-                        this.closeModal();
-                    },
-                    error: (err) => {
-                        this.ui.endAction();
-                        this.notify(err?.error?.message || 'TOURNAMENT_DASHBOARD.TOAST.ADD_TEAMS_ERROR', 'error');
+                    } else {
+                        this.notify('TOURNAMENT_DASHBOARD.TOAST.ADD_TEAMS_SUCCESS', 'success');
                     }
-                });
-        } else {
-            const teamData = { ...this.newTeam() };
-            if (!teamData.name || !teamData.teamType) return;
-
-            // A brand-new team has no squad yet, so it can't be mapped to the tournament
-            // (min 16 members required). Create the team only, then guide the organizer to
-            // build its squad — it gets auto-added once it reaches the member threshold.
-            this.ui.startAction();
-            this.http.post<Team>(`${API_URL}/api/teams`, teamData).subscribe({
-                next: (newTeam) => {
-                    this.ui.endAction();
                     this.closeModal();
-                    this.promptCreateMembers(newTeam.id);
                 },
                 error: (err) => {
                     this.ui.endAction();
-                    // 409 = a team with this name already exists → guide the user.
-                    const key = err?.status === 409
-                        ? 'TOURNAMENT_DASHBOARD.TOAST.TEAM_NAME_EXISTS'
-                        : 'TOURNAMENT_DASHBOARD.TOAST.CREATE_TEAM_ERROR';
-                    this.notify(key, 'error');
+                    this.notify(err?.error?.message || 'TOURNAMENT_DASHBOARD.TOAST.ADD_TEAMS_ERROR', 'error');
                 }
             });
-        }
     }
 
     /**

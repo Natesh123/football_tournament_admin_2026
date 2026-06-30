@@ -22,6 +22,11 @@ export class MatchHeaderComponent implements OnInit, OnDestroy, OnChanges {
     @Output() startMatch = new EventEmitter<void>();
     @Output() completeMatch = new EventEmitter<void>();
 
+    /** Live match on a break — its clock anchor is cleared. */
+    get isPaused(): boolean {
+        return this.match?.status === 'live' && !this.match?.periodStartedAt;
+    }
+
     // Signals so the ticking clock re-renders under zoneless change detection.
     countdown = signal('');
     liveMinute = signal(0);

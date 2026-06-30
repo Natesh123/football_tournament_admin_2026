@@ -158,10 +158,30 @@ export class TournamentDashboardComponent implements OnInit {
     formatChanged = false;
     showValidationErrors = signal(false);
 
+    // Live counts for the non-gated runtime tabs, fetched independently of the child
+    // tabs (which only mount when active). These drive the teams/schedule/matches
+    // completion ticks so those tabs go green only once real data exists.
+    registeredTeamsCount = signal<number>(0);
+    scheduledMatchesCount = signal<number>(0);
+
+    // Sequential setup frontier: gated steps whose order-index is <= this are unlocked.
+    // It advances ONE step per "Save & Next" — so a later step can't unlock just because
+    // its default values happen to satisfy a completion rule (e.g. format/finance defaults).
+    maxStepIndex = signal<number>(0);
+
     /** The reactive FormGroup of the currently-mounted migrated tab (null for non-form tabs). */
     activeForm = signal<FormGroup | null>(null);
 
     settings: TournamentSettings = this.getDefaultSettings();
+
+    // Snapshot of `settings` as last persisted (on load and after each successful
+    // save). Tab gating is evaluated against THIS, not the live form — so editing
+    // a tab does not unlock the next step until the user actually saves it.
+    private savedSettings: TournamentSettings = this.getDefaultSettings();
+
+    private snapshotSavedSettings() {
+        this.savedSettings = JSON.parse(JSON.stringify(this.settings));
+    }
 
     // Wizard steps in display order. `gated` steps must be completed sequentially;
     // non-gated (runtime) steps unlock once all gated steps are complete.
@@ -193,32 +213,76 @@ export class TournamentDashboardComponent implements OnInit {
             && !!s.general.organizer?.phone?.trim(),
         participants: s => s.participants.minTeams > 0 && s.participants.maxTeams >= s.participants.minTeams
             && !!s.participants.regOpenDate && !!s.participants.regCloseDate,
-        rules: () => true,
+        rules: s => !!s.rules.playersOnField && s.rules.playersOnField > 0,
         venues: s => !!s.venues.primaryVenue?.trim(),
         format: s => !!s.format.type,
         finance: s => s.finance.regFee >= 0
     };
 
+    /**
+     * Completion predicates for the non-gated runtime tabs, evaluated against the
+     * live counts (teams registered, matches generated) rather than `settings`.
+     * A tab here is "complete" only once the corresponding real work is done.
+     */
+    private runtimeCompletionRules: Record<string, () => boolean> = {
+        teams: () => this.registeredTeamsCount() >= (this.savedSettings.participants.minTeams || 2),
+        schedule: () => this.scheduledMatchesCount() > 0,
+        matches: () => this.scheduledMatchesCount() > 0,
+    };
+
     // ── Wizard completion / gating ──────────────────────────────────────────
+    // Evaluated against the SAVED snapshot so a step is only "complete" (and thus
+    // unlocks the next one) once its data has actually been persisted.
     isComplete(tabId: string): boolean {
         const rule = this.completionRules[tabId];
-        return rule ? rule(this.settings) : true;
+        if (rule) return rule(this.savedSettings);
+        // Runtime tabs (teams/schedule/matches) are complete only when real data
+        // exists — never merely because the gated setup finished and unlocked them.
+        const runtimeRule = this.runtimeCompletionRules[tabId];
+        if (runtimeRule) return runtimeRule();
+        // Any other tab (sponsors, presentation, status, results) has no completion
+        // criterion, so it stays neutral ("pending") instead of falsely green.
+        return false;
     }
 
     private allGatedComplete(): boolean {
         return this.gatedOrder.every(id => this.isComplete(id));
     }
 
-    /** A step is locked when a required predecessor is incomplete. */
+    /** True once the user has progressed (via Save & Next) through every gated step. */
+    private allGatedProgressed(): boolean {
+        return this.maxStepIndex() >= this.gatedOrder.length;
+    }
+
+    /**
+     * Baseline the wizard frontier from the saved data: unlock the contiguous run of
+     * already-complete gated steps. A freshly created tournament therefore stops at the
+     * first incomplete step, while a fully-configured one re-opens completely unlocked.
+     */
+    private initProgress() {
+        let i = 0;
+        while (i < this.gatedOrder.length && this.isComplete(this.gatedOrder[i])) i++;
+        this.maxStepIndex.set(i);
+    }
+
+    /** Move the frontier forward by one when the active gated step is saved & complete. */
+    private advanceProgress() {
+        const idx = this.gatedOrder.indexOf(this.activeTab());
+        if (idx === -1) return;                       // not a gated setup step
+        if (!this.isComplete(this.activeTab())) return; // don't unlock the next step yet
+        if (idx + 1 > this.maxStepIndex()) this.maxStepIndex.set(idx + 1);
+    }
+
+    /**
+     * A step is locked until the user reaches it via "Save & Next":
+     *  - gated steps unlock sequentially up to the frontier (`maxStepIndex`);
+     *  - non-gated (runtime) steps unlock only once the whole gated wizard is done.
+     */
     isLocked(tabId: string): boolean {
         const tab = this.wizardTabs.find(t => t.id === tabId);
         if (!tab) return false;
-        if (!tab.gated) return !this.allGatedComplete();
-        const idx = this.gatedOrder.indexOf(tabId);
-        for (let i = 0; i < idx; i++) {
-            if (!this.isComplete(this.gatedOrder[i])) return true;
-        }
-        return false;
+        if (!tab.gated) return !this.allGatedProgressed();
+        return this.gatedOrder.indexOf(tabId) > this.maxStepIndex();
     }
 
     /** Visual state for the stepper. */
@@ -235,11 +299,19 @@ export class TournamentDashboardComponent implements OnInit {
         return tab ? this.translate.instant(tab.label) : '';
     }
 
+    /** Label of the next gated step the user must Save & Next through to move the frontier. */
+    private nextRequiredStepLabel(): string {
+        const idx = this.maxStepIndex();
+        const id = idx < this.gatedOrder.length ? this.gatedOrder[idx] : undefined;
+        const tab = this.wizardTabs.find(t => t.id === id);
+        return tab ? this.translate.instant(tab.label) : this.firstIncompleteGatedLabel();
+    }
+
     /** Stepper click handler — blocks navigation to a locked step with a message. */
     goToTab(tabId: string) {
         if (this.isLocked(tabId)) {
             this.ui.showToast(
-                this.translate.instant('TOURNAMENT_DASHBOARD.WIZARD.LOCKED_MSG', { section: this.firstIncompleteGatedLabel() }),
+                this.translate.instant('TOURNAMENT_DASHBOARD.WIZARD.LOCKED_MSG', { section: this.nextRequiredStepLabel() }),
                 'error'
             );
             return;
@@ -385,6 +457,12 @@ export class TournamentDashboardComponent implements OnInit {
             next: (tournament) => {
                 this.tournament.set(tournament);
                 this.mergeTournamentToSettings(tournament);
+                // Baseline the gating snapshot from the persisted data on load.
+                this.snapshotSavedSettings();
+                // Seed the wizard frontier from how far the saved data already reaches.
+                this.initProgress();
+                // Pull live teams/matches counts so the runtime tabs reflect real progress.
+                this.refreshRuntimeProgress();
                 this.isLoading.set(false);
                 // Honour a deep-linked tab now that settings are loaded.
                 if (this.pendingTab && this.wizardTabs.some(t => t.id === this.pendingTab)) {
@@ -396,6 +474,24 @@ export class TournamentDashboardComponent implements OnInit {
             error: (err) => {
                 this.isLoading.set(false);
             }
+        });
+    }
+
+    /**
+     * Fetch the live counts that drive the runtime-tab completion ticks (registered
+     * teams + generated matches). Best-effort and non-blocking — on failure the
+     * counts are left as-is so the affected tabs simply stay "pending".
+     */
+    private refreshRuntimeProgress() {
+        const id = this.tournament()?.id;
+        if (!id) return;
+        this.tournamentService.getTeams(id).subscribe({
+            next: (regs) => this.registeredTeamsCount.set(Array.isArray(regs) ? regs.length : 0),
+            error: () => { /* leave the existing count untouched */ }
+        });
+        this.tournamentService.getStructure(id).subscribe({
+            next: (struct) => this.scheduledMatchesCount.set(struct?.matches?.length || 0),
+            error: () => { /* leave the existing count untouched */ }
         });
     }
 
@@ -526,11 +622,18 @@ export class TournamentDashboardComponent implements OnInit {
 
     setTab(tab: string) {
         // Reset the active form reference; the newly-mounted migrated tab (if any) re-emits via (formReady).
+        const prev = this.activeTab();
         this.activeForm.set(null);
         this.activeTab.set(tab);
         if (tab === 'format' && this.settings.format) {
             // Force a new object reference so ngOnChanges fires in the child component
             this.settings.format = { ...this.settings.format };
+        }
+        // Leaving a tab where runtime data is edited (teams registered, schedule
+        // generated) inside the child component — re-pull the counts so the stepper
+        // ticks update to reflect that work.
+        if (prev !== tab && (prev === 'teams' || prev === 'schedule' || prev === 'matches')) {
+            this.refreshRuntimeProgress();
         }
     }
 
@@ -580,6 +683,8 @@ export class TournamentDashboardComponent implements OnInit {
 
         this.saveChanges(false, () => {
             if (goNext) {
+                // Unlock the next step only now that the current one is saved & complete.
+                this.advanceProgress();
                 const next = this.nextTabId();
                 if (next && !this.isLocked(next)) this.setTab(next);
             }
@@ -738,7 +843,10 @@ export class TournamentDashboardComponent implements OnInit {
             error: (err) => {
                 if (!silent) {
                     this.ui.endAction();
-                    this.showToast('TOURNAMENT_DASHBOARD.TOAST.SAVE_ERROR', 'error');
+                    // Surface the server's actual reason (e.g. a specific validation/DB
+                    // message) instead of a generic failure, so the cause is visible.
+                    const serverMsg = err?.error?.message;
+                    this.showToast(serverMsg || 'TOURNAMENT_DASHBOARD.TOAST.SAVE_ERROR', 'error');
                 }
             }
         });
@@ -746,6 +854,13 @@ export class TournamentDashboardComponent implements OnInit {
 
     /** Common save-completion: stop the loader, toast success, and advance if requested. */
     private finishSave(silent: boolean, onSuccess: (() => void) | undefined, successKey: string) {
+        // Data is now persisted — refresh the gating snapshot so the just-saved tab
+        // counts as complete and the next step unlocks. Must run before onSuccess
+        // (which may navigate to the next, now-unlocked, tab).
+        this.snapshotSavedSettings();
+        // A save may have (re)generated the structure once teams exist — refresh the
+        // runtime counts so the schedule/matches ticks stay accurate.
+        this.refreshRuntimeProgress();
         if (!silent) {
             this.ui.endAction();
             this.showToast(successKey, 'success');

@@ -107,7 +107,7 @@
             }
 
             @if (activeTab() === 'participants') {
-            <app-tournament-participants [data]="settings.participants"
+            <app-tournament-participants [data]="settings.participants" [startDate]="settings.schedule.startDate"
                 (formReady)="onActiveForm($event)"></app-tournament-participants>
             }
 
@@ -127,7 +127,7 @@
             }
 
             @if (activeTab() === 'finance') {
-            <app-tournament-finance [data]="settings.finance"
+            <app-tournament-finance [data]="settings.finance" [baseEntryFee]="settings.participants.regFee"
                 (formReady)="onActiveForm($event)"></app-tournament-finance>
             }
 

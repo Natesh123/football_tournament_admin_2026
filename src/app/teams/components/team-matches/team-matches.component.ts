@@ -29,7 +29,7 @@ import { TeamService, TeamStats } from '../../team.service';
                   </div>
                 </div>
                 <div class="text-right shrink-0">
-                  <p class="text-zinc-300 text-sm">{{ m.date | date:'mediumDate' }}</p>
+                  <p class="text-zinc-300 text-sm">{{ m.date | date:'dd/MM/yyyy' }}</p>
                   <span class="text-xs uppercase tracking-wider font-bold"
                         [ngClass]="m.status === 'live' ? 'text-red-500' : 'text-zinc-500'">{{ m.status }}</span>
                 </div>
@@ -71,7 +71,7 @@ import { TeamService, TeamStats } from '../../team.service';
                 </div>
                 <div class="text-right shrink-0">
                   <p class="text-white font-bold">{{ m.score }}</p>
-                  <p class="text-zinc-500 text-xs">{{ m.date | date:'mediumDate' }}</p>
+                  <p class="text-zinc-500 text-xs">{{ m.date | date:'dd/MM/yyyy' }}</p>
                 </div>
               </div>
             }

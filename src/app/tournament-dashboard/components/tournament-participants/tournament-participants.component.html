@@ -26,14 +26,32 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block required-mark">{{ 'TOURNAMENT_DASHBOARD.PARTICIPANTS.SQUAD_SIZE' | translate }}</label>
+                    <!-- Squad Size with tooltip -->
+                    <div class="relative group">
+                        <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                            <span class="required-mark">{{ 'TOURNAMENT_DASHBOARD.PARTICIPANTS.SQUAD_SIZE' | translate }}</span>
+                            <span class="text-gold-400 cursor-help text-xs leading-none">&#9432;</span>
+                        </label>
+                        <!-- Tooltip -->
+                        <div class="absolute z-20 left-0 bottom-full mb-2 hidden group-hover:block w-72
+                                    bg-zinc-900 border border-gold-400/40 text-zinc-300 text-xs rounded-lg px-4 py-3 shadow-xl pointer-events-none">
+                            {{ 'TOURNAMENT_DASHBOARD.PARTICIPANTS.SQUAD_SIZE_TOOLTIP' | translate }}
+                        </div>
                         <input type="number" formControlName="squadSize"
                             class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all" />
                         <app-validation [control]="form.controls['squadSize']" label="Squad size" />
                     </div>
-                    <div>
-                        <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block required-mark">{{ 'TOURNAMENT_DASHBOARD.PARTICIPANTS.PLAYER_LIMIT' | translate }}</label>
+                    <!-- Maximum Squad Size with tooltip -->
+                    <div class="relative group">
+                        <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                            <span>{{ 'TOURNAMENT_DASHBOARD.PARTICIPANTS.PLAYER_LIMIT' | translate }}</span>
+                            <span class="text-gold-400 cursor-help text-xs leading-none">&#9432;</span>
+                        </label>
+                        <!-- Tooltip -->
+                        <div class="absolute z-20 right-0 bottom-full mb-2 hidden group-hover:block w-72
+                                    bg-zinc-900 border border-gold-400/40 text-zinc-300 text-xs rounded-lg px-4 py-3 shadow-xl pointer-events-none">
+                            {{ 'TOURNAMENT_DASHBOARD.PARTICIPANTS.PLAYER_LIMIT_TOOLTIP' | translate }}
+                        </div>
                         <input type="number" formControlName="playerLimit"
                             class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all" />
                         <app-validation [control]="form.controls['playerLimit']" label="Player limit" />
@@ -49,16 +67,17 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block required-mark">{{ 'TOURNAMENT_DASHBOARD.PARTICIPANTS.REG_OPEN' | translate }}</label>
-                        <input type="date" formControlName="regOpenDate" [min]="todayDate"
-                            class="w-full bg-white/5 border rounded-lg px-4 py-3 text-sm text-white focus:outline-none transition-all [color-scheme:dark]"
-                            [ngClass]="form.controls['regOpenDate'].invalid && form.controls['regOpenDate'].touched ? 'border-red-500 ring-1 ring-red-500/50' : 'border-black-border focus:border-gold-400'" />
+                        <app-date-picker formControlName="regOpenDate" [min]="todayDate"
+                            fieldClass="w-full bg-white/5 border rounded-lg px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none transition-all [color-scheme:dark]"
+                            [invalid]="form.controls['regOpenDate'].invalid && form.controls['regOpenDate'].touched" />
                         <app-validation [control]="form.controls['regOpenDate']" label="Registration open date" />
                     </div>
                     <div>
                         <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block required-mark">{{ 'TOURNAMENT_DASHBOARD.PARTICIPANTS.REG_CLOSE' | translate }}</label>
-                        <input type="date" formControlName="regCloseDate" [min]="form.controls['regOpenDate'].value || todayDate"
-                            class="w-full bg-white/5 border rounded-lg px-4 py-3 text-sm text-white focus:outline-none transition-all [color-scheme:dark]"
-                            [ngClass]="form.controls['regCloseDate'].invalid && form.controls['regCloseDate'].touched ? 'border-red-500 ring-1 ring-red-500/50' : 'border-black-border focus:border-gold-400'" />
+                        <app-date-picker formControlName="regCloseDate" [min]="form.controls['regOpenDate'].value || todayDate"
+                            [max]="regCloseMax"
+                            fieldClass="w-full bg-white/5 border rounded-lg px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none transition-all [color-scheme:dark]"
+                            [invalid]="form.controls['regCloseDate'].invalid && form.controls['regCloseDate'].touched" />
                         <app-validation [control]="form.controls['regCloseDate']" label="Registration close date" />
                     </div>
                 </div>

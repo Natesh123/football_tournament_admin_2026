@@ -31,18 +31,18 @@
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.START_DATE' | translate }} *</label>
-                    <input type="date" [(ngModel)]="data.startDate" [min]="todayDate"
-                        class="w-full bg-white/5 border rounded-lg px-4 py-3 text-sm text-white focus:outline-none transition-all [color-scheme:dark]"
-                        [ngClass]="showValidationErrors && !data.startDate ? 'border-red-500 ring-1 ring-red-500/50 focus:border-red-500 focus:ring-red-500/50' : 'border-black-border focus:border-gold-400 focus:ring-1 focus:ring-gold-400/50'" />
+                    <app-date-picker [(ngModel)]="data.startDate" [min]="todayDate"
+                        fieldClass="w-full bg-white/5 border rounded-lg px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none transition-all [color-scheme:dark]"
+                        [invalid]="showValidationErrors && !data.startDate" />
                     @if (showValidationErrors && !data.startDate) {
                     <p class="text-xs text-red-500 mt-1.5 font-bold">{{ 'COMMON.REQUIRED_FIELD' | translate }}</p>
                     }
                 </div>
                 <div>
                     <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.SCHEDULE.END_DATE' | translate }} *</label>
-                    <input type="date" [(ngModel)]="data.endDate" [min]="data.startDate || todayDate"
-                        class="w-full bg-white/5 border rounded-lg px-4 py-3 text-sm text-white focus:outline-none transition-all [color-scheme:dark]"
-                        [ngClass]="showValidationErrors && !data.endDate ? 'border-red-500 ring-1 ring-red-500/50 focus:border-red-500 focus:ring-red-500/50' : 'border-black-border focus:border-gold-400 focus:ring-1 focus:ring-gold-400/50'" />
+                    <app-date-picker [(ngModel)]="data.endDate" [min]="data.startDate || todayDate"
+                        fieldClass="w-full bg-white/5 border rounded-lg px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none transition-all [color-scheme:dark]"
+                        [invalid]="showValidationErrors && !data.endDate" />
                     @if (showValidationErrors && !data.endDate) {
                     <p class="text-xs text-red-500 mt-1.5 font-bold">{{ 'COMMON.REQUIRED_FIELD' | translate }}</p>
                     }
@@ -277,7 +277,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            {{ match.startTime | date:'medium' }}
+                            {{ match.startTime | date:'dd/MM/yyyy, HH:mm' }}
                         </div>
                         <div *ngIf="match.venue" class="flex items-center gap-1.5">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gold-500/70" fill="none"

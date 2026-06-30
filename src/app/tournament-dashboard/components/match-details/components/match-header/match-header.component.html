@@ -26,8 +26,9 @@
                         {{ 'MATCH_DETAILS.HEADER.SCHEDULED' | translate }}
                     </span>
                     <span *ngIf="match?.status === 'live'"
-                        class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-red-500/10 text-red-500 border border-red-500/20 animate-pulse">
-                        {{ 'MATCH_DETAILS.HEADER.LIVE' | translate }}
+                        class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider border"
+                        [ngClass]="isPaused ? 'bg-amber-500/10 text-amber-400 border-amber-500/30' : 'bg-red-500/10 text-red-500 border-red-500/20 animate-pulse'">
+                        {{ (isPaused ? 'MATCH_DETAILS.HEADER.BREAK' : 'MATCH_DETAILS.HEADER.LIVE') | translate }}
                     </span>
                     <span *ngIf="match?.status === 'completed'"
                         class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-green-500/10 text-green-500 border border-green-500/20">
@@ -133,7 +134,7 @@
                 </div>
                 <div>
                     <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">{{ 'MATCH_DETAILS.HEADER.DATE_TIME' | translate }}</p>
-                    <p class="text-sm font-bold text-white">{{ match?.startTime ? (match.startTime | date:'medium') :
+                    <p class="text-sm font-bold text-white">{{ match?.startTime ? (match.startTime | date:'dd/MM/yyyy, HH:mm') :
                         ('COMMON.TBD' | translate) }}</p>
                 </div>
             </div>

@@ -7,11 +7,12 @@ import { API_URL } from '../../../core/config/app.config';
 import { TeamMemberService, TeamMember } from '../../team-member.service';
 import { UiService } from '../../../services/ui.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { DatePickerComponent } from '../../../shared/components/date-picker/date-picker.component';
 
 @Component({
   selector: 'app-team-members',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule],
+  imports: [CommonModule, FormsModule, TranslateModule, DatePickerComponent],
   templateUrl: './team-members.component.html',
   styles: [`
       .custom-scrollbar::-webkit-scrollbar {

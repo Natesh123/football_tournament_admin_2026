@@ -2,6 +2,7 @@
  *   import { ValidationComponent, CustomValidators, revealAndFocusInvalid } from '../../shared';
  */
 export * from './components/validation/validation.component';
+export * from './components/date-picker/date-picker.component';
 export * from './validators/custom-validators';
 export * from './constants/validation-messages';
 export * from './utils/form.util';

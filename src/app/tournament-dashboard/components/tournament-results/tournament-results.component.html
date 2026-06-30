@@ -219,7 +219,7 @@
                 <div *ngIf="matches().length > 0">
                     @for (stageGroup of matches(); track stageGroup.stage) {
                     <div class="mb-6">
-                        <h3 class="text-sm font-black text-gold-400 uppercase tracking-wider mb-3 ml-2">{{ stageGroup.stage }}</h3>
+                        <h3 class="text-sm font-black text-gold-400 uppercase tracking-wider mb-3 ml-2">{{ stageGroup.stage | translate }}</h3>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             @for (match of stageGroup.matches; track match.id) {
@@ -244,7 +244,7 @@
                                             </ng-container>
                                             <ng-template #scheduledSlot>
                                                 <div class="bg-zinc-900 border border-zinc-800 px-3 py-1 rounded text-xs font-bold text-zinc-400 text-center whitespace-nowrap">
-                                                    {{ match.startTime ? (match.startTime | date:'MMM d, HH:mm') : 'TBD' }}
+                                                    {{ match.startTime ? (match.startTime | date:'dd/MM/yyyy, HH:mm') : 'TBD' }}
                                                 </div>
                                                 <span class="text-[10px] font-bold text-zinc-600 uppercase mt-1">Scheduled</span>
                                             </ng-template>

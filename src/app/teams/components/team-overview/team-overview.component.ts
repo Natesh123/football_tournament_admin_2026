@@ -101,7 +101,7 @@ import { TeamService, TeamStats } from '../../team.service';
                     {{ match.result }}
                   </span>
                 </td>
-                <td class="p-4 text-zinc-400">{{ match.date | date:'mediumDate' }}</td>
+                <td class="p-4 text-zinc-400">{{ match.date | date:'dd/MM/yyyy' }}</td>
                 <td class="p-4 text-zinc-400">{{ match.tournament }}</td>
               </tr>
               <tr *ngIf="(stats()?.recentMatches?.length ?? 0) === 0">

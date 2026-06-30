@@ -101,6 +101,9 @@ export class MatchDetailsComponent implements OnInit {
     // Referee added time — free numeric input (minutes)
     addedTimeInput = signal<number | null>(null);
 
+    // Extra-time minutes entered via the event form's "Extra Time" type.
+    extraTimeInput = signal<number | null>(null);
+
     // Penalty shootout — currently selected taker per side
     penaltyTakerHome = signal<string>('');
     penaltyTakerAway = signal<string>('');
@@ -356,6 +359,14 @@ export class MatchDetailsComponent implements OnInit {
         return players;
     }
 
+    /** Routes the "Add Event" button to the right handler based on the selected type. */
+    onAddEventClick() {
+        const t = this.eventFormType();
+        if (t === 'extra_time') this.addExtraTime();
+        else if (t === 'added_time') this.setAddedTime();
+        else this.submitDirectEvent();
+    }
+
     submitDirectEvent() {
         if (!this.eventFormMinute()) {
             this.showToast(this.translate.instant('MATCH_DETAILS.TOAST.ENTER_MINUTE'), 'error');
@@ -424,6 +435,7 @@ export class MatchDetailsComponent implements OnInit {
         }
         this.patchLiveState({ addedMinutes: minutes }, 'MATCH_DETAILS.TOAST.ADDED_TIME_SET');
         this.addedTimeInput.set(null);
+        this.eventFormType.set('goal'); // reset the form type once added time is set
     }
 
     clearAddedTime() {
@@ -431,10 +443,38 @@ export class MatchDetailsComponent implements OnInit {
         this.addedTimeInput.set(null);
     }
 
+    // ── Break / Resume ───────────────────────────────────────────────────────────
+    /** A live match is "paused" (on a break) when its clock anchor is cleared. */
+    get isPaused(): boolean {
+        const m = this.match();
+        return m?.status === 'live' && !m?.periodStartedAt;
+    }
+
+    toggleBreak() {
+        const action = this.isPaused ? 'resume' : 'pause';
+        this.patchLiveState(
+            { breakAction: action },
+            action === 'pause' ? 'MATCH_DETAILS.TOAST.MATCH_PAUSED' : 'MATCH_DETAILS.TOAST.MATCH_RESUMED'
+        );
+    }
+
     // ── Extra time ───────────────────────────────────────────────────────────────
+    // Started from the "Extra Time" event type: the admin enters how many extra
+    // minutes, which flips the match into extra time and records the added minutes.
+    addExtraTime() {
+        const minutes = Number(this.extraTimeInput());
+        if (!minutes || minutes < 1) {
+            this.showToast(this.translate.instant('MATCH_DETAILS.TOAST.ENTER_MINUTE'), 'error');
+            return;
+        }
+        this.patchLiveState({ match_period: 'extra_time', addedMinutes: minutes }, 'MATCH_DETAILS.TOAST.EXTRA_TIME_STARTED');
+        this.extraTimeInput.set(null);
+        this.eventFormType.set('goal'); // reset the form type once extra time has begun
+    }
+
+    // Flip the period back/forward without a minute prompt (used by the Penalties tab).
     goToExtraTime() {
         this.patchLiveState({ match_period: 'extra_time' }, 'MATCH_DETAILS.TOAST.EXTRA_TIME_STARTED');
-        this.activeTab.set('extra_time');
     }
 
     // ── Penalty shootout ─────────────────────────────────────────────────────────

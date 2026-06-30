@@ -96,6 +96,22 @@ import { revealAndFocusInvalid } from '../../../shared/utils/form.util';
                 </select>
               </div>
 
+              <!-- Contact Number + Email -->
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1.5 required-mark">Contact Number</label>
+                  <input type="tel" formControlName="contactNumber" placeholder="e.g. 9876543210" maxlength="10"
+                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all">
+                  <app-validation [control]="form.controls['contactNumber']" label="Contact number" />
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Email <span class="text-zinc-600 normal-case font-normal">(optional)</span></label>
+                  <input type="email" formControlName="contactEmail" placeholder="e.g. team@example.com"
+                    class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all">
+                  <app-validation [control]="form.controls['contactEmail']" label="Email" />
+                </div>
+              </div>
+
               <!-- City / State / Country -->
               <div class="grid grid-cols-3 gap-4">
                 <div>
@@ -187,6 +203,8 @@ export class CreateTeamModalComponent implements OnChanges {
     name: ['', [Validators.required, Validators.maxLength(60), CustomValidators.noWhitespace], [this.uniqueTeamNameValidator()]],
     shortName: ['', [Validators.minLength(3), Validators.maxLength(5)]],
     teamType: [''],
+    contactNumber: ['', [Validators.required, CustomValidators.mobile]],
+    contactEmail: ['', [Validators.email]],
     city: [''],
     state: [''],
     country: [''],
@@ -232,6 +250,8 @@ export class CreateTeamModalComponent implements OnChanges {
       name: data.name || '',
       shortName: data.shortName || '',
       teamType: data.teamType || '',
+      contactNumber: data.contactNumber || '',
+      contactEmail: data.contactEmail || '',
       city: data.city || '',
       state: data.state || '',
       country: data.country || '',
@@ -285,8 +305,8 @@ export class CreateTeamModalComponent implements OnChanges {
 
   resetForm() {
     this.form.reset({
-      name: '', shortName: '', teamType: '', city: '', state: '',
-      country: '', foundedYear: null, homeGround: '', description: '', logo: null,
+      name: '', shortName: '', teamType: '', contactNumber: '', contactEmail: '',
+      city: '', state: '', country: '', foundedYear: null, homeGround: '', description: '', logo: null,
     });
     this.logoPreview.set(null);
     this.selectedLogoFile = null;

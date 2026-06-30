@@ -149,7 +149,7 @@ import { Match } from '../../../../models/portal.model';
                  </div>
                  
                  <div class="ml-6 text-right">
-                   <span class="text-gray-500 text-sm font-medium">{{ m.startTime | date:'MMM d' }}</span>
+                   <span class="text-gray-500 text-sm font-medium">{{ m.startTime | date:'dd/MM/yyyy' }}</span>
                    <span class="text-gray-600 text-xs block">{{ m.startTime | date:'shortTime' }}</span>
                  </div>
                </div>

@@ -57,7 +57,7 @@
                 @for (group of matches(); track group.date) {
                     <div class="mb-8">
                         <div class="flex items-center gap-4 mb-4">
-                            <h4 class="text-sm font-black text-zinc-400 uppercase tracking-widest">{{ group.date | date:'mediumDate' }}</h4>
+                            <h4 class="text-sm font-black text-zinc-400 uppercase tracking-widest">{{ group.date | date:'dd/MM/yyyy' }}</h4>
                             <div class="flex-1 h-px bg-black-border"></div>
                         </div>
                         <div class="space-y-4">

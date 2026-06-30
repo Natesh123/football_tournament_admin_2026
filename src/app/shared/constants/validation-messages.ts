@@ -36,10 +36,12 @@ export const VALIDATION_MESSAGES: Record<string, ValidationMessageFactory> = {
   mismatch: () => 'Passwords do not match.',
   url: () => 'Please enter a valid URL.',
   teamRange: () => 'Maximum teams must be greater than or equal to minimum teams.',
+  squadRange: () => 'Maximum squad size must be greater than or equal to minimum squad size.',
   uniqueName: () => 'This team name is already taken. Please choose another.',
   fileType: (e) => `Unsupported file type. Allowed: ${(e?.allowed ?? []).join(', ')}.`,
   fileSize: (e) => `File is too large. Maximum size is ${e?.maxSizeMb} MB.`,
   dateRange: () => 'Please select a date within the allowed range.',
+  closeBeforeStart: () => 'Registration must close before the tournament start date.',
 };
 
 /**

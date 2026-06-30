@@ -21,6 +21,17 @@ export class MatchTimelineComponent {
     get sortedEvents() {
         const list = [...this.events];
 
+        // Break / resume markers — synthetic, anchored to the minute they occurred.
+        const breaks = this.match?.breaks || [];
+        breaks.forEach((b: any, i: number) => {
+            list.push({
+                id: `virtual_break_${i}`,
+                type: b.type === 'resume' ? 'resume' : 'break',
+                minute: b.minute ?? 0,
+                teamSide: 'center'
+            });
+        });
+
         // Add virtual lineup event if lineups are configured
         if (this.homeLineup || this.awayLineup) {
             list.push({

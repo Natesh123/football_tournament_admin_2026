@@ -26,16 +26,25 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.RULES.PLAYERS_ON_FIELD' | translate }}</label>
-                    <input type="number" [(ngModel)]="data.playersOnField"
-                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all" />
-                </div>
-                <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.RULES.MIN_PLAYERS' | translate }}</label>
-                    <input type="number" [(ngModel)]="data.minPlayers"
-                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all" />
+            <div>
+                <!-- Players on Field with tooltip (required) -->
+                <div class="relative group">
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                        <span class="required-mark">{{ 'TOURNAMENT_DASHBOARD.RULES.PLAYERS_ON_FIELD' | translate }}</span>
+                        <span class="text-gold-400 cursor-help text-xs leading-none">&#9432;</span>
+                    </label>
+                    <!-- Tooltip -->
+                    <div class="absolute z-20 left-0 bottom-full mb-2 hidden group-hover:block w-72
+                                bg-zinc-900 border border-gold-400/40 text-zinc-300 text-xs rounded-lg px-4 py-3 shadow-xl pointer-events-none">
+                        {{ 'TOURNAMENT_DASHBOARD.RULES.PLAYERS_ON_FIELD_TOOLTIP' | translate }}
+                    </div>
+                    <input type="number" [(ngModel)]="data.playersOnField" name="playersOnField" #pof="ngModel" required min="1"
+                        class="w-full bg-white/5 border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none transition-all"
+                        [ngClass]="pof.invalid && pof.touched ? 'border-red-500' : 'border-black-border'" />
+                    <p *ngIf="pof.invalid && pof.touched"
+                        class="text-[10px] text-red-500 font-bold uppercase tracking-wider mt-1.5">
+                        {{ 'TOURNAMENT_DASHBOARD.RULES.PLAYERS_ON_FIELD_REQUIRED' | translate }}
+                    </p>
                 </div>
             </div>
 

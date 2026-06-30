@@ -5,13 +5,14 @@ import { TranslateModule } from '@ngx-translate/core';
 import { TournamentService } from '../../../tournament/tournament.service';
 import { LoaderComponent } from '../../loader/loader.component';
 import { ValidationComponent } from '../../../shared/components/validation/validation.component';
+import { DatePickerComponent } from '../../../shared/components/date-picker/date-picker.component';
 import { revealAndFocusInvalid } from '../../../shared/utils/form.util';
 import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-tournament-create-modal',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, TranslateModule, LoaderComponent, ValidationComponent],
+    imports: [CommonModule, ReactiveFormsModule, TranslateModule, LoaderComponent, ValidationComponent, DatePickerComponent],
     templateUrl: './tournament-create-modal.component.html'
 })
 export class TournamentCreateModalComponent {

@@ -8,6 +8,7 @@ import { TournamentService, TournamentDTO } from './tournament.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TournamentCreateModalComponent } from '../components/shared/tournament-create-modal/tournament-create-modal.component';
 import { UiService } from '../services/ui.service';
+import { DatePickerComponent } from '../shared/components/date-picker/date-picker.component';
 
 @Component({
     selector: 'app-tournament',
@@ -17,7 +18,8 @@ import { UiService } from '../services/ui.service';
         FormsModule,
         LoaderComponent,
         TranslateModule,
-        TournamentCreateModalComponent
+        TournamentCreateModalComponent,
+        DatePickerComponent
     ],
     templateUrl: './tournament.component.html',
 })
