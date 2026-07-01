@@ -12,13 +12,13 @@
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block required-mark">{{ 'TOURNAMENT_DASHBOARD.FINANCE_SETTINGS.TEAM_REG_FEE' | translate }}</label>
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.FINANCE_SETTINGS.TEAM_REG_FEE' | translate }}</label>
                     <div class="relative">
                         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 font-bold">€</span>
-                        <input type="number" formControlName="regFee"
-                            class="w-full bg-white/5 border border-black-border rounded-lg pl-8 pr-4 py-3 text-emerald-400 font-bold focus:border-gold-400 focus:outline-none transition-all" />
+                        <input type="number" formControlName="regFee" readonly tabindex="-1"
+                            class="w-full bg-white/5 border border-black-border rounded-lg pl-8 pr-4 py-3 text-emerald-400 font-bold opacity-70 cursor-not-allowed focus:outline-none transition-all" />
                     </div>
-                    <app-validation [control]="form.controls['regFee']" label="Registration fee" />
+                    <p class="text-[10px] text-zinc-500 mt-1">{{ 'TOURNAMENT_DASHBOARD.FINANCE_SETTINGS.TEAM_REG_FEE_HINT' | translate }}</p>
                 </div>
                 <div>
                     <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{ 'TOURNAMENT_DASHBOARD.FINANCE_SETTINGS.ACCEPTED_METHOD' | translate }}</label>

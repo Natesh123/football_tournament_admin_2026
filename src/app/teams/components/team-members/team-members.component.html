@@ -473,8 +473,8 @@
                         <div>
                             <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">{{
                                 'TEAM_MEMBERS.MODAL.DOB' | translate }}</label>
-                            <input type="date" [(ngModel)]="newMember.dob"
-                                class="w-full bg-black-main border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-gold-400 focus:outline-none placeholder:text-zinc-600 [color-scheme:dark]">
+                            <app-date-picker [(ngModel)]="newMember.dob"
+                                fieldClass="w-full bg-black-main border rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none [color-scheme:dark]" />
                         </div>
 
                         <!-- Preferred Foot -->

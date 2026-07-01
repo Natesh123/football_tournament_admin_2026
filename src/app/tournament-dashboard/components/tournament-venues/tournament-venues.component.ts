@@ -37,7 +37,7 @@ export class TournamentVenuesComponent implements OnInit, OnChanges {
             multipleVenues: [this.data.multipleVenues ?? false],
             primaryVenue: [this.data.primaryVenue || '', [Validators.required, Validators.maxLength(120)]],
             venueAddress: [this.data.venueAddress || ''],
-            pitchCount: [this.data.pitchCount ?? 1, [Validators.required, Validators.min(1)]],
+            pitchCount: [this.data.pitchCount ?? 1, [Validators.min(1)]],
             fieldType: [this.data.fieldType || 'grass']
         });
         this.form.valueChanges.subscribe(val => Object.assign(this.data, val));
@@ -48,8 +48,9 @@ export class TournamentVenuesComponent implements OnInit, OnChanges {
         if (!this.data.pitches) this.data.pitches = [];
         this.data.pitches.push({
             id: Date.now().toString(),
-            name: `Pitch ${this.data.pitches.length + 1}`,
-            type: this.data.fieldType || 'grass'
+            name: `Location ${this.data.pitches.length + 1}`,
+            type: this.data.fieldType || 'grass',
+            location: ''
         });
         if (this.form.value.multipleVenues) {
             this.form.patchValue({ pitchCount: this.data.pitches.length });

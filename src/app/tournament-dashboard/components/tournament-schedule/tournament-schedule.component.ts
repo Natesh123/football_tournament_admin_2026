@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TournamentService } from '../../../tournament/tournament.service';
 import { UiService } from '../../../services/ui.service';
+import { DatePickerComponent } from '../../../shared/components/date-picker/date-picker.component';
 
 @Component({
     selector: 'app-tournament-schedule',
@@ -11,7 +12,8 @@ import { UiService } from '../../../services/ui.service';
     imports: [
         CommonModule,
         FormsModule,
-        TranslateModule
+        TranslateModule,
+        DatePickerComponent
     ],
     templateUrl: './tournament-schedule.component.html'
 })
@@ -160,7 +162,7 @@ export class TournamentScheduleComponent implements OnInit {
                 this.referees.update(list => [...list, ref]);
                 this.newReferee = { name: '', role: 'Referee', phone: '' };
                 this.isAddingReferee.set(false);
-                this.ui.showToast('TOURNAMENT_DASHBOARD.SCHEDULE.REFEREES.ADDED', 'success');
+                this.ui.showToast(this.translate.instant('TOURNAMENT_DASHBOARD.SCHEDULE.REFEREES.ADDED'), 'success');
             },
             error: (err: any) => {
                 this.isAddingReferee.set(false);
@@ -251,6 +253,10 @@ export class TournamentScheduleComponent implements OnInit {
         const matches = this.structure()?.matches;
         if (matches && matches.length > 0) {
             this.openMatchEditor(matches[0]);
+        } else {
+            // Nothing to edit yet — tell the user to generate the schedule first
+            // instead of letting the button appear to do nothing.
+            this.ui.showToast(this.translate.instant('TOURNAMENT_DASHBOARD.SCHEDULE.ERR_NO_MATCHES_EDIT'), 'warning');
         }
     }
 

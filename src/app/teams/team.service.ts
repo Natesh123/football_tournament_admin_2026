@@ -16,6 +16,7 @@ export interface Team {
     homeGround?: string;
     description?: string;
     captainName?: string;
+    contactNumber?: string;
     contactEmail?: string;
     createdAt: string;
 }

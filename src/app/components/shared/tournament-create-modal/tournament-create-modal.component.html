@@ -55,15 +55,13 @@
                 <div>
                     <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block required-mark">{{
                         'DASHBOARD.MODAL.START_DATE' | translate }}</label>
-                    <input type="date" formControlName="startDate" [min]="todayDate"
-                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all [color-scheme:dark]" />
+                    <app-date-picker formControlName="startDate" [min]="todayDate" />
                     <app-validation [control]="form.controls['startDate']" label="Start date" />
                 </div>
                 <div>
                     <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block">{{
                         'DASHBOARD.MODAL.END_DATE' | translate }}</label>
-                    <input type="date" formControlName="endDate" [min]="form.controls['startDate'].value || todayDate"
-                        class="w-full bg-white/5 border border-black-border rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400/50 transition-all [color-scheme:dark]" />
+                    <app-date-picker formControlName="endDate" [min]="form.controls['startDate'].value || todayDate" />
                     <app-validation [control]="form.controls['endDate']" label="End date" />
                 </div>
             </div>

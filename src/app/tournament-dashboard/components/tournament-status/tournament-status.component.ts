@@ -38,8 +38,16 @@ import { ValidationComponent } from '../../../shared/components/validation/valid
                 </div>
 
                 <!-- Visibility -->
-                <div>
-                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block required-mark">{{ 'TOURNAMENT_DASHBOARD.GENERAL.FORM.VISIBILITY' | translate }}</label>
+                <div class="relative group">
+                    <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                        <span class="required-mark">{{ 'TOURNAMENT_DASHBOARD.GENERAL.FORM.VISIBILITY' | translate }}</span>
+                        <span class="text-gold-400 cursor-help text-xs leading-none">&#9432;</span>
+                    </label>
+                    <!-- Tooltip -->
+                    <div class="absolute z-20 left-0 bottom-full mb-2 hidden group-hover:block w-72
+                                bg-zinc-900 border border-gold-400/40 text-zinc-300 text-xs rounded-lg px-4 py-3 shadow-xl pointer-events-none">
+                        {{ 'TOURNAMENT_DASHBOARD.GENERAL.FORM.VISIBILITY_TOOLTIP' | translate }}
+                    </div>
                     <div class="flex gap-4 mt-2">
                         <label class="cursor-pointer label flex items-center gap-2">
                             <input type="radio" formControlName="visibility" value="public" class="radio border-gold-400 checked:bg-gold-400" />
