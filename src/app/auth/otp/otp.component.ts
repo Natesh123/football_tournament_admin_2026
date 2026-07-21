@@ -52,14 +52,23 @@ export class OtpComponent {
         }).subscribe({
             next: (res: any) => {
                 this.isLoading = false;
-                // Set authenticated user state
-                if (res.token && res.user) {
-                    this.auth.setAuthenticatedUser(res.user, res.token);
-                }
                 // Clear temporary email from storage
                 localStorage.removeItem('email');
-                // Navigate to dashboard
-                this.router.navigate(['/admin/dashboard']);
+
+                if (res.token && res.user) {
+                    // (Legacy path) auto-login if a session is returned.
+                    this.auth.setAuthenticatedUser(res.user, res.token);
+                    this.router.navigate(['/admin/dashboard']);
+                    return;
+                }
+
+                // New accounts are created Inactive and need admin approval — no
+                // session is issued. Show the message and send them to login.
+                this.ui.showToast(
+                    res.message || 'Account created. Please wait for admin approval before logging in.',
+                    'success'
+                );
+                this.router.navigate(['/login']);
             },
             error: (err) => {
                 this.isLoading = false;

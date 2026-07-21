@@ -1037,6 +1037,36 @@ export class PremiumLandingComponent implements OnInit, AfterViewInit, OnDestroy
     this.meta.updateTag({ name: 'description', content: 'Streamline every stage of football administration — fixtures, live scoring, brackets, payments and reporting — from one elite command center.' });
     this.meta.updateTag({ property: 'og:title', content: 'ATB Sports — Tournament Management' });
     this.meta.updateTag({ property: 'og:description', content: 'Run football tournaments with real-time scoring, brackets, and team management.' });
+    this.loadPlans();
+  }
+
+  /**
+   * Replaces the hardcoded pricing cards with the admin-managed subscription
+   * plans (active + landing-visible, max 5). Silently keeps the fallback array
+   * if the request fails or returns nothing.
+   */
+  private loadPlans() {
+    this.http.get<{ success: boolean; data: any[] }>(`${API_URL}/api/public/plans`).subscribe({
+      next: (res) => {
+        const plans = res?.data || [];
+        if (!plans.length) return;
+        this.pricing = plans.slice(0, 5).map((p) => {
+          const price = Number(p.monthlyPrice ?? 0);
+          const amount = Number.isInteger(price) ? `${price}` : price.toFixed(2);
+          return {
+            tier: p.name,
+            desc: p.description || '',
+            amt: price > 0 ? `€${amount}` : 'Free',
+            per: price > 0 ? '/mo' : '',
+            note: p.trialDays ? `${p.trialDays}-day free trial · cancel anytime` : 'Billed monthly · cancel anytime',
+            featured: !!p.isPopular,
+            cta: 'Get Started',
+            feats: (p.features || []).map((f: string) => ({ label: f, off: false })),
+          };
+        });
+      },
+      error: () => { /* keep the hardcoded fallback pricing */ },
+    });
   }
 
   ngAfterViewInit() {
