@@ -23,7 +23,10 @@ export class PermissionGuard implements CanActivate {
             if (firstModule) {
                 this.router.navigate([firstModule]);
             } else {
-                this.auth.logout();
+                // Authenticated, but this account can't access any module. This is NOT
+                // a normal logout — say so plainly, otherwise a fresh user sees
+                // "Logged out successfully" right after logging in and thinks login failed.
+                this.auth.logout('Your account has no module access yet. Please contact an administrator.', 'warning');
             }
             return false;
         }

@@ -113,6 +113,12 @@ export const routes: Routes = [
                 ]
             },
             {
+                path: 'plans',
+                canActivate: [PermissionGuard],
+                data: { permission: 'can_plans' },
+                loadComponent: () => import('./plans/plans.component').then(m => m.PlansComponent)
+            },
+            {
                 path: 'settings',
                 canActivate: [PermissionGuard],
                 data: { permission: 'can_settings' },

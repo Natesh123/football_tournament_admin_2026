@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 
 import { API_URL } from '../core/config/app.config';
-import { UiService } from '../services/ui.service';
+import { UiService, ToastType } from '../services/ui.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -77,11 +77,11 @@ export class AuthService {
         this.userSignal.set(user);
     }
 
-    logout() {
+    logout(message: string = 'Logged out successfully', type: ToastType = 'success') {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         this.userSignal.set(null);
-        this.ui.showToast('Logged out successfully', 'success');
+        this.ui.showToast(message, type);
         this.router.navigate(['/login']);
     }
 

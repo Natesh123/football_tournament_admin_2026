@@ -46,6 +46,12 @@
                     routerLink="/admin/settings" routerLinkActive="!text-gold-400 border-b-2 border-gold-400"
                     class="text-lg font-bold uppercase tracking-wider text-white hover:text-gold-400 transition-all duration-300 pb-1 cursor-pointer">{{
                     'TOPBAR.SETTINGS' | translate }}</a>
+
+                <!-- Plans -->
+                <a *ngIf="auth.hasPermission('can_plans')" routerLink="/admin/plans"
+                    routerLinkActive="!text-gold-400 border-b-2 border-gold-400"
+                    class="text-lg font-bold uppercase tracking-wider text-white hover:text-gold-400 transition-all duration-300 pb-1 cursor-pointer">{{
+                    'TOPBAR.PLANS' | translate }}</a>
             </div>
 
             <!-- Right Actions -->

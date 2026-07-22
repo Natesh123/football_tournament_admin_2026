@@ -22,6 +22,18 @@ import { LoaderComponent } from '../../../components/loader/loader.component';
         </button>
       </div>
 
+      <!-- Search & Filter -->
+      <div class="bg-black-card border border-black-border rounded-xl p-4 flex flex-col sm:flex-row gap-3">
+        <input type="text" [(ngModel)]="searchQuery" placeholder="Search by name, email or phone"
+          class="flex-1 bg-black-bg border border-black-border rounded-lg px-4 py-2 text-white placeholder-zinc-500 focus:border-gold-400 focus:outline-none" />
+        <select [(ngModel)]="statusFilter"
+          class="bg-black-bg border border-black-border rounded-lg px-4 py-2 text-white focus:border-gold-400 focus:outline-none">
+          <option value="">All statuses</option>
+          <option value="1">Active</option>
+          <option value="0">Inactive</option>
+        </select>
+      </div>
+
       <!-- User Form (Add/Edit) -->
       <div *ngIf="showForm" class="bg-black-card border border-gold-400/20 rounded-xl p-6 shadow-2xl animate-in fade-in slide-in-from-top-4">
         <h3 class="text-lg font-semibold text-gold-400 mb-4">{{ editingUserId ? 'Edit User' : 'Add New User' }}</h3>
@@ -124,7 +136,7 @@ import { LoaderComponent } from '../../../components/loader/loader.component';
       <div class="bg-black-card border border-black-border rounded-xl overflow-hidden shadow-2xl">
         <div class="p-4 border-b border-black-border bg-white/5 flex items-center justify-between">
           <span class="font-bold text-lg text-white">System Users</span>
-          <span class="text-xs text-zinc-500 uppercase font-bold tracking-widest">{{ users().length }} total users</span>
+          <span class="text-xs text-zinc-500 uppercase font-bold tracking-widest">{{ filteredUsers().length }} of {{ users().length }} users</span>
         </div>
         <div class="overflow-x-auto min-h-[300px] relative">
           @if (isFetchingData()) {
@@ -143,7 +155,7 @@ import { LoaderComponent } from '../../../components/loader/loader.component';
               </tr>
             </thead>
             <tbody class="divide-y divide-black-border/50">
-              <tr *ngFor="let user of users()" class="group text-zinc-300 hover:bg-gold-400/[0.02] transition-colors">
+              <tr *ngFor="let user of filteredUsers()" class="group text-zinc-300 hover:bg-gold-400/[0.02] transition-colors">
                 <td class="px-6 py-4">
                   <div class="font-bold text-white group-hover:text-gold-400 transition-colors">{{ user.user_name }}</div>
                   <div class="text-xs text-zinc-500">{{ user.email }}</div>
@@ -166,6 +178,20 @@ import { LoaderComponent } from '../../../components/loader/loader.component';
                 </td>
                 <td class="px-6 py-4">
                   <div class="flex items-center space-x-1">
+                    <button (click)="toggleStatus(user)"
+                      [title]="user.state === 1 ? 'Deactivate' : 'Activate'"
+                      class="p-2 rounded-md transition-all active:scale-90"
+                      [ngClass]="user.state === 1 ? 'text-amber-400 hover:bg-amber-400/20' : 'text-green-500 hover:bg-green-500/20'">
+                      @if (user.state === 1) {
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                        </svg>
+                      } @else {
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                      }
+                    </button>
                     <button (click)="viewProfile(user)" class="p-2 text-gold-400 hover:bg-gold-400/20 rounded-md transition-all active:scale-90" title="View Profile">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -184,8 +210,8 @@ import { LoaderComponent } from '../../../components/loader/loader.component';
                   </div>
                 </td>
               </tr>
-              <tr *ngIf="users().length === 0">
-                <td colspan="5" class="px-6 py-12 text-center text-zinc-500 italic">No users found. Capture your first user above.</td>
+              <tr *ngIf="filteredUsers().length === 0">
+                <td colspan="5" class="px-6 py-12 text-center text-zinc-500 italic">No users found.</td>
               </tr>
             </tbody>
           </table>
@@ -208,6 +234,10 @@ export class UsersComponent implements OnInit {
   editingUserId: number | null = null;
   isLoading = false;
   userForm: FormGroup;
+
+  // Client-side search + status filter over the loaded users.
+  searchQuery = '';
+  statusFilter = '';
 
   // Custom Dropdown State
   showRoleDropdown = signal(false);
@@ -260,6 +290,44 @@ export class UsersComponent implements OnInit {
         });
       },
       error: () => this.isFetchingData.set(false)
+    });
+  }
+
+  filteredUsers() {
+    const q = this.searchQuery.trim().toLowerCase();
+    const status = this.statusFilter;
+    return this.users().filter(u => {
+      const matchesQ = !q
+        || (u.user_name || '').toLowerCase().includes(q)
+        || (u.email || '').toLowerCase().includes(q)
+        || (u.phone_number || '').toLowerCase().includes(q);
+      const matchesStatus = status === '' || String(u.state) === status;
+      return matchesQ && matchesStatus;
+    });
+  }
+
+  async toggleStatus(user: any) {
+    const activate = user.state !== 1;
+    const confirmed = await this.ui.confirmAction(
+      activate ? 'Activate User' : 'Deactivate User',
+      `${activate ? 'Activate' : 'Deactivate'} ${user.user_name}? ${activate ? 'They will be able to log in.' : 'They will no longer be able to log in.'}`,
+      activate ? 'Yes, activate' : 'Yes, deactivate'
+    );
+    if (!confirmed) return;
+
+    this.settingsService.saveUser({
+      id: user.id,
+      email: user.email,
+      user_name: user.user_name,
+      phone_number: user.phone_number,
+      roleId: user.roleId,
+      state: activate ? 1 : 0,
+    }).subscribe({
+      next: () => {
+        this.ui.showToast(activate ? 'User activated' : 'User deactivated', 'success');
+        this.loadData();
+      },
+      error: (err) => this.ui.showToast(err.error?.error || 'Failed to update status', 'error'),
     });
   }
 
