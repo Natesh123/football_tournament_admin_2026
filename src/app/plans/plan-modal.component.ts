@@ -63,16 +63,42 @@ import { UiService } from '../services/ui.service';
 
           <!-- Limits -->
           <div>
-            <h3 class="text-xs font-bold uppercase tracking-widest text-gold-400 mb-3">Limits</h3>
+            <h3 class="text-xs font-bold uppercase tracking-widest text-gold-400 mb-3">Limits (-1 for Unlimited)</h3>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div class="space-y-1"><label class="lbl">Max Tournaments</label><input formControlName="maxTournaments" type="number" min="0" class="inp" /></div>
-              <div class="space-y-1"><label class="lbl">Max Teams</label><input formControlName="maxTeams" type="number" min="0" class="inp" /></div>
-              <div class="space-y-1"><label class="lbl">Max Players</label><input formControlName="maxPlayers" type="number" min="0" class="inp" /></div>
-              <div class="space-y-1"><label class="lbl">Max Staff</label><input formControlName="maxStaff" type="number" min="0" class="inp" /></div>
+              <div class="space-y-1"><label class="lbl">Max Tournaments</label><input formControlName="maxTournaments" type="number" min="-1" class="inp" /></div>
+              <div class="space-y-1"><label class="lbl">Max Teams</label><input formControlName="maxTeams" type="number" min="-1" class="inp" /></div>
+              <div class="space-y-1"><label class="lbl">Max Players</label><input formControlName="maxPlayers" type="number" min="-1" class="inp" /></div>
+              <div class="space-y-1"><label class="lbl">Max Staff</label><input formControlName="maxStaff" type="number" min="-1" class="inp" /></div>
               <div class="space-y-1"><label class="lbl">Max Grounds</label><input formControlName="maxGrounds" type="number" min="0" class="inp" /></div>
               <div class="space-y-1"><label class="lbl">Max Referees</label><input formControlName="maxReferees" type="number" min="0" class="inp" /></div>
               <div class="space-y-1"><label class="lbl">Max Vendors</label><input formControlName="maxVendors" type="number" min="0" class="inp" /></div>
               <div class="space-y-1"><label class="lbl">Storage (MB)</label><input formControlName="storageLimitMb" type="number" min="0" class="inp" /></div>
+            </div>
+          </div>
+
+          <!-- Feature Restrictions -->
+          <div>
+            <h3 class="text-xs font-bold uppercase tracking-widest text-gold-400 mb-3">Feature Restrictions</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <label class="flex items-center gap-3 cursor-pointer select-none">
+                <input formControlName="allowOnlineRegistration" type="checkbox" class="w-4 h-4 accent-gold-400" />
+                <span class="text-sm text-zinc-300">Online Registration Allowed</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer select-none">
+                <input formControlName="allowPayment" type="checkbox" class="w-4 h-4 accent-gold-400" />
+                <span class="text-sm text-zinc-300">Payment Collection Allowed</span>
+              </label>
+              <div class="space-y-1">
+                <label class="lbl">Reports Level</label>
+                <select formControlName="reportsLevel" class="inp">
+                  <option value="Basic">Basic Reports</option>
+                  <option value="Advanced">Advanced Reports</option>
+                </select>
+              </div>
+              <label class="flex items-center gap-3 cursor-pointer select-none">
+                <input formControlName="allowCustomBranding" type="checkbox" class="w-4 h-4 accent-gold-400" />
+                <span class="text-sm text-zinc-300">Custom Branding Allowed</span>
+              </label>
             </div>
           </div>
 
@@ -150,14 +176,18 @@ export class PlanModalComponent implements OnChanges {
         monthlyPrice: [0, [Validators.required, Validators.min(0)]],
         yearlyPrice: [null],
         trialDays: [0, [Validators.min(0)]],
-        maxTournaments: [0, [Validators.min(0)]],
-        maxTeams: [0, [Validators.min(0)]],
-        maxPlayers: [0, [Validators.min(0)]],
-        maxStaff: [0, [Validators.min(0)]],
+        maxTournaments: [0],
+        maxTeams: [0],
+        maxPlayers: [0],
+        maxStaff: [0],
         maxGrounds: [0, [Validators.min(0)]],
         maxReferees: [0, [Validators.min(0)]],
         maxVendors: [0, [Validators.min(0)]],
         storageLimitMb: [0, [Validators.min(0)]],
+        allowOnlineRegistration: [false],
+        allowPayment: [false],
+        reportsLevel: ['Basic'],
+        allowCustomBranding: [false],
         features: [''],
         displayOrder: [0, [Validators.min(0)]],
         isPopular: [false],
@@ -175,6 +205,10 @@ export class PlanModalComponent implements OnChanges {
                     maxTournaments: p.maxTournaments, maxTeams: p.maxTeams, maxPlayers: p.maxPlayers,
                     maxStaff: p.maxStaff, maxGrounds: p.maxGrounds, maxReferees: p.maxReferees, maxVendors: p.maxVendors,
                     storageLimitMb: p.storageLimitMb,
+                    allowOnlineRegistration: p.allowOnlineRegistration ?? false,
+                    allowPayment: p.allowPayment ?? false,
+                    reportsLevel: p.reportsLevel ?? 'Basic',
+                    allowCustomBranding: p.allowCustomBranding ?? false,
                     features: (p.features ?? []).join('\n'),
                     displayOrder: p.displayOrder, isPopular: p.isPopular, landingVisible: p.landingVisible, status: p.status,
                 });
@@ -182,7 +216,9 @@ export class PlanModalComponent implements OnChanges {
                 this.form.reset({
                     name: '', code: '', description: '', monthlyPrice: 0, yearlyPrice: null, trialDays: 0,
                     maxTournaments: 0, maxTeams: 0, maxPlayers: 0, maxStaff: 0, maxGrounds: 0, maxReferees: 0,
-                    maxVendors: 0, storageLimitMb: 0, features: '', displayOrder: 0, isPopular: false,
+                    maxVendors: 0, storageLimitMb: 0,
+                    allowOnlineRegistration: false, allowPayment: false, reportsLevel: 'Basic', allowCustomBranding: false,
+                    features: '', displayOrder: 0, isPopular: false,
                     landingVisible: true, status: 'active',
                 });
             }

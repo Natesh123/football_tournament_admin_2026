@@ -138,14 +138,20 @@ import { UiService } from '../services/ui.service';
             @if (p.trialDays) { <div class="text-xs px-2 py-1 rounded-full bg-white/5 text-zinc-300">{{ p.trialDays }}-day trial</div> }
           </div>
           <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-            <div class="stat"><span class="k">Tournaments</span><span class="v">{{ p.maxTournaments }}</span></div>
-            <div class="stat"><span class="k">Teams</span><span class="v">{{ p.maxTeams }}</span></div>
-            <div class="stat"><span class="k">Players</span><span class="v">{{ p.maxPlayers }}</span></div>
-            <div class="stat"><span class="k">Staff</span><span class="v">{{ p.maxStaff }}</span></div>
+            <div class="stat"><span class="k">Tournaments</span><span class="v">{{ p.maxTournaments === -1 ? 'Unlimited' : p.maxTournaments }}</span></div>
+            <div class="stat"><span class="k">Teams</span><span class="v">{{ p.maxTeams === -1 ? 'Unlimited' : p.maxTeams }}</span></div>
+            <div class="stat"><span class="k">Players</span><span class="v">{{ p.maxPlayers === -1 ? 'Unlimited' : p.maxPlayers }}</span></div>
+            <div class="stat"><span class="k">Staff</span><span class="v">{{ p.maxStaff === -1 ? 'Unlimited' : p.maxStaff }}</span></div>
             <div class="stat"><span class="k">Grounds</span><span class="v">{{ p.maxGrounds }}</span></div>
             <div class="stat"><span class="k">Referees</span><span class="v">{{ p.maxReferees }}</span></div>
             <div class="stat"><span class="k">Vendors</span><span class="v">{{ p.maxVendors }}</span></div>
             <div class="stat"><span class="k">Storage</span><span class="v">{{ p.storageLimitMb }} MB</span></div>
+          </div>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-2 pt-2 border-t border-black-border text-xs">
+            <div class="flex items-center gap-1.5"><span [class.text-green-500]="p.allowOnlineRegistration" [class.text-red-500]="!p.allowOnlineRegistration">{{ p.allowOnlineRegistration ? '✓' : '✕' }}</span><span class="text-zinc-300">Online Reg</span></div>
+            <div class="flex items-center gap-1.5"><span [class.text-green-500]="p.allowPayment" [class.text-red-500]="!p.allowPayment">{{ p.allowPayment ? '✓' : '✕' }}</span><span class="text-zinc-300">Payment</span></div>
+            <div class="flex items-center gap-1.5"><span class="text-gold-400">📊</span><span class="text-zinc-300">{{ p.reportsLevel || 'Basic' }} Reports</span></div>
+            <div class="flex items-center gap-1.5"><span [class.text-green-500]="p.allowCustomBranding" [class.text-red-500]="!p.allowCustomBranding">{{ p.allowCustomBranding ? '✓' : '✕' }}</span><span class="text-zinc-300">Branding</span></div>
           </div>
           @if (p.features?.length) {
           <div>

@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, inject, signal
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Meta, Title } from '@angular/platform-browser';
+import { RouterLink } from '@angular/router';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { API_URL } from '../../../../core/config/app.config';
@@ -21,7 +22,7 @@ interface Team { name: string; score: number | string; win?: boolean; grad: stri
 @Component({
   selector: 'app-premium-landing',
   standalone: true,
-  imports: [FormsModule, EpIconComponent],
+  imports: [FormsModule, EpIconComponent, RouterLink],
   host: { '[class.io-ready]': 'ioReady()' },
   template: `
     <!-- page background: warm vignette + faint pitch lines -->
@@ -46,8 +47,25 @@ interface Team { name: string; score: number | string; win?: boolean; grad: stri
           }
         </div>
         <a href="/login" class="btn btn-gold nav-cta"><ep-icon name="log-in"></ep-icon> {{ t().login }}</a>
-        <button class="nav-burger" aria-label="Menu"><ep-icon name="menu"></ep-icon></button>
+        <button class="nav-burger" aria-label="Menu" (click)="toggleMobileMenu()"><ep-icon [name]="mobileMenuOpen() ? 'x' : 'menu'"></ep-icon></button>
       </div>
+      @if (mobileMenuOpen()) {
+        <div class="mobile-menu">
+          <div class="mobile-nav-links">
+            @for (l of navLinks(); track l.href) {
+              <a [href]="l.href" (click)="mobileMenuOpen.set(false)">{{ l.label }}</a>
+            }
+          </div>
+          <div class="mobile-menu-actions">
+            <div class="lang-switch" role="group" aria-label="Language">
+              @for (l of langs; track l.id) {
+                <button type="button" [class.on]="lang() === l.id" (click)="setLang(l.id)">{{ l.label }}</button>
+              }
+            </div>
+            <a href="/login" class="btn btn-gold nav-cta" (click)="mobileMenuOpen.set(false)"><ep-icon name="log-in"></ep-icon> {{ t().login }}</a>
+          </div>
+        </div>
+      }
     </nav>
 
     <!-- ===================== HERO ===================== -->
@@ -211,7 +229,7 @@ interface Team { name: string; score: number | string; win?: boolean; grad: stri
                   <li [class.off]="feat.off"><ep-icon [name]="feat.off ? 'minus' : 'check'"></ep-icon> {{ feat.label }}</li>
                 }
               </ul>
-              <a href="/register" class="btn" [class.btn-gold]="p.featured" [class.btn-ghost]="!p.featured">{{ p.cta }}</a>
+              <a [routerLink]="['/register']" [queryParams]="{ plan: p.tier }" class="btn" [class.btn-gold]="p.featured" [class.btn-ghost]="!p.featured">{{ p.cta }}</a>
             </div>
           }
         </div>
@@ -446,41 +464,69 @@ interface Team { name: string; score: number | string; win?: boolean; grad: stri
     /* ============================================================ NAV */
     .nav{
       position:fixed;top:0;left:0;right:0;z-index:60;
-      transition:background .35s ease,border-color .35s ease,backdrop-filter .35s ease;
-      border-bottom:1px solid transparent;
+      transition:background .35s ease,border-color .35s ease,backdrop-filter .35s ease,box-shadow .35s ease;
+      border-bottom:1px solid rgba(201,164,92,.18);
+      background:linear-gradient(180deg, rgba(10,8,7,.92) 0%, rgba(10,8,7,.75) 60%, rgba(10,8,7,.45) 100%);
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
     }
     .nav.scrolled{
-      background:rgba(10,8,7,.82);backdrop-filter:blur(14px);
-      border-bottom:1px solid var(--line);
+      background:rgba(10,8,7,.95);
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--line-2);
+      box-shadow:0 10px 30px -10px rgba(0,0,0,.8), 0 0 20px rgba(0,0,0,.5);
     }
-    .nav-inner{max-width:var(--maxw);margin:0 auto;padding:18px 28px;display:flex;align-items:center;gap:40px}
+    .nav-inner{max-width:var(--maxw);margin:0 auto;padding:16px 28px;display:flex;align-items:center;gap:40px}
     .brand{display:flex;align-items:center;gap:12px;font-family:'Oswald',sans-serif}
     .brand .mark{
       width:38px;height:38px;border-radius:10px;background:var(--gold-grad);
       display:grid;place-items:center;color:#241803;font-weight:700;font-size:20px;
       box-shadow:var(--shadow-gold),inset 0 1px 0 rgba(255,255,255,.5);
     }
-    .brand .name{font-weight:700;text-transform:uppercase;letter-spacing:.22em;font-size:17px}
-    .brand .name small{display:block;font-size:9px;letter-spacing:.34em;color:var(--gold);font-weight:500;margin-top:1px}
+    .brand .name{font-weight:700;text-transform:uppercase;letter-spacing:.22em;font-size:17px;color:#ffffff;text-shadow:0 2px 4px rgba(0,0,0,.9)}
+    .brand .name small{display:block;font-size:9px;letter-spacing:.34em;color:var(--gold-bright);font-weight:600;margin-top:1px;text-shadow:0 1px 2px rgba(0,0,0,.8)}
     .brand-logo{width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;box-shadow:var(--shadow-gold),0 0 0 1px var(--line-2)}
     .brand-logo.sm{width:28px;height:28px}
     .nav-links{display:flex;gap:34px;margin-left:auto}
     .nav-links a{
-      font-family:'Oswald',sans-serif;font-weight:500;text-transform:uppercase;
-      letter-spacing:.14em;font-size:13px;color:var(--muted);transition:color .2s;position:relative;
+      font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;
+      letter-spacing:.15em;font-size:14px;color:#f8f4ec;transition:color .2s ease, text-shadow .2s ease;position:relative;
+      text-shadow:0 2px 4px rgba(0,0,0,.9);
     }
-    .nav-links a::after{content:"";position:absolute;left:0;bottom:-6px;width:0;height:2px;background:var(--gold-grad);transition:width .25s}
-    .nav-links a:hover{color:var(--text)}
+    .nav-links a::after{
+      content:"";position:absolute;left:0;bottom:-6px;width:0;height:2px;
+      background:var(--gold-grad);box-shadow:0 0 8px rgba(212,175,90,.8);transition:width .25s ease;
+    }
+    .nav-links a:hover{color:var(--gold-bright);text-shadow:0 0 10px rgba(244,226,163,.6)}
     .nav-links a:hover::after{width:100%}
-    .nav-cta{padding:11px 22px;font-size:13px}
-    .lang-switch{display:inline-flex;align-items:center;gap:2px;padding:3px;border:1px solid var(--line-2);border-radius:999px;background:rgba(255,255,255,.02)}
+    .nav-cta{padding:11px 22px;font-size:13px;box-shadow:0 4px 15px rgba(212,175,90,.3), inset 0 1px 0 rgba(255,255,255,.6)}
+    .lang-switch{display:inline-flex;align-items:center;gap:2px;padding:3px;border:1px solid var(--line-2);border-radius:999px;background:rgba(0,0,0,.5);backdrop-filter:blur(6px)}
     .lang-switch button{
       font-family:'Oswald',sans-serif;font-weight:600;letter-spacing:.1em;font-size:12px;
-      color:var(--muted);padding:6px 13px;border-radius:999px;transition:.2s;line-height:1;
+      color:#e5ded0;padding:6px 13px;border-radius:999px;transition:.2s;line-height:1;
+      text-shadow:0 1px 2px rgba(0,0,0,.8);
     }
-    .lang-switch button:hover{color:var(--text)}
-    .lang-switch button.on{background:var(--gold-grad);color:#241803;box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
-    .nav-burger{display:none;width:42px;height:42px;border-radius:10px;border:1px solid var(--line-2);place-items:center}
+    .lang-switch button:hover{color:#ffffff}
+    .lang-switch button.on{background:var(--gold-grad);color:#241803;font-weight:700;text-shadow:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
+    .nav-burger{display:none;width:42px;height:42px;border-radius:10px;border:1px solid var(--line-2);place-items:center;color:#ffffff;background:rgba(0,0,0,.4)}
+
+    /* Mobile Menu Styles */
+    .mobile-menu{
+      display:flex;flex-direction:column;gap:20px;padding:20px 28px 28px;
+      background:rgba(13,10,8,.97);backdrop-filter:blur(20px);
+      border-bottom:1px solid var(--line-2);
+      animation:slideDown .3s cubic-bezier(.16,1,.3,1);
+    }
+    @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+    .mobile-nav-links{display:flex;flex-direction:column;gap:16px}
+    .mobile-nav-links a{
+      font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;
+      letter-spacing:.15em;font-size:16px;color:#f8f4ec;padding:8px 0;
+      border-bottom:1px solid rgba(201,164,92,.1);
+    }
+    .mobile-nav-links a:hover{color:var(--gold-bright)}
+    .mobile-menu-actions{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:8px}
 
     /* ============================================================ HERO */
     .hero{position:relative;z-index:1;padding:150px 0 120px;overflow:hidden;min-height:90vh;display:flex;align-items:center}
@@ -846,8 +892,13 @@ export class PremiumLandingComponent implements OnInit, AfterViewInit, OnDestroy
     && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
   navScrolled = signal(false);
+  mobileMenuOpen = signal(false);
   testiIdx = signal(0);
   isMobile = signal(false);
+
+  toggleMobileMenu() {
+    this.mobileMenuOpen.update(v => !v);
+  }
 
   contactForm = { name: '', email: '', subject: 'Newsletter', message: 'Newsletter signup' };
   contactSubmitting = signal(false);
@@ -967,36 +1018,60 @@ export class PremiumLandingComponent implements OnInit, AfterViewInit, OnDestroy
 
   pricing = [
     {
-      tier: 'Clubs', desc: 'For single clubs running local cups and friendlies.', amt: '$49', per: '/mo',
-      note: 'Billed monthly · cancel anytime', featured: false, cta: 'Get Started',
+      tier: 'Free',
+      desc: 'Starter plan for small local tournaments and individual organizers.',
+      amt: 'Free',
+      per: '',
+      note: 'Free forever · No credit card required',
+      featured: false,
+      cta: 'Get Started',
       feats: [
-        { label: 'Up to 5 tournaments', off: false },
-        { label: '50 registered teams', off: false },
-        { label: 'Live scoring & standings', off: false },
-        { label: 'Email support', off: false },
-        { label: 'Custom branding', off: true },
+        { label: '1 tournament limit', off: false },
+        { label: '8 registered teams', off: false },
+        { label: '100 players limit', off: false },
+        { label: '1 staff member', off: false },
+        { label: 'Basic Reports', off: false },
+        { label: 'Online Registration', off: true },
+        { label: 'Online Payment Collection', off: true },
+        { label: 'Custom Branding', off: true },
       ],
     },
     {
-      tier: 'Leagues', desc: 'For multi-division leagues and regional bodies.', amt: '$149', per: '/mo',
-      note: 'Billed monthly · cancel anytime', featured: true, cta: 'Get Started',
+      tier: 'Basic',
+      desc: 'Ideal for growing clubs and regular tournament organizers.',
+      amt: '€29',
+      per: '/mo',
+      note: 'Billed monthly · cancel anytime',
+      featured: true,
+      cta: 'Get Started',
+      feats: [
+        { label: '5 tournaments limit', off: false },
+        { label: '30 registered teams', off: false },
+        { label: '500 players limit', off: false },
+        { label: '5 staff members', off: false },
+        { label: 'Advanced Reports', off: false },
+        { label: 'Online Registration', off: false },
+        { label: 'Online Payment Collection', off: false },
+        { label: 'Custom Branding', off: true },
+      ],
+    },
+    {
+      tier: 'Premium',
+      desc: 'Full suite for large leagues, federations, and sports organizations.',
+      amt: '€99',
+      per: '/mo',
+      note: 'Billed monthly · cancel anytime',
+      featured: false,
+      cta: 'Get Started',
       feats: [
         { label: 'Unlimited tournaments', off: false },
-        { label: '500 registered teams', off: false },
-        { label: 'Advanced brackets & seeding', off: false },
-        { label: 'Custom branding', off: false },
-        { label: 'Priority support', off: false },
-      ],
-    },
-    {
-      tier: 'Federations', desc: 'For national federations and enterprise operations.', amt: 'Custom', per: '',
-      note: 'Tailored to your competition', featured: false, cta: 'Talk to Sales',
-      feats: [
-        { label: 'Everything in Leagues', off: false },
-        { label: 'Unlimited teams & staff', off: false },
-        { label: 'SSO & audit logs', off: false },
-        { label: 'Dedicated success manager', off: false },
-        { label: 'SLA & on-prem options', off: false },
+        { label: 'Unlimited registered teams', off: false },
+        { label: 'Unlimited players', off: false },
+        { label: '20 staff members', off: false },
+        { label: 'Advanced Reports', off: false },
+        { label: 'Online Registration', off: false },
+        { label: 'Online Payment Collection', off: false },
+        { label: 'Custom Branding', off: false },
       ],
     },
   ];
@@ -1041,9 +1116,8 @@ export class PremiumLandingComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   /**
-   * Replaces the hardcoded pricing cards with the admin-managed subscription
-   * plans (active + landing-visible, max 5). Silently keeps the fallback array
-   * if the request fails or returns nothing.
+   * Replaces the fallback pricing cards with the active subscription
+   * plans loaded from DB via API, mapping exact feature toggles & limits.
    */
   private loadPlans() {
     this.http.get<{ success: boolean; data: any[] }>(`${API_URL}/api/public/plans`).subscribe({
@@ -1053,19 +1127,65 @@ export class PremiumLandingComponent implements OnInit, AfterViewInit, OnDestroy
         this.pricing = plans.slice(0, 5).map((p) => {
           const price = Number(p.monthlyPrice ?? 0);
           const amount = Number.isInteger(price) ? `${price}` : price.toFixed(2);
+
+          const feats: { label: string; off: boolean }[] = [];
+
+          if (p.maxTournaments !== undefined) {
+            feats.push({
+              label: p.maxTournaments === -1 ? 'Unlimited tournaments' : `${p.maxTournaments} tournament${p.maxTournaments === 1 ? '' : 's'} limit`,
+              off: false
+            });
+          }
+          if (p.maxTeams !== undefined) {
+            feats.push({
+              label: p.maxTeams === -1 ? 'Unlimited teams' : `${p.maxTeams} registered teams`,
+              off: false
+            });
+          }
+          if (p.maxPlayers !== undefined) {
+            feats.push({
+              label: p.maxPlayers === -1 ? 'Unlimited players' : `${p.maxPlayers} players limit`,
+              off: false
+            });
+          }
+          if (p.maxStaff !== undefined) {
+            feats.push({
+              label: p.maxStaff === -1 ? 'Unlimited staff members' : `${p.maxStaff} staff member${p.maxStaff === 1 ? '' : 's'}`,
+              off: false
+            });
+          }
+          if (p.reportsLevel) {
+            feats.push({ label: `${p.reportsLevel} Reports`, off: false });
+          }
+          if (p.allowOnlineRegistration !== undefined) {
+            feats.push({ label: 'Online Registration', off: !p.allowOnlineRegistration });
+          }
+          if (p.allowPayment !== undefined) {
+            feats.push({ label: 'Online Payment Collection', off: !p.allowPayment });
+          }
+          if (p.allowCustomBranding !== undefined) {
+            feats.push({ label: 'Custom Branding', off: !p.allowCustomBranding });
+          }
+
+          if (feats.length === 0 && p.features?.length) {
+            p.features.forEach((f: string) => feats.push({ label: f, off: false }));
+          }
+
           return {
             tier: p.name,
             desc: p.description || '',
             amt: price > 0 ? `€${amount}` : 'Free',
             per: price > 0 ? '/mo' : '',
-            note: p.trialDays ? `${p.trialDays}-day free trial · cancel anytime` : 'Billed monthly · cancel anytime',
+            note: p.trialDays ? `${p.trialDays}-day free trial · cancel anytime` : (price > 0 ? 'Billed monthly · cancel anytime' : 'Free forever · No credit card required'),
             featured: !!p.isPopular,
             cta: 'Get Started',
-            feats: (p.features || []).map((f: string) => ({ label: f, off: false })),
+            feats,
           };
         });
+
+        setTimeout(() => this.initReveals(), 50);
       },
-      error: () => { /* keep the hardcoded fallback pricing */ },
+      error: () => { /* keep fallback pricing */ },
     });
   }
 

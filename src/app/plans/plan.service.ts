@@ -20,6 +20,10 @@ export interface Plan {
     storageLimitMb: number;
     trialDays: number;
     features?: string[];
+    allowOnlineRegistration?: boolean;
+    allowPayment?: boolean;
+    reportsLevel?: string;
+    allowCustomBranding?: boolean;
     displayOrder: number;
     isPopular: boolean;
     landingVisible: boolean;
