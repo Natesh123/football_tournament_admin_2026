@@ -1,8 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { ValidationComponent } from '../../shared/components/validation/validation.component';
 import { CustomValidators } from '../../shared/validators/custom-validators';
@@ -15,8 +15,7 @@ import { revealAndFocusInvalid } from '../../shared/utils/form.util';
     standalone: true,
     imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslateModule, ValidationComponent]
 })
-export class RegisterComponent {
-
+export class RegisterComponent implements OnInit {
 
     registerForm: FormGroup;
     errorMessage: string = '';
@@ -24,11 +23,13 @@ export class RegisterComponent {
     isLoading: boolean = false;
     showPassword = signal(false);
     showConfirmPassword = signal(false);
+    plans = ['Free', 'Basic', 'Premium'];
 
     constructor(
         private fb: FormBuilder,
         private auth: AuthService,
-        private router: Router
+        private router: Router,
+        private route: ActivatedRoute
     ) {
         this.registerForm = this.fb.group({
             name: ['', [Validators.required]],
@@ -37,8 +38,17 @@ export class RegisterComponent {
             email: ['', [Validators.required, Validators.email]],
             password: ['', [Validators.required, CustomValidators.passwordStrength]],
             confirmPassword: ['', [Validators.required]],
+            plan: ['Free', [Validators.required]],
             agreeTerms: [false, [Validators.requiredTrue]]
         }, { validators: CustomValidators.matchFields('password', 'confirmPassword') });
+    }
+
+    ngOnInit() {
+        const queryPlan = this.route.snapshot.queryParams['plan'] || this.route.snapshot.queryParams['planId'];
+        if (queryPlan) {
+            const matchedPlan = this.plans.find(p => p.toLowerCase() === String(queryPlan).toLowerCase()) || queryPlan;
+            this.registerForm.patchValue({ plan: matchedPlan });
+        }
     }
 
     submit() {
@@ -51,9 +61,9 @@ export class RegisterComponent {
         this.successMessage = '';
         this.isLoading = true;
 
-        const { name, email, password, user_name, phone_number } = this.registerForm.value;
+        const { name, email, password, user_name, phone_number, plan } = this.registerForm.value;
 
-        this.auth.register({ name, email, password, user_name, phone_number })
+        this.auth.register({ name, email, password, user_name, phone_number, plan })
             .subscribe({
                 next: (res: any) => {
                     this.isLoading = false;

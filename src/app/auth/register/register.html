@@ -151,6 +151,20 @@
                             </div>
                         </div>
 
+                        <!-- Row 3: Subscription Plan -->
+                        <div class="space-y-2 group">
+                            <label class="text-xs font-bold text-gold-400 uppercase tracking-widest required-mark">
+                                Subscription Plan
+                            </label>
+                            <select formControlName="plan"
+                                class="w-full bg-[#1e1e20] border-b-2 border-gold-500/50 px-4 py-3 text-white focus:outline-none focus:border-gold-500 focus:bg-[#252528] transition-all duration-300 rounded-t-lg text-sm font-semibold">
+                                <option *ngFor="let p of plans" [value]="p" class="bg-[#1e1e20] text-white py-2">
+                                    {{ p }} Plan
+                                </option>
+                            </select>
+                            <app-validation [control]="registerForm.controls['plan']" label="Plan" />
+                        </div>
+
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2 group">
                                 <label class="text-xs font-bold text-neutral-400 uppercase tracking-widest required-mark">{{

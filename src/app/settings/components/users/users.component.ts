@@ -120,6 +120,12 @@ import { LoaderComponent } from '../../../components/loader/loader.component';
               </div>
             </div>
           </div>
+          <div class="space-y-1 md:col-span-2">
+            <label class="text-xs text-amber-400 uppercase font-bold px-1">Subscription Plan</label>
+            <select formControlName="plan" class="w-full bg-black-bg border border-amber-500/30 rounded-lg px-4 py-2.5 text-white font-semibold focus:border-gold-400 focus:outline-none">
+              <option *ngFor="let p of availablePlans" [value]="p" class="bg-black-card text-white">{{ p }} Plan</option>
+            </select>
+          </div>
           <div class="md:col-span-2 pt-4">
             <button 
               type="submit" 
@@ -151,6 +157,7 @@ import { LoaderComponent } from '../../../components/loader/loader.component';
                 <th class="px-6 py-5">Contact</th>
                 <th class="px-6 py-5">Role</th>
                 <th class="px-6 py-5">Status</th>
+                <th class="px-6 py-5">Plan</th>
                 <th class="px-6 py-5">Actions</th>
               </tr>
             </thead>
@@ -176,8 +183,42 @@ import { LoaderComponent } from '../../../components/loader/loader.component';
                     {{ user.state === 1 ? 'Active' : 'Inactive' }}
                   </span>
                 </td>
+                <td class="px-6 py-4 relative plan-dropdown-container">
+                  <div (click)="togglePlanDropdown(user, $event)" class="cursor-pointer inline-flex items-center gap-1.5 group/plan">
+                    <span class="px-2.5 py-1 bg-amber-500/10 text-amber-400 rounded-md text-[10px] font-extrabold border border-amber-500/30 uppercase tracking-wider group-hover/plan:border-amber-400 transition-colors">
+                      {{ user.plan || 'Free' }}
+                    </span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-amber-400/70 group-hover/plan:text-amber-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+
+                  <!-- Plan Selector Dropdown Menu -->
+                  <div *ngIf="activePlanDropdownUserId() === user.id"
+                    class="absolute left-4 top-12 bg-black-card border border-amber-500/40 rounded-xl shadow-2xl z-[120] py-1.5 min-w-[150px] animate-in fade-in slide-in-from-top-2">
+                    <div class="px-3 py-1 text-[9px] font-extrabold text-amber-400/80 uppercase tracking-widest border-b border-black-border mb-1">
+                      Change Plan
+                    </div>
+                    <button *ngFor="let p of availablePlans"
+                      (click)="updateUserPlan(user, p, $event)"
+                      class="w-full text-left px-3 py-2 text-xs font-bold transition-colors flex items-center justify-between hover:bg-amber-400/10"
+                      [ngClass]="(user.plan || 'Free') === p ? 'text-amber-400 bg-amber-400/10' : 'text-zinc-300 hover:text-white'">
+                      <span>{{ p }} Plan</span>
+                      <svg *ngIf="(user.plan || 'Free') === p" xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
                 <td class="px-6 py-4">
                   <div class="flex items-center space-x-1">
+                    <button (click)="togglePlanDropdown(user, $event)"
+                      class="p-2 text-amber-400 hover:bg-amber-400/20 rounded-md transition-all active:scale-90"
+                      title="Change Subscription Plan">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h10M7 11h10M7 15h10M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z" />
+                      </svg>
+                    </button>
                     <button (click)="toggleStatus(user)"
                       [title]="user.state === 1 ? 'Deactivate' : 'Activate'"
                       class="p-2 rounded-md transition-all active:scale-90"
@@ -211,7 +252,7 @@ import { LoaderComponent } from '../../../components/loader/loader.component';
                 </td>
               </tr>
               <tr *ngIf="filteredUsers().length === 0">
-                <td colspan="5" class="px-6 py-12 text-center text-zinc-500 italic">No users found.</td>
+                <td colspan="6" class="px-6 py-12 text-center text-zinc-500 italic">No users found.</td>
               </tr>
             </tbody>
           </table>
@@ -234,6 +275,7 @@ export class UsersComponent implements OnInit {
   editingUserId: number | null = null;
   isLoading = false;
   userForm: FormGroup;
+  availablePlans = ['Free', 'Basic', 'Premium'];
 
   // Client-side search + status filter over the loaded users.
   searchQuery = '';
@@ -242,6 +284,7 @@ export class UsersComponent implements OnInit {
   // Custom Dropdown State
   showRoleDropdown = signal(false);
   showStatusDropdown = signal(false);
+  activePlanDropdownUserId = signal<number | null>(null);
   showProfileModal = signal(false);
   userForProfile: any = null;
 
@@ -253,6 +296,9 @@ export class UsersComponent implements OnInit {
     }
     if (!target.closest('.status-dropdown-container')) {
       this.showStatusDropdown.set(false);
+    }
+    if (!target.closest('.plan-dropdown-container')) {
+      this.activePlanDropdownUserId.set(null);
     }
   }
 
@@ -268,7 +314,8 @@ export class UsersComponent implements OnInit {
       user_name: ['', [Validators.required]],
       phone_number: ['', [Validators.required]],
       roleId: [null, [Validators.required]],
-      state: [1, [Validators.required]]
+      state: [1, [Validators.required]],
+      plan: ['Free', [Validators.required]]
     });
   }
 
@@ -300,7 +347,8 @@ export class UsersComponent implements OnInit {
       const matchesQ = !q
         || (u.user_name || '').toLowerCase().includes(q)
         || (u.email || '').toLowerCase().includes(q)
-        || (u.phone_number || '').toLowerCase().includes(q);
+        || (u.phone_number || '').toLowerCase().includes(q)
+        || (u.plan || '').toLowerCase().includes(q);
       const matchesStatus = status === '' || String(u.state) === status;
       return matchesQ && matchesStatus;
     });
@@ -322,6 +370,7 @@ export class UsersComponent implements OnInit {
       phone_number: user.phone_number,
       roleId: user.roleId,
       state: activate ? 1 : 0,
+      plan: user.plan || 'Free'
     }).subscribe({
       next: () => {
         this.ui.showToast(activate ? 'User activated' : 'User deactivated', 'success');
@@ -333,7 +382,10 @@ export class UsersComponent implements OnInit {
 
   resetForm() {
     this.editingUserId = null;
-    this.userForm.reset();
+    this.userForm.reset({
+      state: 1,
+      plan: 'Free'
+    });
   }
 
   editUser(user: any) {
@@ -344,7 +396,8 @@ export class UsersComponent implements OnInit {
       user_name: user.user_name,
       phone_number: user.phone_number,
       roleId: user.roleId,
-      state: user.state
+      state: user.state,
+      plan: user.plan || 'Free'
     });
   }
 
@@ -358,6 +411,41 @@ export class UsersComponent implements OnInit {
     event.stopPropagation();
     this.showStatusDropdown.set(!this.showStatusDropdown());
     this.showRoleDropdown.set(false);
+    this.activePlanDropdownUserId.set(null);
+  }
+
+  togglePlanDropdown(user: any, event: Event) {
+    event.stopPropagation();
+    if (this.activePlanDropdownUserId() === user.id) {
+      this.activePlanDropdownUserId.set(null);
+    } else {
+      this.activePlanDropdownUserId.set(user.id);
+      this.showRoleDropdown.set(false);
+      this.showStatusDropdown.set(false);
+    }
+  }
+
+  updateUserPlan(user: any, newPlan: string, event?: Event) {
+    if (event) event.stopPropagation();
+    this.activePlanDropdownUserId.set(null);
+
+    if ((user.plan || 'Free') === newPlan) return;
+
+    this.settingsService.saveUser({
+      id: user.id,
+      email: user.email,
+      user_name: user.user_name,
+      phone_number: user.phone_number,
+      roleId: user.roleId,
+      state: user.state,
+      plan: newPlan
+    }).subscribe({
+      next: () => {
+        this.ui.showToast(`Updated ${user.user_name}'s plan to ${newPlan}`, 'success');
+        this.loadData();
+      },
+      error: (err) => this.ui.showToast(err.error?.error || 'Failed to update plan', 'error')
+    });
   }
 
   viewProfile(user: any) {

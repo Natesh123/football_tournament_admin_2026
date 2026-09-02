@@ -46,6 +46,9 @@ import { SettingsService } from '../../settings/settings.service';
                     <span class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-[0.1em] border border-green-500/20 text-green-500 bg-green-500/10">
                       {{ user?.state === 1 ? 'Active' : 'Inactive' }}
                     </span>
+                    <span class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-[0.1em] border border-amber-500/30 text-amber-400 bg-amber-500/10">
+                      {{ user?.plan || 'Free' }} Plan
+                    </span>
                   </div>
                 </div>
               </div>
