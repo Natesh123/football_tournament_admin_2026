@@ -847,9 +847,14 @@ interface Team { name: string; score: number | string; win?: boolean; grad: stri
 
     /* ============================================================ responsive */
     @media(max-width:980px){
+      .nav-inner{padding:12px 16px;gap:12px}
       .nav-links{display:none}
+      .nav-inner > .nav-cta{display:none}
       .nav-burger{display:grid}
       .lang-switch{margin-left:auto}
+      .brand .name{font-size:14px;letter-spacing:.15em}
+      .brand .name small{font-size:8px;letter-spacing:.22em}
+      .brand-logo{width:36px;height:36px}
       .hero{min-height:auto;padding:128px 0 88px}
       .hero-ball{width:40vw;opacity:.6}
       .hero-whistle{width:32vw;opacity:.6}
@@ -864,6 +869,12 @@ interface Team { name: string; score: number | string; win?: boolean; grad: stri
       .cta-copy{margin-left:0}
     }
     @media(max-width:600px){
+      .nav-inner{padding:10px 12px;gap:8px}
+      .brand{gap:8px}
+      .brand .name{font-size:13px;letter-spacing:.1em}
+      .brand-logo{width:32px;height:32px}
+      .lang-switch{padding:2px;gap:1px}
+      .lang-switch button{padding:5px 9px;font-size:11px}
       section{padding:52px 0}
       .metrics{grid-template-columns:1fr 1fr}
       .dash-tables{grid-template-columns:1fr}

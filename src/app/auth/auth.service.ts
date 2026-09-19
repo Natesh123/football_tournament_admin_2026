@@ -40,6 +40,10 @@ export class AuthService {
         return this.http.post(`${this.baseUrl}/register`, data);
     }
 
+    getPublicPlans() {
+        return this.http.get<any>(`${API_URL}/api/public/plans`);
+    }
+
     verifyOtp(data: any) {
         return this.http.post(`${this.baseUrl}/verify-otp`, data);
     }

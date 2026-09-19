@@ -656,7 +656,7 @@ export class MatchDetailsComponent implements OnInit {
 
     async handleCompleteMatch() {
         const confirmed = await this.ui.confirmAction(
-            this.translate.instant('MATCH_DETAILS.TIMELINE.COMPLETE_MATCH'),
+            this.translate.instant('MATCH_DETAILS.HEADER.COMPLETE_MATCH'),
             this.translate.instant('MATCH_DETAILS.TIMELINE.COMPLETE_CONFIRM_MSG'),
             this.translate.instant('MATCH_DETAILS.TIMELINE.COMPLETE_CONFIRM_YES')
         );

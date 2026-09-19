@@ -30,6 +30,27 @@
 
         <!-- Modal Body -->
         <form [formGroup]="form" class="p-6 space-y-5">
+            <!-- ADMIN ONLY: Select Target Organizer -->
+            <div *ngIf="auth.isAdmin" class="space-y-1.5 p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl">
+                <label class="text-[11px] font-bold text-amber-400 uppercase tracking-wider block required-mark">
+                    🛡️ Select Target Organizer (Admin Only)
+                </label>
+                <select formControlName="organizerId"
+                        (change)="onOrganizerChange()"
+                        class="w-full bg-black-card border border-amber-500/40 rounded-lg px-4 py-3 text-white focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400/50 transition-all text-sm font-semibold">
+                    <option value="" class="bg-black-card text-zinc-400">-- Select Target Organizer --</option>
+                    <option *ngFor="let org of organizerList()" [value]="org.id" class="bg-black-card text-white">
+                        {{ org.user_name || org.name }} ({{ org.email }}) — Plan: {{ org.plan || 'Basic' }}
+                    </option>
+                </select>
+                <app-validation [control]="form.controls['organizerId']" label="Organizer" />
+                <div *ngIf="selectedOrganizerPlanInfo()" class="text-xs text-amber-300 font-medium mt-1 flex items-center gap-2">
+                    <span>Plan Limit: {{ selectedOrganizerPlanInfo()?.maxTournaments === -1 ? 'Unlimited' : selectedOrganizerPlanInfo()?.maxTournaments }}</span>
+                    <span>•</span>
+                    <span>Remaining: <strong class="text-emerald-400 font-bold">{{ selectedOrganizerPlanInfo()?.remaining }}</strong></span>
+                </div>
+            </div>
+
             <!-- Tournament Name -->
             <div>
                 <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block required-mark">{{

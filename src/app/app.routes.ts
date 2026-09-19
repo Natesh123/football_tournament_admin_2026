@@ -6,6 +6,26 @@ import { MainLayoutComponent } from './components/main-layout/main-layout.compon
 
 export const routes: Routes = [
     {
+        path: 'live-dashboard',
+        loadComponent: () => import('./public/live-dashboard/live-dashboard.component').then(m => m.LiveDashboardComponent)
+    },
+    {
+        path: 'live-dashboard/:id',
+        loadComponent: () => import('./public/live-dashboard/live-dashboard.component').then(m => m.LiveDashboardComponent)
+    },
+    {
+        path: 'public/live-dashboard',
+        loadComponent: () => import('./public/live-dashboard/live-dashboard.component').then(m => m.LiveDashboardComponent)
+    },
+    {
+        path: 'public/live-dashboard/:id',
+        loadComponent: () => import('./public/live-dashboard/live-dashboard.component').then(m => m.LiveDashboardComponent)
+    },
+    {
+        path: 'public/tournament/:id/details',
+        loadComponent: () => import('./tournament-dashboard/components/tournament-details-single-page/tournament-details-single-page.component').then(m => m.TournamentDetailsSinglePageComponent)
+    },
+    {
         path: 'public/tournament/:id',
         loadComponent: () => import('./public/tournament-portal/tournament-portal.component').then(m => m.TournamentPortalComponent)
     },
@@ -83,6 +103,12 @@ export const routes: Routes = [
                 canActivate: [PermissionGuard],
                 data: { permission: 'can_tournaments' },
                 loadComponent: () => import('./tournament-dashboard/components/match-details/match-details.component').then(m => m.MatchDetailsComponent)
+            },
+            {
+                path: 'tournaments/:id/details',
+                canActivate: [PermissionGuard],
+                data: { permission: 'can_tournaments' },
+                loadComponent: () => import('./tournament-dashboard/components/tournament-details-single-page/tournament-details-single-page.component').then(m => m.TournamentDetailsSinglePageComponent)
             },
             {
                 // Deep-link a dashboard tab by path, e.g. tournaments/:id/matches.

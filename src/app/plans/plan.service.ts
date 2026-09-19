@@ -71,4 +71,8 @@ export class PlanService {
     delete(id: number): Observable<void> {
         return this.http.delete<void>(`${this.apiUrl}/${id}`);
     }
+
+    updateLandingVisibility(selectedPlanIds: number[]): Observable<any> {
+        return this.http.put<any>(`${this.apiUrl}/landing-visibility`, { planIds: selectedPlanIds });
+    }
 }

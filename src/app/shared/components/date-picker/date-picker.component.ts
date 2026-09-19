@@ -368,7 +368,7 @@ export class DatePickerComponent implements ControlValueAccessor {
 
   private isOutOfRange(iso: string): boolean {
     if (this.min && iso < this.min) return true;
-    if (this.max && iso > this.max) return true;
+    if (this.max && (!this.min || this.max >= this.min) && iso > this.max) return true;
     return false;
   }
 

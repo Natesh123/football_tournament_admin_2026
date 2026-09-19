@@ -50,12 +50,8 @@
                     <div
                         class="inline-flex items-center gap-4 mb-10 transition-transform duration-500 group-hover:translate-x-2">
                         <div
-                            class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold-400 to-yellow-700 flex items-center justify-center shadow-[0_0_25px_rgba(234,179,8,0.3)] border border-white/10">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-white drop-shadow-md"
-                                viewBox="0 0 24 24" fill="currentColor">
-                                <path
-                                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c1.1 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
-                            </svg>
+                            class="w-16 h-16 rounded-2xl flex items-center justify-center -ml-2">
+                            <img src="/images/logo-gold.png" alt="ATB Sports" class="w-full h-full object-contain drop-shadow-md border-0 bg-transparent mix-blend-screen" onerror="this.src='/assets/images/logo-gold.png'">
                         </div>
                         <div>
                             <span class="text-2xl font-black tracking-tighter uppercase block leading-none">ATB<span
@@ -151,19 +147,6 @@
                             </div>
                         </div>
 
-                        <!-- Row 3: Subscription Plan -->
-                        <div class="space-y-2 group">
-                            <label class="text-xs font-bold text-gold-400 uppercase tracking-widest required-mark">
-                                Subscription Plan
-                            </label>
-                            <select formControlName="plan"
-                                class="w-full bg-[#1e1e20] border-b-2 border-gold-500/50 px-4 py-3 text-white focus:outline-none focus:border-gold-500 focus:bg-[#252528] transition-all duration-300 rounded-t-lg text-sm font-semibold">
-                                <option *ngFor="let p of plans" [value]="p" class="bg-[#1e1e20] text-white py-2">
-                                    {{ p }} Plan
-                                </option>
-                            </select>
-                            <app-validation [control]="registerForm.controls['plan']" label="Plan" />
-                        </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2 group">
@@ -211,6 +194,46 @@
                         </div>
 
                         <app-validation [control]="registerForm.controls['confirmPassword']" label="Confirm password" />
+
+                        <!-- Subscription Plan Selection -->
+                        <div class="space-y-3 pt-2">
+                            <div class="flex items-center justify-between">
+                                <label class="text-xs font-bold text-amber-400 uppercase tracking-widest block">
+                                    Select Subscription Plan
+                                </label>
+                                <span class="text-[10px] text-neutral-500 uppercase font-medium">Selected: {{ registerForm.get('plan')?.value }}</span>
+                            </div>
+                            
+                            <div *ngIf="isLoadingPlans()" class="p-4 bg-[#1e1e20] rounded-xl text-center text-xs text-neutral-400 animate-pulse">
+                                Loading subscription plans...
+                            </div>
+
+                            <div *ngIf="!isLoadingPlans() && publicPlans().length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div *ngFor="let p of publicPlans()"
+                                    (click)="selectPlan(p)"
+                                    class="p-3.5 bg-[#1e1e20] border rounded-xl cursor-pointer transition-all duration-200 hover:border-gold-500 flex flex-col justify-between relative group"
+                                    [ngClass]="registerForm.get('planId')?.value === p.id ? 'border-gold-500 bg-gold-500/10 shadow-[0_0_15px_rgba(234,179,8,0.2)]' : 'border-[#333]'">
+                                    
+                                    <div class="flex items-start justify-between">
+                                        <span class="text-xs font-bold text-white group-hover:text-gold-400">{{ p.name }}</span>
+                                        <span *ngIf="registerForm.get('planId')?.value === p.id" class="flex h-3 w-3 relative">
+                                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-gold-400 opacity-75"></span>
+                                            <span class="relative inline-flex rounded-full h-3 w-3 bg-gold-500"></span>
+                                        </span>
+                                    </div>
+                                    <div class="my-1.5">
+                                        <span class="text-base font-black text-gold-400">
+                                            {{ Number(p.monthlyPrice) > 0 ? ('€' + p.monthlyPrice + '/mo') : 'Free' }}
+                                        </span>
+                                        <span *ngIf="p.trialDays" class="ml-2 text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-neutral-300">{{ p.trialDays }}d trial</span>
+                                    </div>
+                                    <div class="text-[10px] text-neutral-400 space-y-0.5 border-t border-white/5 pt-1.5">
+                                        <div>🏆 {{ p.maxTournaments === -1 ? 'Unlimited' : p.maxTournaments }} Tournament{{ p.maxTournaments === 1 ? '' : 's' }}</div>
+                                        <div>🛡️ {{ p.maxTeams === -1 ? 'Unlimited' : p.maxTeams }} Teams</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <!-- Terms -->
                         <div class="flex items-start gap-3 py-2 group cursor-pointer">

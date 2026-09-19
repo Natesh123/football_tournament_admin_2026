@@ -40,12 +40,10 @@ export class TournamentMatchesComponent implements OnInit, OnDestroy {
 
     filteredMatches = computed(() => {
         const matches = this.structure()?.matches || [];
-        const now = new Date();
         const tab = this.activeTab();
 
-        return matches.filter((match: any) => {
+        const filtered = matches.filter((match: any) => {
             const status = (match.status || 'scheduled').toLowerCase();
-            const startTime = match.startTime ? new Date(match.startTime) : null;
             let category = 'upcoming';
 
             if (status === 'completed' || status === 'finished' || status === 'past') {
@@ -53,12 +51,17 @@ export class TournamentMatchesComponent implements OnInit, OnDestroy {
             } else if (status === 'live' || status === 'in_progress') {
                 category = 'live';
             } else {
-                // Not started (scheduled) - prioritize status over time bounds 
-                // so newly generated matches don't immediately drop into "live" or "past"
                 category = 'upcoming';
             }
 
             return category === tab;
+        });
+
+        return [...filtered].sort((a, b) => {
+            const timeA = a.startTime ? new Date(a.startTime).getTime() : 0;
+            const timeB = b.startTime ? new Date(b.startTime).getTime() : 0;
+            if (timeA !== timeB) return timeA - timeB;
+            return (a.id || 0) - (b.id || 0);
         });
     });
 

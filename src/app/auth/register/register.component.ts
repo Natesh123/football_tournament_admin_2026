@@ -23,7 +23,10 @@ export class RegisterComponent implements OnInit {
     isLoading: boolean = false;
     showPassword = signal(false);
     showConfirmPassword = signal(false);
-    plans = ['Free', 'Basic', 'Premium'];
+    
+    publicPlans = signal<any[]>([]);
+    isLoadingPlans = signal<boolean>(true);
+    Number = Number;
 
     constructor(
         private fb: FormBuilder,
@@ -38,21 +41,56 @@ export class RegisterComponent implements OnInit {
             email: ['', [Validators.required, Validators.email]],
             password: ['', [Validators.required, CustomValidators.passwordStrength]],
             confirmPassword: ['', [Validators.required]],
-            plan: ['Free', [Validators.required]],
+            plan: ['Starter', [Validators.required]],
+            planId: [1, [Validators.required]],
             agreeTerms: [false, [Validators.requiredTrue]]
         }, { validators: CustomValidators.matchFields('password', 'confirmPassword') });
     }
 
     ngOnInit() {
-        const queryPlan = this.route.snapshot.queryParams['plan'] || this.route.snapshot.queryParams['planId'];
-        if (queryPlan) {
-            const matchedPlan = this.plans.find(p => p.toLowerCase() === String(queryPlan).toLowerCase()) || queryPlan;
-            this.registerForm.patchValue({ plan: matchedPlan });
-        }
+        this.fetchPublicPlans();
+    }
+
+    fetchPublicPlans() {
+        this.isLoadingPlans.set(true);
+        this.auth.getPublicPlans().subscribe({
+            next: (res: any) => {
+                const data = res?.data || [];
+                this.publicPlans.set(data);
+                this.isLoadingPlans.set(false);
+
+                // Read query param
+                const queryPlan = this.route.snapshot.queryParams['plan'] || this.route.snapshot.queryParams['planId'];
+                if (data.length > 0) {
+                    let target = data[0]; // fallback
+                    if (queryPlan) {
+                        const q = String(queryPlan).toLowerCase();
+                        const found = data.find((p: any) => 
+                            p.name.toLowerCase() === q || 
+                            p.code.toLowerCase() === q || 
+                            String(p.id) === q
+                        );
+                        if (found) target = found;
+                    }
+                    this.selectPlan(target);
+                }
+            },
+            error: (err) => {
+                console.error("Failed to load public plans:", err);
+                this.isLoadingPlans.set(false);
+            }
+        });
+    }
+
+    selectPlan(planObj: any) {
+        if (!planObj) return;
+        this.registerForm.patchValue({
+            plan: planObj.name,
+            planId: planObj.id
+        });
     }
 
     submit() {
-        // Reveal all validation messages and focus the first invalid field.
         if (!revealAndFocusInvalid(this.registerForm)) {
             return;
         }
@@ -61,16 +99,14 @@ export class RegisterComponent implements OnInit {
         this.successMessage = '';
         this.isLoading = true;
 
-        const { name, email, password, user_name, phone_number, plan } = this.registerForm.value;
+        const { name, email, password, user_name, phone_number, plan, planId } = this.registerForm.value;
 
-        this.auth.register({ name, email, password, user_name, phone_number, plan })
+        this.auth.register({ name, email, password, user_name, phone_number, plan, planId })
             .subscribe({
                 next: (res: any) => {
                     this.isLoading = false;
-                    // Store email for OTP verification
                     localStorage.setItem('email', email);
                     this.successMessage = res.message || 'OTP sent to your email';
-                    // Navigate to OTP page after a brief delay
                     setTimeout(() => {
                         this.router.navigate(['/otp']);
                     }, 1500);

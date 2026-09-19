@@ -211,4 +211,138 @@
             </div>
         </div>
     </div>
+
+    <!-- Admin Access Pending & Bank Details Modal -->
+    <div *ngIf="showAdminModal()" 
+        class="fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-300">
+        
+        <div class="relative w-full max-w-lg bg-[#141416] border border-gold-500/30 rounded-3xl p-6 lg:p-8 shadow-[0_0_60px_rgba(234,179,8,0.2)] text-white overflow-hidden animate-in zoom-in-95 duration-300">
+            <!-- Background Glow -->
+            <div class="absolute -top-24 -right-24 w-60 h-60 bg-gold-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-24 -left-24 w-60 h-60 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <!-- Close Button -->
+            <button (click)="closeModal()" 
+                class="absolute top-5 right-5 text-neutral-400 hover:text-gold-400 transition-colors p-2 rounded-full hover:bg-white/5 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <!-- Header Icon & Title -->
+            <div class="flex items-start gap-4 mb-6">
+                <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0 shadow-[0_0_20px_rgba(245,158,11,0.2)]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <div>
+                    <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[10px] font-extrabold uppercase tracking-wider mb-1">
+                        {{ 'AUTH.LOGIN.ADMIN_ACCESS_REQUIRED' | translate }}
+                    </div>
+                    <h3 class="text-xl font-black text-white leading-tight">
+                        {{ 'AUTH.LOGIN.ADMIN_ACCESS_PENDING_TITLE' | translate }}
+                    </h3>
+                    <p class="text-xs text-neutral-400 mt-1 font-medium leading-relaxed">
+                        {{ 'AUTH.LOGIN.ADMIN_ACCESS_PENDING_DESC' | translate }}
+                        <span class="text-gold-400 font-bold block mt-0.5">{{ 'AUTH.LOGIN.YOU_HAVE_SELECTED_PLAN' | translate:{ plan: userPlan() } }}</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Content Tabs / Sections -->
+            <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
+
+                <!-- Admin Contact Details Section -->
+                <div class="p-4 bg-[#1b1b1e] border border-white/10 rounded-2xl space-y-3">
+                    <div class="text-[11px] font-extrabold text-gold-400 uppercase tracking-widest flex items-center justify-between">
+                        <span>👤 {{ 'AUTH.LOGIN.ADMIN_DETAILS_HEADER' | translate }}</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        <div class="bg-black/30 p-2.5 rounded-xl border border-white/5">
+                            <span class="text-[10px] text-neutral-500 font-bold uppercase block">{{ 'AUTH.LOGIN.ADMIN_NAME' | translate }}</span>
+                            <span class="text-white font-bold">{{ adminDetails()?.name || 'ATB Sports Admin' }}</span>
+                        </div>
+                        <div class="bg-black/30 p-2.5 rounded-xl border border-white/5">
+                            <span class="text-[10px] text-neutral-500 font-bold uppercase block">{{ 'AUTH.LOGIN.ADMIN_PHONE' | translate }}</span>
+                            <a [href]="'tel:' + adminDetails()?.phone" class="text-gold-400 font-bold hover:underline">
+                                {{ adminDetails()?.phone || '+91 98765 43210' }}
+                            </a>
+                        </div>
+                        <div class="sm:col-span-2 bg-black/30 p-2.5 rounded-xl border border-white/5 flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] text-neutral-500 font-bold uppercase block">{{ 'AUTH.LOGIN.ADMIN_EMAIL' | translate }}</span>
+                                <span class="text-white font-bold">{{ adminDetails()?.email || 'admin@atbsports.com' }}</span>
+                            </div>
+                            <button (click)="copyText(adminDetails()?.email, 'email')" 
+                                class="px-2.5 py-1 bg-white/5 hover:bg-gold-500/20 text-gold-400 rounded-lg text-[10px] font-bold border border-gold-500/30 transition-all">
+                                {{ copiedField() === 'email' ? ('AUTH.LOGIN.COPIED' | translate) : ('AUTH.LOGIN.COPY' | translate) }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Bank Details Section (For Subscription Payment) -->
+                <div class="p-4 bg-[#1b1b1e] border border-gold-500/20 rounded-2xl space-y-3 relative overflow-hidden">
+                    <div class="text-[11px] font-extrabold text-amber-400 uppercase tracking-widest flex items-center justify-between">
+                        <span>🏦 {{ 'AUTH.LOGIN.BANK_DETAILS_HEADER' | translate }}</span>
+                        <span class="text-[9px] px-2 py-0.5 bg-amber-500/10 text-amber-400 rounded-md border border-amber-500/30">{{ 'AUTH.LOGIN.TRANSFER_TO_ACTIVATE' | translate }}</span>
+                    </div>
+
+                    <div class="space-y-2.5 text-xs">
+                        <div class="flex items-center justify-between p-2.5 bg-black/40 rounded-xl border border-white/5">
+                            <div>
+                                <span class="text-[10px] text-neutral-500 font-bold uppercase block">{{ 'AUTH.LOGIN.BANK_NAME' | translate }}</span>
+                                <span class="text-white font-bold">{{ adminDetails()?.bankName || 'State Bank of India' }}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between p-2.5 bg-black/40 rounded-xl border border-white/5">
+                            <div>
+                                <span class="text-[10px] text-neutral-500 font-bold uppercase block">{{ 'AUTH.LOGIN.ACCOUNT_NUMBER' | translate }}</span>
+                                <span class="text-gold-400 font-mono font-bold text-sm tracking-wider">{{ adminDetails()?.accountNumber || '98765432101234' }}</span>
+                            </div>
+                            <button (click)="copyText(adminDetails()?.accountNumber, 'acc')" 
+                                class="px-2.5 py-1 bg-gold-400/10 hover:bg-gold-400/20 text-gold-400 rounded-lg text-[10px] font-bold border border-gold-400/30 transition-all">
+                                {{ copiedField() === 'acc' ? ('AUTH.LOGIN.COPIED' | translate) : ('AUTH.LOGIN.COPY' | translate) }}
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <div class="p-2.5 bg-black/40 rounded-xl border border-white/5 flex items-center justify-between">
+                                <div>
+                                    <span class="text-[10px] text-neutral-500 font-bold uppercase block">{{ 'AUTH.LOGIN.IFSC_CODE' | translate }}</span>
+                                    <span class="text-white font-mono font-bold">{{ adminDetails()?.ifscCode || 'SBIN0001234' }}</span>
+                                </div>
+                                <button (click)="copyText(adminDetails()?.ifscCode, 'ifsc')" 
+                                    class="px-2 py-1 bg-white/5 text-neutral-300 hover:text-white rounded text-[10px] font-bold">
+                                    {{ copiedField() === 'ifsc' ? '✓' : ('AUTH.LOGIN.COPY' | translate) }}
+                                </button>
+                            </div>
+
+                            <div class="p-2.5 bg-black/40 rounded-xl border border-white/5">
+                                <span class="text-[10px] text-neutral-500 font-bold uppercase block">{{ 'AUTH.LOGIN.ACCOUNT_HOLDER' | translate }}</span>
+                                <span class="text-white font-bold truncate block">{{ adminDetails()?.accountHolder || 'ATB Sports Tournament Admin' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Footer Action Buttons -->
+            <div class="mt-6 pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center gap-3">
+                <a [href]="'mailto:' + adminDetails()?.email + '?subject=Plan%20Activation%20Request%20-%20' + userPlan()"
+                    class="w-full sm:w-1/2 py-3 bg-gradient-to-r from-gold-400 to-amber-500 text-black font-extrabold text-xs uppercase tracking-widest rounded-xl text-center shadow-lg hover:shadow-[0_0_20px_rgba(234,179,8,0.4)] transition-all active:scale-[0.98]">
+                    {{ 'AUTH.LOGIN.EMAIL_ADMIN_BTN' | translate }}
+                </a>
+                <button (click)="closeModal()"
+                    class="w-full sm:w-1/2 py-3 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all border border-white/10">
+                    {{ 'AUTH.LOGIN.CLOSE_BTN' | translate }}
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
+

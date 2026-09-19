@@ -924,4 +924,11 @@ export class TournamentDashboardComponent implements OnInit {
         };
         return map[status] || '';
     }
+
+    viewSinglePageDetails() {
+        const id = this.tournament()?.id;
+        if (id) {
+            this.router.navigate(['/admin/tournaments', id, 'details']);
+        }
+    }
 }

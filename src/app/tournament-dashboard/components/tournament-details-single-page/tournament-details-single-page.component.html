@@ -1,0 +1,460 @@
+<div class="tournament-details-page bg-[#0d1117] min-h-screen text-slate-100 font-sans pb-16">
+
+  <!-- TOP BAR NAVIGATION BACK BUTTON -->
+  <div class="bg-gray-900/90 border-b border-gray-800 px-4 md:px-8 py-4 backdrop-blur-md sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <button (click)="goBack()" class="flex items-center gap-2 text-sm font-bold text-gray-300 hover:text-amber-400 transition-colors bg-gray-800/80 px-4 py-2 rounded-xl border border-gray-700">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        <span>Back to All Tournaments</span>
+      </button>
+
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-3 py-1.5 rounded-lg">
+          Tournament ID: #{{ tournament().id }}
+        </span>
+
+        <button *ngIf="auth.isAdmin || auth.isOrganizer" (click)="manageTournament()" 
+                class="bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-gray-950 font-bold text-xs px-4 py-2 rounded-xl shadow-lg transition-all flex items-center gap-1.5">
+          <span>⚙️ Manage Settings</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOURNAMENT HERO HEADER -->
+  <header class="bg-gradient-to-r from-gray-950 via-slate-900 to-zinc-900 border-b border-gray-800 py-8 px-4 md:px-8 relative overflow-hidden">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+      
+      <!-- Tournament Identity -->
+      <div class="flex items-center gap-6 w-full md:w-auto">
+        <div class="w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-gray-950 border-2 border-amber-500/40 p-2 flex items-center justify-center shadow-xl shrink-0">
+          <img [src]="tournament().logo" [alt]="tournament().name" class="w-full h-full object-contain rounded-xl" />
+        </div>
+
+        <div>
+          <div class="flex items-center gap-3 flex-wrap">
+            <h1 class="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
+              {{ tournament().name }}
+            </h1>
+
+            <span *ngIf="tournament().status === 'LIVE'" class="bg-rose-600/20 text-rose-400 border border-rose-500/40 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5 animate-pulse">
+              <span class="w-2 h-2 rounded-full bg-rose-500"></span> LIVE 🔴
+            </span>
+            <span *ngIf="tournament().status === 'UPCOMING'" class="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-bold px-3 py-1 rounded-full">
+              UPCOMING ⏳
+            </span>
+            <span *ngIf="tournament().status === 'COMPLETED'" class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-bold px-3 py-1 rounded-full">
+              COMPLETED 🏁
+            </span>
+          </div>
+
+          <div class="text-sm text-gray-400 mt-2 flex flex-wrap items-center gap-4">
+            <span>📍 {{ tournament().location }}</span>
+            <span>•</span>
+            <span>📅 {{ tournament().startDate }} to {{ tournament().endDate }}</span>
+            <span>•</span>
+            <span class="text-amber-400 font-semibold">Stage: {{ tournament().stage }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Summary Cards -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full md:w-auto">
+        <div class="bg-gray-900/80 border border-gray-800 rounded-xl p-3 text-center min-w-[100px]">
+          <div class="text-gray-400 text-[10px] uppercase font-bold tracking-wider">Total Teams</div>
+          <div class="text-xl font-black text-amber-400 mt-0.5">{{ tournament().totalTeams }}</div>
+        </div>
+        <div class="bg-gray-900/80 border border-gray-800 rounded-xl p-3 text-center min-w-[100px]">
+          <div class="text-gray-400 text-[10px] uppercase font-bold tracking-wider">Total Matches</div>
+          <div class="text-xl font-black text-white mt-0.5">{{ tournament().totalMatches }}</div>
+        </div>
+        <div class="bg-gray-900/80 border border-gray-800 rounded-xl p-3 text-center min-w-[100px]">
+          <div class="text-gray-400 text-[10px] uppercase font-bold tracking-wider">Completed</div>
+          <div class="text-xl font-black text-emerald-400 mt-0.5">{{ tournament().completedMatches }}</div>
+        </div>
+        <div class="bg-gray-900/80 border border-gray-800 rounded-xl p-3 text-center min-w-[100px]">
+          <div class="text-gray-400 text-[10px] uppercase font-bold tracking-wider">Remaining</div>
+          <div class="text-xl font-black text-rose-400 mt-0.5">{{ tournament().remainingMatches }}</div>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN SINGLE-PAGE BODY -->
+  <main class="max-w-7xl mx-auto px-4 md:px-8 py-8 space-y-12">
+
+    <!-- 0. TOURNAMENT WINNER CHAMPIONS SPOTLIGHT BANNER -->
+    <section *ngIf="tournamentWinner()" class="bg-gradient-to-r from-amber-950 via-yellow-950/80 to-slate-900 border-2 border-amber-500 rounded-2xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
+      <div class="absolute -right-8 -top-8 text-amber-500/10 text-9xl font-black pointer-events-none select-none">🏆</div>
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-6 relative z-10">
+        <div class="flex items-center gap-5 text-center sm:text-left">
+          <div class="w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-amber-500/20 border-2 border-amber-400 p-2 flex items-center justify-center shadow-2xl shrink-0">
+            <img [src]="tournamentWinner()?.logo" [alt]="tournamentWinner()?.name" class="w-full h-full object-contain rounded-xl" />
+          </div>
+          <div>
+            <span class="text-xs font-black text-amber-400 uppercase tracking-widest bg-amber-500/20 px-3 py-1 rounded-full border border-amber-500/40 inline-block mb-1">
+              👑 Tournament Champion & Winner
+            </span>
+            <h2 class="text-3xl md:text-4xl font-black text-white tracking-tight">
+              {{ tournamentWinner()?.name }}
+            </h2>
+            <p class="text-xs text-amber-300/80 font-bold mt-1">
+              Rank #1 • {{ tournamentWinner()?.points }} Points • {{ tournamentWinner()?.won }} Wins • {{ tournamentWinner()?.goalsFor }} Goals Scored
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 bg-gray-950/80 border border-amber-500/40 px-5 py-3 rounded-2xl">
+          <span class="text-3xl">🥇</span>
+          <div>
+            <div class="text-[10px] font-bold text-amber-400 uppercase tracking-wider">Tournament Winner</div>
+            <div class="text-lg font-black text-white">{{ tournamentWinner()?.name }}</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1. FEATURED CURRENT / NEXT UPCOMING MATCH SPOTLIGHT -->
+    <section *ngIf="nextUpcomingMatch()" class="bg-gradient-to-r from-amber-950/40 via-gray-900 to-slate-900 border border-amber-500/30 rounded-2xl p-6 shadow-2xl">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div>
+          <span class="text-xs font-bold text-amber-400 uppercase tracking-widest bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+            ⏰ Next Scheduled Match Kick-Off
+          </span>
+          <h2 class="text-2xl font-black text-white mt-2">
+            {{ nextUpcomingMatch()?.homeTeam?.name }} vs {{ nextUpcomingMatch()?.awayTeam?.name }}
+          </h2>
+          <p class="text-sm text-gray-400 mt-1">
+            <span class="text-amber-400 font-bold">Kick-off: {{ nextUpcomingMatch()?.dateStr }} at {{ nextUpcomingMatch()?.timeStr }}</span> • {{ nextUpcomingMatch()?.venue }}
+          </p>
+        </div>
+
+        <!-- Real-Time Countdown Timer -->
+        <div class="flex items-center gap-3">
+          <div class="text-center bg-gray-950 border border-gray-800 px-3 py-2 rounded-xl min-w-[55px]">
+            <div class="text-xl font-black text-amber-400">{{ nextMatchCountdown().days }}</div>
+            <div class="text-[10px] text-gray-400 uppercase">Days</div>
+          </div>
+          <span class="text-amber-400 font-bold text-xl">:</span>
+          <div class="text-center bg-gray-950 border border-gray-800 px-3 py-2 rounded-xl min-w-[55px]">
+            <div class="text-xl font-black text-amber-400">{{ nextMatchCountdown().hours }}</div>
+            <div class="text-[10px] text-gray-400 uppercase">Hours</div>
+          </div>
+          <span class="text-amber-400 font-bold text-xl">:</span>
+          <div class="text-center bg-gray-950 border border-gray-800 px-3 py-2 rounded-xl min-w-[55px]">
+            <div class="text-xl font-black text-amber-400">{{ nextMatchCountdown().mins }}</div>
+            <div class="text-[10px] text-gray-400 uppercase">Mins</div>
+          </div>
+          <span class="text-amber-400 font-bold text-xl">:</span>
+          <div class="text-center bg-gray-950 border border-gray-800 px-3 py-2 rounded-xl min-w-[55px]">
+            <div class="text-xl font-black text-rose-400 animate-pulse">{{ nextMatchCountdown().secs }}</div>
+            <div class="text-[10px] text-gray-400 uppercase">Secs</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Empty Spotlight Banner when no upcoming matches scheduled and not finished -->
+    <section *ngIf="!nextUpcomingMatch() && !tournamentWinner() && !isLoading()" class="bg-gray-900/60 border border-gray-800 rounded-2xl p-6 text-center shadow-xl">
+      <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 mb-3">
+        <span class="text-xl">⏳</span>
+      </div>
+      <h3 class="text-lg font-bold text-white">No Upcoming Match Scheduled</h3>
+      <p class="text-xs text-gray-400 mt-1 max-w-md mx-auto">
+        No matches are scheduled for this tournament yet. Once teams register and fixtures are created in settings, upcoming kick-off details will show here.
+      </p>
+    </section>
+
+    <!-- 2. STAGE PROGRESSION PIPELINE -->
+    <section class="bg-gray-900/60 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <span class="text-amber-400">📊</span> Stage Progression Tracker
+        </h3>
+        <span class="text-xs text-gray-400 font-semibold">Active Stage: {{ tournament().stage }}</span>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+        <div *ngFor="let stage of tournamentStages" 
+             [class.border-amber-500]="stage.isCurrent"
+             [class.bg-amber-500/10]="stage.isCurrent"
+             [class.border-gray-800]="!stage.isCurrent"
+             class="border rounded-xl p-3 text-center transition-all">
+          <div class="text-[10px] text-gray-400 font-bold uppercase">Stage</div>
+          <div class="text-sm font-bold mt-0.5" [class.text-amber-400]="stage.isCurrent" [class.text-white]="!stage.isCurrent">
+            {{ stage.name }}
+          </div>
+          <span *ngIf="stage.isCurrent" class="inline-block mt-2 text-[10px] font-black bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full">
+            CURRENT
+          </span>
+          <span *ngIf="stage.isCompleted && !stage.isCurrent" class="inline-block mt-2 text-[10px] font-bold text-emerald-400">
+            ✓ Done
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. CATEGORIZED MATCHES SECTIONS (ONGOING, UPCOMING, COMPLETED) -->
+    <section class="space-y-6">
+      
+      <!-- Match Categorization Tabs -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-800 pb-4">
+        <div>
+          <h2 class="text-2xl font-black text-white flex items-center gap-2">
+            <span class="text-amber-400">⚽</span> Tournament Matches & Results
+          </h2>
+          <p class="text-xs text-gray-400">Clear categorization for ongoing live, scheduled upcoming, and completed match results</p>
+        </div>
+
+        <div class="flex items-center gap-2 bg-gray-950 p-1.5 rounded-xl border border-gray-800">
+          <button (click)="activeMatchTab.set('all')" [class.bg-amber-500]="activeMatchTab() === 'all'" [class.text-gray-950]="activeMatchTab() === 'all'" class="text-xs font-bold px-3 py-1.5 rounded-lg transition-all">All ({{ matches().length }})</button>
+          <button (click)="activeMatchTab.set('live')" [class.bg-rose-600]="activeMatchTab() === 'live'" [class.text-white]="activeMatchTab() === 'live'" class="text-xs font-bold px-3 py-1.5 rounded-lg transition-all flex items-center gap-1">
+            <span>🔴 Live</span>
+            <span class="bg-rose-950 text-white text-[10px] font-black px-1.5 py-0.2 rounded-full">{{ liveMatches().length }}</span>
+          </button>
+          <button (click)="activeMatchTab.set('upcoming')" [class.bg-amber-500]="activeMatchTab() === 'upcoming'" [class.text-gray-950]="activeMatchTab() === 'upcoming'" class="text-xs font-bold px-3 py-1.5 rounded-lg transition-all">Upcoming ({{ upcomingMatches().length }})</button>
+          <button (click)="activeMatchTab.set('completed')" [class.bg-amber-500]="activeMatchTab() === 'completed'" [class.text-gray-950]="activeMatchTab() === 'completed'" class="text-xs font-bold px-3 py-1.5 rounded-lg transition-all">Completed ({{ completedMatches().length }})</button>
+        </div>
+      </div>
+
+      <!-- ONGOING / LIVE MATCHES HIGHLIGHT SECTION -->
+      <div *ngIf="liveMatches().length > 0 && (activeMatchTab() === 'all' || activeMatchTab() === 'live')" class="space-y-4">
+        <h3 class="text-sm font-bold uppercase tracking-wider text-rose-400 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span> 🔴 Ongoing Live Matches
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div *ngFor="let m of liveMatches()" (click)="openMatchModal(m)" 
+               class="bg-gradient-to-b from-gray-900 to-slate-900 border border-rose-500/40 hover:border-rose-500 rounded-2xl p-5 shadow-xl cursor-pointer transition-all hover:-translate-y-1">
+            
+            <div class="flex items-center justify-between border-b border-gray-800 pb-2 mb-3">
+              <span class="text-xs font-bold text-amber-400">{{ m.round }} • {{ m.venue }}</span>
+              <span class="bg-rose-600/20 text-rose-400 border border-rose-500/40 text-xs font-bold px-2.5 py-0.5 rounded-full animate-pulse">
+                LIVE {{ m.minute }}'
+              </span>
+            </div>
+
+            <div class="flex items-center justify-between my-2">
+              <div class="flex items-center gap-3">
+                <img [src]="m.homeTeam.logo" class="w-10 h-10 object-contain" />
+                <span class="font-bold text-white text-base">{{ m.homeTeam.name }}</span>
+              </div>
+
+              <div class="text-2xl font-black text-amber-400 bg-gray-950 px-3 py-1 rounded-xl border border-gray-800">
+                {{ m.homeScore }} - {{ m.awayScore }}
+              </div>
+
+              <div class="flex items-center gap-3">
+                <span class="font-bold text-white text-base">{{ m.awayTeam.name }}</span>
+                <img [src]="m.awayTeam.logo" class="w-10 h-10 object-contain" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MATCHES TABLE LIST -->
+      <div class="bg-gray-900/60 border border-gray-800 rounded-2xl overflow-hidden shadow-xl">
+        <div *ngIf="filteredMatches().length === 0" class="py-12 px-6 text-center">
+          <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-800 text-gray-400 mb-3">
+            <span class="text-xl">⚽</span>
+          </div>
+          <h4 class="text-base font-bold text-white">No Matches Generated Yet</h4>
+          <p class="text-xs text-gray-400 mt-1">Match fixtures created for this tournament will appear here.</p>
+        </div>
+
+        <div *ngIf="filteredMatches().length > 0" class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-gray-200">
+            <thead class="bg-gray-950 text-xs font-bold uppercase tracking-wider text-gray-400 border-b border-gray-800">
+              <tr>
+                <th class="py-4 px-6">Match #</th>
+                <th class="py-4 px-6">Round & Venue</th>
+                <th class="py-4 px-6">Date / Kick-Off Time</th>
+                <th class="py-4 px-6 text-center">Team A vs Team B</th>
+                <th class="py-4 px-6 text-center">Status / Score</th>
+                <th class="py-4 px-6 text-center">Winner / Result</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800/80">
+              <tr *ngFor="let m of filteredMatches()" class="hover:bg-gray-800/50 transition-colors">
+                <td class="py-4 px-6 font-bold text-amber-400">#{{ m.matchNumber }}</td>
+                <td class="py-4 px-6">
+                  <div class="font-bold text-white">{{ m.round }}</div>
+                  <div class="text-xs text-gray-400">{{ m.venue }}</div>
+                </td>
+                <td class="py-4 px-6">
+                  <div class="font-semibold text-white">{{ m.dateStr }}</div>
+                  <div class="text-xs text-amber-400 font-bold">{{ m.timeStr }}</div>
+                </td>
+                <td class="py-4 px-6 text-center">
+                  <div class="flex items-center justify-center gap-3">
+                    <span class="font-bold text-white text-sm" [class.text-amber-400]="m.winnerName === m.homeTeam.name">{{ m.homeTeam.name }}</span>
+                    <img [src]="m.homeTeam.logo" class="w-6 h-6 object-contain" />
+                    <span class="text-gray-500 font-bold text-xs">VS</span>
+                    <img [src]="m.awayTeam.logo" class="w-6 h-6 object-contain" />
+                    <span class="font-bold text-white text-sm" [class.text-amber-400]="m.winnerName === m.awayTeam.name">{{ m.awayTeam.name }}</span>
+                  </div>
+                </td>
+                <td class="py-4 px-6 text-center">
+                  <span *ngIf="m.status === 'LIVE'" class="bg-rose-600/20 text-rose-400 border border-rose-500/40 text-xs font-bold px-3 py-1 rounded-full animate-pulse">
+                    {{ m.homeScore }} - {{ m.awayScore }} ({{ m.minute }}')
+                  </span>
+                  <span *ngIf="m.status === 'COMPLETED'" class="bg-gray-950 text-amber-400 font-black text-sm px-3 py-1 rounded-lg border border-gray-800">
+                    {{ m.homeScore }} - {{ m.awayScore }}
+                  </span>
+                  <span *ngIf="m.status === 'UPCOMING'" class="bg-gray-800 text-gray-400 text-xs font-bold px-3 py-1 rounded-full border border-gray-700">
+                    Scheduled
+                  </span>
+                </td>
+                <td class="py-4 px-6 text-center">
+                  <span *ngIf="m.winnerName" class="text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full">
+                    🏆 {{ m.winnerName }}
+                  </span>
+                  <span *ngIf="!m.winnerName && m.status === 'COMPLETED'" class="text-xs text-gray-400 font-semibold">
+                    Draw
+                  </span>
+                  <span *ngIf="m.status !== 'COMPLETED'" class="text-xs text-gray-500">
+                    -
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. TOTAL TEAMS COUNT & PARTICIPATING TEAMS LIST SECTION -->
+    <section class="space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-black text-white flex items-center gap-2">
+            <span class="text-amber-400">👥</span> Participating Teams & League Standings
+          </h2>
+          <p class="text-xs text-gray-400">Total Teams: {{ teams().length }} registered clubs</p>
+        </div>
+        <span class="text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-3 py-1.5 rounded-lg">
+          Count: {{ teams().length }} Teams
+        </span>
+      </div>
+
+      <!-- Teams Standings Table -->
+      <div class="bg-gray-900/60 border border-gray-800 rounded-2xl overflow-hidden shadow-xl">
+        <div *ngIf="teams().length === 0" class="py-12 px-6 text-center">
+          <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 mb-3">
+            <span class="text-xl">👥</span>
+          </div>
+          <h4 class="text-base font-bold text-white">No Teams Registered Yet</h4>
+          <p class="text-xs text-gray-400 mt-1">Teams registered for this tournament will appear here with live standing statistics and rankings.</p>
+        </div>
+
+        <div *ngIf="teams().length > 0" class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-gray-200">
+            <thead class="bg-gray-950 text-xs font-bold uppercase tracking-wider text-gray-400 border-b border-gray-800">
+              <tr>
+                <th class="py-4 px-4 text-center">RANK</th>
+                <th class="py-4 px-6">TEAM NAME</th>
+                <th class="py-4 px-4 text-center">MP</th>
+                <th class="py-4 px-4 text-center">W</th>
+                <th class="py-4 px-4 text-center">D</th>
+                <th class="py-4 px-4 text-center">L</th>
+                <th class="py-4 px-4 text-center">GF</th>
+                <th class="py-4 px-4 text-center">GA</th>
+                <th class="py-4 px-4 text-center">GD</th>
+                <th class="py-4 px-4 text-center font-black text-amber-400">PTS</th>
+                <th class="py-4 px-6 text-center">FORM</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800/80">
+              <tr *ngFor="let t of standings()" 
+                  [class.bg-amber-500/10]="t.rank === 1"
+                  class="hover:bg-gray-800/50 transition-colors">
+                <td class="py-4 px-4 text-center font-black">
+                  <span *ngIf="t.rank === 1" class="text-amber-400">🥇 1</span>
+                  <span *ngIf="t.rank > 1" class="text-gray-400">{{ t.rank }}</span>
+                </td>
+                <td class="py-4 px-6">
+                  <div class="flex items-center gap-3">
+                    <img [src]="t.logo" [alt]="t.name" class="w-8 h-8 object-contain" />
+                    <div>
+                      <div class="font-bold text-white">{{ t.name }}</div>
+                      <div class="text-xs text-gray-400">{{ t.shortCode }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-4 px-4 text-center font-semibold">{{ t.played }}</td>
+                <td class="py-4 px-4 text-center text-emerald-400 font-semibold">{{ t.won }}</td>
+                <td class="py-4 px-4 text-center text-gray-400 font-semibold">{{ t.drawn }}</td>
+                <td class="py-4 px-4 text-center text-rose-400 font-semibold">{{ t.lost }}</td>
+                <td class="py-4 px-4 text-center">{{ t.goalsFor }}</td>
+                <td class="py-4 px-4 text-center">{{ t.goalsAgainst }}</td>
+                <td class="py-4 px-4 text-center font-bold" [class.text-emerald-400]="t.goalDifference > 0" [class.text-rose-400]="t.goalDifference < 0">
+                  {{ t.goalDifference > 0 ? '+' + t.goalDifference : t.goalDifference }}
+                </td>
+                <td class="py-4 px-4 text-center text-lg font-black text-amber-400 bg-gray-950/40">{{ t.points }}</td>
+                <td class="py-4 px-6 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <span *ngFor="let f of t.form" 
+                          [class.bg-emerald-500]="f === 'W'" 
+                          [class.bg-gray-600]="f === 'D'" 
+                          [class.bg-rose-500]="f === 'L'" 
+                          class="w-5 h-5 rounded text-[10px] font-black text-white flex items-center justify-center">
+                      {{ f }}
+                    </span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. TOURNAMENT KNOCKOUT BRACKET SECTION -->
+    <section class="bg-gray-900/60 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-6">
+      <div>
+        <h2 class="text-2xl font-black text-white flex items-center gap-2">
+          <span class="text-amber-400">🏆</span> Knockout Stage Bracket Tree
+        </h2>
+        <p class="text-xs text-gray-400">Quarter-Finals ➔ Semi-Finals ➔ Final Stage Progression</p>
+      </div>
+
+      <div *ngIf="knockoutBracket().length === 0" class="py-8 text-center bg-gray-950/60 rounded-xl border border-gray-800">
+        <p class="text-sm font-bold text-gray-400">Knockout bracket will be generated once teams advance from group stage.</p>
+      </div>
+
+      <div *ngIf="knockoutBracket().length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div *ngFor="let b of knockoutBracket()" class="bg-gray-950 border border-gray-800 rounded-xl p-4 space-y-3">
+          <span class="text-xs font-bold text-amber-400 uppercase tracking-wider block">{{ b.roundName }}</span>
+          
+          <div class="space-y-2">
+            <div class="flex items-center justify-between bg-gray-900 p-2 rounded-lg border border-gray-800" [class.border-amber-500]="b.winner === b.homeTeam">
+              <div class="flex items-center gap-2">
+                <img [src]="b.homeLogo" class="w-6 h-6 object-contain" />
+                <span class="text-xs font-bold text-white">{{ b.homeTeam }}</span>
+              </div>
+              <span class="text-sm font-black text-amber-400">{{ b.homeScore ?? '-' }}</span>
+            </div>
+
+            <div class="flex items-center justify-between bg-gray-900 p-2 rounded-lg border border-gray-800" [class.border-amber-500]="b.winner === b.awayTeam">
+              <div class="flex items-center gap-2">
+                <img [src]="b.awayLogo" class="w-6 h-6 object-contain" />
+                <span class="text-xs font-bold text-white">{{ b.awayTeam }}</span>
+              </div>
+              <span class="text-sm font-black text-amber-400">{{ b.awayScore ?? '-' }}</span>
+            </div>
+          </div>
+
+          <div *ngIf="b.winner" class="text-[11px] text-emerald-400 font-bold">
+            ✓ Winner: {{ b.winner }}
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+</div>

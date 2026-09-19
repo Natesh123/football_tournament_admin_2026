@@ -22,8 +22,8 @@ import { AuthService } from '../auth/auth.service';
           <h1 class="text-3xl font-bold text-white tracking-tight">{{ 'TEAMS.TITLE' | translate }}</h1>
           <p class="text-zinc-400 mt-1">{{ 'TEAMS.SUBTITLE' | translate }}</p>
         </div>
-        <!-- Only admins manage the shared global team registry. -->
-        @if (isAdmin) {
+        <!-- Allow both admins and organizers to create teams. -->
+        @if (canCreateTeam) {
         <button (click)="openCreateModal()"
           class="px-5 py-2.5 bg-gold-400 hover:bg-gold-500 text-black font-bold rounded-xl transition-all shadow-lg shadow-gold-400/20 flex items-center gap-2 self-start sm:self-auto">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -125,7 +125,7 @@ import { AuthService } from '../auth/auth.service';
               </svg>
             </div>
             <h3 class="text-xl font-bold text-zinc-300 mb-2">{{ 'TEAMS.EMPTY' | translate }}</h3>
-            @if (isAdmin) {
+            @if (canCreateTeam) {
             <p class="text-sm text-zinc-500 mb-6 max-w-xs">Create your first team to start managing rosters, schedules, and match results.</p>
             <button (click)="openCreateModal()"
                     class="px-6 py-2.5 bg-gold-400 hover:bg-gold-500 text-black font-bold rounded-xl transition-all shadow-lg shadow-gold-400/20 flex items-center gap-2">
@@ -160,9 +160,12 @@ export class TeamsComponent {
   private translate = inject(TranslateService);
   private auth = inject(AuthService);
 
-  // Only admins manage the shared global team registry; organizers view read-only.
   get isAdmin(): boolean {
     return this.auth.isAdmin;
+  }
+
+  get canCreateTeam(): boolean {
+    return this.auth.isAdmin || this.auth.isOrganizer || this.auth.hasPermission('can_teams');
   }
 
   teams = signal<Team[]>([]);

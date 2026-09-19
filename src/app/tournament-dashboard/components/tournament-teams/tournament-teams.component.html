@@ -310,14 +310,13 @@
             </button>
         </div>
 
-        <!-- Existing-team picker label + admin shortcut to the full "Register New Team" popup -->
+        <!-- Existing-team picker label + shortcut to the full "Register New Team" popup -->
         <div class="flex items-center justify-between border-b border-black-border px-6 pt-4 pb-3">
             <span class="relative text-sm font-bold tracking-wider text-gold-400">
                 {{ 'TOURNAMENT_DASHBOARD.TEAMS.MODAL.EXISTING_TEAMS' | translate }}
                 <span class="absolute -bottom-3 left-0 w-full h-0.5 bg-gold-400"></span>
             </span>
-            <!-- Only admins manage the shared global team registry. -->
-            @if (isAdmin) {
+            <!-- Create New Team option for all roles -->
             <button type="button" (click)="openCreateTeamModal()"
                 class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gold-400 hover:text-gold-300 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
@@ -326,7 +325,6 @@
                 </svg>
                 {{ 'TOURNAMENT_DASHBOARD.TEAMS.MODAL.CREATE_NEW' | translate }}
             </button>
-            }
         </div>
 
         <div class="p-6 space-y-4">

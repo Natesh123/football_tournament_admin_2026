@@ -1,0 +1,772 @@
+<div class="live-dashboard-container font-sans text-slate-100 bg-[#0d1117] min-h-screen">
+  
+  <!-- TOP BRANDING & TOURNAMENT HEADER -->
+  <header class="header-banner relative overflow-hidden bg-gradient-to-r from-gray-900 via-slate-900 to-zinc-900 border-b border-gray-800 py-6 px-4 md:px-8">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+      
+      <!-- Tournament Info & Logo -->
+      <div class="flex items-center gap-5 w-full md:w-auto">
+        <div class="logo-box w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-amber-500/20 to-yellow-600/10 border border-amber-500/30 p-2 flex items-center justify-center shadow-lg shadow-amber-500/10 shrink-0">
+          <img [src]="selectedTournament()?.logo" [alt]="selectedTournament()?.name" class="w-full h-full object-contain rounded-xl" />
+        </div>
+        
+        <div>
+          <div class="flex items-center gap-3 flex-wrap">
+            <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white">
+              {{ selectedTournament()?.name }}
+            </h1>
+            
+            <!-- Live / Stage Pills -->
+            <span *ngIf="selectedTournament()?.status === 'LIVE'" class="live-pill bg-rose-600/20 text-rose-400 border border-rose-500/40 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5 animate-pulse">
+              <span class="w-2 h-2 rounded-full bg-rose-500"></span> LIVE 🔴
+            </span>
+            <span *ngIf="selectedTournament()?.status === 'UPCOMING'" class="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-bold px-3 py-1 rounded-full">
+              UPCOMING ⏳
+            </span>
+            <span *ngIf="selectedTournament()?.status === 'COMPLETED'" class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-bold px-3 py-1 rounded-full">
+              COMPLETED 🏁
+            </span>
+          </div>
+
+          <p class="text-sm text-gray-400 mt-1 flex items-center gap-2">
+            <span>📍 {{ selectedTournament()?.location }}</span>
+            <span>•</span>
+            <span class="text-amber-400 font-semibold">{{ selectedTournament()?.stage }}</span>
+          </p>
+
+          <div class="mt-2 flex items-center gap-2">
+            <span class="text-xs font-bold px-3 py-1 rounded-lg border backdrop-blur-md"
+                  [class.bg-amber-500/10]="auth.isAdmin"
+                  [class.text-amber-400]="auth.isAdmin"
+                  [class.border-amber-500/30]="auth.isAdmin"
+                  [class.bg-sky-500/10]="auth.isOrganizer && !auth.isAdmin"
+                  [class.text-sky-400]="auth.isOrganizer && !auth.isAdmin"
+                  [class.border-sky-500/30]="auth.isOrganizer && !auth.isAdmin"
+                  [class.bg-gray-800]="!auth.isAdmin && !auth.isOrganizer">
+              {{ userRoleBadge }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Connection Indicator & TOURNAMENT SWITCHER BUTTON -->
+      <div class="flex flex-wrap items-center gap-4 w-full md:w-auto justify-between md:justify-end">
+        <div class="live-indicator-badge bg-gray-900/80 border border-gray-800 rounded-xl px-4 py-2 flex items-center gap-3 backdrop-blur-md">
+          <span class="relative flex h-3 w-3">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+          </span>
+          <div class="text-xs">
+            <div class="font-bold text-emerald-400 tracking-wider">● LIVE DATA</div>
+            <div class="text-gray-400">Updated: {{ lastUpdated() }}</div>
+          </div>
+        </div>
+
+        <!-- USER REQUESTED FEATURE: Tournament Switcher Button ("tronament ku laa oru button marri vachu show panna nalla irukum") -->
+        <button (click)="openTournamentSwitcher()" 
+                class="switcher-btn bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-gray-950 font-bold text-sm px-5 py-2.5 rounded-xl shadow-lg shadow-amber-500/20 transition-all transform hover:-translate-y-0.5 flex items-center gap-2">
+          <span>🏆 Switch Tournament</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Quick Stats Cards Bar -->
+    <div class="max-w-7xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-6 border-t border-gray-800/80">
+      <div class="stat-card bg-gray-900/60 border border-gray-800/80 rounded-xl p-3 text-center">
+        <div class="text-gray-400 text-xs font-medium uppercase tracking-wider">Participating Teams</div>
+        <div class="text-xl font-black text-amber-400 mt-0.5">{{ selectedTournament()?.totalTeams }}</div>
+      </div>
+      <div class="stat-card bg-gray-900/60 border border-gray-800/80 rounded-xl p-3 text-center">
+        <div class="text-gray-400 text-xs font-medium uppercase tracking-wider">Total Matches</div>
+        <div class="text-xl font-black text-white mt-0.5">{{ selectedTournament()?.totalMatches }}</div>
+      </div>
+      <div class="stat-card bg-gray-900/60 border border-gray-800/80 rounded-xl p-3 text-center">
+        <div class="text-gray-400 text-xs font-medium uppercase tracking-wider">Completed</div>
+        <div class="text-xl font-black text-emerald-400 mt-0.5">{{ selectedTournament()?.completedMatches }}</div>
+      </div>
+      <div class="stat-card bg-gray-900/60 border border-gray-800/80 rounded-xl p-3 text-center">
+        <div class="text-gray-400 text-xs font-medium uppercase tracking-wider">Remaining</div>
+        <div class="text-xl font-black text-rose-400 mt-0.5">{{ selectedTournament()?.remainingMatches }}</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- STICKY SINGLE-PAGE NAVIGATION TABS -->
+  <nav class="sticky top-0 z-30 bg-gray-900/90 backdrop-blur-md border-b border-gray-800 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 flex items-center justify-between overflow-x-auto no-scrollbar">
+      
+      <div class="flex items-center space-x-1 sm:space-x-4 py-3 shrink-0">
+        <button (click)="scrollToSection('overview')" 
+                [class.text-amber-400]="activeTab() === 'overview'"
+                [class.border-amber-400]="activeTab() === 'overview'"
+                class="px-4 py-2 text-sm font-semibold border-b-2 border-transparent hover:text-amber-300 transition-all flex items-center gap-2">
+          <span>📊 Overview</span>
+        </button>
+
+        <button (click)="scrollToSection('live')" 
+                [class.text-amber-400]="activeTab() === 'live'"
+                [class.border-amber-400]="activeTab() === 'live'"
+                class="px-4 py-2 text-sm font-semibold border-b-2 border-transparent hover:text-amber-300 transition-all flex items-center gap-2">
+          <span>🔴 Live</span>
+          <span *ngIf="liveMatches().length > 0" class="bg-rose-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full">
+            {{ liveMatches().length }}
+          </span>
+        </button>
+
+        <button (click)="scrollToSection('schedule')" 
+                [class.text-amber-400]="activeTab() === 'schedule'"
+                [class.border-amber-400]="activeTab() === 'schedule'"
+                class="px-4 py-2 text-sm font-semibold border-b-2 border-transparent hover:text-amber-300 transition-all flex items-center gap-2">
+          <span>📅 Schedule</span>
+        </button>
+
+        <button (click)="scrollToSection('standings')" 
+                [class.text-amber-400]="activeTab() === 'standings'"
+                [class.border-amber-400]="activeTab() === 'standings'"
+                class="px-4 py-2 text-sm font-semibold border-b-2 border-transparent hover:text-amber-300 transition-all flex items-center gap-2">
+          <span>🏆 Standings</span>
+        </button>
+
+        <button (click)="scrollToSection('teams')" 
+                [class.text-amber-400]="activeTab() === 'teams'"
+                [class.border-amber-400]="activeTab() === 'teams'"
+                class="px-4 py-2 text-sm font-semibold border-b-2 border-transparent hover:text-amber-300 transition-all flex items-center gap-2">
+          <span>👥 Teams</span>
+        </button>
+
+        <button (click)="scrollToSection('updates')" 
+                [class.text-amber-400]="activeTab() === 'updates'"
+                [class.border-amber-400]="activeTab() === 'updates'"
+                class="px-4 py-2 text-sm font-semibold border-b-2 border-transparent hover:text-amber-300 transition-all flex items-center gap-2">
+          <span>⚡ Live Updates</span>
+        </button>
+      </div>
+
+      <!-- Real-Time Simulation Controls -->
+      <div class="hidden lg:flex items-center gap-3 shrink-0 py-2">
+        <button (click)="toggleSimulation()" 
+                [class.bg-emerald-600/20]="isSimulationActive()"
+                [class.text-emerald-400]="isSimulationActive()"
+                [class.border-emerald-500/40]="isSimulationActive()"
+                class="text-xs font-bold px-3 py-1.5 rounded-lg border border-gray-700 hover:border-gray-500 transition-all flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full" [class.bg-emerald-400]="isSimulationActive()" [class.bg-gray-500]="!isSimulationActive()"></span>
+          Simulation: {{ isSimulationActive() ? 'ON ⚡' : 'PAUSED' }}
+        </button>
+
+        <button (click)="manualSimulateGoal()" class="text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 px-3 py-1.5 rounded-lg transition-all">
+          ⚽ Trigger Goal Demo
+        </button>
+      </div>
+
+    </div>
+  </nav>
+
+  <!-- MAIN SINGLE PAGE CONTENT -->
+  <main class="max-w-7xl mx-auto px-4 py-8 space-y-12">
+
+    <!-- SECTION 1: OVERVIEW & TOURNAMENT PROGRESS (#overview) -->
+    <section id="overview" class="scroll-mt-20 space-y-6">
+      <div class="bg-gray-900/60 border border-gray-800 rounded-2xl p-6 shadow-xl">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          <div>
+            <h2 class="text-xl font-extrabold text-white flex items-center gap-2">
+              <span class="text-amber-400">📈</span> Tournament Progress & Pipeline
+            </h2>
+            <p class="text-sm text-gray-400">Current stage progression and match completion status</p>
+          </div>
+          <div class="text-right">
+            <span class="text-2xl font-black text-amber-400">43%</span>
+            <span class="text-xs text-gray-400 block">Completed</span>
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-gray-800 rounded-full h-3 mb-6 overflow-hidden">
+          <div class="bg-gradient-to-r from-amber-500 to-yellow-400 h-3 rounded-full transition-all duration-500" style="width: 43%"></div>
+        </div>
+
+        <!-- Stage Pipeline Tracker -->
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          <div *ngFor="let stage of tournamentStages" 
+               [class.border-amber-500/60]="stage.isCurrent"
+               [class.bg-amber-500/10]="stage.isCurrent"
+               [class.border-gray-800]="!stage.isCurrent"
+               class="stage-card border rounded-xl p-3 text-center transition-all">
+            <div class="text-xs text-gray-400 font-medium">Stage</div>
+            <div class="text-sm font-bold mt-0.5" [class.text-amber-400]="stage.isCurrent" [class.text-white]="!stage.isCurrent">
+              {{ stage.name }}
+            </div>
+            <span *ngIf="stage.isCurrent" class="inline-block mt-2 text-[10px] font-black bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30">
+              ACTIVE
+            </span>
+            <span *ngIf="stage.isCompleted" class="inline-block mt-2 text-[10px] font-bold text-emerald-400">
+              ✓ Done
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: LIVE MATCHES (#live) -->
+    <section id="live" class="scroll-mt-20 space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-black text-white flex items-center gap-2">
+            <span class="text-rose-500 animate-pulse">🔴</span> Live Matches
+          </h2>
+          <p class="text-sm text-gray-400">Real-time match scores and key action updates</p>
+        </div>
+        <span class="text-xs font-bold text-gray-400 bg-gray-900 border border-gray-800 px-3 py-1.5 rounded-lg">
+          {{ liveMatches().length }} Match(es) Running
+        </span>
+      </div>
+
+      <!-- Live Matches Grid -->
+      <div *ngIf="liveMatches().length > 0; else noLiveMatches" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <div *ngFor="let match of liveMatches()" 
+             (click)="openMatchDetails(match)"
+             class="live-match-card bg-gradient-to-b from-gray-900 to-slate-900/90 border border-rose-500/30 hover:border-rose-500/60 rounded-2xl p-6 shadow-xl hover:shadow-rose-500/10 cursor-pointer transition-all transform hover:-translate-y-1 relative overflow-hidden group">
+          
+          <!-- Live Glow Header -->
+          <div class="flex items-center justify-between mb-4 border-b border-gray-800/80 pb-3">
+            <span class="text-xs font-bold text-amber-400 tracking-wide uppercase">{{ match.round }} • {{ match.venue }}</span>
+            <div class="flex items-center gap-2">
+              <span class="bg-rose-600/20 text-rose-400 border border-rose-500/40 text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1.5 animate-pulse">
+                <span class="w-2 h-2 rounded-full bg-rose-500"></span> LIVE {{ match.minute }}'
+              </span>
+            </div>
+          </div>
+
+          <!-- Teams Scoreboard -->
+          <div class="grid grid-cols-7 items-center my-4">
+            
+            <!-- Home Team -->
+            <div class="col-span-3 flex flex-col items-center text-center">
+              <img [src]="match.homeTeam.logo" [alt]="match.homeTeam.name" class="w-14 h-14 md:w-16 md:h-16 object-contain mb-2 drop-shadow-md group-hover:scale-105 transition-transform" />
+              <span class="font-bold text-base text-white leading-snug">{{ match.homeTeam.name }}</span>
+              <span class="text-xs text-gray-400">Rank #{{ match.homeTeam.rank }}</span>
+            </div>
+
+            <!-- Score Badge -->
+            <div class="col-span-1 flex flex-col items-center justify-center">
+              <div class="text-3xl md:text-4xl font-black text-amber-400 tracking-widest bg-gray-950/80 px-4 py-2 rounded-xl border border-gray-800 shadow-inner">
+                {{ match.homeScore }} - {{ match.awayScore }}
+              </div>
+            </div>
+
+            <!-- Away Team -->
+            <div class="col-span-3 flex flex-col items-center text-center">
+              <img [src]="match.awayTeam.logo" [alt]="match.awayTeam.name" class="w-14 h-14 md:w-16 md:h-16 object-contain mb-2 drop-shadow-md group-hover:scale-105 transition-transform" />
+              <span class="font-bold text-base text-white leading-snug">{{ match.awayTeam.name }}</span>
+              <span class="text-xs text-gray-400">Rank #{{ match.awayTeam.rank }}</span>
+            </div>
+          </div>
+
+          <!-- Live Event Timeline Badges inside Match Card -->
+          <div *ngIf="match.events.length > 0" class="mt-4 pt-4 border-t border-gray-800/80 space-y-2">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-gray-400">Recent Live Events</div>
+            <div class="flex flex-wrap gap-2">
+              <div *ngFor="let ev of match.events.slice(0, 3)" 
+                   class="bg-gray-950/70 border border-gray-800 rounded-lg px-2.5 py-1 text-xs flex items-center gap-1.5">
+                <span>{{ getEventIcon(ev.type) }}</span>
+                <span class="text-amber-400 font-bold">{{ ev.minute }}'</span>
+                <span class="text-gray-200">{{ ev.player }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- View Details Footer -->
+          <div class="mt-4 text-center">
+            <span class="text-xs font-semibold text-amber-400 group-hover:underline inline-flex items-center gap-1">
+              Click to view detailed timeline & match stats ➔
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <ng-template #noLiveMatches>
+        <div class="bg-gray-900/40 border border-gray-800 rounded-2xl p-8 text-center">
+          <div class="text-4xl mb-2">⚽</div>
+          <h3 class="text-lg font-bold text-white">No Live Matches at this Moment</h3>
+          <p class="text-gray-400 text-sm mt-1">Check out the upcoming matches schedule below.</p>
+        </div>
+      </ng-template>
+    </section>
+
+    <!-- SECTION 3: SCHEDULE & UPCOMING MATCHES (#schedule) -->
+    <section id="schedule" class="scroll-mt-20 space-y-6">
+      
+      <!-- Upcoming Highlight with Countdown -->
+      <div *ngIf="nextUpcomingMatch()" class="bg-gradient-to-r from-amber-950/40 via-gray-900 to-slate-900 border border-amber-500/30 rounded-2xl p-6 shadow-xl">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div>
+            <span class="text-xs font-bold text-amber-400 uppercase tracking-widest bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+              ⏳ Next Featured Match
+            </span>
+            <h3 class="text-2xl font-black text-white mt-2">
+              {{ nextUpcomingMatch()?.homeTeam?.name }} vs {{ nextUpcomingMatch()?.awayTeam?.name }}
+            </h3>
+            <p class="text-sm text-gray-400 mt-1">
+              {{ nextUpcomingMatch()?.dateStr }} at {{ nextUpcomingMatch()?.timeStr }} • {{ nextUpcomingMatch()?.venue }}
+            </p>
+          </div>
+
+          <!-- Countdown Timer -->
+          <div class="flex items-center gap-3">
+            <div class="text-center bg-gray-950/90 border border-gray-800 px-3 py-2 rounded-xl min-w-[55px]">
+              <div class="text-xl font-black text-amber-400">{{ nextMatchCountdown().days }}</div>
+              <div class="text-[10px] text-gray-400 uppercase">Days</div>
+            </div>
+            <span class="text-amber-400 font-bold text-xl">:</span>
+            <div class="text-center bg-gray-950/90 border border-gray-800 px-3 py-2 rounded-xl min-w-[55px]">
+              <div class="text-xl font-black text-amber-400">{{ nextMatchCountdown().hours }}</div>
+              <div class="text-[10px] text-gray-400 uppercase">Hours</div>
+            </div>
+            <span class="text-amber-400 font-bold text-xl">:</span>
+            <div class="text-center bg-gray-950/90 border border-gray-800 px-3 py-2 rounded-xl min-w-[55px]">
+              <div class="text-xl font-black text-amber-400">{{ nextMatchCountdown().mins }}</div>
+              <div class="text-[10px] text-gray-400 uppercase">Mins</div>
+            </div>
+            <span class="text-amber-400 font-bold text-xl">:</span>
+            <div class="text-center bg-gray-950/90 border border-gray-800 px-3 py-2 rounded-xl min-w-[55px]">
+              <div class="text-xl font-black text-rose-400 animate-pulse">{{ nextMatchCountdown().secs }}</div>
+              <div class="text-[10px] text-gray-400 uppercase">Secs</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Schedule Filter Toolbar -->
+      <div class="bg-gray-900/60 border border-gray-800 rounded-2xl p-5 shadow-xl space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-black text-white flex items-center gap-2">
+              <span class="text-amber-400">📅</span> Complete Tournament Schedule
+            </h2>
+            <p class="text-sm text-gray-400">All matches with real-time dynamic filters</p>
+          </div>
+
+          <!-- Search Input -->
+          <div class="w-full md:w-64">
+            <input type="text" 
+                   [ngModel]="scheduleSearchQuery()"
+                   (ngModelChange)="scheduleSearchQuery.set($event)"
+                   placeholder="Search team or venue..." 
+                   class="w-full bg-gray-950 border border-gray-800 text-sm text-white px-4 py-2 rounded-xl focus:outline-none focus:border-amber-500" />
+          </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-gray-800/80">
+          <span class="text-xs font-bold text-gray-400 mr-2">Status:</span>
+          <button (click)="scheduleStatusFilter.set('ALL')" [class.bg-amber-500]="scheduleStatusFilter() === 'ALL'" [class.text-gray-950]="scheduleStatusFilter() === 'ALL'" class="text-xs font-bold px-3 py-1.5 rounded-lg border border-gray-800 hover:border-gray-600 transition-all">All</button>
+          <button (click)="scheduleStatusFilter.set('LIVE')" [class.bg-rose-600]="scheduleStatusFilter() === 'LIVE'" [class.text-white]="scheduleStatusFilter() === 'LIVE'" class="text-xs font-bold px-3 py-1.5 rounded-lg border border-gray-800 hover:border-gray-600 transition-all">Live 🔴</button>
+          <button (click)="scheduleStatusFilter.set('UPCOMING')" [class.bg-amber-500]="scheduleStatusFilter() === 'UPCOMING'" [class.text-gray-950]="scheduleStatusFilter() === 'UPCOMING'" class="text-xs font-bold px-3 py-1.5 rounded-lg border border-gray-800 hover:border-gray-600 transition-all">Upcoming</button>
+          <button (click)="scheduleStatusFilter.set('COMPLETED')" [class.bg-amber-500]="scheduleStatusFilter() === 'COMPLETED'" [class.text-gray-950]="scheduleStatusFilter() === 'COMPLETED'" class="text-xs font-bold px-3 py-1.5 rounded-lg border border-gray-800 hover:border-gray-600 transition-all">Completed</button>
+        </div>
+      </div>
+
+      <!-- Schedule Table -->
+      <div class="bg-gray-900/60 border border-gray-800 rounded-2xl overflow-hidden shadow-xl">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-gray-200">
+            <thead class="bg-gray-950 text-xs font-bold uppercase tracking-wider text-gray-400 border-b border-gray-800">
+              <tr>
+                <th class="py-4 px-6">Match #</th>
+                <th class="py-4 px-6">Round / Venue</th>
+                <th class="py-4 px-6">Date & Time</th>
+                <th class="py-4 px-6 text-center">Home Team</th>
+                <th class="py-4 px-6 text-center">Score / Status</th>
+                <th class="py-4 px-6 text-center">Away Team</th>
+                <th class="py-4 px-6 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800/80">
+              <tr *ngFor="let m of filteredSchedule()" class="hover:bg-gray-800/50 transition-colors">
+                <td class="py-4 px-6 font-bold text-amber-400">#{{ m.matchNumber }}</td>
+                <td class="py-4 px-6">
+                  <div class="font-bold text-white">{{ m.round }}</div>
+                  <div class="text-xs text-gray-400">{{ m.venue }}</div>
+                </td>
+                <td class="py-4 px-6">
+                  <div class="font-medium text-white">{{ m.dateStr }}</div>
+                  <div class="text-xs text-gray-400">{{ m.timeStr }}</div>
+                </td>
+                <td class="py-4 px-6 text-center">
+                  <div class="flex items-center justify-end gap-3">
+                    <span class="font-bold text-white">{{ m.homeTeam.name }}</span>
+                    <img [src]="m.homeTeam.logo" [alt]="m.homeTeam.name" class="w-7 h-7 object-contain" />
+                  </div>
+                </td>
+                <td class="py-4 px-6 text-center">
+                  <span *ngIf="m.status === 'LIVE'" class="bg-rose-600/20 text-rose-400 border border-rose-500/40 text-xs font-bold px-3 py-1 rounded-full animate-pulse">
+                    {{ m.homeScore }} - {{ m.awayScore }} ({{ m.minute }}')
+                  </span>
+                  <span *ngIf="m.status === 'COMPLETED'" class="bg-gray-800 text-amber-400 font-black text-sm px-3 py-1 rounded-lg border border-gray-700">
+                    {{ m.homeScore }} - {{ m.awayScore }}
+                  </span>
+                  <span *ngIf="m.status === 'UPCOMING'" class="bg-gray-800 text-gray-400 text-xs font-bold px-3 py-1 rounded-full border border-gray-700">
+                    VS
+                  </span>
+                </td>
+                <td class="py-4 px-6 text-center">
+                  <div class="flex items-center justify-start gap-3">
+                    <img [src]="m.awayTeam.logo" [alt]="m.awayTeam.name" class="w-7 h-7 object-contain" />
+                    <span class="font-bold text-white">{{ m.awayTeam.name }}</span>
+                  </div>
+                </td>
+                <td class="py-4 px-6 text-right">
+                  <button (click)="openMatchDetails(m)" class="text-xs font-bold bg-gray-800 hover:bg-amber-500 hover:text-gray-950 text-white px-3 py-1.5 rounded-lg border border-gray-700 transition-all">
+                    Details
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: TOURNAMENT STANDINGS (#standings) -->
+    <section id="standings" class="scroll-mt-20 space-y-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-black text-white flex items-center gap-2">
+            <span class="text-amber-400">🏆</span> League Standings Table
+          </h2>
+          <p class="text-sm text-gray-400">Automatically recalculated live based on completed & ongoing match scores</p>
+        </div>
+
+        <div class="flex items-center gap-4 text-xs font-semibold text-gray-400">
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-amber-500"></span> #1 Leader</span>
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-500"></span> Qualify (Top 4)</span>
+        </div>
+      </div>
+
+      <!-- Standings Table -->
+      <div class="bg-gray-900/60 border border-gray-800 rounded-2xl overflow-hidden shadow-xl">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-gray-200">
+            <thead class="bg-gray-950 text-xs font-bold uppercase tracking-wider text-gray-400 border-b border-gray-800">
+              <tr>
+                <th class="py-4 px-4 text-center">POS</th>
+                <th class="py-4 px-6">TEAM</th>
+                <th class="py-4 px-4 text-center">MP</th>
+                <th class="py-4 px-4 text-center">W</th>
+                <th class="py-4 px-4 text-center">D</th>
+                <th class="py-4 px-4 text-center">L</th>
+                <th class="py-4 px-4 text-center">GF</th>
+                <th class="py-4 px-4 text-center">GA</th>
+                <th class="py-4 px-4 text-center">GD</th>
+                <th class="py-4 px-4 text-center font-black text-amber-400">PTS</th>
+                <th class="py-4 px-6 text-center">FORM</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800/80">
+              <tr *ngFor="let t of standings()" 
+                  [class.bg-amber-500/10]="t.rank === 1"
+                  [class.border-l-4]="t.rank <= 4"
+                  [class.border-amber-500]="t.rank === 1"
+                  [class.border-emerald-500]="t.rank > 1 && t.rank <= 4"
+                  class="hover:bg-gray-800/50 transition-colors">
+                
+                <!-- Position -->
+                <td class="py-4 px-4 text-center font-black">
+                  <span *ngIf="t.rank === 1" class="text-amber-400 text-base">🥇 1</span>
+                  <span *ngIf="t.rank > 1" [class.text-emerald-400]="t.rank <= 4" [class.text-gray-400]="t.rank > 4">{{ t.rank }}</span>
+                </td>
+
+                <!-- Team Logo & Name -->
+                <td class="py-4 px-6">
+                  <div class="flex items-center gap-3">
+                    <img [src]="t.logo" [alt]="t.name" class="w-8 h-8 object-contain" />
+                    <div>
+                      <div class="font-bold text-white">{{ t.name }}</div>
+                      <div class="text-xs text-gray-400">{{ t.shortCode }}</div>
+                    </div>
+                  </div>
+                </td>
+
+                <td class="py-4 px-4 text-center font-semibold">{{ t.played }}</td>
+                <td class="py-4 px-4 text-center text-emerald-400 font-semibold">{{ t.won }}</td>
+                <td class="py-4 px-4 text-center text-gray-400 font-semibold">{{ t.drawn }}</td>
+                <td class="py-4 px-4 text-center text-rose-400 font-semibold">{{ t.lost }}</td>
+                <td class="py-4 px-4 text-center">{{ t.goalsFor }}</td>
+                <td class="py-4 px-4 text-center">{{ t.goalsAgainst }}</td>
+                <td class="py-4 px-4 text-center font-bold" [class.text-emerald-400]="t.goalDifference > 0" [class.text-rose-400]="t.goalDifference < 0">
+                  {{ t.goalDifference > 0 ? '+' + t.goalDifference : t.goalDifference }}
+                </td>
+                <td class="py-4 px-4 text-center text-lg font-black text-amber-400 bg-gray-950/40">{{ t.points }}</td>
+                
+                <!-- Form Pills -->
+                <td class="py-4 px-6 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <span *ngFor="let f of t.form" 
+                          [class.bg-emerald-500]="f === 'W'" 
+                          [class.bg-gray-600]="f === 'D'" 
+                          [class.bg-rose-500]="f === 'L'" 
+                          class="w-5 h-5 rounded text-[10px] font-black text-white flex items-center justify-center">
+                      {{ f }}
+                    </span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: PARTICIPATING TEAMS (#teams) -->
+    <section id="teams" class="scroll-mt-20 space-y-6">
+      <div>
+        <h2 class="text-2xl font-black text-white flex items-center gap-2">
+          <span class="text-amber-400">👥</span> Participating Teams
+        </h2>
+        <p class="text-sm text-gray-400">Overview of all teams registered in this tournament</p>
+      </div>
+
+      <!-- Teams Cards Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div *ngFor="let team of teams()" class="team-card bg-gray-900/60 border border-gray-800 hover:border-amber-500/40 rounded-2xl p-5 shadow-xl transition-all transform hover:-translate-y-1">
+          <div class="flex items-center gap-4 mb-4">
+            <img [src]="team.logo" [alt]="team.name" class="w-12 h-12 object-contain rounded-lg" />
+            <div>
+              <h3 class="font-bold text-white text-base leading-snug">{{ team.name }}</h3>
+              <span class="text-xs text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                Rank #{{ team.rank }}
+              </span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-4 gap-2 text-center bg-gray-950/80 p-3 rounded-xl text-xs border border-gray-800">
+            <div>
+              <span class="text-gray-400 block">MP</span>
+              <span class="font-bold text-white">{{ team.played }}</span>
+            </div>
+            <div>
+              <span class="text-gray-400 block">W</span>
+              <span class="font-bold text-emerald-400">{{ team.won }}</span>
+            </div>
+            <div>
+              <span class="text-gray-400 block">GF</span>
+              <span class="font-bold text-white">{{ team.goalsFor }}</span>
+            </div>
+            <div>
+              <span class="text-gray-400 block">PTS</span>
+              <span class="font-black text-amber-400">{{ team.points }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 6: LATEST UPDATES / REAL-TIME MATCH FEED (#updates) -->
+    <section id="updates" class="scroll-mt-20 space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-black text-white flex items-center gap-2">
+            <span class="text-amber-400">⚡</span> Real-Time Match Feed
+          </h2>
+          <p class="text-sm text-gray-400">Live reverse-chronological match action stream</p>
+        </div>
+        <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 rounded-lg flex items-center gap-1">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Auto-updating
+        </span>
+      </div>
+
+      <!-- Feed Container -->
+      <div class="bg-gray-900/60 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-4 max-h-[450px] overflow-y-auto">
+        <div *ngFor="let ev of liveFeed()" class="flex items-start gap-4 p-3 bg-gray-950/70 border border-gray-800 rounded-xl hover:border-gray-700 transition-all">
+          <div class="text-2xl p-2 bg-gray-900 rounded-xl border border-gray-800 shrink-0">
+            {{ getEventIcon(ev.type) }}
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-black text-amber-400 uppercase tracking-wider bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                Minute {{ ev.minute }}'
+              </span>
+              <span class="text-xs text-gray-500">{{ ev.timestamp }}</span>
+            </div>
+            <div class="text-sm font-bold text-white mt-1">{{ ev.player }}</div>
+            <p class="text-xs text-gray-400 mt-0.5">{{ ev.detail }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MATCH DETAILS MODAL -->
+  <div *ngIf="showMatchModal()" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl space-y-6 p-6 relative">
+      
+      <!-- Close Button -->
+      <button (click)="closeMatchModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 w-8 h-8 rounded-full flex items-center justify-center transition-all">
+        ✕
+      </button>
+
+      <!-- Modal Header Scoreboard -->
+      <div class="text-center space-y-4 pt-2">
+        <span class="text-xs font-bold text-amber-400 uppercase tracking-widest">{{ selectedMatch()?.round }} • {{ selectedMatch()?.venue }}</span>
+        
+        <div class="flex items-center justify-around my-4">
+          <div class="flex flex-col items-center">
+            <img [src]="selectedMatch()?.homeTeam?.logo" class="w-16 h-16 object-contain mb-2" />
+            <span class="font-bold text-lg text-white">{{ selectedMatch()?.homeTeam?.name }}</span>
+          </div>
+
+          <div class="text-4xl font-black text-amber-400 bg-gray-950 px-6 py-3 rounded-2xl border border-gray-800 shadow-inner">
+            {{ selectedMatch()?.homeScore }} - {{ selectedMatch()?.awayScore }}
+          </div>
+
+          <div class="flex flex-col items-center">
+            <img [src]="selectedMatch()?.awayTeam?.logo" class="w-16 h-16 object-contain mb-2" />
+            <span class="font-bold text-lg text-white">{{ selectedMatch()?.awayTeam?.name }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Tab Controls -->
+      <div class="flex border-b border-gray-800">
+        <button (click)="modalActiveTab.set('summary')" [class.border-amber-400]="modalActiveTab() === 'summary'" [class.text-amber-400]="modalActiveTab() === 'summary'" class="flex-1 py-3 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-gray-400 hover:text-white">Summary</button>
+        <button (click)="modalActiveTab.set('stats')" [class.border-amber-400]="modalActiveTab() === 'stats'" [class.text-amber-400]="modalActiveTab() === 'stats'" class="flex-1 py-3 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-gray-400 hover:text-white">Match Stats</button>
+        <button (click)="modalActiveTab.set('lineups')" [class.border-amber-400]="modalActiveTab() === 'lineups'" [class.text-amber-400]="modalActiveTab() === 'lineups'" class="flex-1 py-3 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-gray-400 hover:text-white">Lineups</button>
+      </div>
+
+      <!-- Tab Content: Summary Events -->
+      <div *ngIf="modalActiveTab() === 'summary'" class="space-y-3">
+        <h4 class="text-sm font-bold text-white">Match Events Timeline</h4>
+        <div class="space-y-2">
+          <div *ngFor="let ev of selectedMatch()?.events" class="flex items-center justify-between bg-gray-950 p-3 rounded-xl border border-gray-800">
+            <div class="flex items-center gap-3">
+              <span class="text-amber-400 font-bold text-sm">{{ ev.minute }}'</span>
+              <span>{{ getEventIcon(ev.type) }}</span>
+              <span class="text-white text-sm font-medium">{{ ev.player }}</span>
+            </div>
+            <span class="text-xs text-gray-400">{{ ev.detail }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Content: Match Stats Comparison -->
+      <div *ngIf="modalActiveTab() === 'stats'" class="space-y-4">
+        <div *ngIf="selectedMatch()?.stats" class="space-y-4">
+          <!-- Possession Bar -->
+          <div>
+            <div class="flex justify-between text-xs font-bold text-gray-300 mb-1">
+              <span>{{ selectedMatch()?.stats?.possessionHome }}%</span>
+              <span class="text-gray-400">Possession</span>
+              <span>{{ selectedMatch()?.stats?.possessionAway }}%</span>
+            </div>
+            <div class="w-full bg-gray-800 rounded-full h-2 flex overflow-hidden">
+              <div class="bg-amber-500 h-2" [style.width.%]="selectedMatch()?.stats?.possessionHome"></div>
+              <div class="bg-sky-500 h-2" [style.width.%]="selectedMatch()?.stats?.possessionAway"></div>
+            </div>
+          </div>
+
+          <!-- Shots -->
+          <div class="flex justify-between items-center py-2 border-b border-gray-800 text-sm">
+            <span class="font-bold text-amber-400">{{ selectedMatch()?.stats?.shotsHome }}</span>
+            <span class="text-gray-400 text-xs uppercase">Total Shots</span>
+            <span class="font-bold text-sky-400">{{ selectedMatch()?.stats?.shotsAway }}</span>
+          </div>
+
+          <!-- Corners -->
+          <div class="flex justify-between items-center py-2 border-b border-gray-800 text-sm">
+            <span class="font-bold text-amber-400">{{ selectedMatch()?.stats?.cornersHome }}</span>
+            <span class="text-gray-400 text-xs uppercase">Corners</span>
+            <span class="font-bold text-sky-400">{{ selectedMatch()?.stats?.cornersAway }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Content: Lineups -->
+      <div *ngIf="modalActiveTab() === 'lineups'" class="grid grid-cols-2 gap-4">
+        <div class="bg-gray-950 p-4 rounded-xl border border-gray-800">
+          <h5 class="font-bold text-amber-400 text-sm mb-2">{{ selectedMatch()?.homeTeam?.name }} XI</h5>
+          <ul class="space-y-1 text-xs text-gray-300">
+            <li *ngFor="let p of selectedMatch()?.lineups?.homeStarters">{{ p }}</li>
+          </ul>
+        </div>
+        <div class="bg-gray-950 p-4 rounded-xl border border-gray-800">
+          <h5 class="font-bold text-sky-400 text-sm mb-2">{{ selectedMatch()?.awayTeam?.name }} XI</h5>
+          <ul class="space-y-1 text-xs text-gray-300">
+            <li *ngFor="let p of selectedMatch()?.lineups?.awayStarters">{{ p }}</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TOURNAMENT SWITCHER MODAL (User Requested Feature) -->
+  <div *ngIf="showTournamentSwitcherModal()" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
+    <div class="bg-gray-900 border border-amber-500/30 rounded-2xl max-w-xl w-full max-h-[85vh] overflow-y-auto shadow-2xl p-6 relative space-y-5">
+      
+      <div class="flex items-center justify-between border-b border-gray-800 pb-4">
+        <div>
+          <h3 class="text-xl font-black text-white flex items-center gap-2">
+            <span>🏆</span> Select Tournament
+          </h3>
+          <p class="text-xs text-gray-400" *ngIf="auth.isAdmin">
+            👑 Admin Mode: Showing all tournaments in system
+          </p>
+          <p class="text-xs text-sky-400 font-semibold" *ngIf="auth.isOrganizer && !auth.isAdmin">
+            🛡️ Organizer Mode: Showing only assigned tournaments for {{ auth.user?.user_name || 'your account' }}
+          </p>
+          <p class="text-xs text-gray-400" *ngIf="!auth.isAdmin && !auth.isOrganizer">
+            Choose a tournament to view its single-page live dashboard
+          </p>
+        </div>
+        <button (click)="closeTournamentSwitcher()" class="text-gray-400 hover:text-white bg-gray-800 w-8 h-8 rounded-full flex items-center justify-center">
+          ✕
+        </button>
+      </div>
+
+      <!-- Search Filter in Modal -->
+      <div>
+        <input type="text" 
+               [ngModel]="tournamentSearchQuery()"
+               (ngModelChange)="tournamentSearchQuery.set($event)"
+               placeholder="Search tournaments by name or location..." 
+               class="w-full bg-gray-950 border border-gray-800 text-sm text-white px-4 py-2.5 rounded-xl focus:outline-none focus:border-amber-500" />
+      </div>
+
+      <!-- List of Tournaments -->
+      <div class="space-y-3">
+        <div *ngFor="let tour of filteredTournamentsModal()" 
+             (click)="selectTournamentFromModal(tour)"
+             [class.border-amber-500]="selectedTournament()?.id === tour.id"
+             [class.bg-amber-500/10]="selectedTournament()?.id === tour.id"
+             class="tournament-modal-item border border-gray-800 hover:border-amber-500/60 bg-gray-950 p-4 rounded-xl flex items-center justify-between cursor-pointer transition-all hover:bg-gray-800/60">
+          
+          <div class="flex items-center gap-4">
+            <img [src]="tour.logo" [alt]="tour.name" class="w-12 h-12 object-contain rounded-lg" />
+            <div>
+              <h4 class="font-bold text-white text-sm">{{ tour.name }}</h4>
+              <p class="text-xs text-gray-400 mt-0.5">📍 {{ tour.location }} • {{ tour.stage }}</p>
+            </div>
+          </div>
+
+          <div class="text-right">
+            <span *ngIf="tour.status === 'LIVE'" class="bg-rose-600/20 text-rose-400 border border-rose-500/40 text-[10px] font-bold px-2 py-0.5 rounded-full">
+              LIVE 🔴
+            </span>
+            <span *ngIf="tour.status === 'UPCOMING'" class="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold px-2 py-0.5 rounded-full">
+              UPCOMING
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

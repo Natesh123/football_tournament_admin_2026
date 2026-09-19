@@ -6,16 +6,20 @@ import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
 import { ProfilePopupComponent } from '../profile/profile-popup.component';
 import { TournamentService, TournamentDTO } from '../../tournament/tournament.service';
+import { MyPlanModalComponent } from '../my-plan-modal/my-plan-modal.component';
+import { AdminNotificationsComponent } from '../admin-notifications/admin-notifications.component';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
     selector: 'app-top-bar',
     standalone: true,
-    imports: [CommonModule, FormsModule, TranslateModule, RouterLink, RouterLinkActive, ProfilePopupComponent],
+    imports: [CommonModule, FormsModule, TranslateModule, RouterLink, RouterLinkActive, ProfilePopupComponent, MyPlanModalComponent, AdminNotificationsComponent],
     templateUrl: './top-bar.component.html'
 })
 export class TopBarComponent {
     private translate = inject(TranslateService);
     auth = inject(AuthService);
+    notificationService = inject(NotificationService);
     private tournamentService = inject(TournamentService);
     private router = inject(Router);
 
@@ -25,6 +29,8 @@ export class TopBarComponent {
     currentLang = signal('en');
     showProfile = signal(false);
     showProfilePopup = signal(false);
+    showMyPlanModal = signal(false);
+    showNotificationsPanel = signal(false);
 
     // --- Tournament search ---
     searchQuery = signal('');
@@ -52,6 +58,9 @@ export class TopBarComponent {
     constructor() {
         const savedLang = localStorage.getItem('lang') || 'en';
         this.translate.use(savedLang);
+        if (this.auth.isAuthenticated()) {
+            this.notificationService.fetchUnreadCount().subscribe();
+        }
     }
 
     setLang(event: Event) {
@@ -63,6 +72,10 @@ export class TopBarComponent {
 
     toggleProfile() {
         this.showProfile.update(v => !v);
+    }
+
+    toggleNotifications() {
+        this.showNotificationsPanel.update(v => !v);
     }
 
     logout() {
@@ -115,6 +128,9 @@ export class TopBarComponent {
         }
         if (!target.closest('.profile-dropdown')) {
             this.showProfile.set(false);
+        }
+        if (!target.closest('.admin-notif-dropdown')) {
+            this.showNotificationsPanel.set(false);
         }
     }
 }

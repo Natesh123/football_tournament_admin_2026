@@ -72,25 +72,22 @@
             <div class="space-y-5">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
                     <span class="text-xs font-bold text-zinc-500 uppercase tracking-wider">{{ 'MATCH_DETAILS.INFO.REFEREE' | translate }}</span>
-                    <span class="text-sm font-bold text-white">{{ match?.referees?.main || match?.matchReferees || ('MATCH_DETAILS.INFO.NOT_ASSIGNED' | translate) }}</span>
+                    <span class="text-sm font-bold text-white">{{ refereeName || ('MATCH_DETAILS.INFO.NOT_ASSIGNED' | translate) }}</span>
                 </div>
 
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
                     <span class="text-xs font-bold text-zinc-500 uppercase tracking-wider">{{ 'MATCH_DETAILS.INFO.ASSISTANT1' | translate }}</span>
-                    <span class="text-sm font-medium text-zinc-300">{{ match?.referees?.assistant1 || ('MATCH_DETAILS.INFO.NOT_ASSIGNED' | translate)
-                        }}</span>
+                    <span class="text-sm font-medium text-zinc-300">{{ assistant1Name || ('MATCH_DETAILS.INFO.NOT_ASSIGNED' | translate) }}</span>
                 </div>
 
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
                     <span class="text-xs font-bold text-zinc-500 uppercase tracking-wider">{{ 'MATCH_DETAILS.INFO.ASSISTANT2' | translate }}</span>
-                    <span class="text-sm font-medium text-zinc-300">{{ match?.referees?.assistant2 || ('MATCH_DETAILS.INFO.NOT_ASSIGNED' | translate)
-                        }}</span>
+                    <span class="text-sm font-medium text-zinc-300">{{ assistant2Name || ('MATCH_DETAILS.INFO.NOT_ASSIGNED' | translate) }}</span>
                 </div>
 
                 <div class="flex justify-between items-center pb-1">
                     <span class="text-xs font-bold text-zinc-500 uppercase tracking-wider">{{ 'MATCH_DETAILS.INFO.FOURTH_OFFICIAL' | translate }}</span>
-                    <span class="text-sm font-medium text-zinc-300">{{ match?.referees?.fourthOfficial || ('MATCH_DETAILS.INFO.NOT_ASSIGNED' | translate)
-                        }}</span>
+                    <span class="text-sm font-medium text-zinc-300">{{ fourthOfficialName || ('MATCH_DETAILS.INFO.NOT_ASSIGNED' | translate) }}</span>
                 </div>
             </div>
         </div>

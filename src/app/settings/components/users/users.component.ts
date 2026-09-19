@@ -13,25 +13,191 @@ import { LoaderComponent } from '../../../components/loader/loader.component';
   template: `
     <div class="space-y-6">
       <div class="flex items-center justify-between">
-        <h2 class="text-2xl font-bold text-white">User Management</h2>
+        <div>
+          <h2 class="text-2xl font-bold text-white">User Management & Filter Page</h2>
+          <p class="text-xs text-zinc-400 mt-1">Filter, search, and manage platform users by Role, Subscription Plan, and Account Status.</p>
+        </div>
         <button 
           (click)="showForm = !showForm; resetForm()"
-          class="px-4 py-2 bg-gold-400 text-black font-bold rounded-lg hover:bg-gold-500 transition-colors shadow-[0_0_15px_rgba(251,191,36,0.2)]"
+          class="px-4 py-2 bg-gold-400 text-black font-bold rounded-lg hover:bg-gold-500 transition-colors shadow-[0_0_15px_rgba(251,191,36,0.2)] flex items-center gap-2"
         >
+          <svg *ngIf="!showForm" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
           {{ showForm ? 'Cancel' : 'Add User' }}
         </button>
       </div>
 
-      <!-- Search & Filter -->
-      <div class="bg-black-card border border-black-border rounded-xl p-4 flex flex-col sm:flex-row gap-3">
-        <input type="text" [(ngModel)]="searchQuery" placeholder="Search by name, email or phone"
-          class="flex-1 bg-black-bg border border-black-border rounded-lg px-4 py-2 text-white placeholder-zinc-500 focus:border-gold-400 focus:outline-none" />
-        <select [(ngModel)]="statusFilter"
-          class="bg-black-bg border border-black-border rounded-lg px-4 py-2 text-white focus:border-gold-400 focus:outline-none">
-          <option value="">All statuses</option>
-          <option value="1">Active</option>
-          <option value="0">Inactive</option>
-        </select>
+      <!-- Overview Stats Bar -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="bg-black-card border border-black-border rounded-xl p-4 flex items-center justify-between">
+          <div>
+            <div class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Total Users</div>
+            <div class="text-2xl font-black text-white mt-1">{{ users().length }}</div>
+          </div>
+          <div class="p-2.5 bg-gold-400/10 rounded-lg text-gold-400 border border-gold-400/20">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          </div>
+        </div>
+        <div class="bg-black-card border border-black-border rounded-xl p-4 flex items-center justify-between">
+          <div>
+            <div class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Active Users</div>
+            <div class="text-2xl font-black text-green-400 mt-1">{{ getActiveCount() }}</div>
+          </div>
+          <div class="p-2.5 bg-green-500/10 rounded-lg text-green-400 border border-green-500/20">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+        </div>
+        <div class="bg-black-card border border-black-border rounded-xl p-4 flex items-center justify-between">
+          <div>
+            <div class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Organizers</div>
+            <div class="text-2xl font-black text-amber-400 mt-1">{{ getOrganizersCount() }}</div>
+          </div>
+          <div class="p-2.5 bg-amber-400/10 rounded-lg text-amber-400 border border-amber-400/20">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+          </div>
+        </div>
+        <div class="bg-black-card border border-black-border rounded-xl p-4 flex items-center justify-between">
+          <div>
+            <div class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Paid Subscribers</div>
+            <div class="text-2xl font-black text-emerald-400 mt-1">{{ getPaidCount() }}</div>
+          </div>
+          <div class="p-2.5 bg-emerald-500/10 rounded-lg text-emerald-400 border border-emerald-500/20">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Filter Presets Tabs -->
+      <div class="flex items-center gap-2 border-b border-black-border pb-3 overflow-x-auto">
+        <button 
+          (click)="setPreset('all')"
+          class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap"
+          [ngClass]="activePreset === 'all' && !hasCustomFilters() ? 'bg-gold-400 text-black shadow-md shadow-gold-400/20' : 'bg-black-card border border-black-border text-zinc-400 hover:text-white'"
+        >
+          All Users ({{ users().length }})
+        </button>
+        <button 
+          (click)="setPreset('organizers')"
+          class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap"
+          [ngClass]="activePreset === 'organizers' ? 'bg-gold-400 text-black shadow-md shadow-gold-400/20' : 'bg-black-card border border-black-border text-zinc-400 hover:text-white'"
+        >
+          Active Organizers ({{ getOrganizersCount() }})
+        </button>
+        <button 
+          (click)="setPreset('paid')"
+          class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap"
+          [ngClass]="activePreset === 'paid' ? 'bg-gold-400 text-black shadow-md shadow-gold-400/20' : 'bg-black-card border border-black-border text-zinc-400 hover:text-white'"
+        >
+          Paid Subscribers ({{ getPaidCount() }})
+        </button>
+        <button 
+          (click)="setPreset('inactive')"
+          class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap"
+          [ngClass]="activePreset === 'inactive' ? 'bg-gold-400 text-black shadow-md shadow-gold-400/20' : 'bg-black-card border border-black-border text-zinc-400 hover:text-white'"
+        >
+          Inactive Users ({{ users().length - getActiveCount() }})
+        </button>
+      </div>
+
+      <!-- Advanced Filter Controls Panel -->
+      <div class="bg-black-card border border-black-border rounded-xl p-4 space-y-3 shadow-xl">
+        <div class="text-xs font-extrabold text-gold-400 uppercase tracking-widest flex items-center justify-between">
+          <span class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.707 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+            Filter Options
+          </span>
+          <button 
+            *ngIf="hasActiveFilters()" 
+            (click)="clearFilters()"
+            class="text-xs text-red-400 hover:text-red-300 font-bold transition-colors flex items-center gap-1 normal-case"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            Clear All Filters
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <!-- Search input -->
+          <div class="relative">
+            <input 
+              type="text" 
+              [(ngModel)]="searchQuery" 
+              placeholder="Search name, email, phone..."
+              class="w-full bg-black-bg border border-black-border rounded-lg pl-9 pr-4 py-2 text-xs text-white placeholder-zinc-500 focus:border-gold-400 focus:outline-none transition-all" 
+            />
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-3 top-2.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+
+          <!-- Role Filter -->
+          <div>
+            <select 
+              [(ngModel)]="roleFilter"
+              class="w-full bg-black-bg border border-black-border rounded-lg px-3 py-2 text-xs text-white focus:border-gold-400 focus:outline-none"
+            >
+              <option value="">All Roles</option>
+              <option *ngFor="let role of roles()" [value]="role.id">{{ role.name }}</option>
+            </select>
+          </div>
+
+          <!-- Plan Filter -->
+          <div>
+            <select 
+              [(ngModel)]="planFilter"
+              class="w-full bg-black-bg border border-black-border rounded-lg px-3 py-2 text-xs text-white focus:border-gold-400 focus:outline-none"
+            >
+              <option value="">All Subscription Plans</option>
+              <option *ngFor="let p of availablePlans" [value]="p">{{ p }} Plan</option>
+            </select>
+          </div>
+
+          <!-- Status Filter -->
+          <div>
+            <select 
+              [(ngModel)]="statusFilter"
+              class="w-full bg-black-bg border border-black-border rounded-lg px-3 py-2 text-xs text-white focus:border-gold-400 focus:outline-none"
+            >
+              <option value="">All Account Statuses</option>
+              <option value="1">Active Only</option>
+              <option value="0">Inactive Only</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Active Filter Tags -->
+        <div *ngIf="hasActiveFilters()" class="flex flex-wrap items-center gap-2 pt-1 border-t border-black-border/50">
+          <span class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Active Filters:</span>
+          <span *ngIf="searchQuery" class="px-2 py-0.5 bg-gold-400/10 text-gold-400 rounded text-[10px] font-bold border border-gold-400/30 flex items-center gap-1">
+            Search: "{{ searchQuery }}"
+            <button (click)="searchQuery = ''" class="hover:text-white">&times;</button>
+          </span>
+          <span *ngIf="roleFilter" class="px-2 py-0.5 bg-gold-400/10 text-gold-400 rounded text-[10px] font-bold border border-gold-400/30 flex items-center gap-1">
+            Role: {{ getRoleNameById(roleFilter) }}
+            <button (click)="roleFilter = ''" class="hover:text-white">&times;</button>
+          </span>
+          <span *ngIf="planFilter" class="px-2 py-0.5 bg-amber-500/10 text-amber-400 rounded text-[10px] font-bold border border-amber-500/30 flex items-center gap-1">
+            Plan: {{ planFilter }}
+            <button (click)="planFilter = ''" class="hover:text-white">&times;</button>
+          </span>
+          <span *ngIf="statusFilter" class="px-2 py-0.5 bg-green-500/10 text-green-400 rounded text-[10px] font-bold border border-green-500/30 flex items-center gap-1">
+            Status: {{ statusFilter === '1' ? 'Active' : 'Inactive' }}
+            <button (click)="statusFilter = ''" class="hover:text-white">&times;</button>
+          </span>
+        </div>
       </div>
 
       <!-- User Form (Add/Edit) -->
@@ -53,7 +219,6 @@ import { LoaderComponent } from '../../../components/loader/loader.component';
           <div class="space-y-1">
             <label class="text-xs text-zinc-500 uppercase font-bold px-1 text-gold-400">Role</label>
             <div class="relative group role-dropdown-container">
-              <!-- Custom Role Dropdown -->
               <div 
                 (click)="toggleRoleDropdown($event)"
                 class="w-full bg-black-bg border-2 border-gold-400/30 rounded-lg px-4 py-2 text-white focus:border-gold-400 focus:outline-none cursor-pointer transition-all hover:bg-white/5 font-semibold text-sm shadow-[0_0_15px_rgba(251,191,36,0.1)] flex items-center justify-between"
@@ -67,7 +232,6 @@ import { LoaderComponent } from '../../../components/loader/loader.component';
                 </div>
               </div>
 
-              <!-- Custom Role Menu -->
               <div 
                 *ngIf="showRoleDropdown()"
                 class="absolute left-0 right-0 mt-1 bg-black-card border border-gold-400/50 rounded-lg shadow-2xl z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
@@ -92,7 +256,6 @@ import { LoaderComponent } from '../../../components/loader/loader.component';
           <div class="space-y-1">
             <label class="text-xs text-zinc-500 uppercase font-bold px-1">Status</label>
             <div class="relative group status-dropdown-container">
-              <!-- Custom Status Dropdown -->
                <div 
                 (click)="toggleStatusDropdown($event)"
                 class="w-full bg-black-bg border border-black-border rounded-lg px-4 py-2 text-white focus:border-gold-400 focus:outline-none cursor-pointer hover:bg-white/5 transition-all flex items-center justify-between"
@@ -108,7 +271,6 @@ import { LoaderComponent } from '../../../components/loader/loader.component';
                 </div>
               </div>
 
-              <!-- Custom Status Menu -->
               <div 
                 *ngIf="showStatusDropdown()"
                 class="absolute left-0 right-0 mt-1 bg-black-card border border-black-border rounded-lg shadow-2xl z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
@@ -138,11 +300,13 @@ import { LoaderComponent } from '../../../components/loader/loader.component';
         </form>
       </div>
 
-      <!-- Users List -->
+      <!-- Users Table List -->
       <div class="bg-black-card border border-black-border rounded-xl overflow-hidden shadow-2xl">
         <div class="p-4 border-b border-black-border bg-white/5 flex items-center justify-between">
-          <span class="font-bold text-lg text-white">System Users</span>
-          <span class="text-xs text-zinc-500 uppercase font-bold tracking-widest">{{ filteredUsers().length }} of {{ users().length }} users</span>
+          <span class="font-bold text-lg text-white">System Users List</span>
+          <span class="text-xs text-zinc-400 font-bold uppercase tracking-wider">
+            Showing <span class="text-gold-400 font-black">{{ filteredUsers().length }}</span> of {{ users().length }} users
+          </span>
         </div>
         <div class="overflow-x-auto min-h-[300px] relative">
           @if (isFetchingData()) {
@@ -252,7 +416,7 @@ import { LoaderComponent } from '../../../components/loader/loader.component';
                 </td>
               </tr>
               <tr *ngIf="filteredUsers().length === 0">
-                <td colspan="6" class="px-6 py-12 text-center text-zinc-500 italic">No users found.</td>
+                <td colspan="6" class="px-6 py-12 text-center text-zinc-500 italic">No matching users found. Try clearing filter options.</td>
               </tr>
             </tbody>
           </table>
@@ -275,11 +439,14 @@ export class UsersComponent implements OnInit {
   editingUserId: number | null = null;
   isLoading = false;
   userForm: FormGroup;
-  availablePlans = ['Free', 'Basic', 'Premium'];
+  availablePlans = ['Starter', 'Club', 'League', 'Federation', 'Enterprise', 'Free', 'Basic', 'Premium'];
 
-  // Client-side search + status filter over the loaded users.
+  // Multi-Criterion Filter State
   searchQuery = '';
+  roleFilter = '';
+  planFilter = '';
   statusFilter = '';
+  activePreset = 'all';
 
   // Custom Dropdown State
   showRoleDropdown = signal(false);
@@ -315,7 +482,7 @@ export class UsersComponent implements OnInit {
       phone_number: ['', [Validators.required]],
       roleId: [null, [Validators.required]],
       state: [1, [Validators.required]],
-      plan: ['Free', [Validators.required]]
+      plan: ['Starter', [Validators.required]]
     });
   }
 
@@ -340,17 +507,94 @@ export class UsersComponent implements OnInit {
     });
   }
 
+  getActiveCount() {
+    return this.users().filter(u => u.state === 1).length;
+  }
+
+  getOrganizersCount() {
+    return this.users().filter(u => {
+      const r = (u.userRole?.name || '').toLowerCase();
+      return r === 'organizer';
+    }).length;
+  }
+
+  getPaidCount() {
+    return this.users().filter(u => {
+      const p = (u.plan || '').toLowerCase();
+      return p && p !== 'free';
+    }).length;
+  }
+
+  setPreset(preset: string) {
+    this.activePreset = preset;
+    this.searchQuery = '';
+    this.roleFilter = '';
+    this.planFilter = '';
+    this.statusFilter = '';
+
+    if (preset === 'organizers') {
+      const orgRole = this.roles().find(r => r.name.toLowerCase() === 'organizer');
+      if (orgRole) this.roleFilter = String(orgRole.id);
+      this.statusFilter = '1';
+    } else if (preset === 'paid') {
+      this.statusFilter = '1';
+    } else if (preset === 'inactive') {
+      this.statusFilter = '0';
+    }
+  }
+
+  hasActiveFilters(): boolean {
+    return !!(this.searchQuery || this.roleFilter || this.planFilter || this.statusFilter);
+  }
+
+  hasCustomFilters(): boolean {
+    return this.hasActiveFilters();
+  }
+
+  clearFilters() {
+    this.searchQuery = '';
+    this.roleFilter = '';
+    this.planFilter = '';
+    this.statusFilter = '';
+    this.activePreset = 'all';
+  }
+
+  getRoleNameById(roleId: string): string {
+    const r = this.roles().find(role => String(role.id) === String(roleId));
+    return r ? r.name : roleId;
+  }
+
   filteredUsers() {
     const q = this.searchQuery.trim().toLowerCase();
+    const role = this.roleFilter;
+    const plan = this.planFilter.toLowerCase();
     const status = this.statusFilter;
+
     return this.users().filter(u => {
+      // Keyword search
       const matchesQ = !q
         || (u.user_name || '').toLowerCase().includes(q)
         || (u.email || '').toLowerCase().includes(q)
         || (u.phone_number || '').toLowerCase().includes(q)
         || (u.plan || '').toLowerCase().includes(q);
+
+      // Role filter
+      const matchesRole = !role || String(u.roleId) === String(role);
+
+      // Plan filter
+      const userPlan = (u.plan || 'Free').toLowerCase();
+      const matchesPlan = !plan || userPlan === plan;
+
+      // Status filter
       const matchesStatus = status === '' || String(u.state) === status;
-      return matchesQ && matchesStatus;
+
+      // Preset filter check
+      let matchesPreset = true;
+      if (this.activePreset === 'paid') {
+        matchesPreset = userPlan !== 'free' && userPlan !== '';
+      }
+
+      return matchesQ && matchesRole && matchesPlan && matchesStatus && matchesPreset;
     });
   }
 
@@ -370,7 +614,7 @@ export class UsersComponent implements OnInit {
       phone_number: user.phone_number,
       roleId: user.roleId,
       state: activate ? 1 : 0,
-      plan: user.plan || 'Free'
+      plan: user.plan || 'Starter'
     }).subscribe({
       next: () => {
         this.ui.showToast(activate ? 'User activated' : 'User deactivated', 'success');
@@ -384,7 +628,7 @@ export class UsersComponent implements OnInit {
     this.editingUserId = null;
     this.userForm.reset({
       state: 1,
-      plan: 'Free'
+      plan: 'Starter'
     });
   }
 
@@ -397,7 +641,7 @@ export class UsersComponent implements OnInit {
       phone_number: user.phone_number,
       roleId: user.roleId,
       state: user.state,
-      plan: user.plan || 'Free'
+      plan: user.plan || 'Starter'
     });
   }
 
@@ -429,7 +673,7 @@ export class UsersComponent implements OnInit {
     if (event) event.stopPropagation();
     this.activePlanDropdownUserId.set(null);
 
-    if ((user.plan || 'Free') === newPlan) return;
+    if ((user.plan || 'Starter') === newPlan) return;
 
     this.settingsService.saveUser({
       id: user.id,

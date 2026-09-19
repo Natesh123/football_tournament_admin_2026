@@ -169,7 +169,9 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
      */
     onNewTeamCreated(teamId: string) {
         this.closeCreateTeamModal();
-        this.promptCreateMembers(teamId);
+        this.fetchTeams();
+        this.selectedExistingTeamIds.set([teamId]);
+        this.saveTeam();
     }
 
     toggleExistingTeamSelection(teamId: string) {
@@ -219,9 +221,24 @@ export class TournamentTeamsComponent implements OnInit, OnChanges {
                     }
                     this.closeModal();
                 },
-                error: (err) => {
+                error: async (err) => {
                     this.ui.endAction();
-                    this.notify(err?.error?.message || 'TOURNAMENT_DASHBOARD.TOAST.ADD_TEAMS_ERROR', 'error');
+                    const errMsg = err?.error?.message || '';
+                    if (errMsg.includes('needs at least') || errMsg.includes('members before it can join')) {
+                        const targetTeamId = teamIds.length === 1 ? teamIds[0] : null;
+                        const confirmed = await this.ui.showErrorConfirm('Oops...', errMsg, 'OK', 'Cancel');
+                        if (confirmed && targetTeamId) {
+                            this.router.navigate(['/admin/teams', targetTeamId, 'members'], {
+                                queryParams: {
+                                    tournamentId: this.tournamentId,
+                                    tournamentName: this.tournamentName,
+                                    required: this.minMembers
+                                }
+                            });
+                        }
+                    } else {
+                        this.notify(errMsg || 'TOURNAMENT_DASHBOARD.TOAST.ADD_TEAMS_ERROR', 'error');
+                    }
                 }
             });
     }

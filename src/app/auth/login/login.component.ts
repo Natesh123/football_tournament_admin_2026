@@ -22,6 +22,10 @@ export class LoginComponent implements OnInit {
     successMessage: string = '';
     isLoading: boolean = false;
     showPassword = signal(false);
+    showAdminModal = signal(false);
+    adminDetails = signal<any>(null);
+    userPlan = signal<string>('');
+    copiedField = signal<string | null>(null);
 
     constructor(
         private fb: FormBuilder,
@@ -54,8 +58,6 @@ export class LoginComponent implements OnInit {
                 },
                 error: () => {
                     // If validation fails, stay on login or redirect to register as per requirement?
-                    // "If the token validation returns false, a message should be displayed asking 
-                    // the user to create an account, and the user should be redirected to the registration page."
                     this.errorMessage = 'Session expired or account not found. Please register.';
                     setTimeout(() => this.router.navigate(['/register']), 2000);
                 }
@@ -102,7 +104,19 @@ export class LoginComponent implements OnInit {
                 error: (err) => {
                     this.isLoading = false;
 
-                    if (err.error?.error === "User not found") {
+                    if (err.error?.inactive || err.error?.adminDetails) {
+                        this.adminDetails.set(err.error.adminDetails || {
+                            name: 'ATB Sports Admin',
+                            email: 'admin@atbsports.com',
+                            phone: '+91 98765 43210',
+                            bankName: 'State Bank of India',
+                            accountNumber: '98765432101234',
+                            ifscCode: 'SBIN0001234',
+                            accountHolder: 'ATB Sports Tournament Admin'
+                        });
+                        this.userPlan.set(err.error.userPlan || 'Paid Plan');
+                        this.showAdminModal.set(true);
+                    } else if (err.error?.error === "User not found") {
                         this.errorMessage = 'Account not found. Please create an account.';
                         this.ui.showToast(this.errorMessage, 'error');
                         setTimeout(() => this.router.navigate(['/register']), 2000);
@@ -112,5 +126,17 @@ export class LoginComponent implements OnInit {
                     }
                 }
             });
+    }
+
+    closeModal() {
+        this.showAdminModal.set(false);
+    }
+
+    copyText(text: string, fieldName: string) {
+        if (!text) return;
+        navigator.clipboard.writeText(text).then(() => {
+            this.copiedField.set(fieldName);
+            setTimeout(() => this.copiedField.set(null), 2000);
+        });
     }
 }

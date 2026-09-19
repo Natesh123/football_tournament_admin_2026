@@ -30,12 +30,16 @@ export class TournamentParticipantsComponent implements OnInit, OnChanges {
 
     /** Latest allowed registration-close date: the day before the tournament start. */
     get regCloseMax(): string {
-        const m = this.startDate?.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (!this.startDate) return '';
+        const m = this.startDate.match(/^(\d{4})-(\d{2})-(\d{2})/);
         if (!m) return '';
         const d = new Date(+m[1], +m[2] - 1, +m[3]);
         d.setDate(d.getDate() - 1);
         const y = d.getFullYear(), mo = String(d.getMonth() + 1).padStart(2, '0'), da = String(d.getDate()).padStart(2, '0');
-        return `${y}-${mo}-${da}`;
+        const maxStr = `${y}-${mo}-${da}`;
+        const minStr = this.form?.controls['regOpenDate']?.value || this.todayDate;
+        if (minStr && maxStr < minStr) return '';
+        return maxStr;
     }
 
     private buildForm() {

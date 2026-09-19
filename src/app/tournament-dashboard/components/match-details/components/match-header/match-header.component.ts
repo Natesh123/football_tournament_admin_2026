@@ -38,6 +38,22 @@ export class MatchHeaderComponent implements OnInit, OnDestroy, OnChanges {
         return path.startsWith('/uploads') ? `${API_URL}${path}` : path;
     }
 
+    get refereeName(): string {
+        const m = this.match;
+        if (!m) return '';
+        if (typeof m.referees === 'string' && m.referees.trim()) return m.referees.trim();
+        if (m.referees && typeof m.referees === 'object') {
+            if (m.referees.main && String(m.referees.main).trim()) return String(m.referees.main).trim();
+            if (m.referees.name && String(m.referees.name).trim()) return String(m.referees.name).trim();
+        }
+        if (m.matchReferees && String(m.matchReferees).trim()) return String(m.matchReferees).trim();
+        const pool = m.tournament?.referees;
+        if (Array.isArray(pool) && pool.length > 0 && pool[0]?.name?.trim()) {
+            return pool[0].name.trim();
+        }
+        return '';
+    }
+
     // Signals so the ticking clock re-renders under zoneless change detection.
     countdown = signal('');
     liveMinute = signal(0);

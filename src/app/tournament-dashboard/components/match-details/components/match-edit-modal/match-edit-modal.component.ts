@@ -38,11 +38,22 @@ export class MatchEditModalComponent implements OnInit {
                 dateStr = new Date(shift).toISOString().slice(0, 16);
             }
 
+            let initialRef = this.match.matchReferees || '';
+            if (!initialRef) {
+                if (typeof this.match.referees === 'string') {
+                    initialRef = this.match.referees;
+                } else if (this.match.referees?.main) {
+                    initialRef = this.match.referees.main;
+                } else if (Array.isArray(this.match.tournament?.referees) && this.match.tournament.referees.length > 0) {
+                    initialRef = this.match.tournament.referees[0]?.name || '';
+                }
+            }
+
             this.formData = {
                 startTime: dateStr || '',
                 venue: this.match.venue || '',
                 status: this.match.status || 'scheduled',
-                matchReferees: this.match.matchReferees || ''
+                matchReferees: initialRef
             };
         }
     }
@@ -60,9 +71,14 @@ export class MatchEditModalComponent implements OnInit {
         this.isSubmitting = true;
         // Convert local time back to UTC string format before saving
         const localDate = new Date(this.formData.startTime);
+        const existingReferees = (typeof this.match?.referees === 'object' && this.match?.referees !== null) ? this.match.referees : {};
         const dataToSave = {
             ...this.formData,
-            startTime: localDate.toISOString()
+            startTime: localDate.toISOString(),
+            referees: {
+                ...existingReferees,
+                main: this.formData.matchReferees
+            }
         };
 
         this.save.emit(dataToSave);

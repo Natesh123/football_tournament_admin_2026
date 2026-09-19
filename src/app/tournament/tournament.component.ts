@@ -99,13 +99,13 @@ export class TournamentComponent implements OnInit {
         });
     }
 
-    manageTournament(id: string | undefined) {
+    manageTournament(id?: string | number | null) {
         if (id) {
             this.router.navigate(['/admin/tournaments', id]);
         }
     }
 
-    viewMatchCenter(id: string | undefined) {
+    viewMatchCenter(id?: string | number | null) {
         if (id) {
             this.router.navigate(['/admin/tournaments', id, 'match-center']);
         }
@@ -309,5 +309,11 @@ export class TournamentComponent implements OnInit {
     onTournamentCreated(created: any) {
         this.ui.showToast('Tournament created successfully!', 'success');
         this.loadTournaments();
+    }
+
+    viewTournamentDetails(id?: string | number | null) {
+        if (id) {
+            this.router.navigate(['/admin/tournaments', id, 'details']);
+        }
     }
 }

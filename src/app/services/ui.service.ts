@@ -69,6 +69,31 @@ export class UiService {
     }
   }
 
+  showErrorConfirm(
+    title: string = 'Oops...',
+    text: string,
+    confirmText: string = 'OK',
+    cancelText: string = 'Cancel'
+  ): Promise<boolean> {
+    return Swal.fire({
+      icon: 'error',
+      title: title,
+      text: text,
+      showCancelButton: true,
+      confirmButtonColor: '#FBBF24',
+      cancelButtonColor: '#27272a',
+      confirmButtonText: confirmText,
+      cancelButtonText: cancelText,
+      background: '#1a1a1a',
+      color: '#ffffff',
+      customClass: {
+        popup: 'border border-gold-400/20 shadow-[0_0_20px_rgba(251,191,36,0.1)] rounded-xl',
+        confirmButton: 'text-black font-bold uppercase tracking-widest text-sm px-6 py-2.5 rounded-lg',
+        cancelButton: 'font-bold uppercase tracking-widest text-sm px-6 py-2.5 rounded-lg text-zinc-300 hover:bg-zinc-700'
+      }
+    }).then((result) => result.isConfirmed);
+  }
+
   /**
    * Prompt for a positive whole number (e.g. extra-time minutes). Resolves to the
    * entered number, or null if the user cancelled or entered nothing valid.
